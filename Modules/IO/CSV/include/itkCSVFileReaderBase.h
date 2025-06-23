@@ -73,7 +73,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CSVFileReaderBase);
 
   /** Set the name of the file to be read */
@@ -117,10 +117,11 @@ public:
   /** Boolean macros for setting HasRowHeaders, HasColumnHeaders and
    *  UseStringDelimiterCharacter. They can conveniently be set by appending
    *  On() or Off() to each of the variable names. */
+  /** @ITKStartGrouping */
   itkBooleanMacro(HasRowHeaders);
   itkBooleanMacro(HasColumnHeaders);
   itkBooleanMacro(UseStringDelimiterCharacter);
-
+  /** @ITKEndGrouping */
   /** Counts the number of rows and columns in a file and prepares the file
    * for iterative reading using the GetNextField() method. */
   void
@@ -140,7 +141,7 @@ public:
    */
   template <typename TData>
   TData
-  ConvertStringToValueType(const std::string str)
+  ConvertStringToValueType(const std::string & str)
   {
     TData              value;
     std::istringstream isstream(str);
@@ -149,10 +150,8 @@ public:
     {
       return std::numeric_limits<TData>::quiet_NaN();
     }
-    else
-    {
-      return value;
-    }
+
+    return value;
   }
 
   /** This method must be defined in derived classes to parse the entire

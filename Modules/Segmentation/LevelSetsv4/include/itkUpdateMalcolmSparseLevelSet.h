@@ -52,7 +52,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(UpdateMalcolmSparseLevelSet);
 
   static constexpr unsigned int ImageDimension = VDimension;
@@ -91,20 +91,23 @@ public:
   Update();
 
   /** Set/Get the sparse level set image */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(InputLevelSet, LevelSetType);
   itkGetModifiableObjectMacro(InputLevelSet, LevelSetType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the RMS change for the update */
   itkGetMacro(RMSChangeAccumulator, LevelSetOutputRealType);
 
   /** Set/Get the Equation container for computing the update */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(EquationContainer, EquationContainerType);
   itkGetModifiableObjectMacro(EquationContainer, EquationContainerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the current level set id */
+  /** @ITKStartGrouping */
   itkSetMacro(CurrentLevelSetId, IdentifierType);
   itkGetMacro(CurrentLevelSetId, IdentifierType);
-
+  /** @ITKEndGrouping */
 protected:
   UpdateMalcolmSparseLevelSet();
   ~UpdateMalcolmSparseLevelSet() override = default;

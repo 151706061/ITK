@@ -53,11 +53,6 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
 
   //
   // swizzle up a random vector image.
-  typename VectorImageType::RegionType  imageRegion;
-  typename VectorImageType::SizeType    size;
-  typename VectorImageType::IndexType   index;
-  typename VectorImageType::SpacingType spacing;
-  typename VectorImageType::PointType   origin;
   // original test case was destined for failure.  NIfTI always writes out 3D
   // orientation.  The only sensible matrices you could pass in would be of the form
   // A B C 0
@@ -70,28 +65,20 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
   //      direction matrix.
   const typename VectorImageType::DirectionType myDirection = PreFillDirection<TDimension>();
 
-  std::cout << " === Testing VectorLength: " << TVecLength << " Image Dimension " << static_cast<int>(TDimension)
-            << std::endl;
+  std::cout << " === Testing VectorLength: " << TVecLength << " Image Dimension " << int{ TDimension } << std::endl;
   std::cout << "======================== Initialized Direction" << std::endl;
   std::cout << myDirection << std::endl;
 
-  for (unsigned int i = 0; i < TDimension; ++i)
-  {
-    size[i] = dimsize;
-    index[i] = 0;
-    spacing[i] = 1.0;
-    origin[i] = 0;
-  }
+  typename VectorImageType::IndexType        index{};
+  auto                                       size = itk::MakeFilled<typename VectorImageType::SizeType>(dimsize);
+  const typename VectorImageType::RegionType imageRegion{ index, size };
+  auto                                       spacing = itk::MakeFilled<typename VectorImageType::SpacingType>(1.0);
 
-  imageRegion.SetSize(size);
-  imageRegion.SetIndex(index);
-  typename VectorImageType::Pointer vi =
+  const typename VectorImageType::Pointer vi =
     itk::IOTestHelper::AllocateImageFromRegionAndSpacing<VectorImageType>(imageRegion, spacing);
-  vi->SetOrigin(origin);
   vi->SetDirection(myDirection);
 
   size_t dims[7];
-  size_t _index[7];
   for (unsigned int i = 0; i < TDimension; ++i)
   {
     dims[i] = size[i];
@@ -103,6 +90,7 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
 
   ScalarType value = std::numeric_limits<ScalarType>::max();
   //  for(fillIt.GoToBegin(); !fillIt.IsAtEnd(); ++fillIt)
+  size_t _index[7];
   for (size_t l = 0; l < dims[6]; ++l)
   {
     _index[6] = l;
@@ -148,14 +136,15 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
     itk::MetaDataDictionary & dictionary = vi->GetMetaDataDictionary();
     itk::EncapsulateMetaData<std::string>(dictionary, "intent_code", intentCode);
   }
+  const std::string description("text description of file content");
+  itk::EncapsulateMetaData<std::string>(vi->GetMetaDataDictionary(), "ITK_FileNotes", description);
   try
   {
     itk::IOTestHelper::WriteImage<VectorImageType, itk::NiftiImageIO>(vi, fname);
   }
   catch (const itk::ExceptionObject & ex)
   {
-    std::string message;
-    message = "Problem found while writing image ";
+    std::string message = "Problem found while writing image ";
     message += fname;
     message += "\n";
     message += ex.GetLocation();
@@ -174,8 +163,7 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
   }
   catch (const itk::ExceptionObject & ex)
   {
-    std::string message;
-    message = "Problem found while reading image ";
+    std::string message = "Problem found while reading image ";
     message += fname;
     message += "\n";
     message += ex.GetLocation();
@@ -201,6 +189,20 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
     else
     {
       std::cout << "The read image should have an intent_code in its dictionary" << std::endl;
+      same = false;
+    }
+    std::string readDescription;
+    if (itk::ExposeMetaData<std::string>(dictionary, "ITK_FileNotes", readDescription))
+    {
+      if (readDescription != description)
+      {
+        std::cout << "ITK_FileNotes is different: " << readDescription << " != " << description << std::endl;
+        same = false;
+      }
+    }
+    else
+    {
+      std::cout << "The read image should have a ITK_FileNotes (nifti descrip field) in its dictionary" << std::endl;
       same = false;
     }
   }
@@ -249,13 +251,12 @@ TestImageOfVectors(const std::string & fname, const std::string & intentCode = "
               for (size_t k = 0; k < dims[0]; ++k)
               {
                 _index[0] = k;
-                FieldPixelType p1, p2;
                 for (size_t q = 0; q < TDimension; ++q)
                 {
                   index[q] = _index[q];
                 }
-                p1 = vi->GetPixel(index);
-                p2 = readback->GetPixel(index);
+                const FieldPixelType p1 = vi->GetPixel(index);
+                const FieldPixelType p2 = readback->GetPixel(index);
                 if (p1 != p2)
                 {
                   same = false;

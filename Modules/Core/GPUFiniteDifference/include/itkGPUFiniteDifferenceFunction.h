@@ -56,7 +56,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUFiniteDifferenceFunction);
 
   /** Extract some parameters from the image type */
@@ -89,7 +89,7 @@ public:
   PixelType
   ComputeUpdate(const NeighborhoodType & itkNotUsed(neighborhood),
                 void *                   itkNotUsed(globalData),
-                const FloatOffsetType &  itkNotUsed(offset = FloatOffsetType(0.0))) override
+                const FloatOffsetType &  itkNotUsed(offset) = FloatOffsetType(0.0)) override
   {
     PixelType pix{};
     return pix;

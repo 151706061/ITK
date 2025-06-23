@@ -99,6 +99,7 @@ protected:
   /** the construction from a const iterator is declared protected
       in order to enforce const correctness. */
   ReflectiveImageRegionIterator(const ReflectiveImageRegionConstIterator<TImage> & it);
+
   Self &
   operator=(const ReflectiveImageRegionConstIterator<TImage> & it);
 };

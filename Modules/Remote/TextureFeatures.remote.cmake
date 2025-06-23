@@ -53,9 +53,9 @@ For more information, see:
   Vimort J., McCormick M., Budin F., Paniagua B.
   Computing Textural Feature Maps for N-Dimensional images
   The Insight Journal. January-December. 2017.
-  https://www.insight-journal.org/browse/publication/985
+  https://doi.org/10.54294/qy48ty
 "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKTextureFeatures.git
-  GIT_TAG e8a9020eddc0310ed490dfe5afc61e065dc95831
+  GIT_TAG 4e63c643c0c9b882b9d3f47e4cb9f886d2c259bd
   )

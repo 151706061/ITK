@@ -71,7 +71,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorThresholdSegmentationLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -93,6 +93,7 @@ public:
   using CovarianceMatrixType = typename MahalanobisFunctionType::CovarianceMatrixType;
 
   /** Set/Get mean and covariance */
+  /** @ITKStartGrouping */
   void
   SetMean(const MeanVectorType & mean)
   {
@@ -103,7 +104,7 @@ public:
   {
     return m_Mahalanobis->GetMean();
   }
-
+  /** @ITKEndGrouping */
   void
   SetCovariance(const CovarianceMatrixType & cov)
   {
@@ -143,14 +144,13 @@ public:
 
 protected:
   VectorThresholdSegmentationLevelSetFunction()
+    : m_Mahalanobis(MahalanobisFunctionType::New())
   {
     MeanVectorType       mean(NumberOfComponents);
     CovarianceMatrixType covariance(NumberOfComponents, NumberOfComponents);
 
     mean.Fill(typename FeatureScalarType::ValueType{});
     covariance.Fill(typename FeatureScalarType::ValueType{});
-
-    m_Mahalanobis = MahalanobisFunctionType::New();
     m_Mahalanobis->SetMean(mean);
     m_Mahalanobis->SetCovariance(covariance);
 

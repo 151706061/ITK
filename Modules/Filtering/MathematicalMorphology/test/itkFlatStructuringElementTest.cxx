@@ -27,13 +27,12 @@ ComputeAreaError(const SEType & k, unsigned int thickness = 0);
 int
 itkFlatStructuringElementTest(int, char *[])
 {
-  int  scalarRadius = 5;
-  int  scalarThickness = 2;
-  bool radiusIsParametric = true;
+  constexpr int  scalarRadius = 5;
+  constexpr int  scalarThickness = 2;
+  constexpr bool radiusIsParametric = true;
 
   using SE2Type = itk::FlatStructuringElement<2>;
-  SE2Type::RadiusType r2;
-  r2.Fill(scalarRadius);
+  auto r2 = itk::MakeFilled<SE2Type::RadiusType>(scalarRadius);
 
   SE2Type::Self result2{};
   result2.RadiusIsParametricOn();
@@ -187,16 +186,11 @@ bool
 ComputeAreaError(const SEType & k, unsigned int thickness)
 {
   float expectedOuterForegroundArea = 1;
-  float expectedInnerForegroundArea;
+  float expectedInnerForegroundArea = 1; // Annulus does have inner area to subtract.
   if (thickness == 0)
   {
     // Circle/Ellipse has no inner area to subtract.
     expectedInnerForegroundArea = 0;
-  }
-  else
-  {
-    // Annulus does have inner area to subtract.
-    expectedInnerForegroundArea = 1;
   }
   if (SEType::NeighborhoodDimension == 2)
   {
@@ -223,7 +217,7 @@ ComputeAreaError(const SEType & k, unsigned int thickness)
     expectedInnerForegroundArea *= (k.GetRadius()[i] - thickness);
   }
 
-  float expectedForegroundArea = expectedOuterForegroundArea - expectedInnerForegroundArea;
+  const float expectedForegroundArea = expectedOuterForegroundArea - expectedInnerForegroundArea;
 
   // Show the neighborhood if it is 2D.
   typename SEType::ConstIterator SEIt;

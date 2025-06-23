@@ -28,9 +28,7 @@ FourierSeriesPath<VDimension>::Evaluate(const InputType & input) const -> Output
 {
   InputType  theta;
   OutputType output;
-  int        numHarmonics;
-
-  numHarmonics = m_CosCoefficients->Size();
+  const int  numHarmonics = m_CosCoefficients->Size();
   output.Fill(0);
 
   const double PI = 4.0 * std::atan(1.0);
@@ -57,9 +55,7 @@ FourierSeriesPath<VDimension>::EvaluateDerivative(const InputType & input) const
 {
   InputType  theta;
   VectorType output;
-  int        numHarmonics;
-
-  numHarmonics = m_CosCoefficients->Size();
+  const int  numHarmonics = m_CosCoefficients->Size();
   output.Fill(0);
 
   const double PI = 4.0 * std::atan(1.0);
@@ -79,7 +75,7 @@ template <unsigned int VDimension>
 void
 FourierSeriesPath<VDimension>::AddHarmonic(const VectorType & CosCoefficients, const VectorType & SinCoefficients)
 {
-  unsigned int numHarmonics = m_CosCoefficients->Size();
+  const unsigned int numHarmonics = m_CosCoefficients->Size();
 
   m_CosCoefficients->InsertElement(numHarmonics, CosCoefficients);
   m_SinCoefficients->InsertElement(numHarmonics, SinCoefficients);
@@ -88,10 +84,10 @@ FourierSeriesPath<VDimension>::AddHarmonic(const VectorType & CosCoefficients, c
 
 template <unsigned int VDimension>
 FourierSeriesPath<VDimension>::FourierSeriesPath()
+  : m_CosCoefficients(CoefficientsType::New())
+  , m_SinCoefficients(CoefficientsType::New())
 {
   this->SetDefaultInputStepSize(1.0 / 50.0);
-  m_CosCoefficients = CoefficientsType::New();
-  m_SinCoefficients = CoefficientsType::New();
 }
 
 template <unsigned int VDimension>

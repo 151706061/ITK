@@ -54,7 +54,7 @@ public:
   /** New macro for creation of through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TranslationTransform);
 
   /** Dimension of the domain space. */
@@ -211,7 +211,7 @@ public:
    *
    * \f[ T( a*P + b*Q ) = a * T(P) + b * T(Q) \f]
    */
-  bool
+  [[nodiscard]] bool
   IsLinear() const override
   {
     return true;
@@ -253,7 +253,7 @@ protected:
 private:
   JacobianType     m_IdentityJacobian{};
   OutputVectorType m_Offset{}; // Offset of the transformation
-};                             // class TranslationTransform
+}; // class TranslationTransform
 
 // Back transform a point
 template <typename TParametersValueType, unsigned int VDimension>

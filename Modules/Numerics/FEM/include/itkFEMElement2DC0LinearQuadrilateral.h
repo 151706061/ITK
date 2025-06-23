@@ -22,9 +22,7 @@
 #include "itkFEMElementStd.h"
 #include "ITKFEMExport.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class Element2DC0LinearQuadrilateral
@@ -64,7 +62,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Element2DC0LinearQuadrilateral);
 
   // ////////////////////////////////////////////////////////////////////////
@@ -123,7 +121,6 @@ protected:
 
 private:
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMElement2DC0LinearQuadrilateral_h

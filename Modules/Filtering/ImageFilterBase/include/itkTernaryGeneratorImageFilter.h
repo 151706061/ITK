@@ -65,7 +65,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TernaryGeneratorImageFilter);
 
   /** Some type alias. */
@@ -103,13 +103,14 @@ public:
   using ValueFunctionType = OutputImagePixelType(Input1ImagePixelType, Input2ImagePixelType, Input3ImagePixelType);
 
   /** Connect one of the operands for pixel-wise operation. */
+  /** @ITKStartGrouping */
   void
   SetInput1(const TInputImage1 * image1);
   virtual void
   SetInput1(const DecoratedInput1ImagePixelType * input1);
   virtual void
   SetInput1(const Input1ImagePixelType & input1);
-
+  /** @ITKEndGrouping */
   /** Set the first operand as a constant. */
   virtual void
   SetConstant1(const Input1ImagePixelType & input1);
@@ -120,13 +121,14 @@ public:
   GetConstant1() const;
 
   /** Connect one of the operands for pixel-wise operation. */
+  /** @ITKStartGrouping */
   void
   SetInput2(const TInputImage2 * image2);
   virtual void
   SetInput2(const DecoratedInput2ImagePixelType * input2);
   virtual void
   SetInput2(const Input2ImagePixelType & input2);
-
+  /** @ITKEndGrouping */
   /** Set the second operand as a constant. */
   virtual void
   SetConstant2(const Input2ImagePixelType & input2);
@@ -137,13 +139,14 @@ public:
   GetConstant2() const;
 
   /** Connect one of the operands for pixel-wise operation. */
+  /** @ITKStartGrouping */
   void
   SetInput3(const TInputImage3 * image3);
   virtual void
   SetInput3(const DecoratedInput3ImagePixelType * input3);
   virtual void
   SetInput3(const Input3ImagePixelType & input3);
-
+  /** @ITKEndGrouping */
   /** Set the second operand as a constant. */
   virtual void
   SetConstant3(const Input3ImagePixelType & input3);
@@ -159,6 +162,7 @@ public:
    *
    * The functor defines an operation done per pixel.
    */
+  /** @ITKStartGrouping */
   void
   SetFunctor(const std::function<ConstRefFunctionType> & f)
   {
@@ -179,11 +183,13 @@ public:
 
     this->Modified();
   }
+  /** @ITKEndGrouping */
 
   /** Set the pixel functor by a C function pointer
    *
    * The functor defines an operation done per pixel.
    */
+  /** @ITKStartGrouping */
   void
   SetFunctor(ConstRefFunctionType * funcPointer)
   {
@@ -202,6 +208,7 @@ public:
 
     this->Modified();
   }
+  /** @ITKEndGrouping */
 
 
   /** Set the pixel functor by a "Functor Object"
@@ -231,13 +238,9 @@ public:
   static constexpr unsigned int Input3ImageDimension = TInputImage3::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck1, (Concept::SameDimension<Input1ImageDimension, Input2ImageDimension>));
   itkConceptMacro(SameDimensionCheck2, (Concept::SameDimension<Input1ImageDimension, Input3ImageDimension>));
   itkConceptMacro(SameDimensionCheck3, (Concept::SameDimension<Input1ImageDimension, OutputImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   TernaryGeneratorImageFilter();
@@ -256,12 +259,13 @@ protected:
    *
    * \sa ImageToImageFilter::ThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData()  */
+  /** @ITKStartGrouping */
   template <typename TFunctor>
   void
   DynamicThreadedGenerateDataWithFunctor(const TFunctor &, const OutputImageRegionType & outputRegionForThread);
   void
   DynamicThreadedGenerateData(const OutputImageRegionType & outputRegionForThread) override;
-
+  /** @ITKEndGrouping */
 
 private:
   std::function<void(const OutputImageRegionType &)> m_DynamicThreadedGenerateDataFunction{};

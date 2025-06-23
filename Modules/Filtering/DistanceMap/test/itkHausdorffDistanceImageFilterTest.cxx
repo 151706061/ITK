@@ -41,8 +41,7 @@ itkHausdorffDistanceImageFilterTest(int argc, char * argv[])
   auto image1 = Image1Type::New();
   auto image2 = Image2Type::New();
 
-  Image1Type::SizeType size;
-  size.Fill(50);
+  auto size = Image1Type::SizeType::Filled(50);
 
   image1->SetRegions(size);
   image2->SetRegions(size);
@@ -101,7 +100,7 @@ itkHausdorffDistanceImageFilterTest(int argc, char * argv[])
     filter->Update();
 
     // Check results
-    const FilterType::RealType trueDistance = 10 * std::sqrt(static_cast<double>(ImageDimension));
+    const FilterType::RealType trueDistance = 10 * std::sqrt(double{ ImageDimension });
     const FilterType::RealType distance = filter->GetHausdorffDistance();
 
     std::cout << " True distance: " << trueDistance << std::endl;
@@ -130,7 +129,7 @@ itkHausdorffDistanceImageFilterTest(int argc, char * argv[])
     filter->Update();
 
     // Check results
-    const FilterType::RealType trueDistance = 10 * std::sqrt(static_cast<double>(ImageDimension));
+    const FilterType::RealType trueDistance = 10 * std::sqrt(double{ ImageDimension });
     const FilterType::RealType distance = filter->GetHausdorffDistance();
 
     std::cout << " True distance: " << trueDistance << std::endl;

@@ -37,10 +37,8 @@ namespace itk
 template <typename TInputImage, typename TProbabilityPrecisionType>
 BayesianClassifierInitializationImageFilter<TInputImage,
                                             TProbabilityPrecisionType>::BayesianClassifierInitializationImageFilter()
-
-{
-  m_MembershipFunctionContainer = nullptr;
-}
+  : m_MembershipFunctionContainer(nullptr)
+{}
 
 // GenerateOutputInformation method. Here we force update on the entire input
 // image. It does not make sense having K-Means etc otherwise.
@@ -52,7 +50,7 @@ BayesianClassifierInitializationImageFilter<TInputImage, TProbabilityPrecisionTy
   Superclass::GenerateOutputInformation();
 
   // get pointers to the input and output
-  typename OutputImageType::Pointer outputPtr = this->GetOutput();
+  const typename OutputImageType::Pointer outputPtr = this->GetOutput();
   if (!outputPtr)
   {
     return;
@@ -137,9 +135,9 @@ BayesianClassifierInitializationImageFilter<TInputImage, TProbabilityPrecisionTy
   sums.Fill(0.0);
   classCount.Fill(0);
 
-  const InputImageType *              inputImage = this->GetInput();
-  typename InputImageType::RegionType imageRegion = inputImage->GetLargestPossibleRegion();
-  InputImageIteratorType              itrInputImage(inputImage, imageRegion);
+  const InputImageType *                    inputImage = this->GetInput();
+  const typename InputImageType::RegionType imageRegion = inputImage->GetLargestPossibleRegion();
+  InputImageIteratorType                    itrInputImage(inputImage, imageRegion);
 
   itrInputImage.GoToBegin();
   itrKMeansImage.GoToBegin();
@@ -175,14 +173,12 @@ BayesianClassifierInitializationImageFilter<TInputImage, TProbabilityPrecisionTy
   }
 
   // Create gaussian membership functions.
-  auto                                                meanEstimatorsContainer = MeanEstimatorsContainerType::New();
-  typename CovarianceEstimatorsContainerType::Pointer covarianceEstimatorsContainer =
-    CovarianceEstimatorsContainerType::New();
+  auto meanEstimatorsContainer = MeanEstimatorsContainerType::New();
+  auto covarianceEstimatorsContainer = CovarianceEstimatorsContainerType::New();
   meanEstimatorsContainer->Reserve(m_NumberOfClasses);
   covarianceEstimatorsContainer->Reserve(m_NumberOfClasses);
 
   m_MembershipFunctionContainer = MembershipFunctionContainerType::New();
-  m_MembershipFunctionContainer->Initialize(); // Clear elements
   for (unsigned int i = 0; i < m_NumberOfClasses; ++i)
   {
     meanEstimatorsContainer->InsertElement(i, new typename GaussianMembershipFunctionType::MeanVectorType(1));
@@ -225,8 +221,8 @@ BayesianClassifierInitializationImageFilter<TInputImage, TProbabilityPrecisionTy
   // TODO Check if we need a progress accumulator
   const InputImageType * inputImage = this->GetInput();
 
-  typename InputImageType::RegionType imageRegion = inputImage->GetLargestPossibleRegion();
-  InputImageIteratorType              itrInputImage(inputImage, imageRegion);
+  const typename InputImageType::RegionType imageRegion = inputImage->GetLargestPossibleRegion();
+  InputImageIteratorType                    itrInputImage(inputImage, imageRegion);
 
   if (!m_UserSuppliesMembershipFunctions)
   {
@@ -293,8 +289,7 @@ BayesianClassifierInitializationImageFilter<TInputImage, TProbabilityPrecisionTy
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "UserSuppliesMembershipFunctions: " << (m_UserSuppliesMembershipFunctions ? "On" : "Off")
-     << std::endl;
+  itkPrintSelfBooleanMacro(UserSuppliesMembershipFunctions);
   os << indent << "NumberOfClasses: " << m_NumberOfClasses << std::endl;
 
   itkPrintSelfObjectMacro(MembershipFunctionContainer);

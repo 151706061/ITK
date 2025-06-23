@@ -49,7 +49,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GradientDescentOptimizerBasev4Template);
 
 #if !defined(ITK_LEGACY_REMOVE)
@@ -118,7 +118,7 @@ public:
   StopOptimization();
 
   /** Get the reason for termination */
-  const StopConditionReturnStringType
+  StopConditionReturnStringType
   GetStopConditionDescription() const override;
 
   /** Modify the gradient in place, to advance the optimization.
@@ -133,11 +133,12 @@ public:
    *
    * \sa EstimateLearningRate()
    */
+  /** @ITKStartGrouping */
   virtual void
   ModifyGradientByScales();
   virtual void
   ModifyGradientByLearningRate();
-
+  /** @ITKEndGrouping */
   using IndexRangeType = ThreadedIndexedContainerPartitioner::IndexRangeType;
 
   /** Derived classes define this worker method to modify the gradient by scales.
@@ -161,9 +162,10 @@ public:
 
 protected:
   /** Default constructor */
+  /** @ITKStartGrouping */
   GradientDescentOptimizerBasev4Template();
   ~GradientDescentOptimizerBasev4Template() override = default;
-
+  /** @ITKEndGrouping */
   /** Flag to control use of the ScalesEstimator (if set) for
    * automatic learning step estimation at *each* iteration.
    */

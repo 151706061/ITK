@@ -47,7 +47,7 @@ main(int, char *[])
   using LandmarkPointType = LandmarkType::LandmarkPointType;
   using PointType = LandmarkType::PointType;
 
-  LandmarkPointer landmark = LandmarkType::New();
+  const LandmarkPointer landmark = LandmarkType::New();
   // Software Guide : EndCodeSnippet
   // Software Guide : BeginLatex
   //
@@ -104,17 +104,15 @@ main(int, char *[])
   //
   // Software Guide : EndLatex
   // Software Guide : BeginCodeSnippet
-  size_t nPoints = landmark->GetPoints().size();
+  const size_t nPoints = landmark->GetPoints().size();
   std::cout << "Number of Points in the landmark: " << nPoints << std::endl;
 
-  LandmarkType::LandmarkPointListType::const_iterator it =
-    landmark->GetPoints().begin();
-  while (it != landmark->GetPoints().end())
+
+  for (auto & currentPoint : landmark->GetPoints())
   {
-    std::cout << "Position: " << (*it).GetPositionInObjectSpace()
+    std::cout << "Position: " << currentPoint.GetPositionInObjectSpace()
               << std::endl;
-    std::cout << "Color: " << (*it).GetColor() << std::endl;
-    ++it;
+    std::cout << "Color: " << currentPoint.GetColor() << std::endl;
   }
   // Software Guide : EndCodeSnippet
 

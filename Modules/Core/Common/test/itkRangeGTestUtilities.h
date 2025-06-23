@@ -109,7 +109,7 @@ public:
   ExpectIteratorIsDefaultConstructible()
   {
     using IteratorType = typename TRange::iterator;
-    IteratorType defaultConstructedIterator{};
+    constexpr IteratorType defaultConstructedIterator{};
 
     // Test that a default-constructed iterator behaves according to C++ proposal
     // N3644, "Null Forward Iterators" by Alan Talbot, which is accepted with
@@ -153,6 +153,15 @@ public:
 
     // Just return true to ease calling this function inside a static_assert.
     return true;
+  }
+
+
+  // Tells if `distance(&front, &back) + 1` is equal to `size`, for the specified container.
+  template <typename TContainer>
+  static constexpr bool
+  IsDistanceFromFrontToBackPlusOneEqualToSize(const TContainer & container)
+  {
+    return std::distance(&container.front(), &container.back()) + 1 == container.size();
   }
 
 

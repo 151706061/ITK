@@ -36,33 +36,18 @@ itkDemonsImageToImageMetricv4Test(int, char ** const)
   constexpr unsigned int imageDimensionality = 3;
   using ImageType = itk::Image<double, imageDimensionality>;
 
-  ImageType::SizeType size;
-  size.Fill(imageSize);
-  ImageType::IndexType index;
-  index.Fill(0);
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-  ImageType::PointType origin;
-  origin.Fill(0);
-  ImageType::DirectionType direction;
-  direction.SetIdentity();
+  auto                           size = ImageType::SizeType::Filled(imageSize);
+  constexpr ImageType::IndexType index{};
+  const ImageType::RegionType    region{ index, size };
+
 
   /* Create simple test images. */
   auto fixedImage = ImageType::New();
   fixedImage->SetRegions(region);
-  fixedImage->SetSpacing(spacing);
-  fixedImage->SetOrigin(origin);
-  fixedImage->SetDirection(direction);
   fixedImage->Allocate();
 
   auto movingImage = ImageType::New();
   movingImage->SetRegions(region);
-  movingImage->SetSpacing(spacing);
-  movingImage->SetOrigin(origin);
-  movingImage->SetDirection(direction);
   movingImage->Allocate();
 
   /* Fill images */
@@ -102,8 +87,7 @@ itkDemonsImageToImageMetricv4Test(int, char ** const)
   field->SetRegions(fixedImage->GetLargestPossibleRegion());
   field->CopyInformation(fixedImage);
   field->Allocate();
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  constexpr DisplacementTransformType::OutputVectorType zeroVector{};
   field->FillBuffer(zeroVector);
   displacementTransform->SetDisplacementField(field);
   displacementTransform->SetGaussianSmoothingVarianceForTheUpdateField(5);
@@ -143,9 +127,8 @@ itkDemonsImageToImageMetricv4Test(int, char ** const)
   }
 
   // Evaluate with GetValueAndDerivative
-  MetricType::MeasureType    valueReturn1, valueReturn2;
+  MetricType::MeasureType    valueReturn1 = NAN;
   MetricType::DerivativeType derivativeReturn;
-
   try
   {
     std::cout << "Calling GetValueAndDerivative..." << std::endl;
@@ -168,7 +151,7 @@ itkDemonsImageToImageMetricv4Test(int, char ** const)
     std::cerr << "Caught unexpected exception during re-initialize: " << exc << std::endl;
     return EXIT_FAILURE;
   }
-
+  MetricType::MeasureType valueReturn2 = NAN;
   try
   {
     std::cout << "Calling GetValue..." << std::endl;
@@ -258,7 +241,7 @@ itkDemonsImageToImageMetricv4Test(int, char ** const)
   ITK_TRY_EXPECT_EXCEPTION(metric->Initialize());
 
   /* Exercise accessor method */
-  const auto testValue = static_cast<MetricType::InternalComputationValueType>(0.5);
+  constexpr auto testValue = static_cast<MetricType::InternalComputationValueType>(0.5);
   metric->SetIntensityDifferenceThreshold(testValue);
   if (itk::Math::NotExactlyEquals(metric->GetIntensityDifferenceThreshold(), testValue))
   {

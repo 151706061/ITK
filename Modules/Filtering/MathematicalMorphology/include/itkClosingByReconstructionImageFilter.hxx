@@ -28,10 +28,7 @@ namespace itk
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::ClosingByReconstructionImageFilter()
   : m_Kernel()
-{
-  m_FullyConnected = false;
-  m_PreserveIntensities = false;
-}
+{}
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 void
@@ -41,7 +38,7 @@ ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::Generate
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -68,8 +65,7 @@ ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::Generate
   this->AllocateOutputs();
 
   // Delegate to a dilate filter.
-  typename GrayscaleDilateImageFilter<TInputImage, TInputImage, TKernel>::Pointer dilate =
-    GrayscaleDilateImageFilter<TInputImage, TInputImage, TKernel>::New();
+  auto dilate = GrayscaleDilateImageFilter<TInputImage, TInputImage, TKernel>::New();
 
   dilate->SetInput(this->GetInput());
   dilate->SetKernel(this->m_Kernel);
@@ -77,8 +73,7 @@ ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::Generate
   progress->RegisterInternalFilter(dilate, .5);
 
   // Delegate to a dilate filter.
-  typename ReconstructionByErosionImageFilter<TInputImage, TInputImage>::Pointer erode =
-    ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
+  auto erode = ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
 
   erode->SetMarkerImage(dilate->GetOutput());
   erode->SetMaskImage(this->GetInput());
@@ -114,8 +109,7 @@ ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::Generate
       ++inputIt;
     }
 
-    typename ReconstructionByErosionImageFilter<TInputImage, TInputImage>::Pointer erodeAgain =
-      ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
+    auto erodeAgain = ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
     erodeAgain->SetMaskImage(this->GetInput());
     erodeAgain->SetMarkerImage(tempImage);
     erodeAgain->SetFullyConnected(m_FullyConnected);
@@ -141,7 +135,7 @@ ClosingByReconstructionImageFilter<TInputImage, TOutputImage, TKernel>::PrintSel
   Superclass::PrintSelf(os, indent);
 
   os << indent << "Kernel: " << m_Kernel << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent << "PreserveIntensities: " << m_PreserveIntensities << std::endl;
 }
 } // end namespace itk

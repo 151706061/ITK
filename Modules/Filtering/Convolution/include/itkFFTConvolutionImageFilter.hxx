@@ -36,9 +36,8 @@ namespace itk
 
 template <typename TInputImage, typename TKernelImage, typename TOutputImage, typename TInternalPrecision>
 FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrecision>::FFTConvolutionImageFilter()
-{
-  m_SizeGreatestPrimeFactor = FFTFilterType::New()->GetSizeGreatestPrimeFactor();
-}
+  : m_SizeGreatestPrimeFactor(FFTFilterType::New()->GetSizeGreatestPrimeFactor())
+{}
 
 template <typename TInputImage, typename TKernelImage, typename TOutputImage, typename TInternalPrecision>
 void
@@ -57,8 +56,8 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
 
     // Crop the output requested region to fit within the largest
     // possible region.
-    InputImageType * inputPtr = itkDynamicCastInDebugMode<InputImageType *>(this->GetPrimaryInput());
-    bool             wasPartiallyInside = inputRegion.Crop(inputPtr->GetLargestPossibleRegion());
+    auto *     inputPtr = itkDynamicCastInDebugMode<InputImageType *>(this->GetPrimaryInput());
+    const bool wasPartiallyInside = inputRegion.Crop(inputPtr->GetLargestPossibleRegion());
     if (!wasPartiallyInside)
     {
       itkExceptionMacro("Requested region is outside the largest possible region.");
@@ -73,7 +72,7 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
   {
     // Input kernel is an image, cast away the constness so we can set
     // the requested region.
-    typename KernelImageType::Pointer kernelPtr = const_cast<KernelImageType *>(this->GetKernelImage());
+    const typename KernelImageType::Pointer kernelPtr = const_cast<KernelImageType *>(this->GetKernelImage());
     kernelPtr->SetRequestedRegionToLargestPossibleRegion();
   }
 }
@@ -149,15 +148,15 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
 {
   float remainingProgress = 1.0f;
 
-  InputRegionType  inputLargestRegion = input->GetLargestPossibleRegion();
-  InputSizeType    inputLargestSize = inputLargestRegion.GetSize();
-  InputIndexType   inputLargestIndex = inputLargestRegion.GetIndex();
-  InputRegionType  inputRequestedRegion = input->GetRequestedRegion();
-  InputSizeType    inputRequestedSize = inputRequestedRegion.GetSize();
-  InputIndexType   inputRequestedIndex = inputRequestedRegion.GetIndex();
-  OutputRegionType outputRequestedRegion = this->GetOutput()->GetRequestedRegion();
-  OutputSizeType   outputRequestedSize = outputRequestedRegion.GetSize();
-  OutputIndexType  outputRequestedIndex = outputRequestedRegion.GetIndex();
+  const InputRegionType  inputLargestRegion = input->GetLargestPossibleRegion();
+  InputSizeType          inputLargestSize = inputLargestRegion.GetSize();
+  InputIndexType         inputLargestIndex = inputLargestRegion.GetIndex();
+  const InputRegionType  inputRequestedRegion = input->GetRequestedRegion();
+  InputSizeType          inputRequestedSize = inputRequestedRegion.GetSize();
+  InputIndexType         inputRequestedIndex = inputRequestedRegion.GetIndex();
+  const OutputRegionType outputRequestedRegion = this->GetOutput()->GetRequestedRegion();
+  OutputSizeType         outputRequestedSize = outputRequestedRegion.GetSize();
+  OutputIndexType        outputRequestedIndex = outputRequestedRegion.GetIndex();
 
   // Pad the input image such that the requested region, expanded by
   // twice the kernel radius, lies entirely within the buffered region.
@@ -167,29 +166,30 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
   using InputPadFilterType = PadImageFilter<InputImageType, InputImageType>;
   using PadSizeType = typename InputPadFilterType::SizeType;
 
-  PadSizeType    lowerPad, upperPad;
+  PadSizeType    lowerPad;
+  PadSizeType    upperPad;
   bool           needsKernelPadding = false;
   KernelSizeType kernelRadius = this->GetKernelRadius();
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
     // Use signed int for arithmetic
-    int largestUpperCorner = inputLargestIndex[dim] + inputLargestSize[dim];
-    int requestedUpperCorner = inputRequestedIndex[dim] + inputRequestedSize[dim];
+    const int largestUpperCorner = inputLargestIndex[dim] + inputLargestSize[dim];
+    const int requestedUpperCorner = inputRequestedIndex[dim] + inputRequestedSize[dim];
 
-    int largestLowerCorner = inputLargestIndex[dim];
-    int requestedLowerCorner = inputRequestedIndex[dim];
+    const int largestLowerCorner = inputLargestIndex[dim];
+    const int requestedLowerCorner = inputRequestedIndex[dim];
 
     // Pad for difference between lower corner of largest vs requested region
-    int lower = static_cast<int>(kernelRadius[dim]) - (requestedLowerCorner - largestLowerCorner);
+    const int lower = static_cast<int>(kernelRadius[dim]) - (requestedLowerCorner - largestLowerCorner);
     // Pad for difference between upper corner of largest vs requested region
-    int upper = static_cast<int>(kernelRadius[dim]) - (largestUpperCorner - requestedUpperCorner);
+    const int upper = static_cast<int>(kernelRadius[dim]) - (largestUpperCorner - requestedUpperCorner);
     lowerPad[dim] = (lower > 0 ? lower : 0);
     upperPad[dim] = (upper > 0 ? upper : 0);
 
     needsKernelPadding = needsKernelPadding || lower > 0 || upper > 0;
   }
 
-  const InputImageType * kernelPaddedInput;
+  const InputImageType * kernelPaddedInput = input;
   if (needsKernelPadding)
   {
     auto inputPadder = InputPadFilterType::New();
@@ -204,10 +204,6 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
     inputPadder->Update();
     kernelPaddedInput = inputPadder->GetOutput();
   }
-  else
-  {
-    kernelPaddedInput = input;
-  }
 
   // Crop to region of interest to minimize FFT requested region size.
   // This blocks forward FFT from requesting the entire input image
@@ -215,18 +211,16 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
   // is required for convolution to succeed.
   // TODO: Improve readability by keeping the output index as-is rather than resetting to 0, if the filter allows it
 
-  const InputImageType * regionOfInterestImage;
-  InputRegionType        regionOfInterest;
-  InputSizeType          regionOfInterestSize;
-  InputIndexType         regionOfInterestIndex;
-
+  InputSizeType  regionOfInterestSize;
+  InputIndexType regionOfInterestIndex;
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
     regionOfInterestSize[dim] = outputRequestedSize[dim] + 2 * kernelRadius[dim];
     regionOfInterestIndex[dim] = outputRequestedIndex[dim] - kernelRadius[dim];
   }
-  regionOfInterest = InputRegionType(regionOfInterestIndex, regionOfInterestSize);
+  const InputRegionType regionOfInterest = InputRegionType(regionOfInterestIndex, regionOfInterestSize);
 
+  const InputImageType * regionOfInterestImage = kernelPaddedInput;
   if (outputRequestedRegion != inputLargestRegion)
   {
 
@@ -257,10 +251,6 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
     remainingProgress -= 0.001f;
     inputInfoFilter->Update();
     regionOfInterestImage = inputInfoFilter->GetOutput();
-  }
-  else
-  {
-    regionOfInterestImage = kernelPaddedInput;
   }
 
   // Pad for FFT so that each image side is factorable by at most
@@ -336,8 +326,8 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
   ProgressAccumulator *             progress,
   float                             progressWeight)
 {
-  KernelRegionType kernelRegion = kernel->GetLargestPossibleRegion();
-  KernelSizeType   kernelSize = kernelRegion.GetSize();
+  const KernelRegionType kernelRegion = kernel->GetLargestPossibleRegion();
+  KernelSizeType         kernelSize = kernelRegion.GetSize();
 
   InputSizeType                      inputPadSize = m_PaddedInputRegion.GetSize();
   typename KernelImageType::SizeType kernelUpperBound;
@@ -348,7 +338,7 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
 
   InternalImagePointerType paddedKernelImage = nullptr;
 
-  float paddingWeight = 0.2f;
+  const float paddingWeight = 0.2f;
   if (this->GetNormalize())
   {
     using NormalizeFilterType = NormalizeToConstantImageFilter<KernelImageType, InternalImageType>;
@@ -362,7 +352,7 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
     // Pad the kernel image with zeros.
     using KernelPadType = ConstantPadImageFilter<InternalImageType, InternalImageType>;
     using KernelPadPointer = typename KernelPadType::Pointer;
-    KernelPadPointer kernelPadder = KernelPadType::New();
+    const KernelPadPointer kernelPadder = KernelPadType::New();
     kernelPadder->SetConstant(TInternalPrecision{});
     kernelPadder->SetPadUpperBound(kernelUpperBound);
     kernelPadder->SetNumberOfWorkUnits(this->GetNumberOfWorkUnits());
@@ -377,7 +367,7 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
     // Pad the kernel image with zeros.
     using KernelPadType = ConstantPadImageFilter<KernelImageType, InternalImageType>;
     using KernelPadPointer = typename KernelPadType::Pointer;
-    KernelPadPointer kernelPadder = KernelPadType::New();
+    const KernelPadPointer kernelPadder = KernelPadType::New();
     kernelPadder->SetConstant(TInternalPrecision{});
     kernelPadder->SetPadUpperBound(kernelUpperBound);
     kernelPadder->SetNumberOfWorkUnits(this->GetNumberOfWorkUnits());
@@ -475,8 +465,8 @@ FFTConvolutionImageFilter<TInputImage, TKernelImage, TOutputImage, TInternalPrec
   {
     extractionIndex[dim] = paddedOutputIndex[dim] + m_FFTPadSize[dim] / 2 + GetKernelRadius()[dim];
   }
-  auto               requestedRegionSize = this->GetOutput()->GetRequestedRegion().GetSize();
-  InternalRegionType extractionRegion(extractionIndex, requestedRegionSize);
+  auto                     requestedRegionSize = this->GetOutput()->GetRequestedRegion().GetSize();
+  const InternalRegionType extractionRegion(extractionIndex, requestedRegionSize);
   extractFilter->SetExtractionRegion(extractionRegion);
 
   // Graft the minipipeline output to this filter.

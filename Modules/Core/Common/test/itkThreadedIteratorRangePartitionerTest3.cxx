@@ -63,7 +63,7 @@ public:
     BeforeThreadedExecution() override
     {
       this->m_DomainInThreadedExecution.resize(this->GetNumberOfWorkUnitsUsed());
-      BorderValuesType unsetBorderValues(2, -1);
+      const BorderValuesType unsetBorderValues(2, -1);
       for (auto & i : m_DomainInThreadedExecution)
       {
         i = unsetBorderValues;
@@ -100,9 +100,9 @@ public:
   }; // end TestDomainThreader class
 
   IteratorRangeDomainThreaderAssociate()
+    : m_ClassDescriptor("enclosing class")
   {
     m_TestDomainThreader = TestDomainThreader::New();
-    m_ClassDescriptor = "enclosing class";
   }
 
   TestDomainThreader *
@@ -133,7 +133,7 @@ ThreadedIteratorRangePartitionerRunTest(
   std::cout << "Testing with " << numberOfThreads << " threads." << std::endl;
 
   using TestDomainThreaderType = IteratorRangeDomainThreaderAssociate::TestDomainThreader;
-  TestDomainThreaderType::Pointer domainThreader = enclosingClass.GetDomainThreader();
+  const TestDomainThreaderType::Pointer domainThreader = enclosingClass.GetDomainThreader();
 
   // Exercise GetMultiThreader().
   domainThreader->GetMultiThreader();
@@ -237,7 +237,7 @@ setStartEnd(const unsigned int                                                  
   getIteratorFromIndex(start, container, beginIt);
   getIteratorFromIndex(end, container, endIt);
 
-  IteratorRangeDomainThreaderAssociate::TestDomainThreader::DomainType newDomain(beginIt, endIt);
+  const IteratorRangeDomainThreaderAssociate::TestDomainThreader::DomainType newDomain(beginIt, endIt);
   fullDomain = newDomain;
 }
 } // namespace
@@ -245,8 +245,8 @@ setStartEnd(const unsigned int                                                  
 int
 itkThreadedIteratorRangePartitionerTest3(int, char *[])
 {
-  IteratorRangeDomainThreaderAssociate                                   enclosingClass;
-  IteratorRangeDomainThreaderAssociate::TestDomainThreader::ConstPointer domainThreader =
+  IteratorRangeDomainThreaderAssociate                                         enclosingClass;
+  const IteratorRangeDomainThreaderAssociate::TestDomainThreader::ConstPointer domainThreader =
     enclosingClass.GetDomainThreader();
 
   if (domainThreader->GetMultiThreader())
@@ -269,14 +269,15 @@ itkThreadedIteratorRangePartitionerTest3(int, char *[])
   using DomainContainerType = IteratorRangeDomainThreaderAssociate::DomainContainerType;
   auto container = DomainContainerType::New();
 
-  for (unsigned int i = 0; i < ITK_DEFAULT_MAX_THREADS + 10; ++i)
+  // ITK_DEFAULT_MAX_THREADS is at least 1, so we have at least 100 elements in container.
+  for (unsigned int i = 0; i < ITK_DEFAULT_MAX_THREADS + 99; ++i)
   {
     container->SetElement(static_cast<int>(i * 2), 2 * i + 1);
   }
   DomainType fullDomain(container->Begin(), container->End());
 
   /* Test with single thread */
-  setStartEnd(0, 103, container, fullDomain);
+  setStartEnd(0, 100, container, fullDomain);
   itk::ThreadIdType numberOfThreads = 1;
   if (ThreadedIteratorRangePartitionerRunTest(enclosingClass, numberOfThreads, fullDomain) != EXIT_SUCCESS)
   {
@@ -284,7 +285,7 @@ itkThreadedIteratorRangePartitionerTest3(int, char *[])
   }
 
   /* Test with range that doesn't start at 0 */
-  setStartEnd(2, 105, container, fullDomain);
+  setStartEnd(5, 100, container, fullDomain);
   numberOfThreads = 1;
   if (ThreadedIteratorRangePartitionerRunTest(enclosingClass, numberOfThreads, fullDomain) != EXIT_SUCCESS)
   {
@@ -295,7 +296,7 @@ itkThreadedIteratorRangePartitionerTest3(int, char *[])
   if (domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads() > 1)
   {
     /* Test with default number of threads. */
-    setStartEnd(6, 109, container, fullDomain);
+    setStartEnd(6, 89, container, fullDomain);
     numberOfThreads = domainThreader->GetMultiThreader()->GetGlobalDefaultNumberOfThreads();
     if (ThreadedIteratorRangePartitionerRunTest(enclosingClass, numberOfThreads, fullDomain) != EXIT_SUCCESS)
     {
@@ -304,7 +305,7 @@ itkThreadedIteratorRangePartitionerTest3(int, char *[])
 
     /* Test with max number of threads and check that we only used as
      * many as is reasonable. */
-    itk::ThreadIdType maxNumberOfThreads = domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads();
+    const itk::ThreadIdType maxNumberOfThreads = domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads();
     setStartEnd(6, 6 + maxNumberOfThreads, container, fullDomain);
     if (ThreadedIteratorRangePartitionerRunTest(enclosingClass, maxNumberOfThreads, fullDomain) != EXIT_SUCCESS)
     {

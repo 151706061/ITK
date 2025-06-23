@@ -68,8 +68,8 @@ itkQuadEdgeMeshPolygonCellTest(int, char *[])
   /**
    * Define the 3d geometric positions for 8 points in a cube.
    */
-  MeshType::CoordRepType testPointCoords[8][3] = { { 0, 0, 0 }, { 9, 0, 0 }, { 9, 0, 9 }, { 0, 0, 9 },
-                                                   { 0, 9, 0 }, { 9, 9, 0 }, { 9, 9, 9 }, { 0, 9, 9 } };
+  MeshType::CoordinateType testPointCoords[8][3] = { { 0, 0, 0 }, { 9, 0, 0 }, { 9, 0, 9 }, { 0, 0, 9 },
+                                                     { 0, 9, 0 }, { 9, 9, 0 }, { 9, 9, 9 }, { 0, 9, 9 } };
 
   /**
    * Add our test points to the mesh.
@@ -119,7 +119,7 @@ itkQuadEdgeMeshPolygonCellTest(int, char *[])
    * Assign the points to the tetrahedron through their identifiers.
    */
   testCell->SetPointIds(polygon1Points);
-  if (newcell->GetPointId(18) != PointIdentifier(-1))
+  if (newcell->GetPointId(18) != static_cast<PointIdentifier>(-1))
   {
     std::cerr << "Get Point should have failed !" << std::endl;
     return EXIT_FAILURE;
@@ -169,7 +169,7 @@ itkQuadEdgeMeshPolygonCellTest(int, char *[])
    */
   mesh->SetCell(0, testCell); // Transfer ownership to the mesh
   std::cout << "PolygonCell pointer = ";
-  std::cout << (void const *)testCell.GetPointer() << std::endl;
+  std::cout << (const void *)testCell.GetPointer() << std::endl;
   std::cout << "PolygonCell Owner   = " << testCell.IsOwner() << std::endl;
 
   return EXIT_SUCCESS;

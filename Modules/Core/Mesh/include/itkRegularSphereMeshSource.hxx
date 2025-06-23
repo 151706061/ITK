@@ -26,6 +26,7 @@ namespace itk
  */
 template <typename TOutputMesh>
 RegularSphereMeshSource<TOutputMesh>::RegularSphereMeshSource()
+  : m_Resolution(2)
 {
   /**
    * Create the output
@@ -35,7 +36,6 @@ RegularSphereMeshSource<TOutputMesh>::RegularSphereMeshSource()
   this->ProcessObject::SetNthOutput(0, output.GetPointer());
   m_Center.Fill(0);
   m_Scale.Fill(1);
-  m_Resolution = 2;
 }
 
 /*
@@ -47,11 +47,11 @@ RegularSphereMeshSource<TOutputMesh>::GenerateData()
 {
   typename OutputMeshType::PointIdentifier tripoints[3] = { 0, 1, 2 };
 
-  typename OutputMeshType::Pointer outputMesh = this->GetOutput();
+  const typename OutputMeshType::Pointer outputMesh = this->GetOutput();
 
   outputMesh->SetCellsAllocationMethod(MeshEnums::MeshClassCellsAllocationMethod::CellsAllocatedDynamicallyCellByCell);
 
-  PointsContainerPointer myPoints = outputMesh->GetPoints();
+  const PointsContainerPointer myPoints = outputMesh->GetPoints();
 
   PointType      p1;
   IdentifierType idx = 0;
@@ -138,11 +138,10 @@ RegularSphereMeshSource<TOutputMesh>::GenerateData()
   // followed by a repositioning of the point on the sphere
   // for each resolution.
   // it's an IN-PLACE process.
-  unsigned int i;
-  for (i = 0; i < m_Resolution; ++i)
+  for (unsigned int i = 0; i < m_Resolution; ++i)
   {
-    typename OutputMeshType::CellsContainerPointer    myCells = outputMesh->GetCells();
-    typename OutputMeshType::CellsContainer::Iterator cells = myCells->Begin();
+    const typename OutputMeshType::CellsContainerPointer myCells = outputMesh->GetCells();
+    typename OutputMeshType::CellsContainer::Iterator    cells = myCells->Begin();
 
     auto        result = OutputMeshType::New();
     PointType   v[3];
@@ -150,10 +149,10 @@ RegularSphereMeshSource<TOutputMesh>::GenerateData()
     v_pt[0] = &v[0];
     v_pt[1] = &v[1];
     v_pt[2] = &v[2];
-    IdentifierType cellIdx = 0;
-    IdentifierType pointIdxOffset = outputMesh->GetNumberOfPoints();
-    IdentifierType pointIdx = pointIdxOffset;
-    IdentifierType newIdx[3] = { 0, 1, 2 };
+    IdentifierType       cellIdx = 0;
+    const IdentifierType pointIdxOffset = outputMesh->GetNumberOfPoints();
+    IdentifierType       pointIdx = pointIdxOffset;
+    IdentifierType       newIdx[3] = { 0, 1, 2 };
 
     // container for the processed edges
     // when subdividing a triangle, the corresponding subdivided

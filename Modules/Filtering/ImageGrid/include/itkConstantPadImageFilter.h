@@ -60,7 +60,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConstantPadImageFilter);
 
   /** Typedef to describe the output image region type. */
@@ -82,6 +82,7 @@ public:
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
   /** Set/Get the pad value.  Default is Zero. */
+  /** @ITKStartGrouping */
   void
   SetConstant(OutputImagePixelType constant)
   {
@@ -96,15 +97,11 @@ public:
   {
     return m_InternalBoundaryCondition.GetConstant();
   }
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputImagePixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   ConstantPadImageFilter();

@@ -21,17 +21,13 @@
 
 #include "itkObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 Subsample<TSample>::Subsample()
-{
-  m_Sample = nullptr;
-  m_TotalFrequency = AbsoluteFrequencyType{};
-  m_ActiveDimension = 0;
-}
+  : m_Sample(nullptr)
+  , m_TotalFrequency(AbsoluteFrequencyType{})
+{}
 
 template <typename TSample>
 void
@@ -75,9 +71,9 @@ void
 Subsample<TSample>::InitializeWithAllInstances()
 {
   m_IdHolder.resize(m_Sample->Size());
-  auto                            idIter = m_IdHolder.begin();
-  typename TSample::ConstIterator iter = m_Sample->Begin();
-  typename TSample::ConstIterator last = m_Sample->End();
+  auto                                  idIter = m_IdHolder.begin();
+  typename TSample::ConstIterator       iter = m_Sample->Begin();
+  const typename TSample::ConstIterator last = m_Sample->End();
   m_TotalFrequency = AbsoluteFrequencyType{};
   while (iter != last)
   {
@@ -128,7 +124,7 @@ Subsample<TSample>::GetMeasurementVector(InstanceIdentifier id) const -> const M
   }
 
   // translate the id to its Sample container id
-  InstanceIdentifier idInTheSample = m_IdHolder[id];
+  const InstanceIdentifier idInTheSample = m_IdHolder[id];
   return m_Sample->GetMeasurementVector(idInTheSample);
 }
 
@@ -142,7 +138,7 @@ Subsample<TSample>::GetFrequency(InstanceIdentifier id) const -> AbsoluteFrequen
   }
 
   // translate the id to its Sample container id
-  InstanceIdentifier idInTheSample = m_IdHolder[id];
+  const InstanceIdentifier idInTheSample = m_IdHolder[id];
   return m_Sample->GetFrequency(idInTheSample);
 }
 
@@ -162,7 +158,7 @@ Subsample<TSample>::Swap(unsigned int index1, unsigned int index2)
     itkExceptionMacro("Index out of range");
   }
 
-  InstanceIdentifier temp = m_IdHolder[index1];
+  const InstanceIdentifier temp = m_IdHolder[index1];
   m_IdHolder[index1] = m_IdHolder[index2];
   m_IdHolder[index2] = temp;
   this->Modified();
@@ -221,7 +217,6 @@ Subsample<TSample>::Graft(const DataObject * thatObject)
     this->m_TotalFrequency = that->m_TotalFrequency;
   }
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

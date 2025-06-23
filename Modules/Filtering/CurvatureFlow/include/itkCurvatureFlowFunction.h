@@ -55,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CurvatureFlowFunction);
 
   /** Inherit some parameters from the superclass type. */
@@ -90,7 +90,7 @@ public:
    * holds the state of any global values needed to calculate the time step,
    * while the equation object performs the actual calculations.  The global
    * data should also be initialized in this method. */
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     auto * ans = new GlobalDataStruct();
@@ -136,7 +136,9 @@ protected:
    * values that are needed in calculating the time step. */
   struct GlobalDataStruct
   {
-    GlobalDataStruct() { m_MaxChange = ScalarValueType{}; }
+    GlobalDataStruct()
+      : m_MaxChange(ScalarValueType{})
+    {}
 
     ~GlobalDataStruct() = default;
 

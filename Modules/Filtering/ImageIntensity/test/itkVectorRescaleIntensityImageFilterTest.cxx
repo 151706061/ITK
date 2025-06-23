@@ -77,20 +77,20 @@ itkVectorRescaleIntensityImageFilterTest(int, char *[])
 
   ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());
 
-  FilterType::InputRealType scale = filter->GetScale();
+  const FilterType::InputRealType scale = filter->GetScale();
   std::cout << "Input scale value: " << static_cast<itk::NumericTraits<FilterType::InputRealType>::PrintType>(scale)
             << std::endl;
 
-  FilterType::InputRealType shift = filter->GetShift();
+  const FilterType::InputRealType shift = filter->GetShift();
   std::cout << "Input scale value: " << static_cast<itk::NumericTraits<FilterType::InputRealType>::PrintType>(shift)
             << std::endl;
 
-  FilterType::InputRealType inputMaximumMagnitude = filter->GetInputMaximumMagnitude();
+  const FilterType::InputRealType inputMaximumMagnitude = filter->GetInputMaximumMagnitude();
   std::cout << "Input maximum magnitude: "
             << static_cast<itk::NumericTraits<FilterType::InputRealType>::PrintType>(inputMaximumMagnitude)
             << std::endl;
 
-  OutputImageType::ConstPointer outputImage = filter->GetOutput();
+  const OutputImageType::ConstPointer outputImage = filter->GetOutput();
 
   using IteratorType = itk::ImageRegionConstIterator<OutputImageType>;
 
@@ -98,7 +98,7 @@ itkVectorRescaleIntensityImageFilterTest(int, char *[])
 
   ot.GoToBegin();
 
-  const double tolerance = 1e-3;
+  constexpr double tolerance = 1e-3;
 
   const double factor = desiredMaximum / static_cast<double>(pixelValue.GetNorm());
 

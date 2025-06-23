@@ -27,10 +27,10 @@ ShapedFloodFilledFunctionConditionalConstIterator<TImage, TFunction>::ShapedFloo
   const ImageType * imagePtr,
   FunctionType *    fnPtr,
   IndexType         startIndex)
-  : m_FullyConnected(false)
+  : m_Function(fnPtr)
+
 {
   this->m_Image = imagePtr;
-  m_Function = fnPtr;
   m_Seeds.push_back(startIndex);
 
   // Set up the temporary image
@@ -43,12 +43,10 @@ ShapedFloodFilledFunctionConditionalConstIterator<TImage, TFunction>::ShapedFloo
   FunctionType *           fnPtr,
   std::vector<IndexType> & startIndex)
   : m_Function(fnPtr)
-  , m_FullyConnected(false)
+
 {
   this->m_Image = imagePtr; // can not be done in the initialization list
-
-  unsigned int i;
-  for (i = 0; i < startIndex.size(); ++i)
+  for (unsigned int i = 0; i < startIndex.size(); ++i)
   {
     m_Seeds.push_back(startIndex[i]);
   }
@@ -61,11 +59,10 @@ template <typename TImage, typename TFunction>
 ShapedFloodFilledFunctionConditionalConstIterator<TImage, TFunction>::ShapedFloodFilledFunctionConditionalConstIterator(
   const ImageType * imagePtr,
   FunctionType *    fnPtr)
-  : m_FullyConnected(false)
+  : m_Function(fnPtr)
+
 {
   this->m_Image = imagePtr;
-  m_Function = fnPtr;
-
   // Set up the temporary image
   this->InitializeIterator();
 }
@@ -80,17 +77,16 @@ ShapedFloodFilledFunctionConditionalConstIterator<TImage, TFunction>::Initialize
   m_ImageRegion = this->m_Image->GetBufferedRegion();
 
   // Build and setup the neighborhood iterator
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
-  NeighborhoodIteratorType tmp_iter(radius, this->m_Image, m_ImageRegion);
+  const NeighborhoodIteratorType tmp_iter(radius, this->m_Image, m_ImageRegion);
   m_NeighborhoodIterator = tmp_iter;
 
   setConnectivity(&m_NeighborhoodIterator, m_FullyConnected);
 
   // Build a temporary image of chars for use in the flood algorithm
   m_TempPtr = TTempImage::New();
-  typename TTempImage::RegionType tempRegion = this->m_Image->GetBufferedRegion();
+  const typename TTempImage::RegionType tempRegion = this->m_Image->GetBufferedRegion();
 
   m_TempPtr->SetRegions(tempRegion);
   m_TempPtr->AllocateInitialized();

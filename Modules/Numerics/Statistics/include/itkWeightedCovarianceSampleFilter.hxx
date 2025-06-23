@@ -20,9 +20,7 @@
 
 #include "itkWeightedMeanSampleFilter.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 WeightedCovarianceSampleFilter<TSample>::WeightedCovarianceSampleFilter()
@@ -64,7 +62,7 @@ WeightedCovarianceSampleFilter<TSample>::ComputeCovarianceMatrixWithWeightingFun
   // set up input / output
   const SampleType * input = this->GetInput();
 
-  MeasurementVectorSizeType measurementVectorSize = input->GetMeasurementVectorSize();
+  const MeasurementVectorSizeType measurementVectorSize = input->GetMeasurementVectorSize();
 
   auto * decoratedOutput = itkDynamicCastInDebugMode<MatrixDecoratedType *>(this->ProcessObject::GetOutput(0));
 
@@ -161,7 +159,7 @@ WeightedCovarianceSampleFilter<TSample>::ComputeCovarianceMatrixWithWeights()
   // set up input / output
   const SampleType * input = this->GetInput();
 
-  MeasurementVectorSizeType measurementVectorSize = input->GetMeasurementVectorSize();
+  const MeasurementVectorSizeType measurementVectorSize = input->GetMeasurementVectorSize();
 
   auto * decoratedOutput = itkDynamicCastInDebugMode<MatrixDecoratedType *>(this->ProcessObject::GetOutput(0));
 
@@ -250,7 +248,6 @@ WeightedCovarianceSampleFilter<TSample>::ComputeCovarianceMatrixWithWeights()
 
   decoratedOutput->Set(output);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

@@ -43,7 +43,7 @@ namespace itk
  * VMaxTopologicalDimension =
  *    Max topological dimension of a cell that can be inserted into this mesh.
  *
- * TCoordRep =
+ * TCoordinate =
  *    Numerical type with which to represent each coordinate value.
  *
  * TInterpolationWeight =
@@ -55,7 +55,7 @@ namespace itk
 template <typename TPixelType,
           unsigned int VPointDimension = 3,
           unsigned int VMaxTopologicalDimension = VPointDimension,
-          typename TCoordRep = float,
+          typename TCoordinate = float,
           typename TInterpolationWeight = float,
           typename TCellPixelType = TPixelType>
 class ITK_TEMPLATE_EXPORT DefaultStaticMeshTraits
@@ -67,7 +67,11 @@ public:
   /** Just save all the template parameters. */
   using PixelType = TPixelType;
   using CellPixelType = TCellPixelType;
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = TInterpolationWeight;
 
   /** Just save all the template parameters. */
@@ -88,15 +92,15 @@ public:
   using CellFeatureIdentifier = IdentifierType;
 
   /** The type of point used by the mesh. */
-  using PointType = Point<CoordRepType, VPointDimension>;
+  using PointType = Point<CoordinateType, VPointDimension>;
 
   /** The type of point used for hashing.  This should never change from
    * this setting, regardless of the mesh type. */
-  using PointHashType = Point<CoordRepType, VPointDimension>;
+  using PointHashType = Point<CoordinateType, VPointDimension>;
 
   /** The container type for use in storing points.  It must conform to
    * the IndexedContainer interface. */
-  using PointsContainer = VectorContainer<PointIdentifier, PointType>;
+  using PointsContainer = VectorContainer<PointType>;
 
   /** The container type that will be used to store boundary links
    * back to cells.  This must conform to the STL "set" interface. */
@@ -114,7 +118,7 @@ public:
 
   /** The container type for use in storing cells.  It must conform to
    * the IndexedContainer interface. */
-  using CellsContainer = VectorContainer<CellIdentifier, CellType *>;
+  using CellsContainer = VectorContainer<CellType *>;
 
   /** The CellLinks container should be a container of PointCellLinksContainer,
    * which should be a container conforming to the STL "set" interface. */
@@ -122,15 +126,15 @@ public:
 
   /** The container type for use in storing point links back to cells.
    * It must conform to the IndexedContainer interface. */
-  using CellLinksContainer = VectorContainer<PointIdentifier, PointCellLinksContainer>;
+  using CellLinksContainer = VectorContainer<PointCellLinksContainer>;
 
   /** The container type for use in storing point data.  It must conform to
    * the IndexedContainer interface. */
-  using PointDataContainer = VectorContainer<PointIdentifier, PixelType>;
+  using PointDataContainer = VectorContainer<PixelType>;
 
   /** The container type for use in storing cell data.  It must conform to
    * the IndexedContainer interface. */
-  using CellDataContainer = VectorContainer<CellIdentifier, CellPixelType>;
+  using CellDataContainer = VectorContainer<CellPixelType>;
 };
 } // end namespace itk
 

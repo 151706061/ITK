@@ -20,9 +20,7 @@
 
 #include "itkColormapFunction.h"
 
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 /**
  * \class CopperColormapFunction
@@ -35,7 +33,7 @@ namespace Function
  * This code was contributed in the Insight Journal paper:
  *
  * "Meeting Andy Warhol Somewhere Over the Rainbow: RGB Colormapping and ITK"
- * https://www.insight-journal.org/browse/publication/285
+ * https://doi.org/10.54294/tmojbk
  *
  * \ingroup ITKColormap
  */
@@ -64,8 +62,7 @@ protected:
   CopperColormapFunction() = default;
   ~CopperColormapFunction() override = default;
 };
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkCopperColormapFunction.hxx"

@@ -39,7 +39,12 @@ ImageMaskSpatialObject<TDimension, TPixel>::IsInsideInObjectSpace(const PointTyp
 
   const IndexType index = image->TransformPhysicalPointToIndex(point);
 
-  return Superclass::GetBufferedRegion().IsInside(index) && Math::NotExactlyEquals(image->GetPixel(index), PixelType{});
+  const bool is_inside = Superclass::GetBufferedRegion().IsInside(index);
+
+  const PixelType background_zero{};
+
+  return is_inside && ((m_UseMaskValue == true && Math::ExactlyEquals(image->GetPixel(index), this->m_MaskValue)) ||
+                       (m_UseMaskValue == false && Math::NotExactlyEquals(image->GetPixel(index), background_zero)));
 }
 
 
@@ -117,11 +122,14 @@ ImageMaskSpatialObject<TDimension, TPixel>::InternalClone() const
   // this to new transform.
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
   }
+
+  rval->SetMaskValue(this->GetMaskValue());
+  rval->SetUseMaskValue(this->GetUseMaskValue());
 
   return loPtr;
 }
@@ -131,6 +139,8 @@ auto
 ImageMaskSpatialObject<TDimension, TPixel>::ComputeMyBoundingBoxInIndexSpace() const -> RegionType
 {
   const ImagePointer imagePointer = this->GetImage();
+  const bool         useMaskValue = this->GetUseMaskValue();
+  const PixelType    maskValue = this->GetMaskValue();
 
   if (imagePointer == nullptr)
   {
@@ -139,12 +149,12 @@ ImageMaskSpatialObject<TDimension, TPixel>::ComputeMyBoundingBoxInIndexSpace() c
 
   const ImageType & image = *imagePointer;
 
-  const auto HasForegroundPixels = [&image](const RegionType & region) {
+  const auto HasForegroundPixels = [&image, useMaskValue, maskValue](const RegionType & region) {
     for (const PixelType pixelValue : ImageRegionRange{ image, region })
     {
-      constexpr auto zeroValue = PixelType{};
+      constexpr PixelType zeroValue{};
 
-      if (pixelValue != zeroValue)
+      if (pixelValue != zeroValue && (useMaskValue == false || pixelValue == maskValue))
       {
         return true;
       }

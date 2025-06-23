@@ -48,7 +48,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = DecimationQuadEdgeMeshFilter<TInput, TOutput, TCriterion>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EdgeDecimationQuadEdgeMeshFilter);
 
   using InputMeshType = TInput;
@@ -181,7 +181,7 @@ protected:
   /**
    * \brief
    */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   NumberOfCommonVerticesIn0Ring() const;
 
   /**
@@ -215,16 +215,17 @@ protected:
    * \brief
    * \todo Finish to implement this method!
    */
+  /** @ITKStartGrouping */
   bool
   CheckOrientation(OutputQEType * iEdge, const OutputPointIdentifier & iId, const OutputPointType & iPt)
   {
     OutputMeshPointer           output = this->GetOutput();
     OutputCellsContainerPointer cells = output->GetCells();
+    /** @ITKEndGrouping */
+    OutputQEType * qe = iEdge;
+    OutputQEType * qe_it = qe->GetOnext();
 
-    std::list<OutputCellIdentifier> r1, r2, elements_to_be_tested;
-    OutputQEType *                  qe = iEdge;
-    OutputQEType *                  qe_it = qe->GetOnext();
-
+    std::list<OutputCellIdentifier> r1;
     do
     {
       r1.push_back(qe_it->GetLeft());
@@ -234,6 +235,7 @@ protected:
     qe = iEdge->GetSym();
     qe_it = qe->GetOnext();
 
+    std::list<OutputCellIdentifier> r2;
     do
     {
       r2.push_back(qe_it->GetLeft());
@@ -243,6 +245,7 @@ protected:
     r1.sort();
     r2.sort();
 
+    std::list<OutputCellIdentifier> elements_to_be_tested;
     std::set_symmetric_difference(
       r1.begin(), r1.end(), r2.begin(), r2.end(), std::back_inserter(elements_to_be_tested));
 
@@ -250,28 +253,22 @@ protected:
 
     using TriangleType = TriangleHelper<OutputPointType>;
 
-    bool                  orientation_ok(true);
-    OutputCellIdentifier  c_id(0);
-    OutputPolygonType *   poly;
-    OutputPointIdentifier p_id;
-
-    int             k(0), replace_k(0);
+    bool            orientation_ok(true);
+    int             replace_k(0);
     OutputPointType pt[3];
-
-    OutputVectorType n_bef, n_aft;
 
     while ((it != elements_to_be_tested.end()) && orientation_ok)
     {
-      c_id = *it;
-      poly = dynamic_cast<OutputPolygonType *>(cells->GetElement(c_id));
+      OutputCellIdentifier c_id = *it;
+      auto *               poly = dynamic_cast<OutputPolygonType *>(cells->GetElement(c_id));
 
       qe = poly->GetEdgeRingEntry();
       qe_it = qe;
-      k = 0;
+      int k = 0;
 
       do
       {
-        p_id = qe_it->GetOrigin();
+        OutputPointIdentifier p_id = qe_it->GetOrigin();
         if (p_id == iId)
         {
           replace_k = k;
@@ -280,7 +277,8 @@ protected:
         qe_it = qe_it->GetLnext();
       } while (qe_it != qe);
 
-      n_bef = TriangleType::ComputeNormal(pt[0], pt[1], pt[2]);
+      OutputVectorType n_bef = TriangleType::ComputeNormal(pt[0], pt[1], pt[2]);
+      OutputVectorType n_aft;
       switch (replace_k)
       {
         default:

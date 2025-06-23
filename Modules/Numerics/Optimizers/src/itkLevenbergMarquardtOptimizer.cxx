@@ -24,14 +24,12 @@ namespace itk
  * Constructor
  */
 LevenbergMarquardtOptimizer::LevenbergMarquardtOptimizer()
-{
-  m_OptimizerInitialized = false;
-  m_VnlOptimizer = nullptr;
-  m_NumberOfIterations = 2000;
-  m_ValueTolerance = 1e-8;
-  m_GradientTolerance = 1e-5;
-  m_EpsilonFunction = 1e-11;
-}
+  : m_VnlOptimizer(nullptr)
+  , m_NumberOfIterations(2000)
+  , m_ValueTolerance(1e-8)
+  , m_GradientTolerance(1e-5)
+  , m_EpsilonFunction(1e-11)
+{}
 
 /**
  * Destructor
@@ -101,8 +99,8 @@ LevenbergMarquardtOptimizer::StartOptimization()
 {
   this->InvokeEvent(StartEvent());
 
-  ParametersType initialPosition = GetInitialPosition();
-  ParametersType parameters(initialPosition);
+  const ParametersType initialPosition = GetInitialPosition();
+  ParametersType       parameters(initialPosition);
 
   // If the user provides the scales then we set otherwise we don't
   // for computation speed.
@@ -198,16 +196,16 @@ LevenbergMarquardtOptimizer::GetOptimizer() const
   return m_VnlOptimizer.get();
 }
 
-const std::string
+std::string
 LevenbergMarquardtOptimizer::GetStopConditionDescription() const
 {
-  std::ostringstream reason, outcome;
-
+  std::ostringstream outcome;
   outcome.str("");
   if (GetOptimizer())
   {
     GetOptimizer()->diagnose_outcome(outcome);
   }
+  std::ostringstream reason;
   reason << this->GetNameOfClass() << ": " << ((!outcome.str().empty()) ? outcome.str().c_str() : "");
   return reason.str();
 }

@@ -54,7 +54,7 @@ itkNrrdComplexImageReadTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  myImage::Pointer image = reader->GetOutput();
+  const myImage::Pointer image = reader->GetOutput();
 
   // Pick off some pixels in the test image (the first, the last, and
   // a few in between) and make sure that the values are very close to
@@ -64,10 +64,9 @@ itkNrrdComplexImageReadTest(int argc, char * argv[])
 
   float              err = 0;
   myImage::IndexType coord;
-  PixelType          sample;
   coord[0] = 0;
   coord[1] = 0;
-  sample = image->GetPixel(coord);
+  PixelType sample = image->GetPixel(coord);
   err += itk::Math::abs(sample.real() - 27.985973);
   err += itk::Math::abs(sample.imag() - 0.0);
 
@@ -107,14 +106,12 @@ itkNrrdComplexImageReadTest(int argc, char * argv[])
   err += itk::Math::abs(sample.real() - -0.036674671);
   err += itk::Math::abs(sample.imag() - -0.0061681992);
 
-  double thresh = 0.00000038;
+  constexpr double thresh = 0.00000038;
   if (err > thresh)
   {
     std::cout << "failure because err == " << err << "> " << thresh << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    return EXIT_SUCCESS;
-  }
+
+  return EXIT_SUCCESS;
 }

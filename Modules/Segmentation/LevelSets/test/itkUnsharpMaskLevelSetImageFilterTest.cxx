@@ -19,8 +19,8 @@
 #include "itkUnsharpMaskLevelSetImageFilter.h"
 #include <iostream>
 
-const unsigned int HEIGHT = (128);
-const unsigned int WIDTH = (128);
+constexpr unsigned int HEIGHT = (128);
+constexpr unsigned int WIDTH = (128);
 
 #define RADIUS (std::min(HEIGHT, WIDTH) / 4)
 
@@ -28,17 +28,12 @@ const unsigned int WIDTH = (128);
 float
 square(unsigned int x, unsigned int y)
 {
-  float X, Y;
-  X = itk::Math::abs(x - static_cast<float>(WIDTH) / 2.0);
-  Y = itk::Math::abs(y - static_cast<float>(HEIGHT) / 2.0);
-  float dis;
+  const float X = itk::Math::abs(x - float{ WIDTH } / 2.0);
+  const float Y = itk::Math::abs(y - float{ HEIGHT } / 2.0);
+  float       dis = -std::sqrt((X - RADIUS) * (X - RADIUS) + (Y - RADIUS) * (Y - RADIUS));
   if (!((X > RADIUS) && (Y > RADIUS)))
   {
     dis = RADIUS - std::max(X, Y);
-  }
-  else
-  {
-    dis = -std::sqrt((X - RADIUS) * (X - RADIUS) + (Y - RADIUS) * (Y - RADIUS));
   }
   return (dis);
 }
@@ -67,9 +62,9 @@ itkUnsharpMaskLevelSetImageFilterTest(int, char *[])
 
   auto im_init = ImageType::New();
 
-  ImageType::RegionType r;
-  ImageType::SizeType   sz = { { HEIGHT, WIDTH } };
-  ImageType::IndexType  idx = { { 0, 0 } };
+  ImageType::RegionType          r;
+  constexpr ImageType::SizeType  sz = { { HEIGHT, WIDTH } };
+  constexpr ImageType::IndexType idx = { { 0, 0 } };
   r.SetSize(sz);
   r.SetIndex(idx);
 

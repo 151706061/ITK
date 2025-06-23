@@ -64,7 +64,12 @@ namespace itk
  *  This filter was contributed in the Insight Journal paper:
  *  "A Label Geometry Image Filter for Multiple Object Measurement"
  *  by Padfield D., Miller J
- *  https://www.insight-journal.org/browse/publication/301
+ *  https://doi.org/10.54294/saa3nn
+ *
+ * This class contains computational inefficiencies and bugs such as some attributes are not computed with respect to
+ * image geometry, consider using these supported alternatives:
+ * \sa LabelStatisticsImageFilter
+ * \sa LabelImageToShapeLabelMapFilter
  *
  * \ingroup ITKReview
  *
@@ -73,7 +78,11 @@ namespace itk
  * \endsphinx
  */
 template <typename TLabelImage, typename TIntensityImage = TLabelImage>
-class ITK_TEMPLATE_EXPORT LabelGeometryImageFilter : public ImageToImageFilter<TLabelImage, TIntensityImage>
+class ITK_TEMPLATE_EXPORT
+#if !defined(ITK_LEGACY_SILENT)
+  [[deprecated("This class contains known computational bugs. See class documentation for details.")]]
+#endif
+  LabelGeometryImageFilter : public ImageToImageFilter<TLabelImage, TIntensityImage>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(LabelGeometryImageFilter);
@@ -87,7 +96,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelGeometryImageFilter);
 
   /** Image related type alias. */
@@ -154,11 +163,10 @@ public:
   public:
     // default constructor
     LabelGeometry()
+      : m_Label(0)
+      , m_Sum(RealType{})
     {
       // initialized to the default values
-      this->m_Label = 0;
-      this->m_Sum = RealType{};
-
       const unsigned int imageDimension = Self::ImageDimension;
 
       // m_BoundingBox.resize(imageDimension*2);
@@ -184,9 +192,8 @@ public:
       m_Eccentricity = 1;
       m_Elongation = 1;
       m_Orientation = 0;
-      LabelPointType emptyPoint;
-      emptyPoint.Fill(0);
-      unsigned int numberOfVertices = 1 << ImageDimension;
+      LabelPointType emptyPoint{};
+      unsigned int   numberOfVertices = 1 << ImageDimension;
       m_OrientedBoundingBoxVertices.resize(numberOfVertices, emptyPoint);
       m_OrientedBoundingBoxVolume = 0;
       m_OrientedBoundingBoxSize.Fill(0);
@@ -214,7 +221,7 @@ public:
     LabelPointType                          m_WeightedCentroid;
     SizeValueType                           m_ZeroOrderMoment;
     IndexArrayType                          m_FirstOrderRawMoments;
-    IndexArrayType                          m_FirstOrderWeightedRawMoments;
+    AxesLengthType                          m_FirstOrderWeightedRawMoments;
     SizeValueType                           m_FirstOrderRawCrossMoment;
     RealType                                m_FirstOrderCentralCrossMoment;
     MatrixType                              m_SecondOrderRawMoments;
@@ -257,8 +264,8 @@ public:
     // turned off if any of these flags are turned on.
     if (value == false)
     {
-      if ((this->m_CalculateOrientedBoundingBox == true) || (this->m_CalculateOrientedLabelRegions == true) ||
-          (this->m_CalculateOrientedIntensityRegions == true))
+      if ((this->m_CalculateOrientedBoundingBox) || (this->m_CalculateOrientedLabelRegions) ||
+          (this->m_CalculateOrientedIntensityRegions))
       {
         // We cannot change the value, so return.
         return;
@@ -285,7 +292,7 @@ public:
 
     // CalculateOrientedBoundingBox needs
     // CalculatePixelIndices to be turned on.
-    if (value == true)
+    if (value)
     {
       this->SetCalculatePixelIndices(true);
     }
@@ -303,7 +310,7 @@ public:
 
       // CalculateOrientedLabelImage needs
       // CalculateOrientedBoundingBox to be turned on.
-      if (value == true)
+      if (value)
       {
         SetCalculateOrientedBoundingBox(true);
       }
@@ -322,7 +329,7 @@ public:
 
       // CalculateOrientedIntensityImage needs
       // CalculateOrientedBoundingBox to be turned on.
-      if (value == true)
+      if (value)
       {
         this->SetCalculateOrientedBoundingBox(true);
       }
@@ -353,13 +360,13 @@ public:
   }
 
   /** Get the number of labels used */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfObjects() const
   {
     return m_LabelGeometryMapper.size();
   }
 
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfLabels() const
   {
     return this->GetNumberOfObjects();
@@ -380,9 +387,6 @@ public:
    * the volume and the zero order moment */
   SizeValueType
   GetVolume(LabelPixelType label) const;
-
-  /** Return the number of pixels for all labels. */
-  // std::vector< SizeValueType > GetAllCounts() const;
 
   /** Return the computed integrated pixel intensity for a label. */
   RealType
@@ -484,11 +488,7 @@ public:
   TIntensityImage *
   GetOrientedIntensityImage(LabelPixelType label) const;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   LabelGeometryImageFilter();

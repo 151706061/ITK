@@ -65,6 +65,8 @@ template <typename TImage>
 class ITK_TEMPLATE_EXPORT ImageIterator : public ImageConstIterator<TImage>
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(ImageIterator);
+
   /** Standard class type aliases. */
   using Self = ImageIterator;
 
@@ -96,18 +98,9 @@ public:
   /** Default Destructor */
   ~ImageIterator() override = default;
 
-  /** Copy Constructor. The copy constructor is provided to make sure the
-   * handle to the image is properly reference counted. */
-  ImageIterator(const Self & it);
-
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageIterator(TImage * ptr, const RegionType & region);
-
-  /** operator= is provided to make sure the handle to the image is properly
-   * reference counted. */
-  Self &
-  operator=(const Self & it);
 
   /** Set the pixel value */
   void
@@ -130,7 +123,7 @@ public:
   }
 
   /** Get the image that this iterator walks. */
-  ImageType *
+  [[nodiscard]] ImageType *
   GetImage() const
   {
     // const_cast is needed here because m_Image is declared as a const pointer
@@ -141,9 +134,11 @@ public:
 protected:
   /** This constructor is declared protected in order to enforce
     const-correctness */
+  /** @ITKStartGrouping */
   ImageIterator(const ImageConstIterator<TImage> & it);
   Self &
   operator=(const ImageConstIterator<TImage> & it);
+  /** @ITKEndGrouping */
 };
 } // end namespace itk
 

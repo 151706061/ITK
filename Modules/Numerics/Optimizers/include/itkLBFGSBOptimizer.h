@@ -45,18 +45,7 @@ class ITK_FORWARD_EXPORT LBFGSBOptimizerHelper;
  *
  * See also the documentation in Numerics/lbfgsb.c
  *
- * References:
- *
- * [1] R. H. Byrd, P. Lu and J. Nocedal.
- * A Limited Memory Algorithm for Bound Constrained Optimization, (1995),
- * SIAM Journal on Scientific and Statistical Computing ,
- * 16, 5, pp. 1190-1208.
- *
- * [2] C. Zhu, R. H. Byrd and J. Nocedal.
- * L-BFGS-B: Algorithm 778: L-BFGS-B, FORTRAN routines for large scale
- * bound constrained optimization (1997),
- * ACM Transactions on Mathematical Software,
- * Vol 23, Num. 4, pp. 550 - 560.
+ * For algorithmic details see \cite byrd1995 and \cite zhu1997.
  *
  * \ingroup Numerics Optimizers
  * \ingroup ITKOptimizers
@@ -75,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LBFGSBOptimizer);
 
   /**  BoundValue type.
@@ -115,25 +104,28 @@ public:
   itkBooleanMacro(Trace);
 
   /** Set the lower bound value for each variable. */
+  /** @ITKStartGrouping */
   virtual void
   SetLowerBound(const BoundValueType & value);
   itkGetConstReferenceMacro(LowerBound, BoundValueType);
-
+  /** @ITKEndGrouping */
   /** Set the upper bound value for each variable. */
+  /** @ITKStartGrouping */
   virtual void
   SetUpperBound(const BoundValueType & value);
   itkGetConstReferenceMacro(UpperBound, BoundValueType);
-
+  /** @ITKEndGrouping */
   /** Set the boundary condition for each variable, where
    * select[i] = 0 if x[i] is unbounded,
    *           = 1 if x[i] has only a lower bound,
    *           = 2 if x[i] has both lower and upper bounds, and
    *           = 3 if x[1] has only an upper bound
    */
+  /** @ITKStartGrouping */
   virtual void
   SetBoundSelection(const BoundSelectionType & value);
   itkGetConstReferenceMacro(BoundSelection, BoundSelectionType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the CostFunctionConvergenceFactor. Algorithm terminates
    * when the reduction in cost function is less than factor * epsmcj
    * where epsmch is the machine precision.
@@ -191,7 +183,7 @@ public:
   itkGetConstReferenceMacro(InfinityNormOfProjectedGradient, double);
 
   /** Get the reason for termination */
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
   /** Returns false unconditionally because LBFGSBOptimizer does not support using scales. */

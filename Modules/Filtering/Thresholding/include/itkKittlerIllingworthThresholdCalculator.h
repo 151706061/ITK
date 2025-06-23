@@ -28,9 +28,8 @@ namespace itk
  * \class KittlerIllingworthThresholdCalculator
  * \brief Computes the KittlerIllingworth's threshold for an image.
  *
- * Kittler and J. Illingworth, "Minimum error thresholding," Pattern Recognition, vol. 19, pp. 41-47, 1986.
- * C. A. Glasbey, "An analysis of histogram-based thresholding algorithms," CVGIP: Graphical Models and Image
- * Processing, vol. 55, pp. 532-537, 1993. Original Matlab code Copyright (C) 2004 Antti Niemisto See
+ * For algorithm description see \cite kittler1986 and \cite glasbey1993.
+ * Original Matlab code Copyright (C) 2004 Antti Niemisto. See
  * https://www.cs.tut.fi/~ant/histthresh/ for an excellent slide presentation and the original Matlab code.
  *
  * This class is templated over the input histogram type.
@@ -41,7 +40,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/811
+ * https://doi.org/10.54294/efycla
  *
  * \ingroup Operators
  * \ingroup ITKThresholding
@@ -62,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KittlerIllingworthThresholdCalculator);
 
   /** Type definition for the input image. */

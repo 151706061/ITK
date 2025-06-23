@@ -55,9 +55,10 @@ FlatStructuringElement<VDimension>::GeneratePolygon(TStructuringElement &, TRadi
 }
 
 template <unsigned int VDimension>
-void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringElement<2> & res,
-                                                         itk::Size<2>                     radius,
-                                                         unsigned int                     lines)
+void
+FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringElement<2> & res,
+                                                    itk::Size<2>                     radius,
+                                                    unsigned int                     lines)
 {
   // radial decomposition method from "Radial Decomposition of Discs
   // and Spheres" - CVGIP: Graphical Models and Image Processing
@@ -126,9 +127,10 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
 //    O[2] = k3 * std::sin(theta);
 
 template <unsigned int VDimension>
-void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringElement<3> & res,
-                                                         itk::Size<3>                     radius,
-                                                         unsigned int                     lines)
+void
+FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringElement<3> & res,
+                                                    itk::Size<3>                     radius,
+                                                    unsigned int                     lines)
 {
   res.SetRadius(radius);
   res.SetDecomposable(true);
@@ -136,7 +138,7 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
   // std::cout << "3 dimensions" << std::endl;
   unsigned int rr = 0;
   int          iterations = 1;
-  int          faces = lines * 2;
+  const int    faces = lines * 2;
   for (unsigned int i = 0; i < 3; ++i)
   {
     if (radius[i] > rr)
@@ -149,10 +151,10 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
     case 12:
     {
       // dodecahedron
-      float        phi = (1.0 + std::sqrt(5.0)) / 2.0;
-      float        b = 1.0 / phi;
-      float        c = 2.0 - phi;
-      unsigned int facets = 12;
+      const float            phi = (1.0 + std::sqrt(5.0)) / 2.0;
+      float                  b = 1.0 / phi;
+      float                  c = 2.0 - phi;
+      constexpr unsigned int facets = 12;
       using FacetArrayType = std::vector<FacetType3>;
       FacetArrayType FacetArray;
       FacetArray.resize(facets);
@@ -334,9 +336,9 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
       for (unsigned int j = 0; j < facets; ++j)
       {
         // Find a line perpendicular to each face
-        LType3 L, A, B;
-        A = FacetArray[j].P2 - FacetArray[j].P1;
-        B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 A = FacetArray[j].P2 - FacetArray[j].P1;
+        LType3 B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 L;
         L[0] = A[1] * B[2] - B[1] * A[2];
         L[1] = B[0] * A[2] - A[0] * B[2];
         L[2] = A[0] * B[1] - B[0] * A[1];
@@ -404,10 +406,10 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
     case 20:
     {
       // Icosahedron
-      float        phi = (1.0 + std::sqrt(5.0)) / 2.0;
-      float        a = 0.5;
-      float        b = 1.0 / (2.0 * phi);
-      unsigned int facets = 20;
+      const float            phi = (1.0 + std::sqrt(5.0)) / 2.0;
+      const float            a = 0.5;
+      const float            b = 1.0 / (2.0 * phi);
+      constexpr unsigned int facets = 20;
       using FacetArrayType = std::vector<FacetType3>;
       FacetArrayType FacetArray;
       FacetArray.resize(facets);
@@ -700,9 +702,9 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
       for (unsigned int j = 0; j < facets; ++j)
       {
         // Find a line perpendicular to each face
-        LType3 L, A, B;
-        A = FacetArray[j].P2 - FacetArray[j].P1;
-        B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 A = FacetArray[j].P2 - FacetArray[j].P1;
+        LType3 B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 L;
         L[0] = A[1] * B[2] - B[1] * A[2];
         L[1] = B[0] * A[2] - A[0] * B[2];
         L[2] = A[0] * B[1] - B[0] * A[1];
@@ -725,56 +727,68 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
       // create triangular facet approximation to a sphere - begin with
       // unit sphere
       // total number of facets is 8 * (4^iterations)
-      unsigned int facets = 8 * static_cast<int>(std::pow(4.0, iterations));
-      double       sqrt2 = std::sqrt(2.0);
+      const unsigned int facets = 8 * static_cast<int>(std::pow(4.0, iterations));
+      const double       sqrt2 = std::sqrt(2.0);
 
       using FacetArrayType = std::vector<FacetType3>;
       FacetArrayType FacetArray;
       FacetArray.resize(facets);
 
       // original corners of octahedron
-      LType3 P0{}, P1{}, P2{}, P3{}, P4{}, P5{};
+      LType3 P0{};
       P0[0] = 0;
       P0[1] = 0;
       P0[2] = 1;
+      LType3 P1{};
       P1[0] = 0;
       P1[1] = 0;
       P1[2] = -1;
+      LType3 P2{};
       P2[0] = -1.0 / sqrt2;
       P2[1] = -1 / sqrt2;
       P2[2] = 0;
+      LType3 P3{};
       P3[0] = 1 / sqrt2;
       P3[1] = -1 / sqrt2;
       P3[2] = 0;
+      LType3 P4{};
       P4[0] = 1 / sqrt2;
       P4[1] = 1 / sqrt2;
       P4[2] = 0;
+      LType3 P5{};
       P5[0] = -1 / sqrt2;
       P5[1] = 1 / sqrt2;
       P5[2] = 0;
 
-      FacetType3 F0, F1, F2, F3, F4, F5, F6, F7;
+      FacetType3 F0;
       F0.P1 = P0;
       F0.P2 = P3;
       F0.P3 = P4;
+      FacetType3 F1;
       F1.P1 = P0;
       F1.P2 = P4;
       F1.P3 = P5;
+      FacetType3 F2;
       F2.P1 = P0;
       F2.P2 = P5;
       F2.P3 = P2;
+      FacetType3 F3;
       F3.P1 = P0;
       F3.P2 = P2;
       F3.P3 = P3;
+      FacetType3 F4;
       F4.P1 = P1;
       F4.P2 = P4;
       F4.P3 = P3;
+      FacetType3 F5;
       F5.P1 = P1;
       F5.P2 = P5;
       F5.P3 = P4;
+      FacetType3 F6;
       F6.P1 = P1;
       F6.P2 = P2;
       F6.P3 = P5;
+      FacetType3 F7;
       F7.P1 = P1;
       F7.P2 = P3;
       F7.P3 = P2;
@@ -792,10 +806,12 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
       for (unsigned int it = 0; it < static_cast<unsigned int>(iterations); ++it)
       {
         // Bisect edges and move to sphere
-        unsigned int ntold = pos;
+        const unsigned int ntold = pos;
         for (unsigned int i = 0; i < ntold; ++i)
         {
-          LType3 Pa, Pb, Pc;
+          LType3 Pa;
+          LType3 Pb;
+          LType3 Pc;
           for (unsigned int d = 0; d < 3; ++d)
           {
             Pa[d] = (FacetArray[i].P1[d] + FacetArray[i].P2[d]) / 2;
@@ -826,9 +842,9 @@ void FlatStructuringElement<VDimension>::GeneratePolygon(itk::FlatStructuringEle
       for (unsigned int j = 0; j < facets; ++j)
       {
         // Find a line perpendicular to each face
-        LType3 L, A, B;
-        A = FacetArray[j].P2 - FacetArray[j].P1;
-        B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 A = FacetArray[j].P2 - FacetArray[j].P1;
+        LType3 B = FacetArray[j].P3 - FacetArray[j].P1;
+        LType3 L; /*one-line-declaration*/
         L[0] = A[1] * B[2] - B[1] * A[2];
         L[1] = B[0] * A[2] - A[0] * B[2];
         L[2] = A[0] * B[1] - B[0] * A[1];
@@ -862,8 +878,7 @@ FlatStructuringElement<VDimension>::Box(RadiusType radius)
   {
     if (radius[i] != 0)
     {
-      LType L;
-      L.Fill(0);
+      LType L{};
       L[i] = radius[i] * 2 + 1;
       res.AddLine(L);
     }
@@ -894,10 +909,9 @@ FlatStructuringElement<VDimension>::Cross(RadiusType radius)
   {
     *kernel_it = false;
   }
-  for (int d = 0; d < static_cast<int>(VDimension); ++d)
+  for (int d = 0; d < int{ VDimension }; ++d)
   {
-    OffsetType o;
-    o.Fill(0);
+    OffsetType o{};
     for (int i = -static_cast<int>(radius[d]); i <= static_cast<int>(radius[d]); ++i)
     {
       o[d] = i;
@@ -918,17 +932,15 @@ FlatStructuringElement<VDimension>::Ball(RadiusType radius, bool radiusIsParamet
   res.m_Decomposable = false;
   res.SetRadiusIsParametric(radiusIsParametric);
 
-  unsigned int i;
-
   // Create an image to hold the ellipsoid
   //
-  auto                           sourceImage = ImageType::New();
-  typename ImageType::RegionType region;
-  RadiusType                     size = radius;
-  for (i = 0; i < static_cast<int>(VDimension); ++i)
+  auto       sourceImage = ImageType::New();
+  RadiusType size = radius;
+  for (unsigned int i = 0; i < int{ VDimension }; ++i)
   {
     size[i] = 2 * size[i] + 1;
   }
+  typename ImageType::RegionType region;
   region.SetSize(size);
 
   sourceImage->SetRegions(region);
@@ -955,7 +967,7 @@ FlatStructuringElement<VDimension>::Ball(RadiusType radius, bool radiusIsParamet
 
   // Define and set the axes lengths for the ellipsoid
   typename EllipsoidType::InputType axes;
-  for (i = 0; i < VDimension; ++i)
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
     if (res.GetRadiusIsParametric())
     {
@@ -970,7 +982,7 @@ FlatStructuringElement<VDimension>::Ball(RadiusType radius, bool radiusIsParamet
 
   // Define and set the center of the ellipsoid in physical space
   typename EllipsoidType::InputType center;
-  for (i = 0; i < VDimension; ++i)
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
     // put the center of ellipse in the middle of the center pixel
     center[i] = res.GetRadius(i) + 0.5;
@@ -985,7 +997,7 @@ FlatStructuringElement<VDimension>::Ball(RadiusType radius, bool radiusIsParamet
   spatialFunction->SetOrientations(orientations);
 
   typename ImageType::IndexType seed;
-  for (i = 0; i < VDimension; ++i)
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
     seed[i] = res.GetRadius(i);
   }
@@ -1027,13 +1039,13 @@ FlatStructuringElement<VDimension>::Annulus(RadiusType   radius,
 
   // Create an image to hold the ellipsoid
   //
-  auto                           kernelImage = ImageType::New();
-  typename ImageType::RegionType region;
-  RadiusType                     size = radius;
+  auto       kernelImage = ImageType::New();
+  RadiusType size = radius;
   for (unsigned int i = 0; i < VDimension; ++i)
   {
     size[i] = 2 * size[i] + 1;
   }
+  typename ImageType::RegionType region;
   region.SetSize(size);
 
   kernelImage->SetRegions(region);
@@ -1066,12 +1078,14 @@ FlatStructuringElement<VDimension>::Annulus(RadiusType   radius,
     if (result.GetRadiusIsParametric())
     {
       axesOuter[i] = 2 * result.GetRadius(i);
-      axesInner[i] = std::max(2 * (OffsetValueType)radius[i] - 2 * (OffsetValueType)thickness, (OffsetValueType)1);
+      axesInner[i] = std::max(2 * (OffsetValueType)radius[i] - 2 * static_cast<OffsetValueType>(thickness),
+                              static_cast<OffsetValueType>(1));
     }
     else
     {
       axesOuter[i] = result.GetSize(i);
-      axesInner[i] = std::max(2 * (OffsetValueType)radius[i] + 1 - 2 * (OffsetValueType)thickness, (OffsetValueType)1);
+      axesInner[i] = std::max(2 * (OffsetValueType)radius[i] + 1 - 2 * static_cast<OffsetValueType>(thickness),
+                              static_cast<OffsetValueType>(1));
     }
   }
   ellipsoidOuter->SetAxes(axesOuter);
@@ -1148,7 +1162,7 @@ FlatStructuringElement<VDimension>::CheckParallel(LType NewVec) const
   {
     LType LL = m_Lines[i];
     LL.Normalize();
-    float L = NN * LL;
+    const float L = NN * LL;
     if ((1.0 - itk::Math::abs(L)) < 0.000001)
     {
       return (true);
@@ -1163,7 +1177,7 @@ FlatStructuringElement<VDimension>::PrintSelf(std::ostream & os, Indent indent) 
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Decomposable: " << (m_Decomposable ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Decomposable);
 
   os << "Lines: " << std::endl;
   for (unsigned int i = 0; i < m_Lines.size(); ++i)
@@ -1171,7 +1185,7 @@ FlatStructuringElement<VDimension>::PrintSelf(std::ostream & os, Indent indent) 
     os << indent.GetNextIndent() << m_Lines[i] << std::endl;
   }
 
-  os << indent << "RadiusIsParametric: " << (m_RadiusIsParametric ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(RadiusIsParametric);
 }
 
 template <unsigned int VDimension>
@@ -1189,13 +1203,13 @@ FlatStructuringElement<VDimension>::ComputeBufferFromLines()
 
   // Create an image to hold the ellipsoid
   //
-  auto                           sourceImage = ImageType::New();
-  typename ImageType::RegionType region;
-  RadiusType                     size = this->GetRadius();
-  for (int i = 0; i < static_cast<int>(VDimension); ++i)
+  auto       sourceImage = ImageType::New();
+  RadiusType size = this->GetRadius();
+  for (int i = 0; i < int{ VDimension }; ++i)
   {
     size[i] = 2 * size[i] + 1;
   }
+  typename ImageType::RegionType region;
   region.SetSize(size);
   sourceImage->SetRegions(region);
   sourceImage->Allocate();
@@ -1213,7 +1227,7 @@ FlatStructuringElement<VDimension>::ComputeBufferFromLines()
 
   // set the center pixel to 1
   typename ImageType::IndexType center;
-  for (int i = 0; i < static_cast<int>(VDimension); ++i)
+  for (int i = 0; i < int{ VDimension }; ++i)
   {
     center[i] = this->GetRadius()[i];
   }

@@ -128,15 +128,15 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::Process(QEType * e)
   QEType * e_sym = e->GetSym();
 
   // General case
-  bool wasLeftFace = e->IsLeftSet();
-  bool wasRiteFace = e->IsRightSet();
-  bool wasLeftTriangle = e->IsLnextOfTriangle();
-  bool wasRiteTriangle = e_sym->IsLnextOfTriangle();
+  const bool wasLeftFace = e->IsLeftSet();
+  const bool wasRiteFace = e->IsRightSet();
+  const bool wasLeftTriangle = e->IsLnextOfTriangle();
+  const bool wasRiteTriangle = e_sym->IsLnextOfTriangle();
 
-  PointIdentifier NewDest = e->GetDestination();
-  PointIdentifier NewOrg = e->GetOrigin();
-  QEType *        leftZip = e->GetLnext();
-  QEType *        riteZip = e->GetOprev();
+  const PointIdentifier NewDest = e->GetDestination();
+  PointIdentifier       NewOrg = e->GetOrigin();
+  QEType *              leftZip = e->GetLnext();
+  QEType *              riteZip = e->GetOprev();
 
   //
   //                    \   |   /                //
@@ -235,12 +235,12 @@ template <typename TMesh, typename TQEType>
 TQEType *
 QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::ProcessIsolatedQuadEdge(QEType * e)
 {
-  QEType * temp = (e->IsIsolated() == true) ? e->GetSym() : e;
+  QEType * temp = (e->IsIsolated()) ? e->GetSym() : e;
   QEType * rebuildEdge = temp->GetOprev();
 
   m_OldPointID = temp->GetSym()->GetOrigin();
 
-  bool e_leftset = e->IsLeftSet();
+  const bool e_leftset = e->IsLeftSet();
   this->m_Mesh->LightWeightDeleteEdge(e);
   if (e_leftset)
   {
@@ -261,8 +261,8 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::ProcessIsolatedFace
   QEType *               e,
   std::stack<QEType *> & EdgesToBeDeleted)
 {
-  PointIdentifier org = e->GetOrigin();
-  PointIdentifier dest = e->GetDestination();
+  const PointIdentifier org = e->GetOrigin();
+  const PointIdentifier dest = e->GetDestination();
 
   // delete all elements
   while (!EdgesToBeDeleted.empty())
@@ -278,10 +278,8 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::ProcessIsolatedFace
   {
     return temp;
   }
-  else
-  {
-    return this->m_Mesh->FindEdge(org);
-  }
+
+  return this->m_Mesh->FindEdge(org);
 }
 
 template <typename TMesh, typename TQEType>
@@ -290,18 +288,18 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::IsFaceIsolated(QETy
                                                                             const bool              iWasLeftFace,
                                                                             std::stack<TQEType *> & oToBeDeleted)
 {
-  bool     border;
   QEType * e_sym = e->GetSym();
 
   // turn around the face (left or right one) while edges are on the border
   // and push them into a stack (which will be used to delete properly all
   // elements )
-  QEType * temp = (iWasLeftFace == true) ? e : e_sym;
+  QEType * temp = iWasLeftFace ? e : e_sym;
   QEType * e_it = temp;
 
   oToBeDeleted.push(e_it);
   e_it = e_it->GetLnext();
 
+  bool border = false;
   do
   {
     oToBeDeleted.push(e_it);
@@ -334,8 +332,8 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::CheckStatus(QEType 
 
   QEType * e_sym = e->GetSym();
 
-  bool IsEdgeIsolated = e->IsIsolated();
-  bool IsSymEdgeIsolated = e_sym->IsIsolated();
+  const bool IsEdgeIsolated = e->IsIsolated();
+  const bool IsSymEdgeIsolated = e_sym->IsIsolated();
   if (IsEdgeIsolated || IsSymEdgeIsolated)
   {
     if (IsEdgeIsolated && IsSymEdgeIsolated)
@@ -369,10 +367,10 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::CheckStatus(QEType 
     return QUADEDGE_ISOLATED;
   }
 
-  PointIdentifier number_common_vertices = CommonVertexNeighboor(e);
+  const PointIdentifier number_common_vertices = CommonVertexNeighboor(e);
   if (number_common_vertices > 2)
   {
-    itkDebugMacro("The 2 vertices have more than 2 common neighboor vertices.");
+    itkDebugMacro("The 2 vertices have more than 2 common neighbor vertices.");
     return TOO_MANY_COMMON_VERTICES;
   }
 
@@ -386,8 +384,8 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::CheckStatus(QEType 
   }
 
   // General case
-  bool wasLeftFace = e->IsLeftSet();
-  bool wasRiteFace = e->IsRightSet();
+  const bool wasLeftFace = e->IsLeftSet();
+  const bool wasRiteFace = e->IsRightSet();
 
   if (wasLeftFace && wasRiteFace)
   {
@@ -435,8 +433,8 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::IsTetrahedron(QETyp
       {
         if (e_sym->GetLprev()->GetOrder() == 3)
         {
-          bool left_triangle = e->IsLnextOfTriangle();
-          bool right_triangle = e_sym->IsLnextOfTriangle();
+          const bool left_triangle = e->IsLnextOfTriangle();
+          const bool right_triangle = e_sym->IsLnextOfTriangle();
 
           if (left_triangle && right_triangle)
           {
@@ -505,8 +503,8 @@ template <typename TMesh, typename TQEType>
 bool
 QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::IsEye(QEType * e)
 {
-  bool OriginOrderIsTwo = (e->GetOrder() == 2);
-  bool DestinationOrderIsTwo = (e->GetSym()->GetOrder() == 2);
+  const bool OriginOrderIsTwo = (e->GetOrder() == 2);
+  const bool DestinationOrderIsTwo = (e->GetSym()->GetOrder() == 2);
 
   return ((OriginOrderIsTwo && !DestinationOrderIsTwo) || (!OriginOrderIsTwo && DestinationOrderIsTwo));
 }
@@ -556,7 +554,7 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::IsEdgeLinkingTwoDif
 {
   QEType * t = e;
   QEType * e_it = t;
-  bool     org_border;
+  bool     org_border = false;
 
   do
   {
@@ -567,25 +565,23 @@ QuadEdgeMeshEulerOperatorJoinVertexFunction<TMesh, TQEType>::IsEdgeLinkingTwoDif
   {
     return false;
   }
+
+  t = e->GetSym();
+  e_it = t;
+  bool dest_border = false;
+  do
+  {
+    dest_border = e_it->IsAtBorder();
+    e_it = e_it->GetOnext();
+  } while ((e_it != t) && (!dest_border));
+
+  if (!dest_border)
+  {
+    return false;
+  }
   else
   {
-    t = e->GetSym();
-    e_it = t;
-    bool dest_border;
-    do
-    {
-      dest_border = e_it->IsAtBorder();
-      e_it = e_it->GetOnext();
-    } while ((e_it != t) && (!dest_border));
-
-    if (!dest_border)
-    {
-      return false;
-    }
-    else
-    {
-      return true;
-    }
+    return true;
   }
 }
 

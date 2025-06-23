@@ -38,6 +38,9 @@ using DICT_ENTRY = struct
 };
 
 static const DICT_ENTRY DICOMV3DataDict [] = {
+  {0x0049,0x0010,"AIR",VR::LO,VM::VM1,"?Possibly PHI?",false },
+  {0x0049,0x0011,"AIR",VR::LO,VM::VM1,"?number?",false },
+  {0x0049,0x0013,"AIR",VR::LT,VM::VM1,"?Long desc possibly PHI?",false },
   {0x0021,0x0010,"SIEMENS MR FMRI",VR::SQ,VM::VM1,"?",false },
   {0x0021,0x0011,"SIEMENS MR FMRI",VR::LO,VM::VM1,"?",false },
   {0x0021,0x0012,"SIEMENS MR FMRI",VR::SQ,VM::VM1,"?",false },
@@ -7416,11 +7419,11 @@ static const DICT_ENTRY DICOMV3DataDict [] = {
   /* end of dups */
   {0x2005,0x0032,"Philips MR Imaging DD 002",VR::SQ,VM::VM1,"Protocol Data Sequence",false },
   {0x2005,0x0034,"Philips MR Imaging DD 002",VR::LT,VM::VM1,"?SeriesTransactionUID?",false },
-  {0x2005,0x0037,"Philips MR Imaging DD 002",VR::PN,VM::VM1,"Protocol Data Name",false },
-  {0x2005,0x0038,"Philips MR Imaging DD 002",VR::PN,VM::VM1,"?MRApplicationName",false },
-  {0x2005,0x0039,"Philips MR Imaging DD 002",VR::PN,VM::VM1,"Protocol Data Type",false },
-  {0x2005,0x0040,"Philips MR Imaging DD 002",VR::PN,VM::VM1,"?MRVersionStr",false },
-  {0x2005,0x0041,"Philips MR Imaging DD 002",VR::PN,VM::VM1,"?MRCommentStr",false },
+  {0x2005,0x0037,"Philips MR Imaging DD 002",VR::LO,VM::VM1,"Protocol Data Name",false },
+  {0x2005,0x0038,"Philips MR Imaging DD 002",VR::LO,VM::VM1,"?MRApplicationName",false },
+  {0x2005,0x0039,"Philips MR Imaging DD 002",VR::LO,VM::VM1,"Protocol Data Type",false },
+  {0x2005,0x0040,"Philips MR Imaging DD 002",VR::LO,VM::VM1,"?MRVersionStr",false },
+  {0x2005,0x0041,"Philips MR Imaging DD 002",VR::LO,VM::VM1,"?MRCommentStr",false },
   {0x2005,0x0043,"Philips MR Imaging DD 002",VR::SL,VM::VM1,"Protocol Data Block Length (non-padded)",false },
   {0x2005,0x0044,"Philips MR Imaging DD 002",VR::OW,VM::VM1,"Protocol Data Block",false },
   {0x2005,0x0047,"Philips MR Imaging DD 002",VR::CS,VM::VM1,"Protocol Data Boolean",false },

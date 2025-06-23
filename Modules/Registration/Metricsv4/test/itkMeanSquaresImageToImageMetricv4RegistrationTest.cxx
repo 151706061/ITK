@@ -57,6 +57,7 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   std::cout << argc << std::endl;
   unsigned int numberOfIterations = 2;
   unsigned int numberOfDisplacementIterations = 2;
+  bool         useScalesEstimator = true;
   if (argc >= 5)
   {
     numberOfIterations = std::stoi(argv[4]);
@@ -64,6 +65,10 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   if (argc >= 6)
   {
     numberOfDisplacementIterations = std::stoi(argv[5]);
+  }
+  if (argc >= 7)
+  {
+    useScalesEstimator = std::stoi(argv[6]);
   }
   std::cout << " iterations " << numberOfIterations << " displacementIterations " << numberOfDisplacementIterations
             << std::endl;
@@ -85,9 +90,9 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
 
   // get the images
   fixedImageReader->Update();
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   movingImageReader->Update();
-  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
 
   /** define a resample filter that will ultimately be used to deform the image */
   using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -119,8 +124,7 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   std::cout << "fixedImage->GetLargestPossibleRegion(): " << fixedImage->GetLargestPossibleRegion() << std::endl;
   field->Allocate();
   // Fill it with 0's
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  constexpr DisplacementTransformType::OutputVectorType zeroVector{};
   field->FillBuffer(zeroVector);
   // Assign to transform
   displacementTransform->SetDisplacementField(field);
@@ -138,8 +142,9 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   auto metric = MetricType::New();
 
   using PointType = PointSetType::PointType;
-  PointSetType::Pointer                             pset(PointSetType::New());
-  unsigned long                                     ind = 0, ct = 0;
+  const PointSetType::Pointer                       pset(PointSetType::New());
+  unsigned long                                     ind = 0;
+  unsigned long                                     ct = 0;
   itk::ImageRegionIteratorWithIndex<FixedImageType> It(fixedImage, fixedImage->GetLargestPossibleRegion());
 
   for (It.GoToBegin(); !It.IsAtEnd(); ++It)
@@ -168,13 +173,13 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   metric->SetMovingImage(movingImage);
   metric->SetFixedTransform(identityTransform);
   metric->SetMovingTransform(affineTransform);
-  const bool gaussian = false;
+  constexpr bool gaussian = false;
   metric->SetUseMovingImageGradientFilter(gaussian);
   metric->SetUseFixedImageGradientFilter(gaussian);
   metric->Initialize();
 
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
 
@@ -204,7 +209,7 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   RegistrationParameterScalesFromShiftType::ScalesType displacementScales(
     displacementTransform->GetNumberOfLocalParameters());
   displacementScales.Fill(1);
-  if (false)
+  if (!useScalesEstimator)
   {
     optimizer->SetScales(displacementScales);
   }
@@ -212,6 +217,7 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   {
     optimizer->SetScalesEstimator(shiftScaleEstimator);
   }
+
   optimizer->SetMetric(metric);
   optimizer->SetNumberOfIterations(numberOfDisplacementIterations);
   try
@@ -252,12 +258,12 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest(int argc, char * argv[])
 
   // write out the displacement field
   using DisplacementWriterType = itk::ImageFileWriter<DisplacementFieldType>;
-  auto        displacementwriter = DisplacementWriterType::New();
-  std::string outfilename(argv[3]);
-  std::string ext = itksys::SystemTools::GetFilenameExtension(outfilename);
-  std::string name = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
-  std::string path = itksys::SystemTools::GetFilenamePath(outfilename);
-  std::string defout = path + std::string("/") + name + std::string("_def") + ext;
+  auto              displacementwriter = DisplacementWriterType::New();
+  const std::string outfilename(argv[3]);
+  const std::string ext = itksys::SystemTools::GetFilenameExtension(outfilename);
+  const std::string name = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+  const std::string path = itksys::SystemTools::GetFilenamePath(outfilename);
+  const std::string defout = path + std::string("/") + name + std::string("_def") + ext;
   displacementwriter->SetFileName(defout.c_str());
   displacementwriter->SetInput(displacementTransform->GetDisplacementField());
   displacementwriter->Update();

@@ -108,22 +108,22 @@ public:
     return (*this);
   }
 
-  QuadEdgeType *
+  [[nodiscard]] [[nodiscard]] QuadEdgeType *
   GetStartEdge() const
   {
     return (m_StartEdge);
   }
-  QuadEdgeType *
+  [[nodiscard]] [[nodiscard]] QuadEdgeType *
   GetIterator() const
   {
     return (m_Iterator);
   }
-  int
+  [[nodiscard]] [[nodiscard]] int
   GetOpType() const
   {
     return (m_OpType);
   }
-  bool
+  [[nodiscard]] [[nodiscard]] bool
   GetStart() const
   {
     return (m_Start);
@@ -250,7 +250,7 @@ public:
   {
     return (this->m_Iterator);
   }
-  const QuadEdgeType *
+  [[nodiscard]] [[nodiscard]] const QuadEdgeType *
   Value() const
   {
     return (this->m_Iterator);
@@ -275,15 +275,17 @@ public:
   using OriginRefType = typename QuadEdgeType::OriginRefType;
 
 public:
-  QuadEdgeMeshIteratorGeom(QuadEdgeType * e = (QuadEdgeType *)nullptr,
-                           int            op = Superclass::OperatorOnext,
-                           bool           start = true)
+  QuadEdgeMeshIteratorGeom(QuadEdgeType * e = nullptr, int op = Superclass::OperatorOnext, bool start = true)
     : Superclass(e, op, start)
   {}
 
   QuadEdgeMeshIteratorGeom(const QuadEdgeMeshIteratorGeom &) = default;
 
-  OriginRefType operator*() { return (this->m_Iterator->GetOrigin()); }
+  OriginRefType
+  operator*()
+  {
+    return (this->m_Iterator->GetOrigin());
+  }
 };
 
 /**
@@ -324,7 +326,7 @@ public:
     return (*this);
   }
 
-  const QuadEdgeType *
+  [[nodiscard]] [[nodiscard]] const QuadEdgeType *
   Value() const
   {
     return (this->m_Iterator);
@@ -371,7 +373,11 @@ public:
     return (*this);
   }
 
-  const OriginRefType operator*() const { return (this->m_Iterator->GetOrigin()); }
+  const OriginRefType
+  operator*() const
+  {
+    return (this->m_Iterator->GetOrigin());
+  }
 };
 } // namespace itk
 

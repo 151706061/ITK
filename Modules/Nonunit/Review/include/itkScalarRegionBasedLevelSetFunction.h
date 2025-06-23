@@ -33,29 +33,13 @@ namespace itk
  * integrating values on the image domain. NOTE: The convention followed is
  * inside of the level-set function is negative and outside is positive.
  *
- * Based on the paper:
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * Based on the paper \cite chan2001.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
- *
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ITKReview
  */
@@ -73,7 +57,7 @@ public:
 
   // itkNewMacro() is not provided since this is an abstract class.
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarRegionBasedLevelSetFunction);
 
   static constexpr unsigned int ImageDimension = TFeatureImage::ImageDimension;

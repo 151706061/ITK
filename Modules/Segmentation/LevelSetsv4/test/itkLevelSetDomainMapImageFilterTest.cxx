@@ -40,11 +40,9 @@ itkLevelSetDomainMapImageFilterTest(int, char *[])
   size[0] = 10;
   size[1] = 10;
 
-  InputImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const InputImageType::RegionType region{ index, size };
 
-  ListPixelType l;
+  const ListPixelType l;
 
   auto input = InputImageType::New();
   input->SetRegions(region);
@@ -69,29 +67,25 @@ itkLevelSetDomainMapImageFilterTest(int, char *[])
   filter->SetInput(input);
   filter->Update();
 
-  OutputImageType::Pointer output = filter->GetOutput();
+  const OutputImageType::Pointer output = filter->GetOutput();
 
   using OutputImageIteratorType = itk::ImageRegionConstIteratorWithIndex<OutputImageType>;
   OutputImageIteratorType it(output, output->GetLargestPossibleRegion());
 
   it.GoToBegin();
 
-  OutputImageType::IndexType out_index;
-  OutputImageType::PixelType out_id;
-
-  const DomainMapType                 domainMap = filter->GetDomainMap();
-  DomainMapType::const_iterator       mapIt;
-  const DomainMapType::const_iterator mapEnd = domainMap.end();
+  const DomainMapType domainMap = filter->GetDomainMap();
+  const auto          mapEnd = domainMap.end();
   while (!it.IsAtEnd())
   {
-    out_index = it.GetIndex();
-    out_id = it.Get();
+    const OutputImageType::IndexType out_index = it.GetIndex();
+    const OutputImageType::PixelType out_id = it.Get();
 
     if (out_id > 0)
     {
       std::cout << "*** " << std::endl;
       std::cout << out_index << " # " << out_id << std::endl;
-      mapIt = domainMap.find(out_id);
+      auto mapIt = domainMap.find(out_id);
       if (mapIt != mapEnd)
       {
         const InputImageType::RegionType domainMapRegion = *(mapIt->second.GetRegion());
@@ -102,14 +96,12 @@ itkLevelSetDomainMapImageFilterTest(int, char *[])
         {
           return EXIT_FAILURE;
         }
-        else
+
+        for (const auto & lIt : *lout)
         {
-          for (const auto & lIt : *lout)
-          {
-            std::cout << lIt << ' ';
-          }
-          std::cout << std::endl;
+          std::cout << lIt << ' ';
         }
+        std::cout << std::endl;
       }
     }
     ++it;

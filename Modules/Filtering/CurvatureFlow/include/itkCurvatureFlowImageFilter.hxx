@@ -25,12 +25,11 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 CurvatureFlowImageFilter<TInputImage, TOutputImage>::CurvatureFlowImageFilter()
+  : m_TimeStep(0.05f)
 {
   this->SetNumberOfIterations(0);
-  m_TimeStep = 0.05f;
 
-  typename CurvatureFlowFunctionType::Pointer cffp;
-  cffp = CurvatureFlowFunctionType::New();
+  auto cffp = CurvatureFlowFunctionType::New();
 
   this->SetDifferenceFunction(static_cast<FiniteDifferenceFunctionType *>(cffp.GetPointer()));
 }
@@ -77,8 +76,8 @@ CurvatureFlowImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegio
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer inputPtr = const_cast<InputImageType *>(this->GetInput());
-  OutputImagePointer                     outputPtr = this->GetOutput();
+  const typename Superclass::InputImagePointer inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const OutputImagePointer                     outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -95,12 +94,10 @@ void
 CurvatureFlowImageFilter<TInputImage, TOutputImage>::EnlargeOutputRequestedRegion(DataObject * ptr)
 {
   // convert DataObject pointer to OutputImageType pointer
-  OutputImageType * outputPtr;
-
-  outputPtr = dynamic_cast<OutputImageType *>(ptr);
+  auto * outputPtr = dynamic_cast<OutputImageType *>(ptr);
 
   // get input image pointer
-  typename Superclass::InputImagePointer inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<InputImageType *>(this->GetInput());
   if (!inputPtr || !outputPtr)
   {
     return;

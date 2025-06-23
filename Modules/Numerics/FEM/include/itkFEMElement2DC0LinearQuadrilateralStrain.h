@@ -23,9 +23,7 @@
 #include "itkFEMElement2DStrain.h"
 #include "ITKFEMExport.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class Element2DC0LinearQuadrilateralStrain
@@ -65,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Element2DC0LinearQuadrilateralStrain);
 
   /** CreateAnother method will clone the existing instance of this type,
@@ -94,7 +92,6 @@ protected:
 
 private:
 }; // class Element2DC0LinearQuadrilateralStrain
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMElement2DC0LinearQuadrilateralStrain_h

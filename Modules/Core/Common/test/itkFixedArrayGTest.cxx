@@ -17,7 +17,9 @@
  *=========================================================================*/
 
 // Enable testing legacy member functions rBegin() and rEnd().
-#define ITK_LEGACY_TEST
+#ifndef ITK_LEGACY_REMOVE
+#  define ITK_LEGACY_TEST
+#endif
 
 // First include the header file to be tested:
 #include "itkFixedArray.h"
@@ -56,7 +58,7 @@ Check_FixedArray_supports_retrieving_values_by_range_based_for_loop()
   EXPECT_EQ(stdArrayIterator, stdArray.cend());
 
   // Now test retrieving the values from a non-const FixedArray:
-  itk::FixedArray<TValue, VLength> nonConstFixedArray{ stdArray };
+  const itk::FixedArray<TValue, VLength> nonConstFixedArray{ stdArray };
 
   stdArrayIterator = stdArray.cbegin();
 
@@ -243,6 +245,14 @@ Is_Filled_FixedArray_correctly_filled()
 }
 
 
+template <typename TValue>
+constexpr bool
+Check_FixedArray_value_type()
+{
+  static_assert(std::is_same_v<typename itk::FixedArray<TValue>::value_type, TValue>);
+  return true;
+}
+
 } // End of namespace
 
 static_assert(Is_Filled_FixedArray_correctly_filled<0>() && Is_Filled_FixedArray_correctly_filled<1>() &&
@@ -253,6 +263,9 @@ static_assert(Is_Filled_FixedArray_correctly_filled<0>() && Is_Filled_FixedArray
 static_assert(itk::RangeGTestUtilities::CheckConstexprBeginAndEndOfContainer<itk::FixedArray<int>>() &&
                 itk::RangeGTestUtilities::CheckConstexprBeginAndEndOfContainer<itk::FixedArray<double, 1>>(),
               "Check constexpr begin() and end() of FixedArray.");
+
+
+static_assert(Check_FixedArray_value_type<int>() && Check_FixedArray_value_type<double>());
 
 
 // Tests that the values of a FixedArray (either const or non-const) can be retrieved by a

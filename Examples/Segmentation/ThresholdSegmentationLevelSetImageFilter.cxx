@@ -146,15 +146,7 @@ main(int argc, char * argv[])
   thresholder->SetOutsideValue(0);
   thresholder->SetInsideValue(255);
 
-  using ReaderType = itk::ImageFileReader<InternalImageType>;
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-
-  auto reader = ReaderType::New();
-  auto writer = WriterType::New();
-
-  reader->SetFileName(argv[1]);
-  writer->SetFileName(argv[2]);
-
+  const auto input = itk::ReadImage<InternalImageType>(argv[1]);
 
   //  We now declare the type of the \doxygen{FastMarchingImageFilter} that
   //  will be used to generate the initial level set in the form of a distance
@@ -176,7 +168,7 @@ main(int argc, char * argv[])
   using ThresholdSegmentationLevelSetImageFilterType =
     itk::ThresholdSegmentationLevelSetImageFilter<InternalImageType,
                                                   InternalImageType>;
-  ThresholdSegmentationLevelSetImageFilterType::Pointer
+  const ThresholdSegmentationLevelSetImageFilterType::Pointer
     thresholdSegmentation =
       ThresholdSegmentationLevelSetImageFilterType::New();
   // Software Guide : EndCodeSnippet
@@ -252,9 +244,8 @@ main(int argc, char * argv[])
 
   // Software Guide : BeginCodeSnippet
   thresholdSegmentation->SetInput(fastMarching->GetOutput());
-  thresholdSegmentation->SetFeatureImage(reader->GetOutput());
+  thresholdSegmentation->SetFeatureImage(input);
   thresholder->SetInput(thresholdSegmentation->GetOutput());
-  writer->SetInput(thresholder->GetOutput());
   // Software Guide : EndCodeSnippet
 
   //
@@ -340,13 +331,12 @@ main(int argc, char * argv[])
   // Software Guide : BeginCodeSnippet
   try
   {
-    reader->Update();
-    const InternalImageType * inputImage = reader->GetOutput();
+    const auto inputImage = itk::ReadImage<InternalImageType>(argv[1]);
     fastMarching->SetOutputRegion(inputImage->GetBufferedRegion());
     fastMarching->SetOutputSpacing(inputImage->GetSpacing());
     fastMarching->SetOutputOrigin(inputImage->GetOrigin());
     fastMarching->SetOutputDirection(inputImage->GetDirection());
-    writer->Update();
+    itk::WriteImage(thresholder->GetOutput(), argv[2]);
   }
   catch (const itk::ExceptionObject & excep)
   {
@@ -372,17 +362,10 @@ main(int argc, char * argv[])
   // We write out some intermediate images for debugging.  These images can
   // help tune parameters.
   //
-  using InternalWriterType = itk::ImageFileWriter<InternalImageType>;
 
-  auto mapWriter = InternalWriterType::New();
-  mapWriter->SetInput(fastMarching->GetOutput());
-  mapWriter->SetFileName("fastMarchingImage.mha");
-  mapWriter->Update();
-
-  auto speedWriter = InternalWriterType::New();
-  speedWriter->SetInput(thresholdSegmentation->GetSpeedImage());
-  speedWriter->SetFileName("speedTermImage.mha");
-  speedWriter->Update();
+  itk::WriteImage(fastMarching->GetOutput(), "fastMarchingImage.mha");
+  itk::WriteImage(thresholdSegmentation->GetSpeedImage(),
+                  "speedTermImage.mha");
 
   //  Software Guide : BeginLatex
   //

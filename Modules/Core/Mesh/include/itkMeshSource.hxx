@@ -24,20 +24,19 @@ namespace itk
 
 template <typename TOutputMesh>
 MeshSource<TOutputMesh>::MeshSource()
+
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type TOutputMesh
-  OutputMeshPointer output = static_cast<TOutputMesh *>(this->MakeOutput(0).GetPointer());
+  const OutputMeshPointer output = static_cast<TOutputMesh *>(this->MakeOutput(0).GetPointer());
 
   this->ProcessObject::SetNumberOfRequiredOutputs(1);
   this->ProcessObject::SetNthOutput(0, output.GetPointer());
-
-  m_GenerateDataRegion = 0;
-  m_GenerateDataNumberOfRegions = 0;
 }
 
 template <typename TOutputMesh>
-typename MeshSource<TOutputMesh>::DataObjectPointer MeshSource<TOutputMesh>::MakeOutput(DataObjectPointerArraySizeType)
+typename MeshSource<TOutputMesh>::DataObjectPointer
+MeshSource<TOutputMesh>::MakeOutput(DataObjectPointerArraySizeType)
 {
   return TOutputMesh::New().GetPointer();
 }

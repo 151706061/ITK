@@ -74,14 +74,10 @@ itkSpatialNeighborSubsamplerTest(int, char *[])
   using SamplerType = itk::Statistics::SpatialNeighborSubsampler<AdaptorType, RegionType>;
   using IteratorType = itk::ImageRegionConstIteratorWithIndex<ImageType>;
 
-  auto     inImage = ImageType::New();
-  SizeType sz;
-  sz.Fill(25);
-  IndexType idx;
-  idx.Fill(0);
-  RegionType region;
-  region.SetSize(sz);
-  region.SetIndex(idx);
+  auto                inImage = ImageType::New();
+  constexpr auto      sz = SizeType::Filled(25);
+  constexpr IndexType idx{};
+  const RegionType    region{ idx, sz };
 
   inImage->SetRegions(region);
   inImage->AllocateInitialized();
@@ -92,9 +88,7 @@ itkSpatialNeighborSubsamplerTest(int, char *[])
   IndexType idxConstraint;
   idxConstraint[0] = 0;
   idxConstraint[1] = 5;
-  RegionType regionConstraint;
-  regionConstraint.SetSize(szConstraint);
-  regionConstraint.SetIndex(idxConstraint);
+  const RegionType regionConstraint{ idxConstraint, szConstraint };
 
   auto sample = AdaptorType::New();
   sample->SetImage(inImage);
@@ -112,7 +106,7 @@ itkSpatialNeighborSubsamplerTest(int, char *[])
   sampler_orig->CanSelectQueryOn();
 
   // test clone mechanism
-  SamplerType::Pointer sampler = sampler_orig->Clone().GetPointer();
+  const SamplerType::Pointer sampler = sampler_orig->Clone().GetPointer();
   if (sampler->GetSample() != sampler_orig->GetSample())
   {
     std::cerr << "Clone did not copy the sample correctly!" << std::endl;
@@ -143,14 +137,12 @@ itkSpatialNeighborSubsamplerTest(int, char *[])
   IndexType                     queryIdx;
   queryIdx[0] = 2;
   queryIdx[1] = 6;
-  ImageType::OffsetValueType queryOffset = inImage->ComputeOffset(queryIdx);
+  const ImageType::OffsetValueType queryOffset = inImage->ComputeOffset(queryIdx);
   sampler->Search(queryOffset, subsample);
-
-  IndexType index;
 
   for (SamplerType::SubsampleConstIterator sIt = subsample->Begin(); sIt != subsample->End(); ++sIt)
   {
-    index = sIt.GetMeasurementVector()[0].GetIndex();
+    const IndexType index = sIt.GetMeasurementVector()[0].GetIndex();
     inImage->SetPixel(index, 255);
   }
 
@@ -164,16 +156,14 @@ itkSpatialNeighborSubsamplerTest(int, char *[])
   IndexType validStart;
   validStart[0] = 0;
   validStart[1] = 5;
-  RegionType validRegion;
-  validRegion.SetSize(validSz);
-  validRegion.SetIndex(validStart);
+  const RegionType validRegion{ validStart, validSz };
 
   IteratorType it(inImage, region);
   it.GoToBegin();
   while (!it.IsAtEnd())
   {
-    PixelType curValue = it.Get();
-    IndexType curIdx = it.GetIndex();
+    const PixelType curValue = it.Get();
+    const IndexType curIdx = it.GetIndex();
     if (validRegion.IsInside(curIdx))
     {
       // inside the region, value must be 255

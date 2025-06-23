@@ -33,7 +33,7 @@ namespace itk
  *        to pixels.
  *
  * Contributed as a paper to the Insight Journal:
- * https://www.insight-journal.org/browse/publication/204
+ * https://doi.org/10.54294/iei8xt
  *
  * \ingroup ImageIterators
  *
@@ -161,7 +161,7 @@ public:
   }
 
   /** Is the iterator at the end of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtEnd() const override
   {
     return this->m_IsAtEnd;
@@ -236,7 +236,7 @@ public:
   void
   SetFullyConnected(const bool _arg);
 
-  bool
+  [[nodiscard]] bool
   GetFullyConnected() const;
 
   itkBooleanMacro(FullyConnected);

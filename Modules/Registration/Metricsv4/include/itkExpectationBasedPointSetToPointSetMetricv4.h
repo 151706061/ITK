@@ -31,12 +31,8 @@ namespace itk
  * This information-theoretic point set measure models each point set
  * as a sum of Gaussians.  To speed up computation, evaluation of the local
  * value/derivative is done in a user-specified neighborhood using the k-d
- * tree constructed in the superclass.
- *
- *  Reference:
- *    Pluta J, Avants BB, Glynn S, Awate S, Gee JC, Detre JA,
- *    "Appearance and incomplete label matching for diffeomorphic template
- *     "based hippocampus segmentation", Hippocampus, 2009 Jun; 19(6):565-71.
+ * tree constructed in the superclass. For more information
+ * see \cite pluta2009.
  *
  * \ingroup ITKMetricsv4
  */
@@ -58,7 +54,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExpectationBasedPointSetToPointSetMetricv4);
 
   /** Types transferred from the base class */
@@ -67,7 +63,7 @@ public:
   using typename Superclass::LocalDerivativeType;
   using typename Superclass::PointType;
   using typename Superclass::PixelType;
-  using typename Superclass::CoordRepType;
+  using typename Superclass::CoordinateType;
   using typename Superclass::PointIdentifier;
   using typename Superclass::NeighborsIdentifierType;
 
@@ -91,10 +87,10 @@ public:
    * which provides a sense of scale for determining the similarity between two
    * point sets.  Default = 1.0.
    */
-  itkSetMacro(PointSetSigma, CoordRepType);
+  itkSetMacro(PointSetSigma, CoordinateType);
 
   /** Get the point set sigma function */
-  itkGetConstMacro(PointSetSigma, CoordRepType);
+  itkGetConstMacro(PointSetSigma, CoordinateType);
 
   /**
    * Set the neighborhood size used to evaluate the measurement at each
@@ -113,14 +109,14 @@ public:
 
   /** Clone method will clone the existing instance of this type,
    *  including its internal member variables. */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 protected:
   ExpectationBasedPointSetToPointSetMetricv4();
   ~ExpectationBasedPointSetToPointSetMetricv4() override = default;
 
-  bool
+  [[nodiscard]] bool
   RequiresFixedPointsLocator() const override
   {
     return false;
@@ -134,10 +130,10 @@ private:
   using VectorType = typename PointType::VectorType;
   using NeighborsIterator = typename NeighborsIdentifierType::const_iterator;
 
-  CoordRepType m_PointSetSigma{};
-  MeasureType  m_PreFactor{};
-  MeasureType  m_Denominator{};
-  unsigned int m_EvaluationKNeighborhood{ 50 };
+  CoordinateType m_PointSetSigma{};
+  MeasureType    m_PreFactor{};
+  MeasureType    m_Denominator{};
+  unsigned int   m_EvaluationKNeighborhood{ 50 };
 };
 } // end namespace itk
 

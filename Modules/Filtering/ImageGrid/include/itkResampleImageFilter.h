@@ -49,7 +49,7 @@ namespace itk
  * number of tissue types.  For such an image, one does not want to
  * interpolate between different pixel values, and so
  * NearestNeighborInterpolateImageFunction< InputImageType,
- * TCoordRep > would be a better choice.
+ * TCoordinate > would be a better choice.
  *
  * If an sample is taken from outside the image domain, the default behavior is
  * to use a default pixel value.  If different behavior is desired, an
@@ -108,7 +108,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ResampleImageFilter);
 
   /** Number of dimensions of output image. */
@@ -185,7 +185,7 @@ public:
   /* See superclass for doxygen. This method adds the additional check
    * that the output space is set */
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
 
   /** Get/Set the coordinate transformation.
    * Set the coordinate transform to use for resampling.  Note that this must
@@ -203,44 +203,51 @@ public:
    * (useful for binary masks and other images with a small number of
    * possible pixel values), and BSplineInterpolateImageFunction
    * (which provides a higher order of interpolation).  */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Interpolator, InterpolatorType);
   itkGetModifiableObjectMacro(Interpolator, InterpolatorType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the extrapolator function.  The default behavior when sampling outside
    * of the input image is to use the DefaultPixelValue.  Some other options
    * include NearestNeighborExtrapolateImageFunction. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Extrapolator, ExtrapolatorType);
   itkGetModifiableObjectMacro(Extrapolator, ExtrapolatorType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the size of the output image. */
+  /** @ITKStartGrouping */
   itkSetMacro(Size, SizeType);
   itkGetConstReferenceMacro(Size, SizeType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the pixel value when a transformed pixel is outside of the
    * image.  The default default pixel value is 0. */
+  /** @ITKStartGrouping */
   itkSetMacro(DefaultPixelValue, PixelType);
   itkGetConstReferenceMacro(DefaultPixelValue, PixelType);
-
+  /** @ITKEndGrouping */
   /** Set the output image spacing. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputSpacing, SpacingType);
   virtual void
   SetOutputSpacing(const double * spacing);
-
+  /** @ITKEndGrouping */
   /** Get the output image spacing. */
   itkGetConstReferenceMacro(OutputSpacing, SpacingType);
 
   /** Set the output image origin. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputOrigin, OriginPointType);
   virtual void
   SetOutputOrigin(const double * origin);
-
+  /** @ITKEndGrouping */
   /** Get the output image origin. */
   itkGetConstReferenceMacro(OutputOrigin, OriginPointType);
 
   /** Set the output direction cosine matrix. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputDirection, DirectionType);
   itkGetConstReferenceMacro(OutputDirection, DirectionType);
-
+  /** @ITKEndGrouping */
   /** Helper method to set the output parameters based on this image. */
   void
   SetOutputParametersFromImage(const ImageBaseType * image);
@@ -266,15 +273,12 @@ public:
 
   /** Turn on/off whether a specified reference image should be used to define
    *  the output information. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseReferenceImage, bool);
   itkBooleanMacro(UseReferenceImage);
   itkGetConstMacro(UseReferenceImage, bool);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<PixelComponentType>));
-  // End concept checking
-#endif
 
 protected:
   ResampleImageFilter();
@@ -288,7 +292,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override
+  VerifyInputInformation() const override
   {}
 
   /** ResampleImageFilter produces an image which is a different size
@@ -318,7 +322,7 @@ protected:
   AfterThreadedGenerateData() override;
 
   /** Compute the Modified Time based on the changed components. */
-  ModifiedTimeType
+  [[nodiscard]] ModifiedTimeType
   GetMTime() const override;
 
   /** ResampleImageFilter can be implemented as a multithreaded filter.
@@ -344,10 +348,12 @@ protected:
   virtual void
   LinearThreadedGenerateData(const OutputImageRegionType & outputRegionForThread);
 
+#if !defined(ITK_LEGACY_REMOVE)
   /** Cast pixel from interpolator output to PixelType. */
   itkLegacyMacro(virtual PixelType CastPixelWithBoundsChecking(const InterpolatorOutputType value,
                                                                const ComponentType          minComponent,
-                                                               const ComponentType          maxComponent) const);
+                                                               const ComponentType          maxComponent) const;)
+#endif
 
 private:
   static PixelComponentType

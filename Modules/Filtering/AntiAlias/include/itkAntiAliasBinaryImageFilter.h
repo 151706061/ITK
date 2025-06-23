@@ -52,14 +52,9 @@ namespace itk
  *
  * \par NOTES
  * This implementation uses a sparse field level set solver instead of the
- * narrow band implementation described in the reference below, which may
+ * narrow band implementation described in \cite whitaker2000, which may
  * introduce some differences in how fast and how accurately (in terms of RMS
  * error) the solution converges.
- *
- * \par REFERENCES
- * Whitaker, Ross.  "Reducing Aliasing Artifacts In Iso-Surfaces of Binary
- * Volumes"  IEEE Volume Visualization and Graphics Symposium, October 2000,
- * pp.23-32.
  *
  * \par PARAMETERS
  *  The MaximumRMSChange parameter is used to determine when the solution has
@@ -131,13 +126,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AntiAliasBinaryImageFilter);
 
   /** Get the upper and lower binary values in the input image. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(UpperBinaryValue, BinaryValueType);
   itkGetConstMacro(LowerBinaryValue, BinaryValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the maximum number of iterations allowed for the solver.  This
    *  prevents infinite loops if a solution "bounces". */
   void
@@ -154,12 +150,8 @@ public:
     return this->GetNumberOfIterations();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, typename TOutputImage::PixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<typename TInputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   AntiAliasBinaryImageFilter();

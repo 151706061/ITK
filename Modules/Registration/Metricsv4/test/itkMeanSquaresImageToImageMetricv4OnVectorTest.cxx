@@ -38,33 +38,17 @@ itkMeanSquaresImageToImageMetricv4OnVectorTest(int, char ** const)
   using VectorType = itk::Vector<double, vectorLength>;
   using ImageType = itk::Image<VectorType, imageDimensionality>;
 
-  ImageType::SizeType size;
-  size.Fill(imageSize);
-  ImageType::IndexType index;
-  index.Fill(0);
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-  ImageType::PointType origin;
-  origin.Fill(0);
-  ImageType::DirectionType direction;
-  direction.SetIdentity();
+  auto                           size = ImageType::SizeType::Filled(imageSize);
+  constexpr ImageType::IndexType index{};
+  const ImageType::RegionType    region{ index, size };
 
   /* Create simple test images. */
   auto fixedImage = ImageType::New();
   fixedImage->SetRegions(region);
-  fixedImage->SetSpacing(spacing);
-  fixedImage->SetOrigin(origin);
-  fixedImage->SetDirection(direction);
   fixedImage->Allocate();
 
   auto movingImage = ImageType::New();
   movingImage->SetRegions(region);
-  movingImage->SetSpacing(spacing);
-  movingImage->SetOrigin(origin);
-  movingImage->SetDirection(direction);
   movingImage->Allocate();
 
   /* Fill images */
@@ -137,9 +121,8 @@ itkMeanSquaresImageToImageMetricv4OnVectorTest(int, char ** const)
   std::cout << "Initialized" << std::endl;
 
   /* Evaluate with GetValueAndDerivative */
-  MetricType::MeasureType    valueReturn1, valueReturn2;
+  MetricType::MeasureType    valueReturn1 = NAN;
   MetricType::DerivativeType derivativeReturn;
-
   try
   {
     std::cout << "Calling GetValueAndDerivative..." << std::endl;
@@ -162,7 +145,7 @@ itkMeanSquaresImageToImageMetricv4OnVectorTest(int, char ** const)
     std::cerr << "Caught unexpected exception during re-initialize: " << exc << std::endl;
     return EXIT_FAILURE;
   }
-
+  MetricType::MeasureType valueReturn2 = NAN;
   try
   {
     std::cout << "Calling GetValue..." << std::endl;

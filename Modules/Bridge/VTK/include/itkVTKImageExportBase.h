@@ -46,7 +46,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VTKImageExportBase);
 
   /** Returns the user data to set for the vtkImageImport callbacks. */
@@ -54,6 +54,7 @@ public:
   GetCallbackUserData();
 
   /** The function pointer type expected for a callback. */
+  /** @ITKStartGrouping */
   using UpdateInformationCallbackType = void (*)(void *);
   using PipelineModifiedCallbackType = int (*)(void *);
   using WholeExtentCallbackType = int * (*)(void *);
@@ -66,11 +67,12 @@ public:
   using UpdateDataCallbackType = void (*)(void *);
   using DataExtentCallbackType = int * (*)(void *);
   using BufferPointerCallbackType = void * (*)(void *);
-
+  /** @ITKEndGrouping */
   /** Compatibility for VTK older than 4.4.  */
+  /** @ITKStartGrouping */
   using FloatSpacingCallbackType = float * (*)(void *);
   using FloatOriginCallbackType = float * (*)(void *);
-
+  /** @ITKEndGrouping */
   /**
    * \class CallbackTypeProxy
    * \brief Provide compatibility between VTK 4.4 and earlier versions.
@@ -132,7 +134,11 @@ public:
   GetBufferPointerCallback() const;
 
 protected:
-  VTKImageExportBase();
+  /**
+   * Constructor sets up information for the image-type independent
+   * callbacks implemented in this superclass.
+   */
+  VTKImageExportBase() = default;
   ~VTKImageExportBase() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;

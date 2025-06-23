@@ -27,11 +27,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 BlackTopHatImageFilter<TInputImage, TOutputImage, TKernel>::BlackTopHatImageFilter()
-{
-  m_SafeBorder = true;
-  m_Algorithm = AlgorithmEnum::HISTO;
-  m_ForceAlgorithm = false;
-}
+  : m_SafeBorder(true)
+  , m_Algorithm(AlgorithmEnum::HISTO)
+{}
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 void
@@ -62,8 +60,7 @@ BlackTopHatImageFilter<TInputImage, TOutputImage, TKernel>::GenerateData()
   }
 
   // Need to subtract the input from the closed image
-  typename SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::Pointer subtract =
-    SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
+  auto subtract = SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
 
   subtract->SetInput1(close->GetOutput());
   subtract->SetInput2(this->GetInput());

@@ -34,16 +34,12 @@ itkImageRandomNonRepeatingIteratorWithIndexTest2(int, char *[])
   using ImageType = itk::Image<PixelType, ImageDimension>;
 
   using RandomConstIteratorType = itk::ImageRandomNonRepeatingConstIteratorWithIndex<ImageType>;
-  constexpr unsigned long N = 10;
-  constexpr int           Seed = 42;
-  ImageType::SizeType     size;
-  size.Fill(N);
-  ImageType::IndexType start;
-  start.Fill(0);
-  ImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
-  auto myImage = ImageType::New();
+  constexpr unsigned long        N = 10;
+  constexpr int                  Seed = 42;
+  auto                           size = ImageType::SizeType::Filled(N);
+  constexpr ImageType::IndexType start{};
+  const ImageType::RegionType    region{ start, size };
+  auto                           myImage = ImageType::New();
   myImage->SetRegions(region);
   myImage->Allocate();
   using WalkType = std::vector<ImageType::IndexType>;
@@ -64,8 +60,8 @@ itkImageRandomNonRepeatingIteratorWithIndexTest2(int, char *[])
   {
     secondWalk.push_back(secondIt.GetIndex());
   }
-  std::pair<WalkIteratorType, WalkIteratorType> mismatchTest;
-  mismatchTest = std::mismatch(firstWalk.begin(), firstWalk.end(), secondWalk.begin());
+  const std::pair<WalkIteratorType, WalkIteratorType> mismatchTest =
+    std::mismatch(firstWalk.begin(), firstWalk.end(), secondWalk.begin());
   if (mismatchTest.first != firstWalk.end())
   {
     std::cerr << "Two iterations with the same seed do not"

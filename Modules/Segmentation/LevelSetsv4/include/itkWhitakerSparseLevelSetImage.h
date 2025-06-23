@@ -51,7 +51,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WhitakerSparseLevelSetImage);
 
   static constexpr unsigned int Dimension = VDimension;
@@ -87,13 +87,7 @@ public:
   OutputType
   Evaluate(const InputType & inputIndex) const override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-
   itkConceptMacro(DoubleConvertible, (Concept::Convertible<OutputRealType, OutputType>));
-
-  // End concept checking
-#endif // ITK_USE_CONCEPT_CHECKING
 
   static inline LayerIdType
   MinusThreeLayer()
@@ -141,7 +135,7 @@ public:
 
     for (LayerIdType status = this->MinusThreeLayer(); status < this->PlusOneLayer(); ++status)
     {
-      LabelObjectPointer labelObject = this->m_LabelMap->GetLabelObject(status);
+      const LabelObjectPointer labelObject = this->m_LabelMap->GetLabelObject(status);
 
       for (SizeValueType i = 0; i < labelObject->GetNumberOfLines(); ++i)
       {

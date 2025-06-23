@@ -24,19 +24,15 @@ namespace itk
 {
 template <typename TImage, typename TPath>
 PathConstIterator<TImage, TPath>::PathConstIterator(const ImageType * imagePtr, const PathType * pathPtr)
+  : m_Image(imagePtr)
+  , m_Path(pathPtr)
+  , m_Region(m_Image->GetLargestPossibleRegion())
+  , m_ImageOrigin(m_Image->GetOrigin())
+  , m_ImageSpacing(m_Image->GetSpacing())
+  , m_ImageSize(m_Region.GetSize().m_InternalArray)
+  , m_VisitStartIndexAsLastIndexIfClosed(true)
 {
   m_ZeroOffset.Fill(0);
-
-  m_Image = imagePtr;
-  m_Path = pathPtr;
-
-  m_ImageOrigin = m_Image->GetOrigin();
-  m_ImageSpacing = m_Image->GetSpacing();
-  m_Region = m_Image->GetLargestPossibleRegion();
-  m_ImageSize = m_Region.GetSize().m_InternalArray;
-
-  m_VisitStartIndexAsLastIndexIfClosed = true;
-
   GoToBegin();
 }
 
@@ -63,7 +59,7 @@ template <typename TImage, typename TPath>
 void
 PathConstIterator<TImage, TPath>::GoToBegin()
 {
-  // Go the the beginning
+  // Go the beginning
   m_CurrentPathPosition = m_Path->StartOfInput();
 
   // But don't visit the first index twice for closed paths (unless told to)

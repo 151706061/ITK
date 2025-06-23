@@ -44,11 +44,10 @@ itkScalarImageToCooccurrenceMatrixFilterTest2(int, char *[])
   auto mask = InputImageType::New();
 
 
-  InputImageType::SizeType inputImageSize = { { IMGWIDTH, IMGHEIGHT } };
+  constexpr InputImageType::SizeType inputImageSize = { { IMGWIDTH, IMGHEIGHT } };
 
-  InputImageType::IndexType index;
-  index.Fill(0);
-  InputImageType::RegionType region;
+  constexpr InputImageType::IndexType index{};
+  InputImageType::RegionType          region;
 
   region.SetSize(inputImageSize);
   region.SetIndex(index);
@@ -129,9 +128,9 @@ itkScalarImageToCooccurrenceMatrixFilterTest2(int, char *[])
 
     filter->SetInput(image);
 
-    InputImageType::OffsetType      offset1 = { { 0, 1 } };
-    InputImageType::OffsetType      offset2 = { { 1, 0 } };
-    FilterType::OffsetVectorPointer offsetV = FilterType::OffsetVector::New();
+    constexpr InputImageType::OffsetType  offset1 = { { 0, 1 } };
+    constexpr InputImageType::OffsetType  offset2 = { { 1, 0 } };
+    const FilterType::OffsetVectorPointer offsetV = FilterType::OffsetVector::New();
     offsetV->push_back(offset1);
     offsetV->push_back(offset2);
 
@@ -163,12 +162,11 @@ itkScalarImageToCooccurrenceMatrixFilterTest2(int, char *[])
     two_two[0] = 2;
     two_two[1] = 2;
 
-    float ooF, otF, toF, ttF, totalF;
-    ooF = hist->GetFrequency(one_one);
-    otF = hist->GetFrequency(one_two);
-    toF = hist->GetFrequency(two_one);
-    ttF = hist->GetFrequency(two_two);
-    totalF = hist->GetTotalFrequency();
+    float ooF = hist->GetFrequency(one_one);
+    float otF = hist->GetFrequency(one_two);
+    float toF = hist->GetFrequency(two_one);
+    float ttF = hist->GetFrequency(two_two);
+    float totalF = hist->GetTotalFrequency();
 
     if (itk::Math::NotAlmostEquals(ooF, 4.0f) || itk::Math::NotAlmostEquals(ttF, 0.0f) ||
         itk::Math::NotAlmostEquals(otF, 0.0f) || itk::Math::NotAlmostEquals(toF, 0.0f) ||
@@ -328,11 +326,9 @@ itkScalarImageToCooccurrenceMatrixFilterTest2(int, char *[])
       std::cerr << "Test failed" << std::endl;
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cerr << "Test succeeded" << std::endl;
-      return EXIT_SUCCESS;
-    }
+
+    std::cerr << "Test succeeded" << std::endl;
+    return EXIT_SUCCESS;
   }
   catch (const itk::ExceptionObject & err)
   {

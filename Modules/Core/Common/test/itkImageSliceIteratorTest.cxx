@@ -40,12 +40,9 @@ itkImageSliceIteratorTest(int, char *[])
   size[1] = 100;
   size[2] = 100;
 
-  ImageType::IndexType start;
-  start.Fill(0);
+  ImageType::IndexType start{};
 
-  ImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  ImageType::RegionType region{ start, size };
 
   myImage->SetRegions(region);
   myImage->Allocate();

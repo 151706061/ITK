@@ -22,9 +22,7 @@
 #include "itkFEMElementBase.h"
 #include "itkFEMMaterialLinearElasticity.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class Element2DStrain
@@ -57,7 +55,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Element2DStrain);
 
   // Repeat the required type alias and enums from parent class
@@ -96,7 +94,7 @@ public:
   /**
    * 2D strain elements have 2 DOFs per node.
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfDegreesOfFreedomPerNode() const override
   {
     return 2;
@@ -105,7 +103,7 @@ public:
   /**
    * Get/Set the material properties for the element
    */
-  Material::ConstPointer
+  [[nodiscard]] Material::ConstPointer
   GetMaterial() const override
   {
     return dynamic_cast<const Material *>(m_mat);
@@ -126,8 +124,7 @@ protected:
    */
   const MaterialLinearElasticity * m_mat{ nullptr };
 }; // class Element2DStrain
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMElement2DStrain.hxx"

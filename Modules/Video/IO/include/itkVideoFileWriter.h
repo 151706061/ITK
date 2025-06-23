@@ -60,36 +60,41 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VideoFileWriter);
 
 
   /** Specify the file to read. This is forwarded to the IO instance. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
-
+  /** @ITKEndGrouping */
   /** Specify the output FpS. */
+  /** @ITKStartGrouping */
   itkSetMacro(FramesPerSecond, TemporalRatioType);
   itkGetMacro(FramesPerSecond, TemporalRatioType);
-
+  /** @ITKEndGrouping */
   /** Specify the FourCC to use for video encoding. FourCC, or four character
    * code, is commonly used to denote the codec to be used to encode video by
    * many libraries. See https://en.wikipedia.org/wiki/FourCC for more
    * information. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FourCC);
   itkGetStringMacro(FourCC);
-
+  /** @ITKEndGrouping */
   /** Get/Set the OutputTemporalRegion */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputTemporalRegion, TemporalRegion);
   itkGetMacro(OutputTemporalRegion, TemporalRegion);
-
+  /** @ITKEndGrouping */
   /** Set/Get the input video pointer */
+  /** @ITKStartGrouping */
   using Superclass::SetInput;
   void
   SetInput(const VideoStreamType * input);
   const VideoStreamType *
   GetInput();
-
+  /** @ITKEndGrouping */
   /** Manually set the VideoIO to use */
   void
   SetVideoIO(IOBasePointer videoIO);

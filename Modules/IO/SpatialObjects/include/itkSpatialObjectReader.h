@@ -63,6 +63,14 @@ public:
   void
   Update();
 
+  /** Set/Get the version of MetaIO to use */
+  /** @ITKStartGrouping */
+  void
+  SetMetaIOVersion(unsigned int ver);
+  unsigned int
+  GetMetaIOVersion() const;
+  /** @ITKEndGrouping */
+
   /** Set the filename  */
   itkSetStringMacro(FileName);
 
@@ -98,6 +106,7 @@ public:
   }
 
   /** Set/GetEvent */
+  /** @ITKStartGrouping */
   const MetaEvent *
   GetEvent()
   {
@@ -109,6 +118,7 @@ public:
   {
     m_MetaToSpatialConverter->SetEvent(event);
   }
+  /** @ITKEndGrouping */
 
   /** Add a converter for a new MetaObject/SpatialObject type */
   void

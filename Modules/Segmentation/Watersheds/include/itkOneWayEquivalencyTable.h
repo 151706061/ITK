@@ -50,13 +50,14 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(OneWayEquivalencyTable);
 
   /**  Standard type alias and smart pointer declarations.   */
+  /** @ITKStartGrouping */
   using Self = OneWayEquivalencyTable;
   using Superclass = DataObject;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
   itkNewMacro(Self);
   itkOverrideGetNameOfClassMacro(OneWayEquivalencyTable);
-
+  /** @ITKEndGrouping */
   /** Define the container type for this table */
   using HashTableType = std::unordered_map<unsigned long, unsigned long>;
 
@@ -92,10 +93,8 @@ public:
     {
       return a;
     }
-    else
-    {
-      return result->second;
-    }
+
+    return result->second;
   }
 
   /** Lookup an equivalency in the table by recursing through all
@@ -114,10 +113,8 @@ public:
     {
       return false;
     }
-    else
-    {
-      return true;
-    }
+
+    return true;
   }
 
   /**  Erases the entry with key a.   */

@@ -32,10 +32,7 @@
   using FrontIterator = QuadEdgeMeshFrontIterator<MeshTypeArg, QEPrimalType>;                                         \
   using ConstFrontIterator = QuadEdgeMeshConstFrontIterator<MeshTypeArg, QEPrimalType>;                               \
                                                                                                                       \
-  virtual FrontIterator BeginFront(QEPrimalType * seed = (QEPrimalType *)0)                                           \
-  {                                                                                                                   \
-    return (FrontIterator(this, true, seed));                                                                         \
-  }                                                                                                                   \
+  virtual FrontIterator BeginFront(QEPrimalType * seed = nullptr) { return (FrontIterator(this, true, seed)); }       \
                                                                                                                       \
   virtual ConstFrontIterator BeginFront(QEPrimalType * seed) const { return (ConstFrontIterator(this, true, seed)); } \
                                                                                                                       \
@@ -55,7 +52,9 @@
                                                                                                                       \
   virtual FrontDualIterator EndDualFront() { return (FrontDualIterator(this, false)); }                               \
                                                                                                                       \
-  virtual ConstFrontDualIterator EndDualFront() const { return (ConstFrontDualIterator(this, false)); }
+  virtual ConstFrontDualIterator EndDualFront() const { return (ConstFrontDualIterator(this, false)); }               \
+                                                                                                                      \
+  ITK_MACROEND_NOOP_STATEMENT
 
 namespace itk
 {
@@ -85,7 +84,11 @@ public:
 
 protected:
   // Mesh types
-  using CoordRepType = typename MeshType::CoordRepType;
+  using CoordinateType = typename MeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   // QE types
   using QEOriginType = typename QEType::OriginRefType;
 
@@ -101,18 +104,13 @@ protected:
   class FrontAtom
   {
   public:
-    FrontAtom(QEType * e = (QEType *)0, const CoordRepType c = 0)
+    FrontAtom(QEType * e = (QEType *)0, const CoordinateType c = 0)
       : m_Edge(e)
       , m_Cost(c)
     {}
     virtual ~FrontAtom() = default;
     FrontAtom &
-    operator=(const FrontAtom & r)
-    {
-      m_Edge = r.m_Edge;
-      m_Cost = r.m_Cost;
-      return *this;
-    }
+    operator=(const FrontAtom & r) = default;
     bool
     operator==(const FrontAtom & r) const
     {
@@ -128,8 +126,8 @@ protected:
     }
 
   public:
-    QEType *     m_Edge;
-    CoordRepType m_Cost;
+    QEType *       m_Edge;
+    CoordinateType m_Cost;
   };
 
   /** The active front is simply a list of edges that can be sorted on
@@ -147,9 +145,8 @@ protected:
 
 public:
   /** Object creation methods. */
-  QuadEdgeMeshFrontBaseIterator(MeshType * mesh = (MeshType *)nullptr,
-                                bool       start = true,
-                                QEType *   seed = (QEType *)nullptr);
+  QuadEdgeMeshFrontBaseIterator(MeshType * mesh = nullptr, bool start = true, QEType * seed = nullptr);
+
   virtual ~QuadEdgeMeshFrontBaseIterator();
 
   Self &
@@ -185,7 +182,7 @@ public:
     return (this->operator++());
   }
 
-  MeshType *
+  [[nodiscard]] MeshType *
   GetMesh() const
   {
     return this->m_Mesh;
@@ -201,24 +198,28 @@ protected:
   /** The default cost associated to an edge is simply 1. This corresponds
    *  to the "topological metric" i.e. all edges have unit length.
    */
-  virtual CoordRepType
-  GetCost(QEType * edge)
+  virtual CoordinateType
+  GetCost(QEType * itkNotUsed(edge))
   {
-    (void)edge;
     return (1);
   }
 
 protected:
   /** Mesh on which we propagate the front */
   MeshType * m_Mesh{};
+
   /** Initial seed of the front */
   QEType * m_Seed{};
+
   /** Whether the iterator is active */
   bool m_Start{};
+
   /** The active front */
   FrontTypePointer m_Front{};
+
   /** The already visited points */
   IsVisitedPointerType m_IsPointVisited{};
+
   /** The current edge at this stage of iteration */
   QEType * m_CurrentEdge{};
 };
@@ -241,10 +242,12 @@ public:
 
 public:
   /** Object creation methods. */
-  QuadEdgeMeshFrontIterator(MeshType * mesh = (MeshType *)0, bool start = true, QEType * seed = (QEType *)nullptr)
+  QuadEdgeMeshFrontIterator(MeshType * mesh = (MeshType *)0, bool start = true, QEType * seed = nullptr)
     : Superclass(mesh, start, seed)
   {}
+
   ~QuadEdgeMeshFrontIterator() override = default;
+
   QEType *
   Value()
   {
@@ -271,14 +274,10 @@ public:
 
 public:
   /** Object creation methods. */
-  QuadEdgeMeshConstFrontIterator(const MeshType * mesh = (MeshType *)0,
-                                 bool             start = true,
-                                 QEType *         seed = (QEType *)nullptr)
-  {
-    (void)mesh;
-    (void)start;
-    (void)seed;
-  }
+  QuadEdgeMeshConstFrontIterator(const MeshType * itkNotUsed(mesh) = (MeshType *)0,
+                                 bool             itkNotUsed(start) = true,
+                                 QEType *         itkNotUsed(seed) = (QEType *)nullptr)
+  {}
 
   /** \todo do we need here a    : Superclass( mesh, start, seed ) { } */
   ~QuadEdgeMeshConstFrontIterator() override = default;
@@ -289,7 +288,7 @@ public:
     return (*this);
   }
 
-  const QEType *
+  [[nodiscard]] const QEType *
   Value() const
   {
     return (this->m_CurrentEdge);

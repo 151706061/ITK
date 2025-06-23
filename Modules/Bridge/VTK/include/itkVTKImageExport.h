@@ -64,7 +64,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VTKImageExport);
 
   /** Method for creation through the object factory. */
@@ -73,16 +73,16 @@ public:
   /** The type of the input image. */
   using InputImageType = TInputImage;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
   itkConceptMacro(ImageDimensionCheck, (Concept::SameDimensionOrMinusOneOrTwo<3, Self::InputImageDimension>));
-#endif
+
   /** Set the input image of this image exporter. */
+  /** @ITKStartGrouping */
   using Superclass::SetInput;
   void
   SetInput(const InputImageType *);
   InputImageType *
   GetInput();
-
+  /** @ITKEndGrouping */
 protected:
   VTKImageExport();
   ~VTKImageExport() override = default;

@@ -66,7 +66,7 @@ namespace itk
  * This term behaves like a doublet attracting the contour to the edges.
  *
  * This class extends the basic LevelSetFunction with a shape prior term
- * as developed in [1].
+ * as developed in \cite leventon2000.
  *
  * \f$ \zeta( \phi^{*} - \phi) \f$
  *
@@ -81,10 +81,6 @@ namespace itk
  * \sa SegmentationLevelSetFunction
  * \sa ShapePriorSegmentationLevelSetFunction
  * \sa ShapeSignedDistanceFunction
- *
- * \par REFERENCES
- * \par
- * [1] Leventon, M.E. et al. "Statistical Shape Influence in Geodesic Active Contours", CVPR 2000.
  *
  * \ingroup FiniteDifferenceFunctions
  * \ingroup ITKLevelSets
@@ -106,7 +102,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GeodesicActiveContourShapePriorLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -141,6 +137,7 @@ public:
 
   /** Set/Get the sigma for the Gaussian kernel used to compute the gradient
    * of the feature image needed for the advection term of the equation. */
+  /** @ITKStartGrouping */
   void
   SetDerivativeSigma(const double v)
   {
@@ -151,7 +148,7 @@ public:
   {
     return m_DerivativeSigma;
   }
-
+  /** @ITKEndGrouping */
   void
   Initialize(const RadiusType & r) override
   {
@@ -165,13 +162,12 @@ public:
 
 protected:
   GeodesicActiveContourShapePriorLevelSetFunction()
+    : m_DerivativeSigma(1.0)
   {
     this->SetAdvectionWeight(NumericTraits<ScalarValueType>::OneValue());
     this->SetPropagationWeight(NumericTraits<ScalarValueType>::OneValue());
     this->SetCurvatureWeight(NumericTraits<ScalarValueType>::OneValue());
     this->SetShapePriorWeight(NumericTraits<ScalarValueType>::OneValue());
-
-    m_DerivativeSigma = 1.0;
   }
 
   ~GeodesicActiveContourShapePriorLevelSetFunction() override = default;

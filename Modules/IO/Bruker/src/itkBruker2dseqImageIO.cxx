@@ -64,7 +64,7 @@ Rescale(T *                         buffer,
   {
     for (SizeType v = 0; v < frameSize; ++v, ++i)
     {
-      double tmp = static_cast<double>(buffer[i]) * slopes[f] + offsets[f];
+      const double tmp = static_cast<double>(buffer[i]) * slopes[f] + offsets[f];
       buffer[i] = static_cast<T>(tmp);
     }
   }
@@ -185,7 +185,7 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
       // Comment line
       continue;
     }
-    else if (line.substr(0, 5) == "##END")
+    if (line.substr(0, 5) == "##END")
     {
       // There should be one comment line after this line in the file
       continue;
@@ -195,14 +195,14 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
       itkGenericExceptionMacro("Failed to parse Bruker JCAMPDX: " + line);
     }
 
-    std::string::size_type epos = line.find('=', 3);
+    const std::string::size_type epos = line.find('=', 3);
     if (epos == std::string::npos)
     {
       itkGenericExceptionMacro("Invalid Bruker JCAMPDX parameter line (Missing =): " << line);
     }
 
-    std::string parname = line.substr(3, epos - 3);
-    std::string par = line.substr(epos + 1);
+    const std::string parname = line.substr(3, epos - 3);
+    std::string       par = line.substr(epos + 1);
     if (par[0] == '(')
     {
       // Array value
@@ -227,7 +227,7 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
           std::vector<std::string> stringArray;
           while (left != std::string::npos)
           {
-            std::string::size_type right = lines.find('>', left + 1);
+            const std::string::size_type right = lines.find('>', left + 1);
             stringArray.push_back(lines.substr(left + 1, right - (left + 1)));
             left = lines.find('<', right + 1);
           }
@@ -237,7 +237,7 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
         {
           // An array of numbers
           std::stringstream   lineStream(lines);
-          double              doubleValue;
+          double              doubleValue = NAN;
           std::vector<double> doubleArray;
           while (lineStream >> doubleValue)
           {
@@ -289,7 +289,7 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
           {
             std::istringstream  arrayStream(lines.substr(leftBracket, rightBracket - leftBracket));
             std::vector<double> doubleArray;
-            double              doubleValue;
+            double              doubleValue = NAN;
             while (arrayStream >> doubleValue)
             {
               doubleArray.push_back(doubleValue);
@@ -311,7 +311,7 @@ ReadJCAMPDX(const std::string & filename, MetaDataDictionary & dict)
     {
       // A single value
       std::istringstream streamPar(par);
-      double             value;
+      double             value = NAN;
       streamPar >> value;
       if (streamPar.fail())
       {
@@ -340,7 +340,7 @@ Bruker2dseqImageIO::Bruker2dseqImageIO()
   // Start out with file byte order == system byte order
   // this will be changed if we're reading a file to whatever
   // the file actually contains.
-  if (ByteSwapper<int>::SystemIsBigEndian())
+  if constexpr (ByteSwapper<int>::SystemIsBigEndian())
   {
     this->m_MachineByteOrder = this->m_ByteOrder = IOByteOrderEnum::BigEndian;
   }
@@ -545,12 +545,12 @@ Bruker2dseqImageIO::Read(void * buffer)
     this->SwapBytesIfNecessary(charBuffer, numberOfComponents);
   }
 
-  MetaDataDictionary &      dict = this->GetMetaDataDictionary();
-  const std::vector<double> slopes = GetParameter<std::vector<double>>(dict, "VisuCoreDataSlope");
-  const std::vector<double> offsets = GetParameter<std::vector<double>>(dict, "VisuCoreDataOffs");
-  const SizeType            frameCount = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreFrameCount"));
-  const SizeType            frameDim = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreDim"));
-  SizeType                  frameSize = this->GetDimensions(0) * this->GetDimensions(1);
+  const MetaDataDictionary & dict = this->GetMetaDataDictionary();
+  const auto                 slopes = GetParameter<std::vector<double>>(dict, "VisuCoreDataSlope");
+  const auto                 offsets = GetParameter<std::vector<double>>(dict, "VisuCoreDataOffs");
+  const SizeType             frameCount = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreFrameCount"));
+  const SizeType             frameDim = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreDim"));
+  SizeType                   frameSize = this->GetDimensions(0) * this->GetDimensions(1);
 
   if (frameDim == 3)
   {
@@ -560,19 +560,19 @@ Bruker2dseqImageIO::Read(void * buffer)
   switch (this->m_ComponentType)
   {
     case IOComponentEnum::CHAR:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::UCHAR:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::SHORT:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::USHORT:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::INT:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::UINT:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::LONG:
-      ITK_FALLTHROUGH;
+      [[fallthrough]];
     case IOComponentEnum::ULONG:
       itkExceptionMacro("Must have float pixels to rescale");
     case IOComponentEnum::FLOAT:
@@ -582,7 +582,7 @@ Bruker2dseqImageIO::Read(void * buffer)
       Rescale(static_cast<double *>(buffer), slopes, offsets, frameSize, frameCount);
       break;
     default:
-      itkExceptionMacro("Datatype not supported: " << this->GetComponentTypeAsString(this->m_ComponentType));
+      itkExceptionMacro("Datatype not supported: " << ImageIOBase::GetComponentTypeAsString(this->m_ComponentType));
   }
 
   //
@@ -599,10 +599,8 @@ Bruker2dseqImageIO::Read(void * buffer)
       {
         break;
       }
-      else
-      {
-        sizeToSwap *= std::stoi(i[0].c_str());
-      }
+
+      sizeToSwap *= std::stoi(i[0].c_str());
     }
     if (sizeToSwap > 1)
     {
@@ -643,7 +641,7 @@ Bruker2dseqImageIO::Read(void * buffer)
           SwapSlicesAndVolumes(static_cast<double *>(buffer), x, y, z, sizeToSwap, noswap);
           break;
         default:
-          itkExceptionMacro("Datatype not supported: " << this->GetComponentTypeAsString(this->m_ComponentType));
+          itkExceptionMacro("Datatype not supported: " << ImageIOBase::GetComponentTypeAsString(this->m_ComponentType));
       }
     }
   }
@@ -688,7 +686,7 @@ Bruker2dseqImageIO::Read(void * buffer)
         ReverseSliceOrder(static_cast<double *>(buffer), x, y, z, v);
         break;
       default:
-        itkExceptionMacro("Datatype not supported: " << this->GetComponentTypeAsString(this->m_ComponentType));
+        itkExceptionMacro("Datatype not supported: " << ImageIOBase::GetComponentTypeAsString(this->m_ComponentType));
     }
   }
 }
@@ -698,7 +696,7 @@ Bruker2dseqImageIO::CanReadFile(const char * FileNameToRead)
 {
   std::string file2Dseq = itksys::SystemTools::CollapseFullPath(FileNameToRead);
   itksys::SystemTools::ConvertToUnixSlashes(file2Dseq);
-  std::string fileVisu = itksys::SystemTools::GetFilenamePath(file2Dseq) + "/visu_pars";
+  const std::string fileVisu = itksys::SystemTools::GetFilenamePath(file2Dseq) + "/visu_pars";
 
   if (!itksys::SystemTools::FileExists(file2Dseq))
   {
@@ -720,18 +718,18 @@ Bruker2dseqImageIO::ReadImageInformation()
 
   std::string path2Dseq = itksys::SystemTools::CollapseFullPath(this->m_FileName);
   itksys::SystemTools::ConvertToUnixSlashes(path2Dseq);
-  std::string pathVisu = itksys::SystemTools::GetFilenamePath(path2Dseq) + "/visu_pars";
+  const std::string pathVisu = itksys::SystemTools::GetFilenamePath(path2Dseq) + "/visu_pars";
   ReadJCAMPDX(pathVisu, dict);
 
   // If the method file exists, read it in case user wants the meta-data
   // However, visu_pars contains everything needed to read so make this optional
-  std::string methodFilename = itksys::SystemTools::GetFilenamePath(path2Dseq) + "/../../method";
+  const std::string methodFilename = itksys::SystemTools::GetFilenamePath(path2Dseq) + "/../../method";
   if (itksys::SystemTools::FileExists(methodFilename))
   {
     ReadJCAMPDX(methodFilename, dict);
   }
 
-  const std::string wordType = GetParameter<std::string>(dict, "VisuCoreWordType");
+  const auto wordType = GetParameter<std::string>(dict, "VisuCoreWordType");
   if (wordType == BRUKER_SIGNED_CHAR)
   {
     this->m_ComponentType = IOComponentEnum::CHAR;
@@ -772,7 +770,7 @@ Bruker2dseqImageIO::ReadImageInformation()
     this->m_ComponentType = IOComponentEnum::FLOAT;
   }
 
-  const std::string byteOrder = GetParameter<std::string>(dict, "VisuCoreByteOrder");
+  const auto byteOrder = GetParameter<std::string>(dict, "VisuCoreByteOrder");
   if (byteOrder == BRUKER_LITTLE_ENDIAN)
   {
     this->m_ByteOrder = IOByteOrderEnum::LittleEndian;
@@ -786,10 +784,10 @@ Bruker2dseqImageIO::ReadImageInformation()
     itkExceptionMacro("VisuCoreByteOrder parameter is invalid: " << byteOrder);
   }
 
-  const SizeType            brukerDim = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreDim"));
-  const SizeType            frames = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreFrameCount"));
-  const std::vector<double> size = GetParameter<std::vector<double>>(dict, "VisuCoreSize");
-  const std::vector<double> FoV = GetParameter<std::vector<double>>(dict, "VisuCoreExtent");
+  const SizeType brukerDim = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreDim"));
+  const SizeType frames = static_cast<SizeType>(GetParameter<double>(dict, "VisuCoreFrameCount"));
+  const auto     size = GetParameter<std::vector<double>>(dict, "VisuCoreSize");
+  const auto     FoV = GetParameter<std::vector<double>>(dict, "VisuCoreExtent");
 
   if (brukerDim == 1)
   {
@@ -803,7 +801,7 @@ Bruker2dseqImageIO::ReadImageInformation()
   }
   else
   {
-    const std::vector<double> position = GetParameter<std::vector<double>>(dict, "VisuCorePosition");
+    const auto position = GetParameter<std::vector<double>>(dict, "VisuCorePosition");
     // Bruker 'origin' is corner of slice/volume. Needs shifting by half-voxel to be ITK origin
     // But for 2D images, the slice position is correct (center of slice)
     vnl_vector<double> halfStep(3);
@@ -828,9 +826,9 @@ Bruker2dseqImageIO::ReadImageInformation()
         // You would think that we could use the SliceDist field for multi-slice, but ParaVision
         // has a bug that sometimes sets SliceDist to 0
         // So - calculate this manually from the SlicePosition field
-        vnl_vector<double> slice1(&position[0], 3);
-        vnl_vector<double> slice2(&position[3], 3);
-        vnl_vector<double> diff = slice2 - slice1;
+        const vnl_vector<double> slice1(&position[0], 3);
+        const vnl_vector<double> slice2(&position[3], 3);
+        const vnl_vector<double> diff = slice2 - slice1;
         spacingZ = diff.magnitude();
       }
       if (dict.HasKey("VisuFGOrderDesc"))
@@ -859,9 +857,9 @@ Bruker2dseqImageIO::ReadImageInformation()
         // The acquisition orientation is not stored in visu_pars so work out if
         // this is coronal by checking if the Y component of the slice positions is
         // changing.
-        vnl_vector<double> corner1(&position[0], 3);
-        vnl_vector<double> corner2(&position[3], 3);
-        vnl_vector<double> diff = corner2 - corner1;
+        const vnl_vector<double> corner1(&position[0], 3);
+        const vnl_vector<double> corner2(&position[3], 3);
+        vnl_vector<double>       diff = corner2 - corner1;
         if (diff[1] != 0)
         {
           reverseZ = -1;
@@ -896,22 +894,22 @@ Bruker2dseqImageIO::ReadImageInformation()
     // It is possible for every slice to have a different orientation,
     // but ITK doesn't support this so concatenate all slices as if they
     // had the same orientation
-    const std::vector<double> orient = GetParameter<std::vector<double>>(dict, "VisuCoreOrientation");
+    const auto orient = GetParameter<std::vector<double>>(dict, "VisuCoreOrientation");
 
     // The Bruker orient field is scanner-to-image. ITK is image-to-scanner.
     // However, ITK stores column-wise, Bruker row-wise. So the below is
     // equivalent to a matrix transpose, which because these are direction
     // matrices with determinant +/-1, is equivalent to an inverse. So this
     // gives the correct orientations.
-    vnl_matrix<double> dirMatrix(&orient[0], 3, 3);
+    const vnl_matrix<double> dirMatrix(&orient[0], 3, 3);
     this->SetDirection(0, dirMatrix.get_row(0));
     this->SetDirection(1, dirMatrix.get_row(1));
     // See note above for apparent bug in 2D coronal acquisitions
     this->SetDirection(2, reverseZ * dirMatrix.get_row(2));
 
     // Now work out the correct ITK origin including the half-voxel offset
-    vnl_vector<double> corner(&position[0], 3);
-    vnl_vector<double> origin = corner + dirMatrix * halfStep;
+    const vnl_vector<double> corner(&position[0], 3);
+    vnl_vector<double>       origin = corner + dirMatrix * halfStep;
 
     this->SetOrigin(0, origin[0]);
     this->SetOrigin(1, origin[1]);

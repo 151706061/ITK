@@ -31,15 +31,13 @@ namespace itk
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::ObjectMorphologyImageFilter()
   : m_Kernel()
+  , m_ObjectValue(NumericTraits<PixelType>::OneValue())
 {
   m_DefaultBoundaryCondition.SetConstant(PixelType{});
   m_BoundaryCondition = &m_DefaultBoundaryCondition;
 
-  m_UseBoundaryCondition = false;
   this->DynamicMultiThreadingOn();
   this->ThreaderUpdateProgressOff();
-
-  m_ObjectValue = NumericTraits<PixelType>::OneValue();
 }
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
@@ -50,7 +48,7 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::GenerateInputRe
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
 
   if (!inputPtr)
   {
@@ -59,8 +57,7 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::GenerateInputRe
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(m_Kernel.GetRadius());
@@ -71,21 +68,19 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::GenerateInputRe
     inputPtr->SetRequestedRegion(inputRequestedRegion);
     return;
   }
-  else
-  {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
 
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion(inputRequestedRegion);
+  // Couldn't crop the region (requested region is outside the largest
+  // possible region).  Throw an exception.
 
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    e.SetLocation(ITK_LOCATION);
-    e.SetDescription("Requested region is outside largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-  }
+  // store what we tried to request (prior to trying to crop)
+  inputPtr->SetRequestedRegion(inputRequestedRegion);
+
+  // build an exception
+  InvalidRequestedRegionError e(__FILE__, __LINE__);
+  e.SetLocation(ITK_LOCATION);
+  e.SetDescription("Requested region is outside largest possible region.");
+  e.SetDataObject(inputPtr);
+  throw e;
 }
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
@@ -100,17 +95,11 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::BeforeThreadedG
   {
     this->GetOutput()->FillBuffer(0);
   }
-}
 
-template <typename TInputImage, typename TOutputImage, typename TKernel>
-void
-ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::DynamicThreadedGenerateData(
-  const OutputImageRegionType & outputRegionForThread)
-{
-  ImageRegionConstIterator<TInputImage> iRegIter;
-  ImageRegionIterator<TOutputImage>     oRegIter;
-  iRegIter = ImageRegionConstIterator<InputImageType>(this->GetInput(), outputRegionForThread);
-  oRegIter = ImageRegionIterator<OutputImageType>(this->GetOutput(), outputRegionForThread);
+  const RegionType requestedRegion = this->GetOutput()->GetRequestedRegion();
+
+  auto iRegIter = ImageRegionConstIterator<InputImageType>(this->GetInput(), requestedRegion);
+  auto oRegIter = ImageRegionIterator<OutputImageType>(this->GetOutput(), requestedRegion);
   /* Copy the input image to the output image - then only boundary pixels
    * need to be changed in the output image */
   while (!oRegIter.IsAtEnd())
@@ -122,18 +111,24 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::DynamicThreaded
     ++oRegIter;
     ++iRegIter;
   }
+}
 
+
+template <typename TInputImage, typename TOutputImage, typename TKernel>
+void
+ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::DynamicThreadedGenerateData(
+  const OutputImageRegionType & outputRegionForThread)
+{
   // Find the boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                        fC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                              fC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
     fC(this->GetInput(), outputRegionForThread, m_Kernel.GetRadius());
 
 
   // Setup the kernel that spans the immediate neighbors of the current
   // input pixel - used to determine if that pixel abuts a non-object
   // pixel, i.e., is a boundary pixel
-  RadiusType bKernelSize;
-  bKernelSize.Fill(1);
+  constexpr auto bKernelSize = MakeFilled<RadiusType>(1);
 
   TotalProgressReporter progress(this, this->GetOutput()->GetRequestedRegion().GetNumberOfPixels());
 
@@ -174,17 +169,13 @@ bool
 ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::IsObjectPixelOnBoundary(
   const InputNeighborhoodIteratorType & iNIter)
 {
-  static const auto s = static_cast<unsigned int>(std::pow(3.0, static_cast<double>(ImageDimension)));
-
-  PixelType    tf;
-  unsigned int i;
-  bool         isInside = true;
+  static const auto s = static_cast<unsigned int>(std::pow(3.0, double{ ImageDimension }));
 
   if (m_UseBoundaryCondition)
   {
-    for (i = 0; i < s; ++i)
+    for (unsigned int i = 0; i < s; ++i)
     {
-      tf = iNIter.GetPixel(i);
+      PixelType tf = iNIter.GetPixel(i);
       if (Math::NotExactlyEquals(tf, m_ObjectValue))
       {
         return true;
@@ -193,9 +184,10 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::IsObjectPixelOn
   }
   else
   {
-    for (i = 0; i < s; ++i)
+    for (unsigned int i = 0; i < s; ++i)
     {
-      tf = iNIter.GetPixel(i, isInside);
+      bool      isInside = true;
+      PixelType tf = iNIter.GetPixel(i, isInside);
       if (Math::NotExactlyEquals(tf, m_ObjectValue) && isInside)
       {
         return true;
@@ -224,7 +216,7 @@ ObjectMorphologyImageFilter<TInputImage, TOutputImage, TKernel>::PrintSelf(std::
 
   m_DefaultBoundaryCondition.Print(os, indent);
 
-  os << indent << "UseBoundaryCondition: " << (m_UseBoundaryCondition ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseBoundaryCondition);
   os << indent << "Kernel: " << static_cast<typename NumericTraits<KernelType>::PrintType>(m_Kernel) << std::endl;
   os << indent << "ObjectValue: " << static_cast<typename NumericTraits<PixelType>::PrintType>(m_ObjectValue)
      << std::endl;

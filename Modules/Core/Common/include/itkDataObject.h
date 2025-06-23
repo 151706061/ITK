@@ -59,10 +59,7 @@ public:
   ~DataObjectError() noexcept override = default;
 
   /** Constructor. Needed to ensure the exception object can be copied. */
-  DataObjectError(const char * file, unsigned int lineNumber);
-
-  /** Constructor. Needed to ensure the exception object can be copied. */
-  DataObjectError(const std::string & file, unsigned int lineNumber);
+  DataObjectError(std::string file, unsigned int lineNumber);
 
   /** Copy constructor. Needed to ensure the exception object can be copied. */
   DataObjectError(const DataObjectError & orig) noexcept;
@@ -71,7 +68,7 @@ public:
   DataObjectError &
   operator=(const DataObjectError & orig) noexcept;
 
-  /** Standard type macro */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DataObjectError);
 
   /** Set the data object that is throwing this exception. */
@@ -80,13 +77,14 @@ public:
 
 
   /** Get the data object that is throwing this exception. */
-  const DataObject *
+  /** @ITKStartGrouping */
+  [[nodiscard]] const DataObject *
   GetDataObject() const noexcept;
 #if !defined(ITK_LEGACY_REMOVE)
   DataObject *
   GetDataObject() noexcept;
 #endif
-
+  /** @ITKEndGrouping */
 protected:
   /** Print exception information.  This method can be overridden by
    * specific exception subtypes.  The default is to print out the
@@ -117,10 +115,7 @@ public:
   ~InvalidRequestedRegionError() noexcept override = default;
 
   /** Constructor. Needed to ensure the exception object can be copied. */
-  InvalidRequestedRegionError(const char * file, unsigned int lineNumber);
-
-  /** Constructor. Needed to ensure the exception object can be copied. */
-  InvalidRequestedRegionError(const std::string & file, unsigned int lineNumber);
+  InvalidRequestedRegionError(std::string file, unsigned int lineNumber);
 
   /** Copy constructor.  Needed to ensure the exception object can be copied. */
   InvalidRequestedRegionError(const InvalidRequestedRegionError & orig) noexcept;
@@ -129,7 +124,7 @@ public:
   InvalidRequestedRegionError &
   operator=(const InvalidRequestedRegionError & orig) noexcept;
 
-  /** Standard type macro */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InvalidRequestedRegionError);
 
 protected:
@@ -300,7 +295,7 @@ public:
 
   using DataObjectIdentifierType = std::string;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DataObject);
 
   /** Method for creation through the object factory. */
@@ -433,13 +428,14 @@ public:
 
   /** The maximum MTime of all upstream filters and data objects.
    * This does not include the MTime of this data object. */
+  /** @ITKStartGrouping */
   void
   SetPipelineMTime(ModifiedTimeType time)
   {
     m_PipelineMTime = time;
   }
   itkGetConstReferenceMacro(PipelineMTime, ModifiedTimeType);
-
+  /** @ITKEndGrouping */
   /** MTime for the last time this DataObject was generated. */
   virtual ModifiedTimeType
   GetUpdateMTime() const;
@@ -449,9 +445,10 @@ public:
    *  the Unix epoch. That is the time 00:00:00 UTC on 1 January 1970
    *  (or 1970-01-01T00:00:00Z ISO 8601)
    */
+  /** @ITKStartGrouping */
   itkSetMacro(RealTimeStamp, RealTimeStamp);
   itkGetConstReferenceMacro(RealTimeStamp, RealTimeStamp);
-
+  /** @ITKEndGrouping */
   /** Setup a DataObject to receive new data.  This method is called
    * by the pipeline mechanism on each output of filter that needs
    * to execute.  The default implementation is to return a DataObject

@@ -33,12 +33,10 @@ itkConfig.LazyLoading = True
 from multiprocessing.pool import ThreadPool
 from multiprocessing import cpu_count
 
-from typing import List
-
 import sys
 
 
-test_image_fn: List[str] = sys.argv[1:]
+test_image_fn: list[str] = sys.argv[1:]
 # print(f"Reading: {test_image_fn}")
 
 

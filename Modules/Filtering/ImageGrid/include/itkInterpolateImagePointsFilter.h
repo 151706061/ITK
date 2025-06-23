@@ -54,7 +54,7 @@ namespace itk
  * Limitations:  The coordinates must be in an image of the same dimension as the
  *       input image.  There is no reason why this should be the case and future
  *       revisions should look at eliminating this limitation.
- *    Currently TCoordType must be the same as the input pixel type (TInputImage).
+ *    Currently TCoordinate must be the same as the input pixel type (TInputImage).
  *       Again future revisions should look at eliminating this limitation.
  *    Though the output generation may be streamed the entire input image,
  *       must be supplied. The coordinates may be streamed in smaller blocks.
@@ -75,8 +75,8 @@ namespace itk
 
 template <typename TInputImage,
           typename TOutputImage,
-          typename TCoordType = typename TInputImage::PixelType,
-          typename InterpolatorType = BSplineInterpolateImageFunction<TInputImage, TCoordType>>
+          typename TCoordinate = typename TInputImage::PixelType,
+          typename InterpolatorType = BSplineInterpolateImageFunction<TInputImage, TCoordinate>>
 class ITK_TEMPLATE_EXPORT InterpolateImagePointsFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
@@ -88,7 +88,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InterpolateImagePointsFilter);
 
   /** New macro for creation of through a Smart Pointer */
@@ -115,7 +115,7 @@ public:
   using ContinuousIndexType = typename InterpolatorType::ContinuousIndexType;
 
   /** Typedefs to describe and access coordinate images */
-  using CoordImageType = Image<TCoordType, Self::ImageDimension>;
+  using CoordImageType = Image<TCoordinate, Self::ImageDimension>;
 
   /** Typedef for region copier */
   using RegionCopierType = ImageToImageFilterDetail::ImageRegionCopier<Self::ImageDimension, Self::ImageDimension>;
@@ -154,11 +154,7 @@ public:
   void
   GenerateInputRequestedRegion() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   InterpolateImagePointsFilter();
@@ -179,7 +175,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override
+  VerifyInputInformation() const override
   {}
 
 private:

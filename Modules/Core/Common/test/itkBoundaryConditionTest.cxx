@@ -32,11 +32,10 @@ template <typename TPixel>
 void
 printn(itk::NeighborhoodAllocator<TPixel> & n, const itk::Size<2> & sz)
 {
-  unsigned int i, j, k;
-  k = 0;
-  for (j = 0; j < sz[1]; ++j)
+  unsigned int k = 0;
+  for (unsigned int j = 0; j < sz[1]; ++j)
   {
-    for (i = 0; i < sz[0]; ++i, ++k)
+    for (unsigned int i = 0; i < sz[0]; ++i, ++k)
     {
       std::cout << n[k] << ' ';
     }
@@ -47,8 +46,8 @@ printn(itk::NeighborhoodAllocator<TPixel> & n, const itk::Size<2> & sz)
 void
 filln(itk::Image<float, 2> * img)
 {
-  float i, j;
-  i = j = 0.0f;
+  float i = 0.0f;
+  float j = 0.0f;
 
   itk::ImageRegionIterator<itk::Image<float, 2>> it(img, img->GetRequestedRegion());
 
@@ -130,9 +129,9 @@ itkBoundaryConditionTest(int, char *[])
   image3D->Allocate();
   imageND->Allocate();
 
-  itk::ImageRegionIterator<ImageType2D> it2D(image2D, image2D->GetRequestedRegion());
-  itk::ImageRegionIterator<ImageType3D> it3D(image3D, image3D->GetRequestedRegion());
-  itk::ImageRegionIterator<ImageTypeND> itND(imageND, imageND->GetRequestedRegion());
+  const itk::ImageRegionIterator<ImageType2D> it2D(image2D, image2D->GetRequestedRegion());
+  itk::ImageRegionIterator<ImageType3D>       it3D(image3D, image3D->GetRequestedRegion());
+  itk::ImageRegionIterator<ImageTypeND>       itND(imageND, imageND->GetRequestedRegion());
 
   println("Initializing some images");
 

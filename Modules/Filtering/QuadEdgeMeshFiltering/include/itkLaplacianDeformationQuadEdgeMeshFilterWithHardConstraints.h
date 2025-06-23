@@ -33,7 +33,7 @@ namespace itk
  *
  * In this context output mesh vertices are exactly constrained to provided output locations.
  *
- *  For details, see https://www.insight-journal.org/browse/publication/890
+ *  For details, see https://doi.org/10.54294/s91axg
  *
  *  \ingroup ITKQuadEdgeMeshFiltering
  */
@@ -58,7 +58,7 @@ public:
   /** Output types. */
   using OutputMeshType = TOutputMesh;
   using typename Superclass::OutputPointType;
-  using typename Superclass::OutputCoordRepType;
+  using typename Superclass::OutputCoordinateType;
   using typename Superclass::OutputPointIdentifier;
 
   static constexpr unsigned int OutputPointDimension = OutputMeshType::PointDimension;

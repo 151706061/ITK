@@ -56,7 +56,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MetaSceneConverter);
 
   /** SpatialObject Scene types */
@@ -69,6 +69,16 @@ public:
   using MetaConverterPointer = typename MetaConverterBaseType::Pointer;
   using ConverterMapType = std::map<std::string, MetaConverterPointer>;
 
+  /** Choose the API and FileFormat version for MetaIO.
+   *    Version 0 (default) is not able to fully / accurately represent
+   *       a SpatialObject scene (image transform and parent-object
+   *       transforms are intermingled.
+   *    Version 1 fixes the bugs in Version 0, but introduces new
+   *       tag-value pairs that won't be processed by older readers/apps. */
+  /** @ITKStartGrouping */
+  itkSetMacro(MetaIOVersion, unsigned int);
+  itkGetConstMacro(MetaIOVersion, unsigned int);
+  /** @ITKEndGrouping */
   /** Read a MetaFile and create a Scene SpatialObject. */
   SpatialObjectPointer
   ReadMeta(const std::string & name);
@@ -84,19 +94,22 @@ public:
   itkSetObjectMacro(Event, MetaEvent);
 
   /** Set if the points should be saved in binary/ASCII */
+  /** @ITKStartGrouping */
   itkSetMacro(BinaryPoints, bool);
   itkGetConstMacro(BinaryPoints, bool);
   itkBooleanMacro(BinaryPoints);
-
+  /** @ITKEndGrouping */
   /** set/get the precision for writing out numbers as plain text */
+  /** @ITKStartGrouping */
   itkSetMacro(TransformPrecision, unsigned int);
   itkGetMacro(TransformPrecision, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set if the images should be written in different files */
+  /** @ITKStartGrouping */
   itkSetMacro(WriteImagesInSeparateFile, bool);
   itkGetConstMacro(WriteImagesInSeparateFile, bool);
   itkBooleanMacro(WriteImagesInSeparateFile);
-
+  /** @ITKEndGrouping */
   /** add new SpatialObject/MetaObject converters at runtime
    *
    *  Every Converter is mapped to both a metaObject type name
@@ -135,6 +148,7 @@ private:
   {
     auto converter = TConverter::New();
     // needed just for Image & ImageMask
+    converter->SetMetaIOVersion(m_MetaIOVersion);
     converter->SetWriteImagesInSeparateFile(this->m_WriteImagesInSeparateFile);
     return converter->SpatialObjectToMetaObject(so);
   }
@@ -143,6 +157,7 @@ private:
   MetaObjectToSpatialObject(const MetaObject * mo)
   {
     auto converter = TConverter::New();
+    converter->SetMetaIOVersion(m_MetaIOVersion);
     return converter->MetaObjectToSpatialObject(mo);
   }
   void
@@ -151,15 +166,12 @@ private:
   void
   SetTransform(SpatialObjectType * so, const MetaObject * meta);
 
-  double m_Orientation[100]{};
-  double m_Position[10]{};
-  double m_CenterOfRotation[10]{};
-
   MetaEvent *      m_Event{};
   bool             m_BinaryPoints{};
   bool             m_WriteImagesInSeparateFile{};
   unsigned int     m_TransformPrecision{};
   ConverterMapType m_ConverterMap{};
+  unsigned int     m_MetaIOVersion{ 0 };
 };
 } // end namespace itk
 

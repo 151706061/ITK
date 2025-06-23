@@ -41,7 +41,9 @@ template <typename TFilter>
 class ShowIterationObject
 {
 public:
-  ShowIterationObject(TFilter * filter) { m_Filter = filter; }
+  ShowIterationObject(TFilter * filter)
+    : m_Filter(filter)
+  {}
   void
   ShowIteration()
   {
@@ -100,8 +102,8 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
   // The true shape is just the circle.
   //
 
-  PixelType background = 0;
-  PixelType foreground = 190;
+  constexpr PixelType background = 0;
+  constexpr PixelType foreground = 190;
 
   // Fill in the background
   auto inputImage = ImageType::New();
@@ -121,9 +123,7 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
   ImageType::SizeType rectSize;
   rectSize[0] = 80;
   rectSize[1] = 10;
-  ImageType::RegionType rectRegion;
-  rectRegion.SetIndex(rectStart);
-  rectRegion.SetSize(rectSize);
+  const ImageType::RegionType rectRegion{ rectStart, rectSize };
 
   using Iterator = itk::ImageRegionIterator<ImageType>;
   Iterator it(inputImage, rectRegion);
@@ -150,7 +150,7 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
 
   while (!it.IsAtEnd())
   {
-    ImageType::IndexType          index = it.GetIndex();
+    const ImageType::IndexType    index = it.GetIndex();
     SphereFunctionType::PointType point;
     inputImage->TransformIndexToPhysicalPoint(index, point);
     if (sphere->Evaluate(point) <= 0.0)
@@ -241,8 +241,8 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
 
   while (!citer.IsAtEnd())
   {
-    ComponentImageType::IndexType index = citer.GetIndex();
-    SphereFunctionType::PointType point;
+    const ComponentImageType::IndexType index = citer.GetIndex();
+    SphereFunctionType::PointType       point;
     meanImage->TransformIndexToPhysicalPoint(index, point);
 
     citer.Set(sphere->Evaluate(point));
@@ -258,7 +258,7 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
   using ImageVectorType = ShapeFunctionType::ImagePointerVector;
   ImageVectorType pca;
 
-  unsigned int numberOfPCA = 1;
+  constexpr unsigned int numberOfPCA = 1;
   pca.resize(numberOfPCA);
 
   pca[0] = ComponentImageType::New();
@@ -297,8 +297,7 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
   costFunction->SetShapeParameterMeans(mean);
   costFunction->SetShapeParameterStandardDeviations(stddev);
 
-  CostFunctionType::WeightsType weights;
-  weights.Fill(1.0);
+  auto weights = itk::MakeFilled<CostFunctionType::WeightsType>(1.0);
   weights[1] = 10.0;
   costFunction->SetWeights(weights);
 
@@ -337,8 +336,8 @@ itkGeodesicActiveContourShapePriorLevelSetImageFilterTest_2(int, char *[])
   // Connect an observer to the filter.
   //
   using WatcherType = ShowIterationObject<FilterType>;
-  WatcherType                                    iterationWatcher(filter);
-  itk::SimpleMemberCommand<WatcherType>::Pointer command = itk::SimpleMemberCommand<WatcherType>::New();
+  WatcherType                                          iterationWatcher(filter);
+  const itk::SimpleMemberCommand<WatcherType>::Pointer command = itk::SimpleMemberCommand<WatcherType>::New();
   command->SetCallbackFunction(&iterationWatcher, &WatcherType::ShowIteration);
   filter->AddObserver(itk::IterationEvent(), command);
 

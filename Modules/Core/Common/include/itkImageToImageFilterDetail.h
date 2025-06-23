@@ -31,8 +31,7 @@
 #include "itkImageRegion.h"
 #include "itkSmartPointer.h"
 
-namespace itk
-{
+
 /** ImageToImageFilterDetail namespace to house implementations of
  * functions that are dependent on dimension. These functions are
  * overloaded based on type unique for each different dimension.
@@ -41,8 +40,9 @@ namespace itk
  * ImageToImageFilter would force the instantiation of all versions of
  * these overloaded functions.
  */
-namespace ImageToImageFilterDetail
+namespace itk::ImageToImageFilterDetail
 {
+
 /** \struct  DispatchBase
  * \brief Base class for a class used to dispatch to dimension specific implementations.
  *
@@ -54,8 +54,7 @@ namespace ImageToImageFilterDetail
 struct DispatchBase
 {};
 
-/** \struct BooleanDispatch
- * \brief Templated class to produce a unique type "true" and "false".
+/** \brief Templated class to produce a unique type "true" and "false".
  *
  * BooleanDispatch is a templated class that produce a unique type for
  * for "true" and for "false".  These types may be used to decide which
@@ -65,8 +64,7 @@ template <bool>
 struct BooleanDispatch
 {};
 
-/** \struct IntDispatch
- * \brief Templated class to produce a unique type for each integer
+/** \brief Templated class to produce a unique type for each integer
  *
  * IntDispatch is a templated class that produces a unique
  * type for each integer.  IntDispatch is typically
@@ -77,8 +75,7 @@ template <int>
 struct IntDispatch : public DispatchBase
 {};
 
-/** \struct UnsignedIntDispatch
- * \brief Templated class to produce a unique type for each unsigned integer (usually a dimension).
+/** \brief Templated class to produce a unique type for each unsigned integer (usually a dimension).
  *
  * UnsignedIntDispatch is a templated class that produces a unique
  * type for each unsigned integer.  UnsignedIntDispatch is typically
@@ -95,8 +92,7 @@ template <unsigned int>
 struct UnsignedIntDispatch : public DispatchBase
 {};
 
-/** \struct BinaryBooleanDispatch
- * \brief Templated class to produce a unique type for a pairing of booleans.
+/** \brief Templated class to produce a unique type for a pairing of booleans.
  *
  * BinaryBooleanDispatch is a templated class that produces a unique type
  * for each pairing of two boolean values ((true, true), (true, false),
@@ -111,8 +107,7 @@ struct BinaryBooleanDispatch
   using SecondType = BooleanDispatch<B2>;
 };
 
-/** \struct BinaryIntDispatch
- * \brief Templated class to produce a unique type for a pairing of integers.
+/** \brief Templated class to produce a unique type for a pairing of integers.
  *
  * IntBooleanDispatch is a templated class that produces a unique type
  * for each pairing of two integer values.
@@ -126,8 +121,7 @@ struct BinaryIntDispatch
   using SecondType = IntDispatch<D2>;
 };
 
-/** \struct BinaryUnsignedIntDispatch
- * \brief Templated class to produce a unique type for a pairing of unsigned integers (usually two dimensions).
+/** \brief Templated class to produce a unique type for a pairing of unsigned integers (usually two dimensions).
  *
  * BinaryUnsignedIntDispatch is a templated class that produces a
  * unique type for a pairing of unsigned integers.
@@ -215,7 +209,7 @@ ImageToImageFilterDefaultCopyRegion(const typename BinaryUnsignedIntDispatch<D1,
 {
   // Source dimension is greater than the destination dimension, copy the
   // first part of the source into the destination
-  unsigned int dim;
+
 
   Index<D1>         destIndex;
   Size<D1>          destSize;
@@ -223,7 +217,7 @@ ImageToImageFilterDefaultCopyRegion(const typename BinaryUnsignedIntDispatch<D1,
   const Size<D2> &  srcSize = srcRegion.GetSize();
 
   // copy what we can
-  for (dim = 0; dim < D1; ++dim)
+  for (unsigned int dim = 0; dim < D1; ++dim)
   {
     destIndex[dim] = srcIndex[dim];
     destSize[dim] = srcSize[dim];
@@ -257,26 +251,26 @@ ImageToImageFilterDefaultCopyRegion(const typename BinaryUnsignedIntDispatch<D1,
 {
   // Source dimension is less than the destination dimension, copy source
   // into the first part of the destination and set zeros elsewhere.
-  unsigned int dim;
-
   Index<D1>         destIndex;
   Size<D1>          destSize;
   const Index<D2> & srcIndex = srcRegion.GetIndex();
   const Size<D2> &  srcSize = srcRegion.GetSize();
 
   // copy what we can
-  for (dim = 0; dim < D2; ++dim)
   {
-    destIndex[dim] = srcIndex[dim];
-    destSize[dim] = srcSize[dim];
+    unsigned int dim = 0;
+    for (; dim < D2; ++dim)
+    {
+      destIndex[dim] = srcIndex[dim];
+      destSize[dim] = srcSize[dim];
+    }
+    // fill in the rest of the dimensions with zero/one
+    for (; dim < D1; ++dim)
+    {
+      destIndex[dim] = 0;
+      destSize[dim] = 1;
+    }
   }
-  // fill in the rest of the dimensions with zero/one
-  for (; dim < D1; ++dim)
-  {
-    destIndex[dim] = 0;
-    destSize[dim] = 1;
-  }
-
   destRegion.SetIndex(destIndex);
   destRegion.SetSize(destSize);
 }
@@ -295,7 +289,7 @@ ImageToImageFilterDefaultCopyRegion(const typename BinaryUnsignedIntDispatch<D1,
  * This function object is used by the default implementation of
  * ImageToImageFilter::GenerateInputRequestedRegion(). It can also
  * be used in routines like ImageSource::ThreadedGenerateData()
- * where a filter may need to map the the output region for a
+ * where a filter may need to map the output region for a
  * particular thread to an input region.
  *
  * This copier uses a "dispatch pattern" to call one of three
@@ -453,7 +447,6 @@ public:
 };
 
 
-} // end of namespace ImageToImageFilterDetail
-} // end namespace itk
+} // namespace itk::ImageToImageFilterDetail
 
 #endif

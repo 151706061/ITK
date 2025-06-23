@@ -39,7 +39,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateInputRequeste
   ImageToImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion();
 
   // Get pointer to input
-  typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
   if (inputPtr.IsNull())
   {
     return;
@@ -47,12 +47,10 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateInputRequeste
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
-  RadiusType radius;
-  radius.Fill(0);
+  RadiusType radius{};
   for (size_t dim = 0; dim < ImageDimension; ++dim)
   {
     radius[dim] = this->GetKernelRadius(dim);
@@ -67,8 +65,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateInputRequeste
 
 template <typename TInputImage, typename TOutputImage>
 void
-FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::SetInputBoundaryCondition(
-  const InputBoundaryConditionPointerType)
+FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::SetInputBoundaryCondition(BoundaryConditionType *)
 {
   itkWarningMacro("FFTDiscreteGaussianImageFilter ignores InputBoundaryCondition, use RealBoundaryCondition instead");
 }
@@ -83,8 +80,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateKernelImage()
     // Get directional 1D Gaussian kernels to compose image
     itk::VariableLengthVector<KernelType> directionalOperators;
     directionalOperators.SetSize(this->GetFilterDimensionality());
-    RadiusType kernelSize;
-    kernelSize.Fill(1);
+    auto kernelSize = MakeFilled<RadiusType>(1);
     for (size_t dim = 0; dim < this->GetFilterDimensionality(); ++dim)
     {
       this->GenerateKernel(dim, directionalOperators[dim]);
@@ -92,9 +88,8 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateKernelImage()
     }
 
     // Set up kernel image
-    typename RealImageType::IndexType index;
-    index.Fill(0);
-    typename RealImageType::RegionType region;
+    const typename RealImageType::IndexType index{};
+    typename RealImageType::RegionType      region;
     region.SetSize(kernelSize);
     region.SetIndex(index);
     m_KernelImage->SetRegions(region);
@@ -123,7 +118,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateKernelImage()
     using KernelSizeType = typename GaussianImageSourceType::SizeType;
     using KernelMeanType = typename GaussianImageSourceType::ArrayType;
 
-    typename GaussianImageSourceType::Pointer kernelSource = GaussianImageSourceType::New();
+    auto kernelSource = GaussianImageSourceType::New();
 
     auto inputSpacing = this->GetInput()->GetSpacing();
     auto inputOrigin = this->GetInput()->GetOrigin();
@@ -135,8 +130,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateKernelImage()
     kernelSource->SetOrigin(inputOrigin);
     kernelSource->SetDirection(this->GetInput()->GetDirection());
 
-    KernelSizeType kernelSize;
-    kernelSize.Fill(1);
+    auto kernelSize = KernelSizeType::Filled(1);
     for (size_t dim = 0; dim < this->GetFilterDimensionality(); ++dim)
     {
       kernelSize[dim] = static_cast<SizeValueType>(this->GetKernelRadius(dim)) * 2 + 1;
@@ -146,7 +140,7 @@ FFTDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateKernelImage()
     KernelMeanType mean;
     for (size_t dim = 0; dim < ImageDimension; ++dim)
     {
-      double radius = (kernelSize[dim] - 1) / 2;
+      const double radius = (kernelSize[dim] - 1) / 2;
       mean[dim] = inputSpacing[dim] * radius + inputOrigin[dim]; // center pixel pos
     }
     kernelSource->SetMean(mean);

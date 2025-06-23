@@ -27,6 +27,7 @@
 #include "ITKIOHDF5Export.h"
 #include "itkMetaDataObjectBase.h"
 #include "itkMetaDataDictionary.h"
+#include <memory> // For unique_ptr.
 
 // itk namespace first suppresses
 // kwstyle error for the H5 namespace below
@@ -95,7 +96,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HDF5ImageIO);
 
   /*-------- This part of the interfaces deals with reading data. ----- */
@@ -213,9 +214,9 @@ private:
   void
   ResetToInitialState();
 
-  H5::H5File *  m_H5File{ nullptr };
-  H5::DataSet * m_VoxelDataSet{ nullptr };
-  bool          m_ImageInformationWritten{ false };
+  std::unique_ptr<H5::H5File>  m_H5File;
+  std::unique_ptr<H5::DataSet> m_VoxelDataSet;
+  bool                         m_ImageInformationWritten{ false };
 };
 } // end namespace itk
 

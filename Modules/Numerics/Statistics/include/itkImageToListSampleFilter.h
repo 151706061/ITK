@@ -23,9 +23,7 @@
 #include "itkProcessObject.h"
 #include "itkDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class ImageToListSampleFilter
@@ -64,7 +62,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToListSampleFilter);
 
   /** Method for creation through the object factory. */
@@ -115,9 +113,10 @@ public:
    * specified, only pixels with this value will be added to the list sample, if
    * no mask has been specified all pixels will be added as measurement vectors
    * to the list sample. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaskValue, MaskPixelType);
   itkGetConstMacro(MaskValue, MaskPixelType);
-
+  /** @ITKEndGrouping */
 protected:
   ImageToListSampleFilter();
   ~ImageToListSampleFilter() override = default;
@@ -146,8 +145,7 @@ protected:
 private:
   MaskPixelType m_MaskValue{};
 }; // end of class ImageToListSampleFilter
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkImageToListSampleFilter.hxx"

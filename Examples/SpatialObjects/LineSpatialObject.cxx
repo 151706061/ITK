@@ -53,7 +53,7 @@ main(int, char *[])
   using PointType = LineType::PointType;
   using CovariantVectorType = LineType::CovariantVectorType;
 
-  LinePointer Line = LineType::New();
+  const LinePointer Line = LineType::New();
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -119,7 +119,7 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  LineType::LinePointListType pointList = Line->GetPoints();
+  const LineType::LinePointListType pointList = Line->GetPoints();
   std::cout << "Number of points representing the line: ";
   std::cout << pointList.size() << std::endl;
   // Software Guide : EndCodeSnippet
@@ -137,18 +137,17 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  LineType::LinePointListType::const_iterator it = Line->GetPoints().begin();
-  while (it != Line->GetPoints().end())
+
+  for (auto & currentPoint : Line->GetPoints())
   {
-    std::cout << "Position = " << (*it).GetPositionInObjectSpace()
+    std::cout << "Position = " << currentPoint.GetPositionInObjectSpace()
               << std::endl;
-    std::cout << "Color = " << (*it).GetColor() << std::endl;
-    std::cout << "First normal = " << (*it).GetNormalInObjectSpace(0)
+    std::cout << "Color = " << currentPoint.GetColor() << std::endl;
+    std::cout << "First normal = " << currentPoint.GetNormalInObjectSpace(0)
               << std::endl;
-    std::cout << "Second normal = " << (*it).GetNormalInObjectSpace(1)
+    std::cout << "Second normal = " << currentPoint.GetNormalInObjectSpace(1)
               << std::endl;
     std::cout << std::endl;
-    ++it;
   }
   // Software Guide : EndCodeSnippet
 

@@ -44,14 +44,14 @@ itkFiniteCylinderSpatialFunctionTest(int, char *[])
   orientation[2] = 0.0;
   ITK_TRY_EXPECT_EXCEPTION(spatialFunc->SetOrientation(orientation));
 
-  double axis = 40.0;
+  constexpr double axis = 40.0;
   spatialFunc->SetAxisLength(axis);
   ITK_TEST_SET_GET_VALUE(axis, spatialFunc->GetAxisLength());
 
   // Define function, which encapsulates cylinder.
-  int xExtent = 50;
-  int yExtent = 50;
-  int zExtent = 50;
+  constexpr int xExtent = 50;
+  constexpr int yExtent = 50;
+  constexpr int zExtent = 50;
 
   TCylinderFunctionVectorType center;
   center[0] = xExtent / 2;
@@ -66,16 +66,14 @@ itkFiniteCylinderSpatialFunctionTest(int, char *[])
   spatialFunc->SetOrientation(orientation);
   ITK_TEST_SET_GET_VALUE(orientation, spatialFunc->GetOrientation());
 
-  double radius = 5.0;
+  constexpr double radius = 5.0;
   spatialFunc->SetRadius(radius);
   ITK_TEST_SET_GET_VALUE(radius, spatialFunc->GetRadius());
 
   // Evaluate all points in the spatial function and count the number of
   // pixels that are inside the cylinder.
-  double testPosition[dimension]; // position of a pixel
-
-  bool functionValue;            // Value of pixel at a given position
-  int  interiorPixelCounter = 0; // Count pixels inside cylinder
+  double testPosition[dimension];  // position of a pixel
+  int    interiorPixelCounter = 0; // Count pixels inside cylinder
 
   for (int x = 0; x < xExtent; ++x)
   {
@@ -86,8 +84,9 @@ itkFiniteCylinderSpatialFunctionTest(int, char *[])
         testPosition[0] = x;
         testPosition[1] = y;
         testPosition[2] = z;
-        functionValue = spatialFunc->Evaluate(testPosition);
-        if (functionValue == 1)
+        // Value of pixel at a given position
+        const bool functionValue = spatialFunc->Evaluate(testPosition);
+        if (functionValue)
         {
           interiorPixelCounter++;
         }
@@ -100,19 +99,19 @@ itkFiniteCylinderSpatialFunctionTest(int, char *[])
   testPosition[0] = center[0];
   testPosition[1] = center[1];
   testPosition[2] = center[2];
-  functionValue = spatialFunc->Evaluate(testPosition);
+  const bool functionValue = spatialFunc->Evaluate(testPosition);
 
   // Volume of cylinder using V=pi*r^2*h
-  double volume = 3.14159 * pow(radius, 2) * axis;
+  const double volume = 3.14159 * pow(radius, 2) * axis;
 
   // Percent difference in volume measurement and calculation
-  double volumeError = (itk::Math::abs(volume - interiorPixelCounter) / volume) * 100;
+  const double volumeError = (itk::Math::abs(volume - interiorPixelCounter) / volume) * 100;
 
   std::cout << spatialFunc;
 
   // 5% error was randomly chosen as a successful ellipsoid fill.
   // This should actually be some function of the image/ellipsoid size.
-  if (volumeError <= 7.0 && functionValue == 1)
+  if (volumeError <= 7.0 && functionValue)
   {
 
     // With testing settings, results should yield:

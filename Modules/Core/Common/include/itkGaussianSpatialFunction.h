@@ -55,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianSpatialFunction);
 
   /** Input type for the function. */
@@ -72,22 +72,26 @@ public:
   Evaluate(const TInput & position) const override;
 
   /** Set/Get the scale factor to multiply the true value of the Gaussian. */
+  /** @ITKStartGrouping */
   itkSetMacro(Scale, double);
   itkGetConstMacro(Scale, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get whether or not to normalize the Gaussian. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(Normalized, bool);
   itkGetConstMacro(Normalized, bool);
   itkBooleanMacro(Normalized);
-
+  /** @ITKEndGrouping */
   /** Set/Get the standard deviation in each direction. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sigma, ArrayType);
   itkGetConstMacro(Sigma, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the mean in each direction. */
+  /** @ITKStartGrouping */
   itkSetMacro(Mean, ArrayType);
   itkGetConstMacro(Mean, ArrayType);
-
+  /** @ITKEndGrouping */
 protected:
   GaussianSpatialFunction() = default;
   ~GaussianSpatialFunction() override = default;

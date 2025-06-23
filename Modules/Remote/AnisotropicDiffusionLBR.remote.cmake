@@ -60,9 +60,9 @@ itk_fetch_module(
     \"Anisotropic Diffusion in ITK\"
     Mirebeau J., Fehrenbach J., Risser L., Tobji S.
     The Insight Journal. 2014 January-December.
-    https://insight-journal.org/browse/publication/953
+    ttps://doi.org/10.54294/en3833
   "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKAnisotropicDiffusionLBR.git
-  GIT_TAG d46aab0e0c8f02b89eaa0420e61970559177683f
+  GIT_TAG 4dbdfe9dd209c0f266a821d1cc2c2135c8057bf9
   )

@@ -29,7 +29,7 @@ int main( int , char * [] )
 
   lsqrDense solver;
 
-  const double tolerance = 1e-9;
+  constexpr double tolerance = 1e-9;
 
   const unsigned int n = 2;
   double x[n];
@@ -437,7 +437,7 @@ int main( int , char * [] )
   }
 
 
-  std::cout << "Stopped because " << solver.GetStoppingReason() << std::endl;
+  std::cout << "Stopped because " << solver.GetStoppingReason() << ": " << solver.GetStoppingReasonMessage() << std::endl;
   std::cout << "Used " << solver.GetNumberOfIterationsPerformed() << " Iterations" << std::endl;
   std::cout << "Frobenius norm estimation of Abar = " << solver.GetFrobeniusNormEstimateOfAbar() << std::endl;
   std::cout << "Condition number estimation of Abar = " << solver.GetConditionNumberEstimateOfAbar() << std::endl;

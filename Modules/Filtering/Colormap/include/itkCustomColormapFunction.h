@@ -22,9 +22,7 @@
 
 #include <vector>
 
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 /**
  * \class CustomColormapFunction
@@ -36,7 +34,7 @@ namespace Function
  * This code was contributed in the Insight Journal paper:
  *
  * "Meeting Andy Warhol Somewhere Over the Rainbow: RGB Colormapping and ITK"
- * https://www.insight-journal.org/browse/publication/285
+ * https://doi.org/10.54294/tmojbk
  *
  * \ingroup ITKColormap
  *
@@ -113,8 +111,7 @@ private:
   ChannelType m_GreenChannel{};
   ChannelType m_BlueChannel{};
 };
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkCustomColormapFunction.hxx"

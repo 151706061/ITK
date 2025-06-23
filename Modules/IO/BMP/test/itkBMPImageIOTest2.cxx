@@ -46,28 +46,27 @@ itkBMPImageIOTest2(int argc, char * argv[])
   reader->SetFileName(argv[1]);
   reader->UpdateOutputInformation();
 
-  std::cout << "PixelType: " << reader->GetImageIO()->GetPixelTypeAsString(reader->GetImageIO()->GetPixelType())
+  std::cout << "PixelType: " << itk::ImageIOBase::GetPixelTypeAsString(reader->GetImageIO()->GetPixelType())
             << std::endl;
-  std::cout << "ComponentType: "
-            << reader->GetImageIO()->GetComponentTypeAsString(reader->GetImageIO()->GetComponentType()) << std::endl;
+  std::cout << "ComponentType: " << itk::ImageIOBase::GetComponentTypeAsString(reader->GetImageIO()->GetComponentType())
+            << std::endl;
   std::cout << "NumberOfComponents: " << reader->GetImageIO()->GetNumberOfComponents() << std::endl;
 
   ITK_TRY_EXPECT_NO_EXCEPTION(reader->Update());
 
-  ImageType::Pointer image = reader->GetOutput();
+  const ImageType::Pointer image = reader->GetOutput();
 
 
   image->Print(std::cout);
 
-  ImageType::RegionType region = image->GetLargestPossibleRegion();
+  const ImageType::RegionType region = image->GetLargestPossibleRegion();
   std::cout << "LargestPossibleRegion " << region;
 
   // Print the IO
   reader->GetImageIO()->Print(std::cout);
 
   // Generate test image
-  itk::ImageFileWriter<ImageType>::Pointer writer;
-  writer = itk::ImageFileWriter<ImageType>::New();
+  const itk::ImageFileWriter<ImageType>::Pointer writer = itk::ImageFileWriter<ImageType>::New();
   writer->SetInput(reader->GetOutput());
   writer->SetFileName(argv[2]);
 

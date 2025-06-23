@@ -39,8 +39,7 @@ namespace itk
          using DerivativeOperatorType = itk::DerivativeOperator<float, 2>;
          DerivativeOperatorType derivativeOperator;
          derivativeOperator.SetDirection(0); // X dimension
-         itk::Size<2> radius;
-         radius.Fill(1); // A radius of 1 in both dimensions is a 3x3 operator
+         constexpr auto radius = itk::Size<2>::Filled(1); // A radius of 1 in both dimensions is a 3x3 operator
          derivativeOperator.CreateToRadius(radius);
    \endcode
  * and creates a kernel that looks like:
@@ -73,7 +72,7 @@ public:
   using Self = DerivativeOperator;
   using Superclass = NeighborhoodOperator<TPixel, VDimension, TAllocator>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DerivativeOperator);
 
   /** Type alias support for pixel real type.*/
@@ -87,7 +86,7 @@ public:
   }
 
   /** Returns the order of the derivative. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetOrder() const
   {
     return m_Order;

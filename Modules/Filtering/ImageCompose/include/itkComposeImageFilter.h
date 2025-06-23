@@ -20,7 +20,7 @@
 
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
-#include "itkImageRegionConstIterator.h"
+#include "itkImageScanlineIterator.h"
 #include <vector>
 
 namespace itk
@@ -55,7 +55,6 @@ namespace itk
  Complex Image}
  * \endsphinx
  */
-
 template <typename TInputImage,
           typename TOutputImage = VectorImage<typename TInputImage::PixelType, TInputImage::ImageDimension>>
 class ITK_TEMPLATE_EXPORT ComposeImageFilter : public ImageToImageFilter<TInputImage, TOutputImage>
@@ -85,12 +84,8 @@ public:
   void
   SetInput3(const InputImageType * image3);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputCovertibleToOutputCheck,
                   (Concept::Convertible<InputPixelType, typename NumericTraits<OutputPixelType>::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   ComposeImageFilter();
@@ -108,27 +103,8 @@ protected:
 private:
   // we have to specialize the code for complex, because it provides no operator[]
   // method
-  using InputIteratorType = ImageRegionConstIterator<InputImageType>;
+  using InputIteratorType = ImageScanlineConstIterator<InputImageType>;
   using InputIteratorContainerType = std::vector<InputIteratorType>;
-
-  template <typename T>
-  void
-  ComputeOutputPixel(std::complex<T> & pix, InputIteratorContainerType & inputItContainer)
-  {
-    pix = std::complex<T>(inputItContainer[0].Get(), inputItContainer[1].Get());
-    ++(inputItContainer[0]);
-    ++(inputItContainer[1]);
-  }
-  template <typename TPixel>
-  void
-  ComputeOutputPixel(TPixel & pix, InputIteratorContainerType & inputItContainer)
-  {
-    for (unsigned int i = 0; i < this->GetNumberOfInputs(); ++i)
-    {
-      pix[i] = static_cast<typename NumericTraits<OutputPixelType>::ValueType>(inputItContainer[i].Get());
-      ++(inputItContainer[i]);
-    }
-  }
 };
 } // namespace itk
 

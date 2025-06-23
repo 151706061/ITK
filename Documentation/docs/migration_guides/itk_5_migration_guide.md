@@ -69,8 +69,8 @@ Availability of the C++11 standard allows use of many Standard Library
 features. These were previously implemented as portable ITK classes.
 The standard library classes are preferred over ITK's implementations.
 The most notable examples of this are:
- * [atomic integers](https://itk.org/Doxygen413/html/classitk_1_1AtomicInt.html) should be replaced by `std::atomic`.
- * [mutex locks](https://itk.org/Doxygen413/html/classitk_1_1MutexLock.html)
+ * [atomic integers](https://docs.itk.org/projects/doxygen/en/v4.13.0/classitk_1_1AtomicInt.html) should be replaced by `std::atomic`.
+ * [mutex locks](https://docs.itk.org/projects/doxygen/en/v4.13.0/classitk_1_1MutexLock.html)
 and related classes should be replaced by the similarly named classes from STL's
 [`<mutex>`](https://en.cppreference.com/w/cpp/header/mutex) header.
  * `itksys::hash_map` should be replaced by [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map).
@@ -312,7 +312,7 @@ and intuitive.
 SpatialObjects now only have two spaces and two transforms directly associated with them:
 * ObjectSpace is the space that is "local" to each object.   It is the physical space in which its data/parameters are defined.  For
 example, for an ImageSpatialObject it is the "PhysicalSpace" (see Image Class definition) of the Image.   For an Line/Tube/DTI and other
-point-based SpatialObjects, it is the inherent space in which the Point coordinates are specififed.   Typically, when a SpatialObject is
+point-based SpatialObjects, it is the inherent space in which the Point coordinates are specified.   Typically, when a SpatialObject is
 extracted from an Image, the parameters/coordinates of the SpatialObject are the space as the physical space of the source Image.   Any
 children of a SpatialObject are defined within the ObjectSpace of that parent SpatialObject.
 
@@ -368,7 +368,7 @@ It should be replaced by [itk::SimpleFilterWatcher](../../../Modules/Core/Common
 `itksys::hash_map` has been removed. It should be replaced by `std::unordered_map`.
 
 `WatershedImageFilter` produces slightly different results due to changes of `hash_map`.
-Generally, [MorphologicalWatersheds](https://itk.org/Doxygen/html/classitk_1_1MorphologicalWatershedImageFilter.html)
+Generally, [MorphologicalWatersheds](https://docs.itk.org/projects/doxygen/en/stable/classitk_1_1MorphologicalWatershedImageFilter.html)
 produce more stable results and should be preferred to regular watersheds.
 
 Since `itk::ProgressReporter` does not work well with the new threading model,
@@ -627,6 +627,6 @@ To resolve these errors, update the remote module's dependency specification in
 Update scripts
 --------------
 
-[Utilities/ITKv5Preparation](https://github.com/InsightSoftwareConsortium/ITK/tree/master/Utilities/ITKv5Preparation) directory contains
+[Utilities/ITKv5Preparation](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Utilities/ITKv5Preparation) directory contains
 bash scripts which have been used to update ITK to version 5. These scripts
 can assist with updating external code bases to ITK 5 content and style.

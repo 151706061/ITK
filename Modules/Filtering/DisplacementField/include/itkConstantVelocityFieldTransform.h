@@ -45,7 +45,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConstantVelocityFieldTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -119,19 +119,21 @@ public:
    * Set the displacement field. Create special set accessor to update
    * interpolator and assign displacement field to transform parameters
    * container. */
+  /** @ITKStartGrouping */
   virtual void
   SetConstantVelocityField(ConstantVelocityFieldType *);
   itkGetModifiableObjectMacro(ConstantVelocityField, ConstantVelocityFieldType);
-
+  /** @ITKEndGrouping */
   void
   SetFixedParameters(const FixedParametersType &) override;
 
   /** Get/Set the interpolator.
    * Create out own set accessor that assigns the velocity field */
+  /** @ITKStartGrouping */
   virtual void
   SetConstantVelocityFieldInterpolator(ConstantVelocityFieldInterpolatorType *);
   itkGetModifiableObjectMacro(ConstantVelocityFieldInterpolator, ConstantVelocityFieldInterpolatorType);
-
+  /** @ITKEndGrouping */
   /** Get the modification time of velocity field */
   itkGetConstReferenceMacro(ConstantVelocityFieldSetTime, ModifiedTimeType);
 
@@ -197,7 +199,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Clone the current transform */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
   typename DisplacementFieldType::Pointer

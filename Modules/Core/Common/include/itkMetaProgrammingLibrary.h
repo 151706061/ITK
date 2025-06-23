@@ -44,7 +44,7 @@ struct TrueType
   using Type = TrueType;
 
   static constexpr ValueType Value = true;
-                             operator ValueType() { return Value; }
+  operator ValueType() { return Value; }
 };
 
 /** borrowed from `<type_traits>`.
@@ -56,7 +56,7 @@ struct FalseType
   using ValueType = bool;
   using Type = FalseType;
   static constexpr ValueType Value = false;
-                             operator ValueType() { return Value; }
+  operator ValueType() { return Value; }
 };
 
 /** MPL \c if control-statement.
@@ -99,7 +99,7 @@ struct OrC<false, false, false> : FalseType
 /** MPL \c OR operator on types.
  * \tparam TF1 First boolean type
  * \tparam TF2 Second boolean type
- * \tparam VF3 Third (optional) boolean type
+ * \tparam TF3 Third (optional) boolean type
  *
  * This \em overload automatically fetches \c TF1, \c TF2 and \c TF3 values.
  * However, beware, it won't work with standard C++ traits or boost traits.

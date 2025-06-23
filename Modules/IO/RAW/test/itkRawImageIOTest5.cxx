@@ -40,11 +40,9 @@ public:
   {
     m_Image = ImageType::New();
 
-    typename ImageType::RegionType region;
-    typename ImageType::SizeType   size;
-    typename ImageType::IndexType  start;
-
-    start.Fill(0);
+    typename ImageType::RegionType          region;
+    typename ImageType::SizeType            size;
+    constexpr typename ImageType::IndexType start{};
     size[0] = 16; // To fill the range of 8 bits image
     size[1] = 16;
 
@@ -97,9 +95,9 @@ public:
     auto rawImageIO = RawImageIOType::New();
     reader->SetImageIO(rawImageIO);
 
-    unsigned int dim[2] = { 16, 16 };
-    double       spacing[2] = { 1.0, 1.0 };
-    double       origin[2] = { 0.0, 0.0 };
+    constexpr unsigned int dim[2] = { 16, 16 };
+    constexpr double       spacing[2] = { 1.0, 1.0 };
+    constexpr double       origin[2] = { 0.0, 0.0 };
 
     for (unsigned int i = 0; i < 2; ++i)
     {
@@ -114,7 +112,7 @@ public:
 
     reader->Update();
 
-    ImageType::ConstPointer image = reader->GetOutput();
+    const ImageType::ConstPointer image = reader->GetOutput();
 
 
     //
@@ -148,7 +146,7 @@ public:
     m_FileName = filename;
   }
 
-  bool
+  [[nodiscard]] bool
   GetError() const
   {
     return m_Error;
@@ -175,7 +173,7 @@ itkRawImageIOTest5(int argc, char * argv[])
   }
 
 
-  std::string directory = argv[1];
+  const std::string directory = argv[1];
 
 
   //

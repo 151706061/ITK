@@ -52,11 +52,10 @@ itkDeformableSimplexMesh3DBalloonForceFilterTest(int argc, char * argv[])
   // declare the triangle to simplex mesh filter
   using SimplexFilterType = itk::TriangleMeshToSimplexMeshFilter<TriangleMeshType, SimplexMeshType>;
 
-  auto      mySphereMeshSource = SphereMeshSourceType::New();
-  PointType center;
-  center.Fill(10);
+  auto                 mySphereMeshSource = SphereMeshSourceType::New();
+  auto                 center = itk::MakeFilled<PointType>(10);
   PointType::ValueType scaleInit[3] = { 3, 3, 3 };
-  VectorType           scale = scaleInit;
+  const VectorType     scale = scaleInit;
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetResolution(2);
@@ -77,8 +76,7 @@ itkDeformableSimplexMesh3DBalloonForceFilterTest(int argc, char * argv[])
 
   auto originalImage = OriginalImageType::New();
 
-  ImageSizeType imageSize;
-  imageSize.Fill(20);
+  auto imageSize = ImageSizeType::Filled(20);
   originalImage->SetRegions(imageSize);
   originalImage->Allocate();
 
@@ -142,7 +140,7 @@ itkDeformableSimplexMesh3DBalloonForceFilterTest(int argc, char * argv[])
   deformFilter->SetRigidity(0);
   deformFilter->Update();
 
-  SimplexMeshType::Pointer deformResult = deformFilter->GetOutput();
+  const SimplexMeshType::Pointer deformResult = deformFilter->GetOutput();
 
   std::cout << "Deformation Result: " << deformResult << std::endl;
 

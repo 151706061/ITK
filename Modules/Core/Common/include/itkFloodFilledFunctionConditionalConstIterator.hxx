@@ -27,9 +27,9 @@ FloodFilledFunctionConditionalConstIterator<TImage, TFunction>::FloodFilledFunct
   const ImageType * imagePtr,
   FunctionType *    fnPtr,
   IndexType         startIndex)
+  : m_Function(fnPtr)
 {
   this->m_Image = imagePtr;
-  m_Function = fnPtr;
   m_Seeds.push_back(startIndex);
 
   // Set up the temporary image
@@ -41,11 +41,10 @@ FloodFilledFunctionConditionalConstIterator<TImage, TFunction>::FloodFilledFunct
   const ImageType *        imagePtr,
   FunctionType *           fnPtr,
   std::vector<IndexType> & startIndex)
+  : m_Function(fnPtr)
 {
   this->m_Image = imagePtr;
-  m_Function = fnPtr;
-  unsigned int i;
-  for (i = 0; i < startIndex.size(); ++i)
+  for (unsigned int i = 0; i < startIndex.size(); ++i)
   {
     m_Seeds.push_back(startIndex[i]);
   }
@@ -58,9 +57,9 @@ template <typename TImage, typename TFunction>
 FloodFilledFunctionConditionalConstIterator<TImage, TFunction>::FloodFilledFunctionConditionalConstIterator(
   const ImageType * imagePtr,
   FunctionType *    fnPtr)
+  : m_Function(fnPtr)
 {
   this->m_Image = imagePtr;
-  m_Function = fnPtr;
 
   // Set up the temporary image
   this->InitializeIterator();
@@ -80,7 +79,7 @@ FloodFilledFunctionConditionalConstIterator<TImage, TFunction>::InitializeIterat
 
   // Build a temporary image of chars for use in the flood algorithm
   m_TemporaryPointer = TTempImage::New();
-  typename TTempImage::RegionType tempRegion = this->m_Image->GetBufferedRegion();
+  const typename TTempImage::RegionType tempRegion = this->m_Image->GetBufferedRegion();
 
   m_TemporaryPointer->SetRegions(tempRegion);
   m_TemporaryPointer->AllocateInitialized();
@@ -205,7 +204,7 @@ FloodFilledFunctionConditionalConstIterator<TImage, TFunction>::DoFloodStep()
         }
       }
     } // end left/right neighbor loop
-  }   // end check all neighbors
+  } // end check all neighbors
 
   // Now that all the potential neighbors have been
   // inserted we can get rid of the pixel in the front

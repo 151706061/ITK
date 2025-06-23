@@ -48,11 +48,9 @@ itkMutualInformationMetricTest(int, char *[])
     ImageDimension = MovingImageType::ImageDimension
   };
 
-  MovingImageType::SizeType   size = { { 100, 100 } };
-  MovingImageType::IndexType  index = { { 0, 0 } };
-  MovingImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  constexpr MovingImageType::SizeType  size = { { 100, 100 } };
+  constexpr MovingImageType::IndexType index = { { 0, 0 } };
+  const MovingImageType::RegionType    region{ index, size };
 
   auto imgMoving = MovingImageType::New();
   imgMoving->SetRegions(region);
@@ -156,8 +154,8 @@ itkMutualInformationMetricTest(int, char *[])
   //------------------------------------------------------------
   // Set up an affine transform parameters
   //------------------------------------------------------------
-  unsigned int   numberOfParameters = transformer->GetNumberOfParameters();
-  ParametersType parameters(numberOfParameters);
+  const unsigned int numberOfParameters = transformer->GetNumberOfParameters();
+  ParametersType     parameters(numberOfParameters);
 
   // set the parameters to the identity
   unsigned long count = 0;
@@ -189,7 +187,7 @@ itkMutualInformationMetricTest(int, char *[])
   // for parameters[4] = {-10,10}
   //---------------------------------------------------------
 
-  MetricType::MeasureType    measure;
+  MetricType::MeasureType    measure = NAN;
   MetricType::DerivativeType derivative(numberOfParameters);
 
   itk::TimeProbesCollectorBase collector;
@@ -221,7 +219,7 @@ itkMutualInformationMetricTest(int, char *[])
 
   metric->Print(std::cout);
 
-  itk::KernelFunctionBase<double>::Pointer theKernel = metric->GetModifiableKernelFunction();
+  const itk::KernelFunctionBase<double>::Pointer theKernel = metric->GetModifiableKernelFunction();
   metric->SetKernelFunction(theKernel);
   theKernel->Print(std::cout);
 

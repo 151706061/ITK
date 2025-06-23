@@ -24,8 +24,8 @@ namespace itk
 {
 template <unsigned int VSplineOrder, typename TRealValueType>
 CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::CoxDeBoorBSplineKernelFunction()
+  : m_SplineOrder(VSplineOrder)
 {
-  this->m_SplineOrder = VSplineOrder;
   this->GenerateBSplineShapeFunctions(this->m_SplineOrder + 1);
 }
 
@@ -87,7 +87,7 @@ CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::CoxDeBoor(const un
 
   if (itk::Math::AlmostEquals(den, TRealValueType{ 0.0 }))
   {
-    PolynomialType poly(TRealValueType{ 0.0 });
+    const PolynomialType poly(TRealValueType{ 0.0 });
     poly1 = poly;
   }
   else
@@ -102,7 +102,7 @@ CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::CoxDeBoor(const un
   den = knots(i + p + 1) - knots(i + 1);
   if (itk::Math::AlmostEquals(den, TRealValueType{ 0.0 }))
   {
-    PolynomialType poly(TRealValueType{ 0.0 });
+    const PolynomialType poly(TRealValueType{ 0.0 });
     poly2 = poly;
   }
   else
@@ -152,24 +152,18 @@ CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::Evaluate(const TRe
 {
   const TRealValueType absValue = itk::Math::abs(u);
 
-  unsigned int which;
+  auto which = static_cast<unsigned int>(absValue);
   if (this->m_SplineOrder % 2 == 0)
   {
     which = static_cast<unsigned int>(absValue + TRealValueType{ 0.5 });
-  }
-  else
-  {
-    which = static_cast<unsigned int>(absValue);
   }
 
   if (which < this->m_BSplineShapeFunctions.rows())
   {
     return PolynomialType(this->m_BSplineShapeFunctions.get_row(which)).evaluate(absValue);
   }
-  else
-  {
-    return TRealValueType{ 0.0 };
-  }
+
+  return TRealValueType{ 0.0 };
 }
 
 template <unsigned int VSplineOrder, typename TRealValueType>
@@ -186,14 +180,10 @@ CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::EvaluateNthDerivat
 {
   const TRealValueType absValue = itk::Math::abs(u);
 
-  unsigned int which;
+  auto which = static_cast<unsigned int>(absValue);
   if (this->m_SplineOrder % 2 == 0)
   {
     which = static_cast<unsigned int>(absValue + TRealValueType{ 0.5 });
-  }
-  else
-  {
-    which = static_cast<unsigned int>(absValue);
   }
 
   if (which < this->m_BSplineShapeFunctions.rows())
@@ -208,10 +198,8 @@ CoxDeBoorBSplineKernelFunction<VSplineOrder, TRealValueType>::EvaluateNthDerivat
     {
       return -der;
     }
-    else
-    {
-      return der;
-    }
+
+    return der;
   }
   else
   {

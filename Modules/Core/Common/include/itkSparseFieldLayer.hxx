@@ -24,16 +24,8 @@ namespace itk
 template <typename TNodeType>
 SparseFieldLayer<TNodeType>::SparseFieldLayer()
 {
-  m_HeadNode = new NodeType;
-  m_HeadNode->Next = m_HeadNode;
-  m_HeadNode->Previous = m_HeadNode;
-  m_Size = 0;
-}
-
-template <typename TNodeType>
-SparseFieldLayer<TNodeType>::~SparseFieldLayer()
-{
-  delete m_HeadNode;
+  m_HeadNode->Next = m_HeadNode.get();
+  m_HeadNode->Previous = m_HeadNode.get();
 }
 
 template <typename TNodeType>
@@ -42,7 +34,7 @@ SparseFieldLayer<TNodeType>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "HeadNode: " << m_HeadNode << std::endl;
+  os << indent << "HeadNode: " << m_HeadNode.get() << std::endl;
   os << indent << "Size: " << m_Size << std::endl;
 }
 
@@ -57,13 +49,13 @@ template <typename TNodeType>
 auto
 SparseFieldLayer<TNodeType>::SplitRegions(int num) const -> RegionListType
 {
-  std::vector<RegionType> regionlist;
-  unsigned int            size, regionsize;
-  size = Size();
-  regionsize = static_cast<unsigned int>(std::ceil(static_cast<float>(size) / static_cast<float>(num)));
+  const unsigned int size = Size();
+  const auto    regionsize = static_cast<unsigned int>(std::ceil(static_cast<float>(size) / static_cast<float>(num)));
   ConstIterator position = Begin();
-  ConstIterator last = End();
+  const ConstIterator last = End();
 
+  std::vector<RegionType> regionlist;
+  regionlist.reserve(num);
   for (int i = 0; i < num; ++i)
   {
     unsigned int j = 0;

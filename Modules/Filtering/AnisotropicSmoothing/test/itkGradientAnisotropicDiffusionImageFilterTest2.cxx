@@ -38,9 +38,9 @@ namespace
 bool
 SameImage(ImagePointer testImage, ImagePointer baselineImage)
 {
-  PixelType     intensityTolerance = .001;
-  int           radiusTolerance = 0;
-  unsigned long numberOfPixelTolerance = 0;
+  constexpr PixelType     intensityTolerance = .001;
+  constexpr int           radiusTolerance = 0;
+  constexpr unsigned long numberOfPixelTolerance = 0;
 
   using DiffType = itk::Testing::ComparisonImageFilter<ImageType, ImageType>;
   auto diff = DiffType::New();
@@ -50,7 +50,7 @@ SameImage(ImagePointer testImage, ImagePointer baselineImage)
   diff->SetToleranceRadius(radiusTolerance);
   diff->UpdateLargestPossibleRegion();
 
-  unsigned long status = diff->GetNumberOfPixelsWithDifferences();
+  const unsigned long status = diff->GetNumberOfPixelsWithDifferences();
 
 
   if (status > numberOfPixelTolerance)
@@ -75,11 +75,11 @@ itkGradientAnisotropicDiffusionImageFilterTest2(int argc, char * argv[])
   }
 
 
-  itk::ImageFileReader<myFloatImage>::Pointer input = itk::ImageFileReader<myFloatImage>::New();
+  const itk::ImageFileReader<myFloatImage>::Pointer input = itk::ImageFileReader<myFloatImage>::New();
   input->SetFileName(argv[1]);
 
   // Create a filter
-  itk::GradientAnisotropicDiffusionImageFilter<myFloatImage, myFloatImage>::Pointer filter =
+  const itk::GradientAnisotropicDiffusionImageFilter<myFloatImage, myFloatImage>::Pointer filter =
     itk::GradientAnisotropicDiffusionImageFilter<myFloatImage, myFloatImage>::New();
   filter->SetNumberOfIterations(10);
   filter->SetConductanceParameter(1.0f);
@@ -88,7 +88,7 @@ itkGradientAnisotropicDiffusionImageFilterTest2(int argc, char * argv[])
   filter->SetInput(input->GetOutput());
 
   using myUCharImage = itk::Image<unsigned char, 2>;
-  itk::CastImageFilter<myFloatImage, myUCharImage>::Pointer caster =
+  const itk::CastImageFilter<myFloatImage, myUCharImage>::Pointer caster =
     itk::CastImageFilter<myFloatImage, myUCharImage>::New();
   caster->SetInput(filter->GetOutput());
 
@@ -96,15 +96,14 @@ itkGradientAnisotropicDiffusionImageFilterTest2(int argc, char * argv[])
 
 
   // Generate test image
-  itk::ImageFileWriter<myUCharImage>::Pointer writer;
-  writer = itk::ImageFileWriter<myUCharImage>::New();
+  const itk::ImageFileWriter<myUCharImage>::Pointer writer = itk::ImageFileWriter<myUCharImage>::New();
   writer->SetInput(caster->GetOutput());
   writer->SetFileName(argv[2]);
 
   ITK_TRY_EXPECT_NO_EXCEPTION(writer->Update());
 
 
-  myFloatImage::Pointer normalImage = filter->GetOutput();
+  const myFloatImage::Pointer normalImage = filter->GetOutput();
   normalImage->DisconnectPipeline();
 
   // We now set up testing when the image spacing is not trivial 1 and

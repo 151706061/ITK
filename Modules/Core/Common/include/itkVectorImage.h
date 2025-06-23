@@ -93,7 +93,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorImage);
 
   /** Pixel type alias support Used to declare pixel type in filters
@@ -181,7 +181,7 @@ public:
      \endcode
    *
    * \sa Image::Rebind
-   * \deprecated Use template alias RebindImageType instead
+   * Deprecated: Use template alias RebindImageType instead
    */
   template <typename UPixelType, unsigned int VUImageDimension = VImageDimension>
   struct Rebind
@@ -223,7 +223,7 @@ public:
   void
   SetPixel(const IndexType & index, const PixelType & value)
   {
-    OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
+    const OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
 
     for (VectorLengthType i = 0; i < m_VectorLength; ++i)
     {
@@ -239,7 +239,7 @@ public:
   const PixelType
   GetPixel(const IndexType & index) const
   {
-    OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
+    const OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
 
     // Do not create a local for this method, to use return value
     // optimization.
@@ -258,7 +258,7 @@ public:
   PixelType
   GetPixel(const IndexType & index)
   {
-    OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
+    const OffsetValueType offset = m_VectorLength * this->FastComputeOffset(index);
 
     // Correctness of this method relies of return value optimization, do
     // not create a local for the value.
@@ -274,16 +274,25 @@ public:
    *
    * For efficiency, this function does not check that the
    * image has actually been allocated yet. */
-  PixelType operator[](const IndexType & index) { return this->GetPixel(index); }
+  PixelType
+  operator[](const IndexType & index)
+  {
+    return this->GetPixel(index);
+  }
 
   /** \brief Access a pixel.
    *
    * For efficiency, this function does not check that the
    * image has actually been allocated yet. */
-  const PixelType operator[](const IndexType & index) const { return this->GetPixel(index); }
+  const PixelType
+  operator[](const IndexType & index) const
+  {
+    return this->GetPixel(index);
+  }
 
   /** Return a pointer to the beginning of the buffer.  This is used by
    * the image iterator class. */
+  /** @ITKStartGrouping */
   InternalPixelType *
   GetBufferPointer()
   {
@@ -294,7 +303,7 @@ public:
   {
     return m_Buffer ? m_Buffer->GetBufferPointer() : nullptr;
   }
-
+  /** @ITKEndGrouping */
   /** Return a pointer to the container. */
   PixelContainer *
   GetPixelContainer()
@@ -356,11 +365,12 @@ public:
   }
 
   /** Set/Get macros for the length of each vector in the vector image */
+  /** @ITKStartGrouping */
   itkSetMacro(VectorLength, VectorLengthType);
   itkGetConstReferenceMacro(VectorLength, VectorLengthType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the number of components each pixel has, ie the VectorLength */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfComponentsPerPixel() const override;
 
   void

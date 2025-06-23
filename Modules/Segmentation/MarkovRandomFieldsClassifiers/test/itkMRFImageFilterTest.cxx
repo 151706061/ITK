@@ -25,14 +25,14 @@
 
 
 // Data definitions
-#define IMGWIDTH 6
-#define IMGHEIGHT 6
-#define NFRAMES 3
-#define NUMBANDS 2
-#define NDIMENSION 3
-#define NUM_CLASSES 3
-#define MAX_NUM_ITER 5
-#define NEIGHBORHOOD_RAD 1
+constexpr uint8_t IMGWIDTH = 6;
+constexpr uint8_t IMGHEIGHT = 6;
+constexpr uint8_t NFRAMES = 3;
+constexpr uint8_t NUMBANDS = 2;
+constexpr uint8_t NDIMENSION = 3;
+constexpr uint8_t NUM_CLASSES = 3;
+constexpr uint8_t MAX_NUM_ITER = 5;
+constexpr uint8_t NEIGHBORHOOD_RAD = 1;
 
 
 int
@@ -52,8 +52,7 @@ itkMRFImageFilterTest(int, char *[])
 
   VecImageType::SizeType vecImgSize = { { IMGWIDTH, IMGHEIGHT, NFRAMES } };
 
-  VecImageType::IndexType index;
-  index.Fill(0);
+  constexpr VecImageType::IndexType index{};
 
   VecImageType::RegionType region;
 
@@ -74,11 +73,9 @@ itkMRFImageFilterTest(int, char *[])
 
   // Set up the vector to store the image  data
   using DataVector = VecImageType::PixelType;
-  DataVector dblVec;
 
-  int i, k;
-  int halfWidth = static_cast<int>(vecImgSize[0]) / 2;
-  int halfHeight = static_cast<int>(vecImgSize[1]) / 2;
+  const int halfWidth = static_cast<int>(vecImgSize[0]) / 2;
+  const int halfHeight = static_cast<int>(vecImgSize[1]) / 2;
 
   //--------------------------------------------------------------------------
   // Manually create and store each vector
@@ -86,12 +83,13 @@ itkMRFImageFilterTest(int, char *[])
   // Slice 1
   //--------------------------------------------------------------------------
   // Row 1-3
-  for (k = 0; k < halfHeight; ++k)
+  DataVector dblVec;
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3
     dblVec[0] = 21;
     dblVec[1] = 19;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -99,19 +97,19 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6
     dblVec[0] = 18;
     dblVec[1] = 14;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
   }
 
   // Row 4-6
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3
     dblVec[0] = 15;
     dblVec[1] = 11;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -119,7 +117,7 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6
     dblVec[0] = 10;
     dblVec[1] = 16;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -129,12 +127,12 @@ itkMRFImageFilterTest(int, char *[])
   // Slice 2
   //--------------------------------------------------------------------------
   // Row 1-3
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
     dblVec[0] = 14;
     dblVec[1] = 20;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -142,19 +140,19 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6 Row k
     dblVec[0] = 18;
     dblVec[1] = 22;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
   }
 
   // Row 4-6
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
     dblVec[0] = 15;
     dblVec[1] = 15;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -162,7 +160,7 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6 Row k
     dblVec[0] = 12;
     dblVec[1] = 12;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -172,12 +170,12 @@ itkMRFImageFilterTest(int, char *[])
   // Slice 3
   //--------------------------------------------------------------------------
   // Row 1-3
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
     dblVec[0] = 19;
     dblVec[1] = 20;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -185,19 +183,19 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6 Row k
     dblVec[0] = 19;
     dblVec[1] = 21;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
   }
 
   // Row 4-6
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
     dblVec[0] = 12;
     dblVec[1] = 12;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -205,7 +203,7 @@ itkMRFImageFilterTest(int, char *[])
     // Vector no. 4-6 Row k
     dblVec[0] = 11;
     dblVec[1] = 10;
-    for (i = 0; i < halfWidth; ++i, ++outIt)
+    for (int i = 0; i < halfWidth; ++i, ++outIt)
     {
       outIt.Set(dblVec);
     }
@@ -217,10 +215,9 @@ itkMRFImageFilterTest(int, char *[])
   using ClassImageType = itk::Image<unsigned short, NDIMENSION>;
   auto classImage = ClassImageType::New();
 
-  ClassImageType::SizeType classImgSize = { { IMGWIDTH, IMGHEIGHT, NFRAMES } };
+  constexpr ClassImageType::SizeType classImgSize = { { IMGWIDTH, IMGHEIGHT, NFRAMES } };
 
-  ClassImageType::IndexType classindex;
-  classindex.Fill(0);
+  constexpr ClassImageType::IndexType classindex{};
 
   ClassImageType::RegionType classregion;
 
@@ -244,19 +241,19 @@ itkMRFImageFilterTest(int, char *[])
   //--------------------------------------------------------------------------
   // Row 1-3
 
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
-    for (i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
+    for (int i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
     {
       classoutIt.Set(2);
     }
   }
 
   // Row 4-6
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
-    for (i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
+    for (int i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
     {
       classoutIt.Set(1);
     }
@@ -265,10 +262,10 @@ itkMRFImageFilterTest(int, char *[])
   // Slice 2
   //--------------------------------------------------------------------------
   // Row 1-6
-  for (k = 0; k < (halfHeight * 2); ++k)
+  for (int k = 0; k < (halfHeight * 2); ++k)
   {
     // Vector no. 1-3 Row k
-    for (i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
+    for (int i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
     {
       classoutIt.Set(0);
     }
@@ -277,19 +274,19 @@ itkMRFImageFilterTest(int, char *[])
   //--------------------------------------------------------------------------
   // Slice 3
   //--------------------------------------------------------------------------
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
     // Vector no. 1-3 Row k
-    for (i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
+    for (int i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
     {
       classoutIt.Set(2);
     }
   }
 
   // Row 4-6
-  for (k = 0; k < halfHeight; ++k)
+  for (int k = 0; k < halfHeight; ++k)
   {
-    for (i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
+    for (int i = 0; i < (halfWidth * 2); ++i, ++classoutIt)
     {
       classoutIt.Set(1);
     }
@@ -347,7 +344,7 @@ itkMRFImageFilterTest(int, char *[])
   using ClassifierType = itk::ImageClassifierBase<VecImageType, ClassImageType>;
 
   using ClassifierPointer = ClassifierType::Pointer;
-  ClassifierPointer myClassifier = ClassifierType::New();
+  const ClassifierPointer myClassifier = ClassifierType::New();
   // Set the Classifier parameters
   myClassifier->SetNumberOfClasses(NUM_CLASSES);
 
@@ -392,7 +389,7 @@ itkMRFImageFilterTest(int, char *[])
   std::cout << "Stop condition: (1) Maximum number of iterations (2) Error tolerance:  "
             << applyMRFImageFilter->GetStopCondition() << std::endl;
 
-  ClassImageType::Pointer outClassImage = applyMRFImageFilter->GetOutput();
+  const ClassImageType::Pointer outClassImage = applyMRFImageFilter->GetOutput();
 
   // Testing of different parameter access functions in the filter
   std::cout << "The number of classes labelled was: " << applyMRFImageFilter->GetNumberOfClasses() << std::endl;
@@ -403,20 +400,20 @@ itkMRFImageFilterTest(int, char *[])
   std::cout << "The MRF neighborhood weights are: " << std::endl;
 
   // Test other optional access functions to test coverage
-  std::vector<double> MRFNeighborhoodWeight = applyMRFImageFilter->GetMRFNeighborhoodWeight();
-  std::vector<double> testNewNeighborhoodWeight(MRFNeighborhoodWeight.size(), 1);
+  const std::vector<double> MRFNeighborhoodWeight = applyMRFImageFilter->GetMRFNeighborhoodWeight();
+  const std::vector<double> testNewNeighborhoodWeight(MRFNeighborhoodWeight.size(), 1);
 
   applyMRFImageFilter->SetMRFNeighborhoodWeight(testNewNeighborhoodWeight);
 
   // Print the mrf labelled image
-  ClassImageIterator labeloutIt(outClassImage, outClassImage->GetBufferedRegion());
+  const ClassImageIterator labeloutIt(outClassImage, outClassImage->GetBufferedRegion());
 
   //---------------------------------------------------------------------
   // Set up the neighborhood iterators and the valid neighborhoods
   // for iteration
   //---------------------------------------------------------------------
 
-  // Set up the nighborhood iterators
+  // Set up the neighborhood iterators
   // Labelled image neighborhood iterator typedef
 
   using OutImageNeighborhoodIterator = itk::NeighborhoodIterator<ClassImageType>;
@@ -424,16 +421,12 @@ itkMRFImageFilterTest(int, char *[])
   using OutImageFacesCalculator = itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<ClassImageType>;
   using OutImageFaceListType = OutImageFacesCalculator::FaceListType;
 
-  OutImageNeighborhoodRadiusType outImageNeighborhoodRadius;
-  outImageNeighborhoodRadius.Fill(1);
+  auto outImageNeighborhoodRadius = itk::MakeFilled<OutImageNeighborhoodRadiusType>(1);
 
   // Define the face list for the input/labelled image
   OutImageFacesCalculator outImageFacesCalculator;
-
-  OutImageFaceListType outImageFaceList;
-
   // Compute the faces for the neighborhoods in the input/labelled image
-  outImageFaceList =
+  OutImageFaceListType outImageFaceList =
     outImageFacesCalculator(outClassImage, outClassImage->GetBufferedRegion(), outImageNeighborhoodRadius);
 
   // Set up a face list iterator
@@ -445,12 +438,11 @@ itkMRFImageFilterTest(int, char *[])
 
   int sum = 0;
   using ClassImagePixelType = ClassImageType::PixelType;
-  ClassImagePixelType * outLabel;
 
   // Loop through the labelled region and add the pixel labels
   while (!nOutImageNeighborhoodIter.IsAtEnd())
   {
-    outLabel = nOutImageNeighborhoodIter.GetCenterValue();
+    ClassImagePixelType * outLabel = nOutImageNeighborhoodIter.GetCenterValue();
     sum += static_cast<int>(*outLabel);
     ++nOutImageNeighborhoodIter;
   }

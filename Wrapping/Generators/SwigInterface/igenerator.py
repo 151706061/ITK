@@ -65,7 +65,7 @@ from io import StringIO
 from os.path import exists
 from pathlib import Path
 from keyword import iskeyword
-from typing import List, Dict, Any
+from typing import Any
 
 
 def argument_parser():
@@ -222,12 +222,11 @@ sys.path.insert(1, glb_options.pygccxml_path)
 import pygccxml
 import logging
 
-
 # Global debugging variables
-pyi_approved_index_list: List[Path] = [
+pyi_approved_index_list: list[Path] = [
     Path(x) for x in glb_options.pyi_index_list.split(";")
 ]
-pyi_created_index_list: List[Path] = []
+pyi_created_index_list: list[Path] = []
 
 
 # The ITKClass is duplicated in pyi_generator.py
@@ -438,9 +437,9 @@ def get_arg_type(decls, arg_type, for_snake_case_hints=True):
     elif arg_type_str.startswith("itk::FlatStructuringElement<"):
         return lib + "FlatStructuringElement"
     elif arg_type_str.startswith("itk::RGBPixel<"):
-        return "Tuple[int, int, int]"
+        return "tuple[int, int, int]"
     elif arg_type_str.startswith("itk::RGBAPixel<"):
-        return "Tuple[int, int, int, int]"
+        return "tuple[int, int, int, int]"
     elif not for_snake_case_hints and arg_type_str == "void":
         return "None"
     elif not for_snake_case_hints and arg_type_str.startswith("vnl_"):
@@ -686,7 +685,7 @@ class SwigInputGenerator:
         self.apply_file_names = []
 
         # A dict of sets containing the .pyi python equivalent for all class methods and params
-        self.classes: Dict[str, ITKClass] = dict()
+        self.classes: dict[str, ITKClass] = dict()
         self.current_class = ""
 
         # a dict to let us use the alias name instead of the full c++ name. Without
@@ -1214,7 +1213,7 @@ class SwigInputGenerator:
 
     instance = itk.{process_object}.New(*args, **kwargs)
 """
-                if snake_case == 'transform_to_displacement_field_filter':
+                if snake_case == "transform_to_displacement_field_filter":
                     instantiation = f"""
     transform = None
     if len(args):
@@ -1242,7 +1241,8 @@ class SwigInputGenerator:
                 self.outputFile.write(
                     f"""from itk.support import helpers
 import itk.support.types as itkt
-from typing import Sequence, Tuple, Union
+from typing import Union
+from collections.abc import Sequence
 
 @helpers.accept_array_like_xarray_torch
 def {snake_case}(*args{args_typehint}, {kwargs_typehints}**kwargs){return_typehint}:
@@ -1800,7 +1800,7 @@ def get_previous_content(file_path: Path) -> str:
     if file_path.is_file():
         # Avoid writing file if contents are not modified.  This is to prevent
         # unnecessary changing of file timestamps.
-        with open(file_path, "r") as index_file:
+        with open(file_path) as index_file:
             previous_file_contents: str = index_file.read()
             return previous_file_contents
     return "INVALID_CONTENT"
@@ -1831,12 +1831,12 @@ def generate_wrapping_namespace(
     return wrapping_namespace.namespace("wrappers")
 
 
-class GLBSubmoduleNamespaceCache(object):
+class GLBSubmoduleNamespaceCache:
     # Static variable for the get_submodule_namespace class, used as a cache
 
     def __init__(self):
-        self.wrapping_namespaces_cache: Dict[str, Any] = dict()
-        self.cache_hit_count: Dict[str, int] = collections.defaultdict(int)
+        self.wrapping_namespaces_cache: dict[str, Any] = dict()
+        self.cache_hit_count: dict[str, int] = collections.defaultdict(int)
 
     def get_submodule_namespace(
         self, submodule_name: str, library_output_dir: str, pygccxml_config
@@ -1951,7 +1951,7 @@ def main():
         xml_generator_path=options.castxml_path, xml_generator="castxml"
     )
 
-    submodule_names_list: List[str] = []
+    submodule_names_list: list[str] = []
     # The first mdx file is the master index file for this module.
     master_mdx_filename: Path = Path(options.mdx[0])
     with open(master_mdx_filename) as ff:
@@ -1984,7 +1984,7 @@ def main():
 
     snake_case_process_object_functions = set()
 
-    ordered_submodule_list: List[str] = []
+    ordered_submodule_list: list[str] = []
     if options.submodule_order:
         all_submodules = options.submodule_order.split(";") + submodule_names_list
         for submodule_name in all_submodules:
@@ -2025,7 +2025,7 @@ if __name__ == "__main__":
         # for m in pyi_approved_index_list:
         #     if m in pyi_created_index_list:
         #         print(f"GOOD: :{m}: Required and created")
-        not_created: List[Path] = []
+        not_created: list[Path] = []
         for m in pyi_approved_index_list:
             if m not in pyi_created_index_list:
                 not_created.append(m)
@@ -2034,7 +2034,7 @@ if __name__ == "__main__":
             print(f"""cmdln: {" ".join(sys.argv)}""")
             [print(f"BAD: :{m}: Required not created") for m in not_created]
 
-        extra_created: List[Path] = []
+        extra_created: list[Path] = []
         for m in pyi_created_index_list:
             if m not in pyi_approved_index_list:
                 extra_created.append(m)

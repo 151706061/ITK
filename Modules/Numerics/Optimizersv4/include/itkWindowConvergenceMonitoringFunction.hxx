@@ -25,9 +25,7 @@
 #include "itkPointSet.h"
 #include "itkVector.h"
 
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 
 template <typename TScalar>
@@ -89,19 +87,17 @@ WindowConvergenceMonitoringFunction<TScalar>::GetConvergenceValue() const -> Rea
   bspliner->SetSize(size);
   bspliner->SetNumberOfLevels(1);
   bspliner->SetSplineOrder(1);
-  typename BSplinerType::ArrayType ncps;
-  ncps.Fill(bspliner->GetSplineOrder()[0] + 1);
+  auto ncps = MakeFilled<typename BSplinerType::ArrayType>(bspliner->GetSplineOrder()[0] + 1);
   bspliner->SetNumberOfControlPoints(ncps);
   bspliner->SetNumberOfWorkUnits(1);
 
   auto energyProfileWindow = EnergyProfileType::New();
-  energyProfileWindow->Initialize();
 
   for (unsigned int n = 0; n < this->m_WindowSize; ++n)
   {
     ProfilePointType windowPoint;
-    windowPoint[0] = static_cast<typename ProfilePointType::CoordRepType>(n) /
-                     static_cast<typename ProfilePointType::CoordRepType>(this->m_WindowSize - 1);
+    windowPoint[0] = static_cast<typename ProfilePointType::CoordinateType>(n) /
+                     static_cast<typename ProfilePointType::CoordinateType>(this->m_WindowSize - 1);
     energyProfileWindow->SetPoint(n, windowPoint);
     energyProfileWindow->SetPointData(n, ProfilePointDataType(this->m_EnergyValues[n] / this->m_TotalEnergy));
   }
@@ -121,7 +117,7 @@ WindowConvergenceMonitoringFunction<TScalar>::GetConvergenceValue() const -> Rea
   endPoint[0] = NumericTraits<RealType>::OneValue();
   typename BSplinerFunctionType::GradientType gradient = bsplinerFunction->EvaluateGradientAtParametricPoint(endPoint);
 
-  RealType convergenceValue = -gradient[0][0];
+  const RealType convergenceValue = -gradient[0][0];
 
   return convergenceValue;
 }
@@ -138,7 +134,6 @@ WindowConvergenceMonitoringFunction<TScalar>::PrintSelf(std::ostream & os, Inden
   os << indent << "Window size: " << this->m_WindowSize << std::endl;
 }
 
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #endif

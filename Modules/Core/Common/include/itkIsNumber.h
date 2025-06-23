@@ -22,13 +22,12 @@
 #include "itkMetaProgrammingLibrary.h"
 #include "itkIntTypes.h"
 
-namespace itk
-{
+
 /// \cond HIDE_META_PROGRAMMING
-namespace mpl
+namespace itk::mpl
 {
 /** Tells whether a type is a number.
- * \return \c TrueType for all kinds of numbers from \c short to `long long`,
+ * \c TrueType for all kinds of numbers from \c short to `long long`,
  * and from \c float to `long double`.
  * \ingroup MetaProgrammingLibrary
  * \ingroup ITKCommon
@@ -79,8 +78,7 @@ struct IsNumber<long double> : TrueType
 {};
 /// \endcond
 
-} // end namespace mpl
+} // namespace itk::mpl
 /// \endcond
-} // end namespace itk
 
 #endif // itkIsNumber_h

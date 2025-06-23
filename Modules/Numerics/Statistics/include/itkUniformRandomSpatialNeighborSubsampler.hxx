@@ -19,18 +19,15 @@
 #define itkUniformRandomSpatialNeighborSubsampler_hxx
 #include <set>
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 template <typename TSample, typename TRegion>
 UniformRandomSpatialNeighborSubsampler<TSample, TRegion>::UniformRandomSpatialNeighborSubsampler()
+
 {
   m_RandomNumberGenerator = RandomGeneratorType::New();
-  m_UseClockForSeed = false;
   m_RandomNumberGenerator->SetSeed(this->m_Seed);
-  m_NumberOfResultsRequested = 0;
 }
 
 template <typename TSample, typename TRegion>
@@ -39,7 +36,7 @@ UniformRandomSpatialNeighborSubsampler<TSample, TRegion>::InternalClone() const
 {
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
@@ -123,7 +120,7 @@ UniformRandomSpatialNeighborSubsampler<TSample, TRegion>::Search(const InstanceI
 
   unsigned int pointsFound = 0;
 
-  std::set<InstanceIdentifier>         usedIds;
+  const std::set<InstanceIdentifier>   usedIds;
   typename RegionType::OffsetValueType offset;
 
   // The trouble with decoupling the region from the sample is that
@@ -178,7 +175,7 @@ UniformRandomSpatialNeighborSubsampler<TSample, TRegion>::GetIntegerVariate(Rand
                                                                             RandomIntType itkNotUsed(mean))
   -> RandomIntType
 {
-  RandomIntType sizeRange = upperBound - lowerBound;
+  const RandomIntType sizeRange = upperBound - lowerBound;
   // mean ignored since we are uniformly sampling
   return lowerBound + m_RandomNumberGenerator->GetIntegerVariate(sizeRange);
 }
@@ -194,7 +191,6 @@ UniformRandomSpatialNeighborSubsampler<TSample, TRegion>::PrintSelf(std::ostream
   os << std::endl;
 }
 
-} // end namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #endif

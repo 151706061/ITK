@@ -38,7 +38,7 @@ createMetaDataDictionary()
 
   using ObjectType = itk::LightObject;
   using PointerType = typename ObjectType::Pointer;
-  PointerType obj = ObjectType::New();
+  const PointerType obj = ObjectType::New();
   itk::EncapsulateMetaData<PointerType>(metaDataDictionary, "object", obj);
 
   return metaDataDictionary;
@@ -74,9 +74,9 @@ TEST(MetaDataDictionary, Basic)
   EXPECT_NE(dic.Get("one"), nullptr);
   EXPECT_NE(dic.Get("two"), nullptr);
   EXPECT_NE(dic.Get("object"), nullptr);
-  EXPECT_THROW(dic.Get("three"), itk::ExceptionObject);
-  EXPECT_THROW(dic.Get(""), itk::ExceptionObject);
-  EXPECT_THROW(dic.Get("ONE"), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novalue = dic.Get("three"), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novlaue = dic.Get(""), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novalue = dic.Get("ONE"), itk::ExceptionObject);
 
   EXPECT_EQ(dic.GetKeys().size(), 3u);
 
@@ -143,9 +143,9 @@ TEST(MetaDataDictionary, ConstBasic)
   EXPECT_NE(cdic.Get("one"), nullptr);
   EXPECT_NE(cdic.Get("two"), nullptr);
   EXPECT_NE(cdic.Get("object"), nullptr);
-  EXPECT_THROW(cdic.Get("three"), itk::ExceptionObject);
-  EXPECT_THROW(cdic.Get(""), itk::ExceptionObject);
-  EXPECT_THROW(cdic.Get("ONE"), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novalue = cdic.Get("three"), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novalue = cdic.Get(""), itk::ExceptionObject);
+  EXPECT_THROW([[maybe_unused]] auto novalue = cdic.Get("ONE"), itk::ExceptionObject);
 
   EXPECT_EQ(cdic.GetKeys().size(), 3u);
 

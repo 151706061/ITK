@@ -52,7 +52,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEquationTermContainer);
 
   using TermIdType = unsigned int;
@@ -78,9 +78,10 @@ public:
   using TermPointer = typename TermType::Pointer;
 
   /** Set/Get the input image to be segmented. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Input, InputImageType);
   itkGetModifiableObjectMacro(Input, InputImageType);
-
+  /** @ITKEndGrouping */
   itkSetMacro(CurrentLevelSetId, LevelSetIdentifierType);
   itkGetMacro(CurrentLevelSetId, LevelSetIdentifierType);
 
@@ -155,8 +156,16 @@ public:
     ConstIterator(const Iterator & it)
       : m_Iterator(it.m_Iterator)
     {}
-    ConstIterator & operator*() { return *this; }
-    ConstIterator * operator->() { return this; }
+    ConstIterator &
+    operator*()
+    {
+      return *this;
+    }
+    ConstIterator *
+    operator->()
+    {
+      return this;
+    }
     ConstIterator &
     operator++()
     {
@@ -199,13 +208,13 @@ public:
 
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
-    TermIdType
+    [[nodiscard]] TermIdType
     GetIdentifier() const
     {
       return m_Iterator->first;
     }
 
-    TermType *
+    [[nodiscard]] TermType *
     GetTerm() const
     {
       return m_Iterator->second;
@@ -228,8 +237,16 @@ public:
     {}
     ~Iterator() = default;
 
-    Iterator & operator*() { return *this; }
-    Iterator * operator->() { return this; }
+    Iterator &
+    operator*()
+    {
+      return *this;
+    }
+    Iterator *
+    operator->()
+    {
+      return this;
+    }
 
     Iterator &
     operator++()
@@ -274,13 +291,13 @@ public:
 
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
-    TermIdType
+    [[nodiscard]] TermIdType
     GetIdentifier() const
     {
       return m_Iterator->first;
     }
 
-    TermType *
+    [[nodiscard]] TermType *
     GetTerm() const
     {
       return m_Iterator->second;

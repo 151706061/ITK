@@ -38,20 +38,20 @@ namespace itk
  * \ingroup ImageFunctions
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = float>
+template <typename TInputImage, typename TCoordinate = float>
 class ITK_TEMPLATE_EXPORT NearestNeighborExtrapolateImageFunction
-  : public ExtrapolateImageFunction<TInputImage, TCoordRep>
+  : public ExtrapolateImageFunction<TInputImage, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(NearestNeighborExtrapolateImageFunction);
 
   /** Standard class type aliases. */
   using Self = NearestNeighborExtrapolateImageFunction;
-  using Superclass = ExtrapolateImageFunction<TInputImage, TCoordRep>;
+  using Superclass = ExtrapolateImageFunction<TInputImage, TCoordinate>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NearestNeighborExtrapolateImageFunction);
 
   /** Method for creation through the object factory. */

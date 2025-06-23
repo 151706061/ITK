@@ -53,7 +53,7 @@ itkScalarToRGBColormapImageFilterTest(int argc, char * argv[])
   reader->SetFileName(argv[1]);
   reader->Update();
 
-  std::string colormapString(argv[3]);
+  const std::string colormapString(argv[3]);
 
   using VectorImageType = itk::VectorImage<unsigned char, ImageDimension>;
   using VectorFilterType = itk::ScalarToRGBColormapImageFilter<ImageType, VectorImageType>;
@@ -337,12 +337,12 @@ itkScalarToRGBColormapImageFilterTest(int argc, char * argv[])
     std::ifstream str(argv[4]);
     std::string   line;
 
-    float                     value;
     ColormapType::ChannelType channel;
 
     // Get red values
     std::getline(str, line);
     std::istringstream issr(line);
+    float              value = NAN;
     while (issr >> value)
     {
       channel.push_back(value);

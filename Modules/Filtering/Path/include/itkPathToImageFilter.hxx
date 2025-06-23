@@ -82,21 +82,9 @@ template <typename TInputPath, typename TOutputImage>
 void
 PathToImageFilter<TInputPath, TOutputImage>::SetSpacing(const double * spacing)
 {
-  unsigned int i;
-
-  for (i = 0; i < OutputImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Spacing, spacing, OutputImageDimension))
   {
-    if (Math::NotExactlyEquals(spacing[i], m_Spacing[i]))
-    {
-      break;
-    }
-  }
-  if (i < OutputImageDimension)
-  {
-    for (i = 0; i < OutputImageDimension; ++i)
-    {
-      m_Spacing[i] = spacing[i];
-    }
+    this->Modified();
   }
 }
 
@@ -104,21 +92,9 @@ template <typename TInputPath, typename TOutputImage>
 void
 PathToImageFilter<TInputPath, TOutputImage>::SetSpacing(const float * spacing)
 {
-  unsigned int i;
-
-  for (i = 0; i < OutputImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Spacing, spacing, OutputImageDimension))
   {
-    if (Math::NotExactlyEquals(static_cast<double>(spacing[i]), m_Spacing[i]))
-    {
-      break;
-    }
-  }
-  if (i < OutputImageDimension)
-  {
-    for (i = 0; i < OutputImageDimension; ++i)
-    {
-      m_Spacing[i] = spacing[i];
-    }
+    this->Modified();
   }
 }
 
@@ -133,21 +109,9 @@ template <typename TInputPath, typename TOutputImage>
 void
 PathToImageFilter<TInputPath, TOutputImage>::SetOrigin(const double * origin)
 {
-  unsigned int i;
-
-  for (i = 0; i < OutputImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Origin, origin, OutputImageDimension))
   {
-    if (Math::NotExactlyEquals(origin[i], m_Origin[i]))
-    {
-      break;
-    }
-  }
-  if (i < OutputImageDimension)
-  {
-    for (i = 0; i < OutputImageDimension; ++i)
-    {
-      m_Origin[i] = origin[i];
-    }
+    this->Modified();
   }
 }
 
@@ -155,21 +119,9 @@ template <typename TInputPath, typename TOutputImage>
 void
 PathToImageFilter<TInputPath, TOutputImage>::SetOrigin(const float * origin)
 {
-  unsigned int i;
-
-  for (i = 0; i < OutputImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Origin, origin, OutputImageDimension))
   {
-    if (Math::NotExactlyEquals(static_cast<double>(origin[i]), m_Origin[i]))
-    {
-      break;
-    }
-  }
-  if (i < OutputImageDimension)
-  {
-    for (i = 0; i < OutputImageDimension; ++i)
-    {
-      m_Origin[i] = origin[i];
-    }
+    this->Modified();
   }
 }
 
@@ -184,19 +136,17 @@ template <typename TInputPath, typename TOutputImage>
 void
 PathToImageFilter<TInputPath, TOutputImage>::GenerateData()
 {
-  unsigned int i;
-
   itkDebugMacro("PathToImageFilter::GenerateData() called");
 
   // Get the input and output pointers
-  const InputPathType * InputPath = this->GetInput();
-  OutputImagePointer    OutputImage = this->GetOutput();
+  const InputPathType *    InputPath = this->GetInput();
+  const OutputImagePointer OutputImage = this->GetOutput();
 
   // Generate the image
   double   origin[OutputImageDimension];
   SizeType size;
 
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     // Set Image size to the size of the path's bounding box
     // size[i] = (SizeValueType)
@@ -215,7 +165,7 @@ PathToImageFilter<TInputPath, TOutputImage>::GenerateData()
   // paths's bounding box will be used as default.
 
   bool specified = false;
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     if (m_Size[i] != 0)
     {
@@ -243,7 +193,7 @@ PathToImageFilter<TInputPath, TOutputImage>::GenerateData()
   // the spatial object is used as default.
 
   specified = false;
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     if (m_Spacing[i] != 0.0)
     {

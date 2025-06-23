@@ -39,9 +39,7 @@ namespace itk
  * the value of the variables at the know points and on containing the
  * value of the variables at the trail points.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * For an alternative implementation, see itk::FastMarchingExtensionImageFilterBase.
  *
@@ -70,7 +68,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingExtensionImageFilter);
 
   /** Inherited type alias. */
@@ -127,11 +125,7 @@ public:
     return m_AuxTrialValues;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(AuxValueHasNumericTraitsCheck, (Concept::HasNumericTraits<TAuxValue>));
-  // End concept checking
-#endif
 
 protected:
   FastMarchingExtensionImageFilter();

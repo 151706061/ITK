@@ -27,7 +27,7 @@ itkCenteredEuler3DTransformTest(int, char *[])
   std::cout << "==================================" << std::endl;
   std::cout << "Testing Centered Euler Angles 3D Transform" << std::endl << std::endl;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 3;
   bool                   Ok = true;
 
@@ -67,7 +67,7 @@ itkCenteredEuler3DTransformTest(int, char *[])
 
   // Rotate an itk::Point
   EulerTransformType::InputPointType::ValueType pInit[3] = { 10, -5, 3 };
-  EulerTransformType::InputPointType            p = pInit;
+  const EulerTransformType::InputPointType      p = pInit;
   EulerTransformType::InputPointType            q;
 
   itk::Matrix<double, 3, 3> RotationX;
@@ -122,17 +122,16 @@ itkCenteredEuler3DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   std::cout << "Testing Translation:";
 
   eulerTransform->SetRotation(0, 0, 0);
 
   EulerTransformType::OffsetType::ValueType ioffsetInit[3] = { 1, -4, 8 };
-  EulerTransformType::OffsetType            ioffset = ioffsetInit;
+  const EulerTransformType::OffsetType      ioffset = ioffsetInit;
 
   eulerTransform->SetOffset(ioffset);
   std::cout << "eulerTransform: " << eulerTransform;
@@ -155,10 +154,9 @@ itkCenteredEuler3DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   // Testing Parameters
   std::cout << "Testing Set/Get Parameters: ";
@@ -271,8 +269,8 @@ itkCenteredEuler3DTransformTest(int, char *[])
       {
         for (unsigned int j = 0; j < 3; ++j)
         {
-          double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
-          double computedDerivative = jacobian[j][k];
+          const double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
+          const double computedDerivative = jacobian[j][k];
           approxJacobian[j][k] = approxDerivative;
           if (itk::Math::abs(approxDerivative - computedDerivative) > 1e-5)
           {
@@ -376,7 +374,7 @@ itkCenteredEuler3DTransformTest(int, char *[])
                         (outputTestPoint[2] - testPoint[2]) * (outputTestPoint[2] - testPoint[2]);
   computeError = std::sqrt(computeError);
 
-  double errorTolerance = 0.001;
+  constexpr double errorTolerance = 0.001;
   if (computeError > errorTolerance)
   {
     std::cout << " [ FAILED ] " << std::endl;

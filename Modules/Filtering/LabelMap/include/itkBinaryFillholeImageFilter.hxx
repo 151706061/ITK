@@ -29,10 +29,9 @@ namespace itk
 
 template <typename TInputImage>
 BinaryFillholeImageFilter<TInputImage>::BinaryFillholeImageFilter()
-{
-  m_FullyConnected = false;
-  m_ForegroundValue = NumericTraits<InputImagePixelType>::max();
-}
+  : m_ForegroundValue(NumericTraits<InputImagePixelType>::max())
+
+{}
 
 template <typename TInputImage>
 void
@@ -42,7 +41,7 @@ BinaryFillholeImageFilter<TInputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -133,7 +132,7 @@ BinaryFillholeImageFilter<TInputImage>::PrintSelf(std::ostream & os, Indent inde
   os << indent
      << "ForegroundValue: " << static_cast<typename NumericTraits<InputImagePixelType>::PrintType>(m_ForegroundValue)
      << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 
 } // end namespace itk

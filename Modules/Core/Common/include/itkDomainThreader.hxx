@@ -25,9 +25,9 @@ namespace itk
 template <typename TDomainPartitioner, typename TAssociate>
 DomainThreader<TDomainPartitioner, TAssociate>::DomainThreader()
   : m_Associate(nullptr)
+  , m_DomainPartitioner(DomainPartitionerType::New())
 
 {
-  this->m_DomainPartitioner = DomainPartitionerType::New();
   this->m_MultiThreader = MultiThreaderBase::New();
   this->m_NumberOfWorkUnits = this->m_MultiThreader->GetNumberOfWorkUnits();
 }
@@ -71,7 +71,7 @@ template <typename TDomainPartitioner, typename TAssociate>
 void
 DomainThreader<TDomainPartitioner, TAssociate>::DetermineNumberOfWorkUnitsUsed()
 {
-  ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
+  const ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
 
   // Attempt a single dummy partition, just to get the number of subdomains actually created
   DomainType subdomain;

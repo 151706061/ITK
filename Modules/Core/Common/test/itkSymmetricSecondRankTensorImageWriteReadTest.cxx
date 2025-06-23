@@ -37,15 +37,11 @@ itkSymmetricSecondRankTensorImageWriteReadTest(int argc, char * argv[])
 
   auto tensorImageInput = TensorImageType::New();
 
-  TensorImageType::SizeType size;
-  size.Fill(10);
+  auto size = TensorImageType::SizeType::Filled(10);
 
-  TensorImageType::IndexType start;
-  start.Fill(0);
+  constexpr TensorImageType::IndexType start{};
 
-  TensorImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const TensorImageType::RegionType region{ start, size };
 
   tensorImageInput->SetRegions(region);
   tensorImageInput->Allocate();
@@ -76,7 +72,7 @@ itkSymmetricSecondRankTensorImageWriteReadTest(int argc, char * argv[])
     const TensorImageType::ConstPointer tensorImageOutput = itk::ReadImage<TensorImageType>(argv[1]);
 
     // Compare the read values to the original values
-    const float tolerance = 1e-5;
+    constexpr float tolerance = 1e-5;
 
     itk::ImageRegionConstIterator<TensorImageType> inIt(tensorImageInput, region);
     itk::ImageRegionConstIterator<TensorImageType> outIt(tensorImageOutput, region);

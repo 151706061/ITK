@@ -20,7 +20,7 @@
  * Test program for itkGPUImage class.
  * This program shows how to use GPU image and GPU program.
  */
-//#include "pathToOpenCLSourceCode.h"
+// #include "pathToOpenCLSourceCode.h"
 #include "itkGPUImage.h"
 #include "itkGPUKernelManager.h"
 #include "itkGPUContextManager.h"
@@ -55,9 +55,7 @@ itkGPUImageTest(int argc, char * argv[])
   ItkImage1f::SizeType size;
   size[0] = width;
   size[1] = height;
-  ItkImage1f::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  ItkImage1f::RegionType region{ start, size };
 
   // create
   srcA = ItkImage1f::New();

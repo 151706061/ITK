@@ -49,7 +49,6 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
    */
   using ShapeFunctionType = itk::SphereSignedDistanceFunction<double, Dimension>;
   auto shape = ShapeFunctionType::New();
-  shape->Initialize();
 
   /**
    * Set up a statistical model of the shape parameters.
@@ -82,8 +81,7 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
   /**
    * Create an input level set and active region container
    */
-  ImageType::SizeType size;
-  size.Fill(128);
+  auto                  size = ImageType::SizeType::Filled(128);
   ImageType::RegionType region;
   region.SetSize(size);
 
@@ -98,8 +96,8 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
   Iterator iter(input, region);
   iter.GoToBegin();
 
-  unsigned int counter = 0;
-  PixelType    activeRegionThreshold = 3.0;
+  unsigned int        counter = 0;
+  constexpr PixelType activeRegionThreshold = 3.0;
 
   while (!iter.IsAtEnd())
   {
@@ -108,7 +106,7 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
     index = iter.GetIndex();
     input->TransformIndexToPhysicalPoint(index, point);
 
-    float value = shape->Evaluate(point);
+    const float value = shape->Evaluate(point);
     iter.Set(value);
 
     if (itk::Math::abs(value) < activeRegionThreshold)
@@ -150,8 +148,7 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
   costFunction->SetShapeParameterMeans(shapeMean);
   costFunction->SetShapeParameterStandardDeviations(shapeStdDev);
 
-  CostFunctionType::WeightsType weights;
-  weights.Fill(1.5);
+  auto weights = itk::MakeFilled<CostFunctionType::WeightsType>(1.5);
 
   costFunction->SetWeights(weights);
 
@@ -223,7 +220,7 @@ itkShapePriorMAPCostFunctionTest(int, char *[])
 
   // exercise error testing
 
-  bool pass;
+  bool pass = false;
 
 #define TEST_INITIALIZATION_ERROR(ComponentName, badComponent, goodComponent) \
   costFunction->Set##ComponentName(badComponent);                             \

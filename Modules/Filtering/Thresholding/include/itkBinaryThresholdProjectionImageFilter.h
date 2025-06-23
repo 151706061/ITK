@@ -28,10 +28,8 @@ namespace itk
  * \brief BinaryThreshold projection
  *
  *
- * This class was contributed to the Insight Journal by Gaetan Lehmann.
- * the original paper can be found at
- * https://www.insight-journal.org/browse/publication/71
- *
+ * This class was contributed to the Insight Journal by Gaetan Lehmann
+ * \cite Lehmann_2006_a.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction,
  * INRA de Jouy-en-Josas, France.
@@ -78,10 +76,8 @@ public:
     {
       return m_ForegroundValue;
     }
-    else
-    {
-      return m_BackgroundValue;
-    }
+
+    return m_BackgroundValue;
   }
 
   bool m_IsForeground;
@@ -111,7 +107,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryThresholdProjectionImageFilter);
 
   /** Method for creation through the object factory. */
@@ -129,33 +125,31 @@ public:
 
   /** Set/Get the output value used as "foreground". Defaults to
    * maximum value of PixelType. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, OutputPixelType);
   itkGetConstMacro(ForegroundValue, OutputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the output value used as "background". Defaults to
    * NumericTraits<PixelType>::NonpositiveMin(). */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputPixelType);
   itkGetConstMacro(BackgroundValue, OutputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the input value consider as "threshold". Defaults to
    *  NumericTraits<InputPixelType>::max() */
+  /** @ITKStartGrouping */
   itkSetMacro(ThresholdValue, InputPixelType);
   itkGetConstMacro(ThresholdValue, InputPixelType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputPixelTypeGreaterThanComparable, (Concept::GreaterThanComparable<InputPixelType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   BinaryThresholdProjectionImageFilter()
-  {
-    m_ForegroundValue = NumericTraits<OutputPixelType>::max();
-    m_BackgroundValue = NumericTraits<OutputPixelType>::NonpositiveMin();
-    m_ThresholdValue = InputPixelType{};
-  }
+    : m_ForegroundValue(NumericTraits<OutputPixelType>::max())
+    , m_BackgroundValue(NumericTraits<OutputPixelType>::NonpositiveMin())
+    , m_ThresholdValue(InputPixelType{})
+  {}
 
   ~BinaryThresholdProjectionImageFilter() override = default;
 

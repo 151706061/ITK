@@ -61,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GE5ImageIO);
 
   /*-------- This part of the interfaces deals with reading data. ----- */
@@ -126,7 +126,7 @@ protected:
 
 private:
   int
-  CheckGE5xImages(char const * const imageFileTemplate, std::string & reason);
+  CheckGE5xImages(const char * const imageFileTemplate, std::string & reason);
 };
 } // end namespace itk
 

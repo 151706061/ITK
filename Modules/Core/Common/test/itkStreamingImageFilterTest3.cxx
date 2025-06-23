@@ -37,9 +37,9 @@ itkStreamingImageFilterTest3(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  const std::string inputFilename = argv[1];
-  const std::string outputFilename = argv[2];
-  unsigned int      numberOfStreamDivisions = std::stoi(argv[3]);
+  const std::string  inputFilename = argv[1];
+  const std::string  outputFilename = argv[2];
+  const unsigned int numberOfStreamDivisions = std::stoi(argv[3]);
 
   using PixelType = unsigned char;
   using ImageType = itk::Image<PixelType, 2>;
@@ -53,22 +53,20 @@ itkStreamingImageFilterTest3(int argc, char * argv[])
   filter->SetInput(reader->GetOutput());
 
   // monitor what's going on
-  itk::PipelineMonitorImageFilter<ImageType>::Pointer monitor;
-  monitor = itk::PipelineMonitorImageFilter<ImageType>::New();
+  const itk::PipelineMonitorImageFilter<ImageType>::Pointer monitor = itk::PipelineMonitorImageFilter<ImageType>::New();
   monitor->SetInput(filter->GetOutput());
 
-  itk::ImageRegionSplitterMultidimensional::Pointer splitter;
-  splitter = itk::ImageRegionSplitterMultidimensional::New();
+  const itk::ImageRegionSplitterMultidimensional::Pointer splitter = itk::ImageRegionSplitterMultidimensional::New();
 
-  itk::StreamingImageFilter<ImageType, ImageType>::Pointer streamer;
-  streamer = itk::StreamingImageFilter<ImageType, ImageType>::New();
+  const itk::StreamingImageFilter<ImageType, ImageType>::Pointer streamer =
+    itk::StreamingImageFilter<ImageType, ImageType>::New();
   streamer->SetInput(monitor->GetOutput());
   streamer->SetNumberOfStreamDivisions(numberOfStreamDivisions);
   streamer->SetRegionSplitter(splitter);
 
   itk::WriteImage(streamer->GetOutput(), outputFilename);
 
-  unsigned int expectedNumberOfStreams =
+  const unsigned int expectedNumberOfStreams =
     splitter->GetNumberOfSplits(streamer->GetOutput()->GetLargestPossibleRegion(), numberOfStreamDivisions);
 
   std::cout << "ExpectedNumberOfStreams: " << expectedNumberOfStreams << std::endl;

@@ -25,11 +25,10 @@ namespace itk
 template <typename TTransform>
 BSplineExponentialDiffeomorphicTransformParametersAdaptor<
   TTransform>::BSplineExponentialDiffeomorphicTransformParametersAdaptor()
+
 {
   this->m_NumberOfControlPointsForTheConstantVelocityField.Fill(4);
-  this->m_NumberOfControlPointsForTheConstantVelocityFieldSetTime = 0;
   this->m_NumberOfControlPointsForTheUpdateField.Fill(4);
-  this->m_NumberOfControlPointsForTheUpdateFieldSetTime = 0;
 }
 
 /**
@@ -40,8 +39,7 @@ void
 BSplineExponentialDiffeomorphicTransformParametersAdaptor<TTransform>::SetMeshSizeForTheConstantVelocityField(
   const ArrayType & meshSize)
 {
-  ArrayType numberOfControlPoints;
-  numberOfControlPoints.Fill(0);
+  ArrayType numberOfControlPoints{};
   for (unsigned int d = 0; d < SpaceDimension; ++d)
   {
     if (meshSize[d] > 0)
@@ -60,8 +58,7 @@ void
 BSplineExponentialDiffeomorphicTransformParametersAdaptor<TTransform>::SetMeshSizeForTheUpdateField(
   const ArrayType & meshSize)
 {
-  ArrayType numberOfControlPoints;
-  numberOfControlPoints.Fill(0);
+  ArrayType numberOfControlPoints{};
   for (unsigned int d = 0; d < SpaceDimension; ++d)
   {
     if (meshSize[d] > 0)

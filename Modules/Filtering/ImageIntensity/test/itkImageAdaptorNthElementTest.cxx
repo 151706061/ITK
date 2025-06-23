@@ -37,7 +37,7 @@ itkImageAdaptorNthElementTest(int, char *[])
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope
   // scope.
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   //-------------------------------------------------------------
   //                        Typedefs
@@ -77,13 +77,10 @@ itkImageAdaptorNthElementTest(int, char *[])
   size[1] = 2;
   size[2] = 2; // Small size, because we are printing it
 
-  myIndexType start;
-  start.Fill(0);
+  constexpr myIndexType start{};
 
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const myRegionType region{ start, size };
 
   float spacing[3];
   spacing[0] = 1.0;
@@ -135,7 +132,7 @@ itkImageAdaptorNthElementTest(int, char *[])
   }
 
 
-  std::cout << "Container Image Initializaed" << std::endl;
+  std::cout << "Container Image Initialized" << std::endl;
 
   //-------------------------------------------------------------
   //                 Create and Initialize the Float image
@@ -149,7 +146,7 @@ itkImageAdaptorNthElementTest(int, char *[])
 
   myFloatIteratorType itf(myFloatImage, myFloatImage->GetRequestedRegion());
 
-  myFloatPixelType initialFloatValue = 5.0;
+  constexpr myFloatPixelType initialFloatValue = 5.0;
 
   while (!itf.IsAtEnd())
   {
@@ -174,7 +171,7 @@ itkImageAdaptorNthElementTest(int, char *[])
     ++itf;
   }
 
-  std::cout << "Float Image Initializaed" << std::endl;
+  std::cout << "Float Image Initialized" << std::endl;
 
 
   //-------------------------------------------------------------
@@ -201,7 +198,7 @@ itkImageAdaptorNthElementTest(int, char *[])
   myFloatImageType::Pointer myFloatOutputImage = filter->GetOutput();
   myFloatOutputImage->SetSpacing(spacing);
 
-  std::cout << "Float Output Image Initializaed" << std::endl;
+  std::cout << "Float Output Image Initialized" << std::endl;
 
   //-------------------------------------------------------------
   //         Force the execution of the filter

@@ -68,7 +68,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PasteImageFilter);
 
   /** Typedefs from Superclass */
@@ -110,9 +110,10 @@ public:
 
   /** Set/Get the destination index (where in the first input the second
    * input will be pasted. */
+  /** @ITKStartGrouping */
   itkSetMacro(DestinationIndex, InputImageIndexType);
   itkGetConstMacro(DestinationIndex, InputImageIndexType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the array describing which axes in the destination image to skip
    *
    * The axes with true values are set to 1, to fill the difference between the dimension of the input and source image.
@@ -121,32 +122,37 @@ public:
    *
    * By default this array contains SourceImageDimension false values followed by true values for the remainder.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(DestinationSkipAxes, InputSkipAxesArrayType);
   itkGetConstMacro(DestinationSkipAxes, InputSkipAxesArrayType);
-
+  /** @ITKEndGrouping */
 
   /** Set/Get the source region (what part of the second input will be
    * pasted. */
+  /** @ITKStartGrouping */
   itkSetMacro(SourceRegion, SourceImageRegionType);
   itkGetConstMacro(SourceRegion, SourceImageRegionType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the "destination" image.  This is the image that will be
    * obscured by the paste operation. */
+  /** @ITKStartGrouping */
   itkSetInputMacro(DestinationImage, InputImageType);
   itkGetInputMacro(DestinationImage, InputImageType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the "source" image.  This is the image that will be
    * pasted over the destination image. */
+  /** @ITKStartGrouping */
   itkSetInputMacro(SourceImage, SourceImageType);
   itkGetInputMacro(SourceImage, SourceImageType);
-
+  /** @ITKEndGrouping */
   /** Set/Get a constant value to fill the destination region.
    *
    * This input is an alternative input to the SourceImage.
    */
+  /** @ITKStartGrouping */
   itkSetDecoratedInputMacro(Constant, SourceImagePixelType);
   itkGetDecoratedInputMacro(Constant, SourceImagePixelType);
-
+  /** @ITKEndGrouping */
 
   /** PasteImageFilter needs to set the input requested regions for its
    * inputs.  The first input's requested region will be set to match
@@ -167,13 +173,13 @@ public:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override
+  VerifyInputInformation() const override
   {}
 
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
 
-  bool
+  [[nodiscard]] bool
   CanRunInPlace() const override;
 
 protected:

@@ -18,6 +18,7 @@
 
 #include "itkMutualInformationImageToImageMetric.h"
 
+#include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "itkTextOutput.h"
 #include "itkSimpleMultiResolutionImageRegistrationUI.h"
 #include "itkTestingMacros.h"
@@ -80,7 +81,6 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
   bool pass = true;
 
   constexpr unsigned int dimension = 3;
-  unsigned int           j;
 
   using PixelType = float;
 
@@ -118,14 +118,12 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
   auto fixedImage = FixedImageType::New();
   auto movingImage = MovingImageType::New();
 
-  double displacement[dimension] = { 7, 3, 2 };
-  double scale[dimension] = { 0.80, 1.0, 1.0 };
+  constexpr double displacement[dimension] = { 7, 3, 2 };
+  constexpr double scale[dimension] = { 0.80, 1.0, 1.0 };
 
-  FixedImageType::SizeType   size = { { 100, 100, 40 } };
-  FixedImageType::IndexType  index = { { 0, 0, 0 } };
-  FixedImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  FixedImageType::SizeType            size = { { 100, 100, 40 } };
+  constexpr FixedImageType::IndexType index = { { 0, 0, 0 } };
+  const FixedImageType::RegionType    region{ index, size };
 
   fixedImage->SetRegions(region);
   fixedImage->Allocate();
@@ -138,7 +136,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
   using FixedImageIterator = itk::ImageRegionIterator<FixedImageType>;
 
   itk::Point<double, dimension> center;
-  for (j = 0; j < dimension; ++j)
+  for (unsigned int j = 0; j < dimension; ++j)
   {
     center[j] = 0.5 * static_cast<double>(region.GetSize()[j]);
   }
@@ -151,21 +149,21 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
   while (!mIter.IsAtEnd())
   {
-    for (j = 0; j < dimension; ++j)
+    for (unsigned int j = 0; j < dimension; ++j)
     {
       p[j] = mIter.GetIndex()[j];
     }
 
     d = p - center;
 
-    fIter.Set((PixelType)F(d));
+    fIter.Set(static_cast<PixelType>(F(d)));
 
-    for (j = 0; j < dimension; ++j)
+    for (unsigned int j = 0; j < dimension; ++j)
     {
       d[j] = d[j] * scale[j] + displacement[j];
     }
 
-    mIter.Set((PixelType)F(d));
+    mIter.Set(static_cast<PixelType>(F(d)));
 
     ++fIter;
     ++mIter;
@@ -173,7 +171,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
   // set the image origin to be center of the image
   double transCenter[dimension];
-  for (j = 0; j < dimension; ++j)
+  for (unsigned int j = 0; j < dimension; ++j)
   {
     transCenter[j] = -0.5 * static_cast<double>(size[j]);
   }
@@ -206,7 +204,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     parametersScales.Fill(1.0);
 
-    for (j = 9; j < 12; ++j)
+    for (unsigned int j = 9; j < 12; ++j)
     {
       parametersScales[j] = 0.0001;
     }
@@ -251,7 +249,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
      ******************************************************************/
     SimpleMultiResolutionImageRegistrationUI2<RegistrationType> simpleUI(registration);
 
-    unsigned short numberOfLevels = 3;
+    constexpr unsigned short numberOfLevels = 3;
 
     itk::Array<unsigned int> niter(numberOfLevels);
     itk::Array<double>       rates(numberOfLevels);
@@ -269,7 +267,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     try
     {
-      metric->ReinitializeSeed(121212);
+      metric->ReinitializeSeed(itk::Statistics::MersenneTwisterRandomVariateGenerator::DefaultSeed);
       registration->SetNumberOfLevels(numberOfLevels);
       registration->SetInitialTransformParameters(initialParameters);
 
@@ -301,14 +299,14 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     std::cout << "True solution is: " << trueParameters << std::endl;
 
-    for (j = 0; j < 9; ++j)
+    for (unsigned int j = 0; j < 9; ++j)
     {
       if (itk::Math::abs(solution[j] - trueParameters[j]) > 0.025)
       {
         pass = false;
       }
     }
-    for (j = 9; j < 12; ++j)
+    for (unsigned int j = 9; j < 12; ++j)
     {
       if (itk::Math::abs(solution[j] - trueParameters[j]) > 1.0)
       {
@@ -331,7 +329,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
     /*************************************************
      * Check for parzen window exception
      **************************************************/
-    double oldValue = metric->GetMovingImageStandardDeviation();
+    const double oldValue = metric->GetMovingImageStandardDeviation();
     metric->SetMovingImageStandardDeviation(0.005);
 
     try
@@ -430,7 +428,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     parametersScales.Fill(1.0);
 
-    for (j = 9; j < 12; ++j)
+    for (unsigned int j = 9; j < 12; ++j)
     {
       parametersScales[j] = 0.0001;
     }
@@ -475,7 +473,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
      ******************************************************************/
     SimpleMultiResolutionImageRegistrationUI2<RegistrationType> simpleUI(registration);
 
-    unsigned short numberOfLevels = 3;
+    constexpr unsigned short numberOfLevels = 3;
 
     itk::Array<unsigned int> niter(numberOfLevels);
     itk::Array<double>       rates(numberOfLevels);
@@ -493,7 +491,7 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     try
     {
-      metric->ReinitializeSeed(121212);
+      metric->ReinitializeSeed(itk::Statistics::MersenneTwisterRandomVariateGenerator::DefaultSeed);
       registration->SetSchedules(fixedImageSchedule, movingImageSchedule);
       ITK_TEST_SET_GET_VALUE(fixedImageSchedule, registration->GetFixedImagePyramidSchedule());
       ITK_TEST_SET_GET_VALUE(movingImageSchedule, registration->GetMovingImagePyramidSchedule());
@@ -529,14 +527,14 @@ itkMultiResolutionImageRegistrationMethodTest_1(int, char *[])
 
     std::cout << "True solution is: " << trueParameters << std::endl;
 
-    for (j = 0; j < 9; ++j)
+    for (unsigned int j = 0; j < 9; ++j)
     {
       if (itk::Math::abs(solution[j] - trueParameters[j]) > 0.025)
       {
         pass = false;
       }
     }
-    for (j = 9; j < 12; ++j)
+    for (unsigned int j = 9; j < 12; ++j)
     {
       if (itk::Math::abs(solution[j] - trueParameters[j]) > 1.0)
       {
@@ -573,7 +571,7 @@ F(itk::Vector<double, 3> & v)
   x -= 8;
   y += 3;
   z += 0;
-  double r = std::sqrt(x * x + y * y + z * z);
+  const double r = std::sqrt(x * x + y * y + z * z);
   if (r > 35)
   {
     value = 2 * (itk::Math::abs(x) + 0.8 * itk::Math::abs(y) + 0.5 * itk::Math::abs(z));

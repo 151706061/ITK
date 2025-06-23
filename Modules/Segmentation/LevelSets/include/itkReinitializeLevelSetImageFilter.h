@@ -43,9 +43,7 @@ namespace itk
  * For the output, the reinitialize level set is only valid for a distance
  * of OutputNarrowBandwidth / 2 of either side of the level set of interest.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * \ingroup LevelSetSegmentation
  *
@@ -66,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ReinitializeLevelSetImageFilter);
 
   /** LevelSetType type alias support */
@@ -84,22 +82,30 @@ public:
 
   /** Set/Get the value of the level set to be located. The default value is
    *  0. */
+  /** @ITKStartGrouping */
   itkSetMacro(LevelSetValue, double);
   itkGetConstMacro(LevelSetValue, double);
+  /** @ITKEndGrouping */
 
   /** Set/Get the narrowbanding flag. By default, narrowbanding is switched
    * off. */
+  /** @ITKStartGrouping */
   itkSetMacro(NarrowBanding, bool);
   itkGetConstMacro(NarrowBanding, bool);
   itkBooleanMacro(NarrowBanding);
+  /** @ITKEndGrouping */
 
   /** Set/Get the input narrow bandwidth. The default value is 12. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(InputNarrowBandwidth, double, 0.0, NumericTraits<double>::max());
   itkGetConstMacro(InputNarrowBandwidth, double);
+  /** @ITKEndGrouping */
 
   /** Set/Get the output narrow bandwidth. The default value is 12. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(OutputNarrowBandwidth, double, 0.0, NumericTraits<double>::max());
   itkGetConstMacro(OutputNarrowBandwidth, double);
+  /** @ITKEndGrouping */
 
   /** Set the bandwidth for both the input and output narrowband,
    * By default, both the input and output are set to 12. */
@@ -111,6 +117,7 @@ public:
   }
 
   /** Set/Get the input narrowband container. */
+  /** @ITKStartGrouping */
   void
   SetInputNarrowBand(NodeContainer * ptr);
 
@@ -119,6 +126,7 @@ public:
   {
     return m_InputNarrowBand;
   }
+  /** @ITKEndGrouping */
 
   /** Get the output narrowband. */
   NodeContainerPointer
@@ -127,12 +135,8 @@ public:
     return m_OutputNarrowBand;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(LevelSetDoubleAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType, double>));
   itkConceptMacro(LevelSetOStreamWritableCheck, (Concept::OStreamWritable<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ReinitializeLevelSetImageFilter();

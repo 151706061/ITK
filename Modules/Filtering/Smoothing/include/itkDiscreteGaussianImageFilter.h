@@ -31,11 +31,9 @@ namespace itk
  * This filter performs Gaussian blurring by separable convolution of an image
  * and a discrete Gaussian operator (kernel).
  *
- * The Gaussian operator used here was described by Tony Lindeberg (Discrete
- * Scale-Space Theory and the Scale-Space Primal Sketch.  Dissertation. Royal
- * Institute of Technology, Stockholm, Sweden. May 1991.) The Gaussian kernel
- * used here was designed so that smoothing and derivative operations commute
- * after discretization.
+ * The Gaussian operator used here was described by Tony Lindeberg in
+ * \cite lindeberg1991. The Gaussian kernel used here was designed so
+ * that smoothing and derivative operations commute after discretization.
  *
  * The variance or standard deviation (sigma) will be evaluated as pixel units
  * if SetUseImageSpacing is off (false) or as physical units if
@@ -75,7 +73,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DiscreteGaussianImageFilter);
 
   /** Image type information. */
@@ -104,7 +102,10 @@ public:
 
   /** Typedef to describe the boundary condition. */
   using BoundaryConditionType = ImageBoundaryCondition<TInputImage>;
-  using InputBoundaryConditionPointerType = BoundaryConditionType *;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using InputBoundaryConditionPointerType [[deprecated("Please just use `BoundaryConditionType *` instead!")]] =
+    BoundaryConditionType *;
+#endif
   using InputDefaultBoundaryConditionType = ZeroFluxNeumannBoundaryCondition<TInputImage>;
   using RealBoundaryConditionPointerType = ImageBoundaryCondition<RealOutputImageType> *;
   using RealDefaultBoundaryConditionType = ZeroFluxNeumannBoundaryCondition<RealOutputImageType>;
@@ -124,33 +125,43 @@ public:
    * dimension. If UseImageSpacing is true, the units are the physical units
    * of your image.  If UseImageSpacing is false then the units are
    * pixels. */
+  /** @ITKStartGrouping */
   itkSetMacro(Variance, ArrayType);
   itkGetConstMacro(Variance, const ArrayType);
+  /** @ITKEndGrouping */
 
   /** The algorithm will size the discrete kernel so that the error
    * resulting from truncation of the kernel is no greater than
    * MaximumError. The default is 0.01 in each dimension. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumError, ArrayType);
   itkGetConstMacro(MaximumError, const ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set the kernel to be no wider than MaximumKernelWidth pixels,
    *  even if MaximumError demands it. The default is 32 pixels. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(MaximumKernelWidth, unsigned int);
   itkSetMacro(MaximumKernelWidth, unsigned int);
+  /** @ITKEndGrouping */
 
   /** Set the number of dimensions to smooth. Defaults to the image
    * dimension. Can be set to less than ImageDimension, smoothing all
    * the dimensions less than FilterDimensionality.  For instance, to
    * smooth the slices of a volume without smoothing in Z, set the
    * FilterDimensionality to 2. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(FilterDimensionality, unsigned int);
   itkSetMacro(FilterDimensionality, unsigned int);
+  /** @ITKEndGrouping */
 
   /** Set/get the boundary condition. */
-  itkSetMacro(InputBoundaryCondition, InputBoundaryConditionPointerType);
-  itkGetConstMacro(InputBoundaryCondition, InputBoundaryConditionPointerType);
+  /** @ITKStartGrouping */
+  itkSetMacro(InputBoundaryCondition, BoundaryConditionType *);
+  itkGetConstMacro(InputBoundaryCondition, BoundaryConditionType *);
   itkSetMacro(RealBoundaryCondition, RealBoundaryConditionPointerType);
   itkGetConstMacro(RealBoundaryCondition, RealBoundaryConditionPointerType);
+  /** @ITKEndGrouping */
 
   /** Convenience Set methods for setting all dimensional parameters
    *  to the same values. */
@@ -204,8 +215,10 @@ public:
     }
     this->SetVariance(variance);
   }
+
   /** SetSigmaArray is preserved for interface
    *  backwards compatibility. */
+  /** @ITKStartGrouping */
   void
   SetSigmaArray(const ArrayType & sigmas)
   {
@@ -216,6 +229,7 @@ public:
   {
     this->SetVariance(sigma * sigma);
   }
+  /** @ITKEndGrouping */
 
   /** Get the Sigma value. */
   ArrayType
@@ -231,7 +245,7 @@ public:
 
   /** Get the Sigma scalar. If the Sigma is anisotropic, we will just
    * return the Sigma along the first dimension. */
-  double
+  [[nodiscard]] double
   GetSigma() const
   {
     return std::sqrt(m_Variance[0]);
@@ -262,7 +276,7 @@ public:
   }
 
   /** Get the radius of the generated directional kernel */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetKernelRadius(const unsigned int dimension) const;
 
   /** Get the radius of the separable kernel in each direction */
@@ -279,9 +293,11 @@ public:
    * into account and to specify the Gaussian variance in real world units;
    * use Off to ignore the image spacing and to specify the Gaussian variance
    * in voxel units. Default is On. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
+  /** @ITKEndGrouping */
 
 #if !defined(ITK_FUTURE_LEGACY_REMOVE)
   /** Use the image spacing information in calculations. Use this option if you
@@ -313,25 +329,20 @@ public:
    * This parameter was introduced to reduce the memory used by images
    * internally, at the cost of performance.
    */
-  itkLegacyMacro(unsigned int GetInternalNumberOfStreamDivisions() const);
-  itkLegacyMacro(void SetInternalNumberOfStreamDivisions(unsigned int));
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  itkLegacyMacro(unsigned int GetInternalNumberOfStreamDivisions() const;)
+  itkLegacyMacro(void SetInternalNumberOfStreamDivisions(unsigned int);)
 
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelValueType>));
 
-  // End concept checking
-#endif
-
 protected:
   DiscreteGaussianImageFilter()
+    : m_MaximumKernelWidth(32)
+    , m_FilterDimensionality(ImageDimension)
+    , m_UseImageSpacing(true)
   {
     m_Variance.Fill(0.0);
     m_MaximumError.Fill(0.01);
-    m_MaximumKernelWidth = 32;
-    m_UseImageSpacing = true;
-    m_FilterDimensionality = ImageDimension;
+
     m_InputBoundaryCondition = &m_InputDefaultBoundaryCondition;
     m_RealBoundaryCondition = &m_RealDefaultBoundaryCondition;
   }
@@ -387,7 +398,7 @@ private:
 
   /** Pointer to a persistent boundary condition object used
    ** for the image iterator. */
-  InputBoundaryConditionPointerType m_InputBoundaryCondition{};
+  BoundaryConditionType * m_InputBoundaryCondition{};
 
   /** Default boundary condition */
   InputDefaultBoundaryConditionType m_InputDefaultBoundaryCondition{};

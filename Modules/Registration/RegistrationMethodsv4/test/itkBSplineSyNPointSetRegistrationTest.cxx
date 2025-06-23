@@ -40,10 +40,8 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
 
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
   // two circles with a small offset
   PointType offset;
@@ -56,11 +54,11 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
   {
     auto label = static_cast<unsigned int>(1.5 + count / 100);
 
-    PointType fixedPoint;
-    float     radius = 100.0;
+    PointType       fixedPoint;
+    constexpr float radius = 100.0;
     fixedPoint[0] = radius * std::cos(theta);
     fixedPoint[1] = radius * std::sin(theta);
-    if (PointSetType::PointDimension > 2)
+    if constexpr (PointSetType::PointDimension > 2)
     {
       fixedPoint[2] = radius * std::sin(theta);
     }
@@ -70,7 +68,7 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
     PointType movingPoint;
     movingPoint[0] = fixedPoint[0] + offset[0];
     movingPoint[1] = fixedPoint[1] + offset[1];
-    if (PointSetType::PointDimension > 2)
+    if constexpr (PointSetType::PointDimension > 2)
     {
       movingPoint[2] = fixedPoint[2] + offset[2];
     }
@@ -156,7 +154,7 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
   // if the user wishes to add that option, they can use the class
   // GaussianSmoothingOnUpdateDisplacementFieldTransformAdaptor
 
-  unsigned int numberOfLevels = 3;
+  constexpr unsigned int numberOfLevels = 3;
 
   DisplacementFieldRegistrationType::NumberOfIterationsArrayType numberOfIterationsPerLevel;
   numberOfIterationsPerLevel.SetSize(3);
@@ -202,7 +200,7 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
     fieldTransformAdaptor->SetMeshSizeForTheUpdateField(newUpdateMeshSize);
     fieldTransformAdaptor->SetMeshSizeForTheTotalField(newTotalMeshSize);
 
-    adaptors.push_back(fieldTransformAdaptor);
+    adaptors.emplace_back(fieldTransformAdaptor);
   }
 
   displacementFieldRegistration->SetFixedPointSet(fixedPoints);
@@ -234,7 +232,7 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
 
   // applying the resultant transform to moving points and verify result
   std::cout << "Fixed\tMoving\tMovingTransformed\tFixedTransformed\tDiff" << std::endl;
-  PointType::ValueType tolerance = 0.01;
+  constexpr PointType::ValueType tolerance = 0.01;
 
   float averageError = 0.0;
   for (unsigned int n = 0; n < movingPoints->GetNumberOfPoints(); ++n)
@@ -243,8 +241,8 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
     PointType transformedMovingPoint =
       displacementFieldRegistration->GetModifiableTransform()->GetInverseTransform()->TransformPoint(
         movingPoints->GetPoint(n));
-    PointType fixedPoint = fixedPoints->GetPoint(n);
-    PointType transformedFixedPoint =
+    PointType       fixedPoint = fixedPoints->GetPoint(n);
+    const PointType transformedFixedPoint =
       displacementFieldRegistration->GetModifiableTransform()->TransformPoint(fixedPoints->GetPoint(n));
     PointType difference;
     difference[0] = transformedMovingPoint[0] - fixedPoint[0];
@@ -255,7 +253,7 @@ itkBSplineSyNPointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(ar
     averageError += ((difference.GetVectorFromOrigin()).GetSquaredNorm());
   }
 
-  unsigned int numberOfPoints = movingPoints->GetNumberOfPoints();
+  const unsigned int numberOfPoints = movingPoints->GetNumberOfPoints();
   if (numberOfPoints > 0)
   {
     averageError /= static_cast<float>(numberOfPoints);

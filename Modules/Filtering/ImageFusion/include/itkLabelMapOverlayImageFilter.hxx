@@ -28,9 +28,9 @@ namespace itk
 
 template <typename TLabelMap, typename TFeatureImage, typename TOutputImage>
 LabelMapOverlayImageFilter<TLabelMap, TFeatureImage, TOutputImage>::LabelMapOverlayImageFilter()
+  : m_Opacity(0.5)
 {
   this->SetNumberOfRequiredInputs(2);
-  m_Opacity = 0.5;
   this->DynamicMultiThreadingOn();
 }
 
@@ -42,7 +42,7 @@ LabelMapOverlayImageFilter<TLabelMap, TFeatureImage, TOutputImage>::GenerateInpu
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  LabelMapPointer input = const_cast<LabelMapType *>(this->GetInput());
+  const LabelMapPointer input = const_cast<LabelMapType *>(this->GetInput());
   if (!input)
   {
     return;

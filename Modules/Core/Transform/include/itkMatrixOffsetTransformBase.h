@@ -116,7 +116,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MatrixOffsetTransformBase);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -494,7 +494,7 @@ public:
   }
 
 protected:
-  /** \deprecated Use GetInverse for public API instead.
+  /** Deprecated: Use GetInverse for public API instead.
    * Method will eventually be made a protected member function */
   const InverseMatrixType &
   GetInverseMatrix() const;
@@ -507,8 +507,13 @@ protected:
    * to values specified by the caller.  If the arguments are
    * omitted, then the MatrixOffsetTransformBase is initialized to an identity
    * transformation in the appropriate number of dimensions. */
-  MatrixOffsetTransformBase(const MatrixType & matrix, const OutputVectorType & offset);
+  /** @ITKStartGrouping */
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] MatrixOffsetTransformBase(const MatrixType &       matrix,
+                                                                         const OutputVectorType & offset);
+#endif
   explicit MatrixOffsetTransformBase(unsigned int paramDims = ParametersDimension);
+  /** @ITKEndGrouping */
 
   /** Destroy an MatrixOffsetTransformBase object */
   ~MatrixOffsetTransformBase() override = default;
@@ -535,10 +540,8 @@ protected:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 
   virtual void

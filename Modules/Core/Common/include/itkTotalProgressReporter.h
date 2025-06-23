@@ -102,8 +102,8 @@ public:
 
     if (count >= m_PixelsBeforeUpdate)
     {
-      SizeValueType total = static_cast<SizeValueType>(m_PixelsPerUpdate - m_PixelsBeforeUpdate) + count;
-      SizeValueType numberOfUpdates = total / m_PixelsPerUpdate;
+      const SizeValueType total = static_cast<SizeValueType>(m_PixelsPerUpdate - m_PixelsBeforeUpdate) + count;
+      const SizeValueType numberOfUpdates = total / m_PixelsPerUpdate;
 
       m_PixelsBeforeUpdate = m_PixelsPerUpdate - total % m_PixelsPerUpdate;
       m_CurrentPixel += numberOfUpdates * m_PixelsPerUpdate;
@@ -124,7 +124,7 @@ public:
 protected:
   ProcessObject * m_Filter;
   float           m_InverseNumberOfPixels;
-  SizeValueType   m_CurrentPixel;
+  SizeValueType   m_CurrentPixel{ 0 };
   SizeValueType   m_PixelsPerUpdate;
   SizeValueType   m_PixelsBeforeUpdate;
   float           m_ProgressWeight;

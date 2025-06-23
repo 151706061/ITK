@@ -214,7 +214,7 @@ LabelMap<TLabelObject>::SetPixel(const IndexType & idx, const LabelType & iLabel
     {
       auto tempIt = it;
       ++it;
-      bool emitModifiedEvent = (iLabel == m_BackgroundValue);
+      const bool emitModifiedEvent = (iLabel == m_BackgroundValue);
       this->RemovePixel(tempIt, idx, emitModifiedEvent);
     }
     else
@@ -241,7 +241,7 @@ LabelMap<TLabelObject>::AddPixel(const IndexType & idx, const LabelType & label)
     return;
   }
 
-  LabelObjectContainerIterator it = m_LabelObjectContainer.find(label);
+  const LabelObjectContainerIterator it = m_LabelObjectContainer.find(label);
 
   this->AddPixel(it, idx, label);
 }
@@ -268,7 +268,7 @@ LabelMap<TLabelObject>::AddPixel(const LabelObjectContainerIterator & it,
   else
   {
     // the label does not exist yet - create a new one
-    LabelObjectPointerType labelObject = LabelObjectType::New();
+    const LabelObjectPointerType labelObject = LabelObjectType::New();
     labelObject->SetLabel(label);
     labelObject->AddIndex(idx);
     // Modified() is called in AddLabelObject()
@@ -311,9 +311,9 @@ LabelMap<TLabelObject>::RemovePixel(const IndexType & idx, const LabelType & lab
     return;
   }
 
-  LabelObjectContainerIterator it = m_LabelObjectContainer.find(label);
+  const LabelObjectContainerIterator it = m_LabelObjectContainer.find(label);
 
-  bool emitModifiedEvent = true;
+  constexpr bool emitModifiedEvent = true;
   RemovePixel(it, idx, emitModifiedEvent);
 }
 
@@ -339,7 +339,7 @@ LabelMap<TLabelObject>::SetLine(const IndexType & idx, const LengthType & length
   else
   {
     // the label does not exist yet - create a new one
-    LabelObjectPointerType labelObject = LabelObjectType::New();
+    const LabelObjectPointerType labelObject = LabelObjectType::New();
     labelObject->SetLabel(label);
     labelObject->AddLine(idx, length);
     // Modified() is called in AddLabelObject()
@@ -394,8 +394,8 @@ LabelMap<TLabelObject>::PushLabelObject(LabelObjectType * labelObject)
   }
   else
   {
-    LabelType lastLabel = m_LabelObjectContainer.rbegin()->first;
-    LabelType firstLabel = m_LabelObjectContainer.begin()->first;
+    const LabelType lastLabel = m_LabelObjectContainer.rbegin()->first;
+    const LabelType firstLabel = m_LabelObjectContainer.begin()->first;
     if (lastLabel != NumericTraits<LabelType>::max() && lastLabel + 1 != m_BackgroundValue)
     {
       labelObject->SetLabel(lastLabel + 1);
@@ -414,7 +414,7 @@ LabelMap<TLabelObject>::PushLabelObject(LabelObjectType * labelObject)
       // search for an unused label
       LabelType                         label = firstLabel;
       LabelObjectContainerConstIterator it;
-      for (it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); it++, label++)
+      for (it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it, ++label)
       {
         assert((it->second.IsNotNull()));
         if (label == m_BackgroundValue)
@@ -521,7 +521,7 @@ template <typename TLabelObject>
 void
 LabelMap<TLabelObject>::Optimize()
 {
-  for (LabelObjectContainerConstIterator it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it)
+  for (auto it = m_LabelObjectContainer.begin(); it != m_LabelObjectContainer.end(); ++it)
   {
     assert((it->second.IsNotNull()));
     it->second->Optimize();

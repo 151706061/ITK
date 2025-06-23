@@ -23,8 +23,9 @@
   try
     {
     std::ofstream redirectStream;
-    std::streambuf *redirectBuf, *oldCoutBuf = nullptr;
-    RedirectOutputParameters& redirectOutputParameters = GetRedirectOutputParameters();
+    std::streambuf *redirectBuf = nullptr;
+    std::streambuf *oldCoutBuf = nullptr;
+    RedirectOutputParameters const& redirectOutputParameters = GetRedirectOutputParameters();
     if (redirectOutputParameters.redirect)
       {
       std::cout << "Test output has been redirected to: " << redirectOutputParameters.fileName << std::endl;

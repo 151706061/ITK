@@ -58,7 +58,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUMeanImageFilter);
 
   /** Superclass type alias. */
@@ -110,6 +110,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
 
   /** Class methods used to interface with the registered factories. */
+  /** @ITKStartGrouping */
   const char *
   GetITKSourceVersion() const override
   {
@@ -120,11 +121,11 @@ public:
   {
     return "A Factory for GPUMeanImageFilter";
   }
-
+  /** @ITKEndGrouping */
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUMeanImageFilterFactory);
 
   /** Register one factory of this type  */

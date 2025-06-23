@@ -47,7 +47,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FiniteCylinderSpatialFunction);
 
   /** Method for creation through the object factory. */
@@ -60,33 +60,33 @@ public:
   using typename Superclass::OutputType;
 
   /** Set/Get and set the center of the cylinder. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Center, InputType);
   itkSetMacro(Center, InputType);
-
+  /** @ITKEndGrouping */
   /** Get and set the medial axis length of the cylinder. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(AxisLength, double);
   itkSetMacro(AxisLength, double);
-
+  /** @ITKEndGrouping */
   /** Get and set the radius length of the cylinder. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Radius, double);
   itkSetMacro(Radius, double);
-
+  /** @ITKEndGrouping */
   /** Set the orientation vectors (must be orthogonal) of the ellipsoid axes.
    * Must be normalized!!!!! */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Orientation, InputType);
   virtual void
   SetOrientation(const InputType _Orientation);
-
+  /** @ITKEndGrouping */
   /** Evaluates the function at a given position. */
   OutputType
   Evaluate(const InputType & position) const override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(DimensionShouldBe3, (Concept::SameDimension<VDimension, 3u>));
   itkConceptMacro(PointDimensionShouldBe3, (Concept::SameDimension<InputType::Dimension, 3u>));
-  // End concept checking
-#endif
 
 protected:
   FiniteCylinderSpatialFunction();

@@ -52,11 +52,9 @@ itkKullbackLeiblerCompareHistogramImageToImageMetricTest(int, char *[])
     ImageDimension = MovingImageType::ImageDimension
   };
 
-  MovingImageType::SizeType   size = { { 16, 16 } };
-  MovingImageType::IndexType  index = { { 0, 0 } };
-  MovingImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  constexpr MovingImageType::SizeType  size = { { 16, 16 } };
+  constexpr MovingImageType::IndexType index = { { 0, 0 } };
+  const MovingImageType::RegionType    region{ index, size };
 
   auto imgMoving = MovingImageType::New();
   imgMoving->SetRegions(region);
@@ -84,9 +82,9 @@ itkKullbackLeiblerCompareHistogramImageToImageMetricTest(int, char *[])
   center[0] = static_cast<double>(region.GetSize()[0]) / 2.0;
   center[1] = static_cast<double>(region.GetSize()[1]) / 2.0;
 
-  const double s = static_cast<double>(region.GetSize()[0]) / 2.0;
-  const double mag = 200.0;
-  const double noisemag = 0.0; // ended up yielding best results
+  const double     s = static_cast<double>(region.GetSize()[0]) / 2.0;
+  constexpr double mag = 200.0;
+  constexpr double noisemag = 0.0; // ended up yielding best results
 
   itk::Point<double, 2>  p;
   itk::Vector<double, 2> d;
@@ -198,7 +196,7 @@ itkKullbackLeiblerCompareHistogramImageToImageMetricTest(int, char *[])
   // set the number of samples to use
   // metric->SetNumberOfSpatialSamples( 100 );
 
-  unsigned int                        nBins = 64;
+  constexpr unsigned int              nBins = 64;
   MetricType::HistogramType::SizeType histSize;
   histSize.SetSize(2);
   histSize[0] = nBins;
@@ -235,8 +233,8 @@ itkKullbackLeiblerCompareHistogramImageToImageMetricTest(int, char *[])
   //------------------------------------------------------------
   // Set up an affine transform parameters
   //------------------------------------------------------------
-  unsigned int   numberOfParameters = transformer->GetNumberOfParameters();
-  ParametersType parameters(numberOfParameters);
+  const unsigned int numberOfParameters = transformer->GetNumberOfParameters();
+  ParametersType     parameters(numberOfParameters);
 
   // set the parameters to the identity
   unsigned long count = 0;
@@ -267,7 +265,7 @@ itkKullbackLeiblerCompareHistogramImageToImageMetricTest(int, char *[])
   // for parameters[4] = {-10,10}
   //---------------------------------------------------------
 
-  MetricType::MeasureType    measure;
+  MetricType::MeasureType    measure = NAN;
   MetricType::DerivativeType derivative(numberOfParameters);
 
   itk::TimeProbesCollectorBase collector;

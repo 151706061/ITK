@@ -28,9 +28,9 @@ template <typename TInputImage, typename TOutputImage>
 AntiAliasBinaryImageFilter<TInputImage, TOutputImage>::AntiAliasBinaryImageFilter()
   : m_UpperBinaryValue(NumericTraits<BinaryValueType>::OneValue())
   , m_LowerBinaryValue(BinaryValueType{})
+  , m_CurvatureFunction(CurvatureFunctionType::New())
   , m_InputImage(nullptr)
 {
-  m_CurvatureFunction = CurvatureFunctionType::New();
   this->SetDifferenceFunction(m_CurvatureFunction);
 
   if (TInputImage::ImageDimension == 2)
@@ -70,10 +70,8 @@ AntiAliasBinaryImageFilter<TInputImage, TOutputImage>::CalculateUpdateValue(cons
   {
     return (std::max(new_value, this->GetValueZero()));
   }
-  else
-  {
-    return (std::min(new_value, this->GetValueZero()));
-  }
+
+  return (std::min(new_value, this->GetValueZero()));
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -93,8 +91,7 @@ AntiAliasBinaryImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Find the minimum and maximum of the input image and use these values to
   // set m_UpperBinaryValue, m_LowerBinaryValue, and m_IsoSurfaceValue in the
   // parent class.
-  typename itk::MinimumMaximumImageCalculator<InputImageType>::Pointer minmax =
-    itk::MinimumMaximumImageCalculator<InputImageType>::New();
+  auto minmax = itk::MinimumMaximumImageCalculator<InputImageType>::New();
   minmax->SetImage(m_InputImage);
   minmax->ComputeMinimum();
   minmax->ComputeMaximum();

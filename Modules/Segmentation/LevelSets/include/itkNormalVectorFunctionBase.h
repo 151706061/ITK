@@ -60,7 +60,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NormalVectorFunctionBase);
 
   /** Image dimension derived from the superclass. */
@@ -84,7 +84,8 @@ public:
   using NormalVectorType = typename NodeType::NodeDataType;
 
   /** GlobalData methods are not needed in this class. */
-  void *
+  /** @ITKStartGrouping */
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     return nullptr;
@@ -92,7 +93,7 @@ public:
   void
   ReleaseGlobalDataPointer(void *) const override
   {}
-
+  /** @ITKEndGrouping */
   /** For the global time step, we return the time step parameter. */
   TimeStepType
   ComputeGlobalTimeStep(void *) const override

@@ -78,7 +78,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PointSetToPointSetMetricv4);
 
   /**  Type of the measure. */
@@ -140,7 +140,11 @@ public:
 
   using typename Superclass::PointType;
   using typename Superclass::PixelType;
-  using CoordRepType = typename PointType::CoordRepType;
+  using CoordinateType = typename PointType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using PointsContainer = FixedPointsContainer;
   using PointsConstIterator = typename PointsContainer::ConstIterator;
   using typename Superclass::PointIdentifier;
@@ -210,7 +214,7 @@ private:
                                      const PixelType & pixel) const override
   {
     return this->GetLocalNeighborhoodValue(point, pixel);
-  };
+  }
 
   LocalDerivativeType
   GetLocalNeighborhoodDerivativeWithIndex(const PointIdentifier &,
@@ -218,7 +222,7 @@ private:
                                           const PixelType & pixel) const override
   {
     return this->GetLocalNeighborhoodDerivative(point, pixel);
-  };
+  }
 
   void
   GetLocalNeighborhoodValueAndDerivativeWithIndex(const PointIdentifier &,
@@ -228,7 +232,7 @@ private:
                                                   const PixelType &     pixel) const override
   {
     this->GetLocalNeighborhoodValueAndDerivative(point, measure, derivative, pixel);
-  };
+  }
 };
 } // end namespace itk
 

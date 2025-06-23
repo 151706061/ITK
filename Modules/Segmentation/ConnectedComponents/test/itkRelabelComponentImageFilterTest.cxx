@@ -27,6 +27,12 @@
 #include "itkTestingMacros.h"
 
 
+using SignedPixelType = signed short;
+
+// Explicit template instantiation to test compile-time support of signed types
+template class itk::RelabelComponentImageFilter<itk::Image<SignedPixelType>, itk::Image<SignedPixelType>>;
+
+
 int
 itkRelabelComponentImageFilterTest(int argc, char * argv[])
 {
@@ -63,9 +69,9 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
 
   using HistogramType = itk::Statistics::Histogram<RealType>;
 
-  int      NumBins = 13;
-  RealType LowerBound = 51.0;
-  RealType UpperBound = 252.0;
+  constexpr int      NumBins = 13;
+  constexpr RealType LowerBound = 51.0;
+  constexpr RealType UpperBound = 252.0;
 
   auto reader = ReaderType::New();
   auto writer = WriterType::New();
@@ -80,8 +86,8 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
   auto finalThreshold = FinalThresholdFilterType::New();
   auto statistics = StatisticsFilterType::New();
 
-  itk::SimpleFilterWatcher watcher(relabel);
-  itk::SimpleFilterWatcher statswatcher(statistics);
+  const itk::SimpleFilterWatcher watcher(relabel);
+  const itk::SimpleFilterWatcher statswatcher(statistics);
 
   reader->SetFileName(argv[1]);
 
@@ -95,9 +101,8 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
   change->ChangeSpacingOn();
 
   // Create a binary input image to label
-  InternalPixelType threshold_low, threshold_hi;
-  threshold_low = std::stoi(argv[3]);
-  threshold_hi = std::stoi(argv[4]);
+  const InternalPixelType threshold_low = std::stoi(argv[3]);
+  const InternalPixelType threshold_hi = std::stoi(argv[4]);
 
   threshold->SetInput(change->GetOutput());
   threshold->SetInsideValue(itk::NumericTraits<InternalPixelType>::OneValue());
@@ -111,15 +116,15 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
   connected->SetInput(threshold->GetOutput());
   relabel->SetInput(connected->GetOutput());
 
-  itk::SizeValueType numberOfObjectsToPrint = 5;
+  constexpr itk::SizeValueType numberOfObjectsToPrint = 5;
   relabel->SetNumberOfObjectsToPrint(numberOfObjectsToPrint);
   ITK_TEST_SET_GET_VALUE(numberOfObjectsToPrint, relabel->GetNumberOfObjectsToPrint());
 
-  typename RelabelComponentType::ObjectSizeType minimumObjectSize = 0;
+  constexpr typename RelabelComponentType::ObjectSizeType minimumObjectSize = 0;
   relabel->SetMinimumObjectSize(minimumObjectSize);
   ITK_TEST_SET_GET_VALUE(minimumObjectSize, relabel->GetMinimumObjectSize());
 
-  bool sortByObjectSize = true;
+  constexpr bool sortByObjectSize = true;
   ITK_TEST_SET_GET_BOOLEAN(relabel, SortByObjectSize, sortByObjectSize);
 
   std::cout << "Modified time of relabel's output = " << relabel->GetOutput()->GetMTime() << std::endl;
@@ -239,7 +244,7 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
   }
 
   // Check for the sizes of the 7 first labels which should be sorted by default
-  unsigned long ref1[7] = { 7656, 2009, 1586, 1491, 1454, 921, 906 };
+  const unsigned long ref1[7] = { 7656, 2009, 1586, 1491, 1454, 921, 906 };
   for (int i = 0; i < 6; ++i)
   {
     if (relabel->GetSizeOfObjectsInPixels()[i] != ref1[i])
@@ -255,7 +260,7 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
   relabel->Update();
 
   // Check for the sizes of the 7 first labels which are no more sorted
-  unsigned long ref2[7] = { 1491, 2, 1, 906, 3, 40, 1 };
+  const unsigned long ref2[7] = { 1491, 2, 1, 906, 3, 40, 1 };
   for (int i = 0; i < 7; ++i)
   {
     if (relabel->GetSizeOfObjectsInPixels()[i] != ref2[i])
@@ -271,9 +276,7 @@ itkRelabelComponentImageFilterTest(int argc, char * argv[])
     std::cout << "Test PASSED!" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test FAILED!" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test FAILED!" << std::endl;
+  return EXIT_FAILURE;
 }

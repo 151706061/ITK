@@ -29,9 +29,7 @@
 
 #include <cmath>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class FEMRobustSolver
@@ -62,19 +60,7 @@ namespace fem
  *
  * \author Yixun Liu
  *
- * \par REFERENCE
- * O. Clatz, H. Delingette, I.-F. Talos, A. Golby, R. Kikinis, F. Jolesz,
- * N. Ayache, and S. Warfield, "Robust non-rigid registration to capture
- * brain shift from intra-operative MRI", IEEE Trans. Med. Imag., vol. 24,
- * no. 11, pp. 1417-1427, 2005.
- *
- *
- * \par REFERENCE
- * Yixun Liu, Andriy Fedorov, Ron Kikinis and Nikos Chrisochoides, "Real-time Non-rigid
- * Registration of Medical Images on a Cooperative Parallel Architecture",
- * IEEE International Conference on Bioinformatics & Biomedicine, pp. 401- 4,
- * November 2009.
- *
+ * For algorithmic details see \cite clatz2005 and \cite liu2009.
  *
  * \ingroup ITKFEM
  */
@@ -94,7 +80,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RobustSolver);
 
   /** Inherit some types from the superclass. */
@@ -263,7 +249,7 @@ protected:
   ComputeLandmarkTensor();
 
   /** Get scaling factor. */
-  float
+  [[nodiscard]] float
   GetLandmarkTensorPonderation() const;
 
   /**
@@ -385,8 +371,7 @@ public:
   }
 };
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMRobustSolver.hxx"

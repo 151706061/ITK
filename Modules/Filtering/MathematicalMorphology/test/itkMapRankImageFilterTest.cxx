@@ -46,14 +46,13 @@ itkMapRankImageFilterTest(int argc, char * argv[])
   using SEType = itk::FlatStructuringElement<2>;
   using FilterType = itk::RankImageFilter<ImageType, ImageType, SEType>;
 
-  auto                     filter = FilterType::New();
-  itk::SimpleFilterWatcher filterWatch(filter);
+  auto                           filter = FilterType::New();
+  const itk::SimpleFilterWatcher filterWatch(filter);
 
   using RadiusType = FilterType::RadiusType;
 
   // test default values
-  RadiusType r1;
-  r1.Fill(1);
+  auto r1 = itk::MakeFilled<RadiusType>(1);
   if (filter->GetRadius() != r1)
   {
     std::cerr << "Wrong default Radius." << std::endl;
@@ -66,8 +65,7 @@ itkMapRankImageFilterTest(int argc, char * argv[])
   }
 
   // set radius with a radius type
-  RadiusType r5;
-  r5.Fill(5);
+  auto r5 = itk::MakeFilled<RadiusType>(5);
   filter->SetRadius(r5);
   if (filter->GetRadius() != r5)
   {
@@ -92,7 +90,7 @@ itkMapRankImageFilterTest(int argc, char * argv[])
 
   try
   {
-    int r = std::stoi(argv[3]);
+    const int r = std::stoi(argv[3]);
     filter->SetInput(input->GetOutput());
     filter->SetRadius(r);
     filter->SetRank(0.5);

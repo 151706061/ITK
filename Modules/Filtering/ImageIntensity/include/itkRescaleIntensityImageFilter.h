@@ -33,12 +33,11 @@ class ITK_TEMPLATE_EXPORT IntensityLinearTransform
 public:
   using RealType = typename NumericTraits<TInput>::RealType;
   IntensityLinearTransform()
-  {
-    m_Factor = 1.0;
-    m_Offset = 0.0;
-    m_Minimum = NumericTraits<TOutput>::NonpositiveMin();
-    m_Maximum = NumericTraits<TOutput>::max();
-  }
+    : m_Factor(1.0)
+    , m_Offset(0.0)
+    , m_Maximum(NumericTraits<TOutput>::max())
+    , m_Minimum(NumericTraits<TOutput>::NonpositiveMin())
+  {}
 
   ~IntensityLinearTransform() = default;
   void
@@ -74,8 +73,8 @@ public:
   inline TOutput
   operator()(const TInput & x) const
   {
-    RealType value = static_cast<RealType>(x) * m_Factor + m_Offset;
-    auto     result = static_cast<TOutput>(value);
+    const RealType value = static_cast<RealType>(x) * m_Factor + m_Offset;
+    auto           result = static_cast<TOutput>(value);
 
     result = (result > m_Maximum) ? m_Maximum : result;
     result = (result < m_Minimum) ? m_Minimum : result;
@@ -156,7 +155,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RescaleIntensityImageFilter);
 
   itkSetMacro(OutputMinimum, OutputPixelType);
@@ -167,14 +166,16 @@ public:
   /** Get the Scale and Shift used for the linear transformation
       of gray level values.
    \warning These Values are only valid after the filter has been updated */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(Scale, RealType);
   itkGetConstReferenceMacro(Shift, RealType);
-
+  /** @ITKEndGrouping */
   /** Get the Minimum and Maximum values of the input image.
    \warning These Values are only valid after the filter has been updated */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(InputMinimum, InputPixelType);
   itkGetConstReferenceMacro(InputMaximum, InputPixelType);
-
+  /** @ITKEndGrouping */
   /** Process to execute before entering the multithreaded section */
   void
   BeforeThreadedGenerateData() override;
@@ -183,14 +184,10 @@ public:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelType>));
   itkConceptMacro(RealTypeMultiplyOperatorCheck, (Concept::MultiplyOperator<RealType>));
   itkConceptMacro(RealTypeAdditiveOperatorsCheck, (Concept::AdditiveOperators<RealType>));
-  // End concept checking
-#endif
 
 protected:
   RescaleIntensityImageFilter();

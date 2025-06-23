@@ -80,7 +80,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DenseFiniteDifferenceImageFilter);
 
   /** Convenient type alias */
@@ -102,17 +102,15 @@ public:
   /** The container type for the update buffer. */
   using UpdateBufferType = OutputImageType;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputTimesDoubleCheck, (Concept::MultiplyOperator<PixelType, double>));
   itkConceptMacro(OutputAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType>));
   itkConceptMacro(OutputAdditiveAndAssignOperatorsCheck, (Concept::AdditiveAndAssignOperators<PixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<typename TInputImage::PixelType, PixelType>));
-  // End concept checking
-#endif
 
 protected:
-  DenseFiniteDifferenceImageFilter() { m_UpdateBuffer = UpdateBufferType::New(); }
+  DenseFiniteDifferenceImageFilter()
+    : m_UpdateBuffer(UpdateBufferType::New())
+  {}
   ~DenseFiniteDifferenceImageFilter() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;

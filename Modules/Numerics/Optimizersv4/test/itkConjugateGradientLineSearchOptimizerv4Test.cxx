@@ -56,8 +56,8 @@ public:
   using MeasureType = Superclass::MeasureType;
 
   ConjugateGradientLineSearchOptimizerv4TestMetric()
+
   {
-    m_Iterations = 0;
     m_Parameters.SetSize(SpaceDimension);
     m_Parameters.Fill(0);
   }
@@ -69,7 +69,7 @@ public:
   void
   GetDerivative(DerivativeType & derivative) const override
   {
-    MeasureType value;
+    MeasureType value = NAN;
     GetValueAndDerivative(value, derivative);
   }
 
@@ -81,8 +81,8 @@ public:
       derivative.SetSize(2);
     }
 
-    double x = m_Parameters[0];
-    double y = m_Parameters[1];
+    const double x = m_Parameters[0];
+    const double y = m_Parameters[1];
 
     std::cout << "GetValueAndDerivative( ";
     std::cout << x << ' ';
@@ -105,10 +105,10 @@ public:
   MeasureType
   GetValue() const override
   {
-    double x = m_Parameters[0];
-    double y = m_Parameters[1];
+    const double x = m_Parameters[0];
+    const double y = m_Parameters[1];
 
-    MeasureType value = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const MeasureType value = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     return value;
   }
@@ -153,7 +153,7 @@ public:
 
 private:
   ParametersType       m_Parameters;
-  mutable unsigned int m_Iterations;
+  mutable unsigned int m_Iterations{ 0 };
 };
 
 ///////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ ConjugateGradientLineSearchOptimizerv4RunTest(itk::ConjugateGradientLineSearchOp
   //
   // check results to see if it is within range
   //
-  double trueParameters[2] = { 2, -2 };
+  constexpr double trueParameters[2] = { 2, -2 };
   for (unsigned int j = 0; j < 2; ++j)
   {
     if (itk::Math::abs(finalPosition[j] - trueParameters[j]) > 0.01)
@@ -213,7 +213,7 @@ itkConjugateGradientLineSearchOptimizerv4Test(int, char *[])
   auto itkOptimizer = OptimizerType::New();
 
   // Declaration of the Metric
-  ConjugateGradientLineSearchOptimizerv4TestMetric::Pointer metric =
+  const ConjugateGradientLineSearchOptimizerv4TestMetric::Pointer metric =
     ConjugateGradientLineSearchOptimizerv4TestMetric::New();
 
   itkOptimizer->SetMetric(metric);
@@ -240,7 +240,7 @@ itkConjugateGradientLineSearchOptimizerv4Test(int, char *[])
   }
 
   //
-  // test with non-idenity scales
+  // test with non-identity scales
   //
   std::cout << "Test optimization with non-identity scales:" << std::endl;
   metric->SetParameters(initialPosition);
@@ -271,8 +271,73 @@ itkConjugateGradientLineSearchOptimizerv4Test(int, char *[])
     return EXIT_FAILURE;
   }
 
+  // Test repeat runs with the same parameters
+  initialPosition[0] = 200;
+  initialPosition[1] = -200;
+
+  metric->SetParameters(initialPosition);
+
+  // local variable to store initial learning rate
+  double initialLearningRate = 0.5;
+
+  itkOptimizer = OptimizerType::New(); // Reinitialize optimizer
+  itkOptimizer->SetMetric(metric);     // Reattach the metric
+  itkOptimizer->SetMaximumLineSearchIterations(5);
+  itkOptimizer->SetLearningRate(initialLearningRate);
+  itkOptimizer->SetLowerLimit(0.1);
+  itkOptimizer->SetUpperLimit(5);
+  itkOptimizer->SetEpsilon(1.e-4);
+
+  itkOptimizer->SetNumberOfIterations(50);
+
+  std::cout << "Test optimization retest 1 (initial):" << std::endl;
+  if (ConjugateGradientLineSearchOptimizerv4RunTest(itkOptimizer) == EXIT_FAILURE)
+  {
+    return EXIT_FAILURE;
+  }
+
+  // Store the first result
+  ParametersType firstFinalPosition = itkOptimizer->GetMetric()->GetParameters();
+
+  metric->SetParameters(initialPosition);
+
+  // Run the optimizer a second time
+  std::cout << "Test optimization 2 (restart with same parameters):" << std::endl;
+  if (ConjugateGradientLineSearchOptimizerv4RunTest(itkOptimizer) == EXIT_FAILURE)
+  {
+    return EXIT_FAILURE;
+  }
+
+  // Store the second result
+  ParametersType secondFinalPosition = itkOptimizer->GetMetric()->GetParameters();
+
+  // Compare results
+  bool identical = true;
+  for (unsigned int j = 0; j < spaceDimension; ++j)
+  {
+    if (itk::Math::abs(firstFinalPosition[j] - secondFinalPosition[j]) > itk::NumericTraits<double>::epsilon())
+    {
+      identical = false;
+    }
+  }
+
+  if (!identical)
+  {
+    std::cerr << "ERROR: Optimizer does not reset properly: results differ runs with same parameters." << std::endl;
+    std::cerr << "First run result: " << firstFinalPosition << std::endl;
+    std::cerr << "Second run result: " << secondFinalPosition << std::endl;
+    return EXIT_FAILURE;
+  }
+  else
+  {
+    std::cout << "SUCCESS: Optimizer produces identical results on restart." << std::endl;
+  }
+
   // Exercise various member functions
+  itkOptimizer->SetInitialLearningRate(0.5);
   std::cout << "LearningRate: " << itkOptimizer->GetLearningRate();
+  std::cout << std::endl;
+  std::cout << "InitialLearningRate: " << itkOptimizer->GetInitialLearningRate();
   std::cout << std::endl;
   std::cout << "NumberOfIterations: " << itkOptimizer->GetNumberOfIterations();
   std::cout << std::endl;

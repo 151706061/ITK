@@ -28,12 +28,9 @@
 #include "itkSize.h"
 #include <vector>
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class MeasurementVectorTraits
- * \brief
  * \ingroup Statistics
  * \ingroup ITKStatistics
  */
@@ -46,7 +43,7 @@ public:
       the frequency by one does not change the total frequency (because of lack of
       precision). Using double type will also ultimately fall into the same problem.
       Hence in the new statistics framework, InstanceIdentifier/FrequencyTypes are
-      set to the the largest possible integer on the machine */
+      set to the largest possible integer on the machine */
   using InstanceIdentifier = IdentifierType;
 
   /** Type defined for representing the frequency of measurement vectors */
@@ -66,7 +63,7 @@ public:
     // If the default constructor creates a vector of
     // length zero, we assume that it is resizable,
     // otherwise that is a pretty useless measurement vector.
-    MeasurementVectorLength len = NumericTraits<TVectorType>::GetLength({});
+    const MeasurementVectorLength len = NumericTraits<TVectorType>::GetLength({});
 
     return (len == 0);
   }
@@ -193,7 +190,7 @@ public:
     {
       return VLength;
     }
-    else if (b->Size() != VLength)
+    if (b->Size() != VLength)
     {
       itkGenericExceptionMacro(<< errMsg);
     }
@@ -210,12 +207,9 @@ public:
     {
       return VLength;
     }
-    if (b.Size() != 0)
+    if (b.Size() != VLength)
     {
-      if (b.Size() != VLength)
-      {
-        itkGenericExceptionMacro(<< errMsg);
-      }
+      itkGenericExceptionMacro(<< errMsg);
     }
     return 0;
   }
@@ -230,7 +224,7 @@ public:
     {
       return VLength;
     }
-    else if (b->Size() != VLength)
+    if (b->Size() != VLength)
     {
       itkGenericExceptionMacro(<< errMsg);
     }
@@ -245,12 +239,9 @@ public:
     {
       return VLength;
     }
-    if (!b.empty())
+    if (b.size() != VLength)
     {
-      if (b.size() != VLength)
-      {
-        itkGenericExceptionMacro(<< errMsg);
-      }
+      itkGenericExceptionMacro(<< errMsg);
     }
     return 0;
   }
@@ -263,7 +254,7 @@ public:
     {
       return VLength;
     }
-    else if (b->size() != VLength)
+    if (b->size() != VLength)
     {
       itkGenericExceptionMacro(<< errMsg);
     }
@@ -278,7 +269,7 @@ public:
     {
       return VLength;
     }
-    else if (l != VLength)
+    if (l != VLength)
     {
       itkGenericExceptionMacro(<< errMsg);
     }
@@ -293,7 +284,7 @@ public:
     {
       return VLength;
     }
-    else if (l != VLength)
+    if (l != VLength)
     {
       itkGenericExceptionMacro(<< errMsg);
     }
@@ -410,7 +401,6 @@ public:
 };
 
 /** \class MeasurementVectorTraitsTypes
- * \brief
  * \ingroup Statistics
  * \ingroup ITKStatistics
  */
@@ -538,7 +528,7 @@ public:
 
 /// \endcond
 
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics
+
 
 #endif // itkMeasurementVectorTraits_h

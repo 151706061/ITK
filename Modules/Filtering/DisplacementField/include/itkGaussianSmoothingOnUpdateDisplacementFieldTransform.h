@@ -55,7 +55,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianSmoothingOnUpdateDisplacementFieldTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -75,16 +75,18 @@ public:
    * Get/Set the Gaussian smoothing standard deviation for the update field.
    * Default = 1.75.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheUpdateField, ScalarType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheUpdateField, ScalarType);
-
+  /** @ITKEndGrouping */
   /**
    * Get/Set the Gaussian smoothing standard deviation for the total field.
    * Default = 0.5.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheTotalField, ScalarType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheTotalField, ScalarType);
-
+  /** @ITKEndGrouping */
   /** Update the transform's parameters by the values in \c update.
    * We assume \c update is of the same length as Parameters. Throw
    * exception otherwise.
@@ -110,7 +112,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Clone the current transform */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
   /** Used in GaussianSmoothDisplacementField as variance for the

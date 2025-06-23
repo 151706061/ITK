@@ -37,7 +37,7 @@ template <typename TProbe>
 void
 ResourceProbesCollectorBase<TProbe>::Stop(const char * id)
 {
-  IdType tid = id;
+  const IdType tid = id;
 
   auto pos = this->m_Probes.find(tid);
   if (pos == this->m_Probes.end())
@@ -52,7 +52,7 @@ template <typename TProbe>
 const TProbe &
 ResourceProbesCollectorBase<TProbe>::GetProbe(const char * id) const
 {
-  IdType tid = id;
+  const IdType tid = id;
 
   auto pos = this->m_Probes.find(tid);
   if (pos == this->m_Probes.end())
@@ -67,8 +67,8 @@ template <typename TProbe>
 void
 ResourceProbesCollectorBase<TProbe>::Report(std::ostream & os, bool printSystemInfo, bool printReportHead, bool useTabs)
 {
-  auto                             probe = this->m_Probes.begin();
-  typename MapType::const_iterator end = this->m_Probes.end();
+  auto       probe = this->m_Probes.begin();
+  const auto end = this->m_Probes.end();
 
   if (probe == end)
   {
@@ -122,8 +122,8 @@ ResourceProbesCollectorBase<TProbe>::ExpandedReport(std::ostream & os,
                                                     bool           printReportHead,
                                                     bool           useTabs)
 {
-  auto                             probe = this->m_Probes.begin();
-  typename MapType::const_iterator end = this->m_Probes.end();
+  auto       probe = this->m_Probes.begin();
+  const auto end = this->m_Probes.end();
 
   if (probe == end)
   {
@@ -174,23 +174,23 @@ template <typename TProbe>
 void
 ResourceProbesCollectorBase<TProbe>::JSONReport(std::ostream & os, bool printSystemInfo)
 {
-  auto                             probe = this->m_Probes.begin();
-  typename MapType::const_iterator end = this->m_Probes.end();
+  auto       probe = this->m_Probes.begin();
+  const auto end = this->m_Probes.end();
 
   if (probe == end)
   {
-    os << "{ \"Status\": \"No probes have been created\" }" << std::endl;
+    os << R"({ "Status": "No probes have been created" })" << std::endl;
     return;
   }
 
   os << "{\n";
   if (printSystemInfo)
   {
-    os << "  \"SystemInformation\": ";
+    os << R"(  "SystemInformation": )";
     probe->second.PrintJSONSystemInformation(os);
     os << ",\n";
   }
-  os << "  \"Probes\": [\n";
+  os << R"(  "Probes": [)" << "\n";
   bool firstProbe = true;
   while (probe != end)
   {
@@ -220,7 +220,7 @@ ResourceProbesCollectorBase<TProbe>::JSONReport(const char * name, std::ostream 
   auto pos = this->m_Probes.find(tid);
   if (pos == this->m_Probes.end())
   {
-    os << "  { \"ProbeName\": \"" << name << "\", \"Status\": \"Does not exist!\" }" << std::endl;
+    os << R"(  { "ProbeName": ")" << name << R"(", "Status": "Does not exist!" })" << std::endl;
     return;
   }
 

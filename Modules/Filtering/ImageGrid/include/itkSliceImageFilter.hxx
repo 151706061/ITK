@@ -63,9 +63,8 @@ template <class TInputImage, class TOutputImage>
 void
 SliceImageFilter<TInputImage, TOutputImage>::SetStart(typename TInputImage::IndexType::IndexValueType start)
 {
-  unsigned int j;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     if (start != m_Start[j])
     {
@@ -81,9 +80,8 @@ template <class TInputImage, class TOutputImage>
 void
 SliceImageFilter<TInputImage, TOutputImage>::SetStop(typename TInputImage::IndexType::IndexValueType stop)
 {
-  unsigned int j;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     if (stop != m_Stop[j])
     {
@@ -99,9 +97,8 @@ template <class TInputImage, class TOutputImage>
 void
 SliceImageFilter<TInputImage, TOutputImage>::SetStep(int step)
 {
-  unsigned int j;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     if (step != m_Step[j])
     {
@@ -118,8 +115,8 @@ void
 SliceImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  InputImageConstPointer inputPtr = this->GetInput();
-  OutputImagePointer     outputPtr = this->GetOutput();
+  const InputImageConstPointer inputPtr = this->GetInput();
+  const OutputImagePointer     outputPtr = this->GetOutput();
 
   TotalProgressReporter progress(this, outputPtr->GetRequestedRegion().GetNumberOfPixels());
 
@@ -163,8 +160,8 @@ SliceImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
 
 
   // Get pointers to the input and output
-  InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
-  OutputImagePointer outputPtr = this->GetOutput();
+  const InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   const typename TOutputImage::SizeType &  outputRequestedRegionSize = outputPtr->GetRequestedRegion().GetSize();
   const typename TOutputImage::IndexType & outputRequestedRegionStartIndex = outputPtr->GetRequestedRegion().GetIndex();
@@ -182,8 +179,7 @@ SliceImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   }
 
 
-  typename TInputImage::SizeType inputRequestedRegionSize;
-  inputRequestedRegionSize.Fill(0);
+  typename TInputImage::SizeType inputRequestedRegionSize{};
   for (unsigned int i = 0; i < TInputImage::ImageDimension; ++i)
   {
     if (outputRequestedRegionSize[i] > 0)
@@ -227,8 +223,8 @@ SliceImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
   Superclass::GenerateOutputInformation();
 
   // Get pointers to the input and output
-  InputImageConstPointer inputPtr = this->GetInput();
-  OutputImagePointer     outputPtr = this->GetOutput();
+  const InputImageConstPointer inputPtr = this->GetInput();
+  const OutputImagePointer     outputPtr = this->GetOutput();
 
   // Compute the output spacing, the output image size, and the
   // output image start index
@@ -245,14 +241,14 @@ SliceImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
     outputSpacing[i] = inputSpacing[i] * itk::Math::abs(m_Step[i]);
 
     // clamp start, inclusive start interval
-    IndexValueType start =
+    const IndexValueType start =
       std::clamp(m_Start[i],
                  inputIndex[i] - static_cast<int>(m_Step[i] < 0),
                  static_cast<IndexValueType>(inputIndex[i] + inputSize[i]) - static_cast<int>(m_Step[i] < 0));
 
     // clamp stop as open interval
     // Based on the sign of the step include 1 after the end.
-    IndexValueType stop =
+    const IndexValueType stop =
       std::clamp(m_Stop[i],
                  inputIndex[i] - static_cast<int>(m_Step[i] < 0),
                  static_cast<IndexValueType>(inputIndex[i] + inputSize[i]) - static_cast<int>(m_Step[i] < 0));
@@ -302,7 +298,7 @@ SliceImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
 
 template <class TInputImage, class TOutputImage>
 void
-SliceImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() ITKv5_CONST
+SliceImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() const
 {
 
   Superclass::VerifyInputInformation();

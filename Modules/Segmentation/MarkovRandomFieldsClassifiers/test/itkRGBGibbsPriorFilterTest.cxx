@@ -87,10 +87,9 @@ itkRGBGibbsPriorFilterTest(int, char *[])
 
   using VecImagePixelType = VecImageType::PixelType;
 
-  VecImageType::SizeType vecImgSize = { { ImageWidth, ImageHeight, NumFrames } };
+  constexpr VecImageType::SizeType vecImgSize = { { ImageWidth, ImageHeight, NumFrames } };
 
-  VecImageType::IndexType index;
-  index.Fill(0);
+  constexpr VecImageType::IndexType index{};
 
   VecImageType::RegionType region;
 
@@ -136,10 +135,9 @@ itkRGBGibbsPriorFilterTest(int, char *[])
   using ClassImageType = itk::Image<unsigned short, ImageDimension>;
   auto classImage = ClassImageType::New();
 
-  ClassImageType::SizeType classImgSize = { { ImageWidth, ImageHeight, NumFrames } };
+  constexpr ClassImageType::SizeType classImgSize = { { ImageWidth, ImageHeight, NumFrames } };
 
-  ClassImageType::IndexType classindex;
-  classindex.Fill(0);
+  constexpr ClassImageType::IndexType classindex{};
 
   ClassImageType::RegionType classregion;
 
@@ -238,12 +236,12 @@ itkRGBGibbsPriorFilterTest(int, char *[])
   using ClassifierType = itk::ImageClassifierBase<VecImageType, ClassImageType>;
 
   using ClassifierPointer = ClassifierType::Pointer;
-  ClassifierPointer myClassifier = ClassifierType::New();
+  const ClassifierPointer myClassifier = ClassifierType::New();
   // Set the Classifier parameters
   myClassifier->SetNumberOfClasses(NumClasses);
 
   // Set the decision rule
-  myClassifier->SetDecisionRule((DecisionRuleBasePointer)myDecisionRule);
+  myClassifier->SetDecisionRule(DecisionRuleBasePointer(myDecisionRule));
 
   // Add the membership functions
   for (unsigned int ii = 0; ii < NumClasses; ++ii)
@@ -270,45 +268,45 @@ itkRGBGibbsPriorFilterTest(int, char *[])
 
   //  applyGibbsImageFilter->SetErrorTolerance(0.00);
 
-  unsigned int clusterSize = 10;
+  constexpr unsigned int clusterSize = 10;
   applyGibbsImageFilter->SetClusterSize(clusterSize);
   ITK_TEST_SET_GET_VALUE(clusterSize, applyGibbsImageFilter->GetClusterSize());
 
-  unsigned int boundaryGradient = 6;
+  constexpr unsigned int boundaryGradient = 6;
   applyGibbsImageFilter->SetBoundaryGradient(boundaryGradient);
   ITK_TEST_SET_GET_VALUE(boundaryGradient, applyGibbsImageFilter->GetBoundaryGradient());
 
-  unsigned int objectLabel = 1;
+  constexpr unsigned int objectLabel = 1;
   applyGibbsImageFilter->SetObjectLabel(objectLabel);
   ITK_TEST_SET_GET_VALUE(objectLabel, applyGibbsImageFilter->GetObjectLabel());
 
-  GibbsPriorFilterType::IndexType startPoint{};
+  constexpr GibbsPriorFilterType::IndexType startPoint{};
   applyGibbsImageFilter->SetStartPoint(startPoint);
   ITK_TEST_SET_GET_VALUE(startPoint, applyGibbsImageFilter->GetStartPoint());
 
   // applyGibbsImageFilter->SetRecursiveNumber(1);
 
-  double cliqueWeight1 = 5.0;
+  constexpr double cliqueWeight1 = 5.0;
   applyGibbsImageFilter->SetCliqueWeight_1(cliqueWeight1);
   ITK_TEST_SET_GET_VALUE(cliqueWeight1, applyGibbsImageFilter->GetCliqueWeight_1());
 
-  double cliqueWeight2 = 5.0;
+  constexpr double cliqueWeight2 = 5.0;
   applyGibbsImageFilter->SetCliqueWeight_2(cliqueWeight2);
   ITK_TEST_SET_GET_VALUE(cliqueWeight2, applyGibbsImageFilter->GetCliqueWeight_2());
 
-  double cliqueWeight3 = 5.0;
+  constexpr double cliqueWeight3 = 5.0;
   applyGibbsImageFilter->SetCliqueWeight_3(cliqueWeight3);
   ITK_TEST_SET_GET_VALUE(cliqueWeight3, applyGibbsImageFilter->GetCliqueWeight_3());
 
-  double cliqueWeight4 = 5.0;
+  constexpr double cliqueWeight4 = 5.0;
   applyGibbsImageFilter->SetCliqueWeight_4(cliqueWeight4);
   ITK_TEST_SET_GET_VALUE(cliqueWeight4, applyGibbsImageFilter->GetCliqueWeight_4());
 
-  double cliqueWeight5 = 5.0;
+  constexpr double cliqueWeight5 = 5.0;
   applyGibbsImageFilter->SetCliqueWeight_5(cliqueWeight5);
   ITK_TEST_SET_GET_VALUE(cliqueWeight5, applyGibbsImageFilter->GetCliqueWeight_5());
 
-  double cliqueWeight6 = 0.0;
+  constexpr double cliqueWeight6 = 0.0;
   applyGibbsImageFilter->SetCliqueWeight_6(cliqueWeight6);
   ITK_TEST_SET_GET_VALUE(cliqueWeight6, applyGibbsImageFilter->GetCliqueWeight_6());
 
@@ -326,7 +324,7 @@ itkRGBGibbsPriorFilterTest(int, char *[])
   // Kick off the Gibbs labeller function
   applyGibbsImageFilter->Update();
 
-  ClassImageType::Pointer outClassImage = applyGibbsImageFilter->GetOutput();
+  const ClassImageType::Pointer outClassImage = applyGibbsImageFilter->GetOutput();
 
   // Print the mrf labelled image
   ClassImageIterator labeloutIt(outClassImage, outClassImage->GetBufferedRegion());
@@ -354,7 +352,6 @@ itkRGBGibbsPriorFilterTest(int, char *[])
   //  fclose(output);
   // Verify if the results were as per expectation
 
-  bool passTest;
   /*  int j = 0;
     i = 0;
     labeloutIt.GoToBegin();
@@ -367,16 +364,13 @@ itkRGBGibbsPriorFilterTest(int, char *[])
     ++labeloutIt;
     }
   */
-  passTest = ((j1 > 285) && (j1 < 315));
-  if (passTest)
-  {
-    std::cout << "Gibbs Prior Test Passed" << std::endl;
-  }
-  else
+
+  const bool passTest = ((j1 > 285) && (j1 < 315));
+  if (!passTest)
   {
     std::cout << "Gibbs Prior Test failed" << std::endl;
     return EXIT_FAILURE;
   }
-
+  std::cout << "Gibbs Prior Test Passed" << std::endl;
   return EXIT_SUCCESS;
 }

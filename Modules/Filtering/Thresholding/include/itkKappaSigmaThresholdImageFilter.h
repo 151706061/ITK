@@ -36,7 +36,7 @@ namespace itk
  * \author Gaetan Lehmann
  *
  * \note This class was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/132
+ * https://doi.org/10.54294/39qekn
  *
  * \sa KappaSigmaThresholdImageCalculator
  * \ingroup IntensityImageFilters
@@ -60,7 +60,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KappaSigmaThresholdImageFilter);
 
   /** Standard image type within this class. */
@@ -96,23 +96,22 @@ public:
 
   /** Set the mask value used to select which pixels will be considered in the
    * threshold computation (optional, only in case a MaskImage is set). */
+  /** @ITKStartGrouping */
   itkSetMacro(MaskValue, MaskPixelType);
   itkGetConstMacro(MaskValue, MaskPixelType);
-
+  /** @ITKEndGrouping */
   /** Set the Sigma multiplier (Kappa) to adjust the pixel rejection rate. */
+  /** @ITKStartGrouping */
   itkSetMacro(SigmaFactor, double);
   itkGetConstMacro(SigmaFactor, double);
-
+  /** @ITKEndGrouping */
   /** Set the number of rejection passes. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetConstMacro(NumberOfIterations, unsigned int);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputComparableCheck, (Concept::Comparable<OutputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
   /** Set the mask image */
   void

@@ -51,8 +51,7 @@ LaplacianSharpeningImageFilter<TInputImage, TOutputImage>::GenerateData()
 
   // Calculate the needed input image statistics
 
-  typename StatisticsImageFilter<InputImageType>::Pointer inputCalculator =
-    StatisticsImageFilter<InputImageType>::New();
+  auto inputCalculator = StatisticsImageFilter<InputImageType>::New();
 
   inputCalculator->SetInput(localInput);
   inputCalculator->Update();
@@ -110,8 +109,8 @@ LaplacianSharpeningImageFilter<TInputImage, TOutputImage>::GenerateData()
   filteredMinMaxFilter->SetInput(laplacianFilter->GetOutput());
   filteredMinMaxFilter->Update();
 
-  RealType filteredShift = static_cast<RealType>(filteredMinMaxFilter->GetMinimum());
-  RealType filteredScale = static_cast<RealType>(filteredMinMaxFilter->GetMaximum()) - filteredShift;
+  const auto     filteredShift = static_cast<RealType>(filteredMinMaxFilter->GetMinimum());
+  const RealType filteredScale = static_cast<RealType>(filteredMinMaxFilter->GetMaximum()) - filteredShift;
   filteredMinMaxFilter = nullptr;
 
   // Combine the input image and the laplacian image
@@ -129,8 +128,7 @@ LaplacianSharpeningImageFilter<TInputImage, TOutputImage>::GenerateData()
   binaryFilter->Update();
 
   // Calculate needed combined image statistics
-  typename StatisticsImageFilter<RealImageType>::Pointer enhancedCalculator =
-    StatisticsImageFilter<RealImageType>::New();
+  auto enhancedCalculator = StatisticsImageFilter<RealImageType>::New();
 
   enhancedCalculator->SetInput(binaryFilter->GetOutput());
   enhancedCalculator->Update();
@@ -161,7 +159,7 @@ LaplacianSharpeningImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostrea
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
 }
 
 } // end namespace itk

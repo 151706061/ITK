@@ -52,9 +52,9 @@ itkFastMarchingTest2(int, char *[])
 
   auto marcher = FloatFMType::New();
 
-  ShowProgressObject                                    progressWatch(marcher);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(marcher);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   marcher->AddObserver(itk::ProgressEvent(), command);
 
@@ -66,10 +66,9 @@ itkFastMarchingTest2(int, char *[])
 
   NodeType node;
 
-  FloatImage::OffsetType offset0 = { { 28, 35 } };
+  constexpr FloatImage::OffsetType offset0 = { { 28, 35 } };
 
-  itk::Index<2> index;
-  index.Fill(0);
+  itk::Index<2> index{};
 
   node.SetValue(0.0);
   node.SetIndex(index + offset0);
@@ -118,7 +117,7 @@ itkFastMarchingTest2(int, char *[])
   marcher->SetTrialPoints(trialPoints);
 
   // specify the size of the output image
-  FloatImage::SizeType size = { { 64, 64 } };
+  constexpr FloatImage::SizeType size = { { 64, 64 } };
   marcher->SetOutputSize(size);
 
   // setup a speed image of ones
@@ -169,7 +168,7 @@ itkFastMarchingTest2(int, char *[])
 
 
   // check the results
-  FloatImage::Pointer                  output = marcher->GetOutput();
+  const FloatImage::Pointer            output = marcher->GetOutput();
   itk::ImageRegionIterator<FloatImage> iterator(output, output->GetBufferedRegion());
 
   bool passed = true;
@@ -219,9 +218,7 @@ itkFastMarchingTest2(int, char *[])
     std::cout << "Fast Marching test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Fast Marching test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Fast Marching test failed" << std::endl;
+  return EXIT_FAILURE;
 }

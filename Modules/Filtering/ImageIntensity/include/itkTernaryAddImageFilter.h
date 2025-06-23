@@ -57,7 +57,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TernaryAddImageFilter);
 
 protected:
@@ -67,7 +67,7 @@ protected:
     Superclass::SetFunctor(FunctorType());
 #endif
   }
-  virtual ~TernaryAddImageFilter() = default;
+  ~TernaryAddImageFilter() override = default;
 };
 } // end namespace itk
 

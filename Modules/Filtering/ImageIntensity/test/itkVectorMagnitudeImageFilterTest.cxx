@@ -31,13 +31,11 @@ itkVectorMagnitudeImageFilterTest(int, char *[])
   using FloatImageType = itk::Image<float, 2>;
 
   // Define the size start index of the image
-  VectorImageType::SizeType size;
-  size.Fill(3);
+  auto size = VectorImageType::SizeType::Filled(3);
 
-  VectorImageType::IndexType start;
-  start.Fill(0);
+  constexpr VectorImageType::IndexType start{};
 
-  VectorImageType::RegionType region(start, size);
+  const VectorImageType::RegionType region(start, size);
 
   // Construct an image
   auto image = VectorImageType::New();
@@ -80,7 +78,7 @@ itkVectorMagnitudeImageFilterTest(int, char *[])
   }
 
   // Get the filter output
-  FloatImageType::Pointer outputImage = magnitude->GetOutput();
+  const FloatImageType::Pointer outputImage = magnitude->GetOutput();
 
   // Declare Iterator type for the output image
   using myOutputIteratorType = itk::ImageRegionIterator<FloatImageType>;

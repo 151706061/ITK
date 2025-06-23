@@ -18,19 +18,15 @@
 #ifndef itkSubsamplerBase_hxx
 #define itkSubsamplerBase_hxx
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 template <typename TSample>
 SubsamplerBase<TSample>::SubsamplerBase()
-{
-  m_Sample = nullptr;
-  m_RequestMaximumNumberOfResults = true;
-  m_CanSelectQuery = true;
-  m_Seed = 0;
-}
+  : m_Sample(nullptr)
+  , m_RequestMaximumNumberOfResults(true)
+  , m_CanSelectQuery(true)
+{}
 
 template <typename TSample>
 typename LightObject::Pointer
@@ -38,7 +34,7 @@ SubsamplerBase<TSample>::InternalClone() const
 {
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
@@ -72,7 +68,6 @@ SubsamplerBase<TSample>::PrintSelf(std::ostream & os, Indent indent) const
   os << std::endl;
 }
 
-} // end namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #endif

@@ -77,7 +77,7 @@ public:
   using MapStorageType = InformationValueType;
   using MapType = std::map<MapKeyType, MapStorageType>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BuildInformation);
 
   /** Returns the global instance */
@@ -85,6 +85,7 @@ public:
   New();
 
   /** Returns the global singleton instance of the BuildInformation */
+  /** @ITKStartGrouping */
   static Pointer
   GetInstance();
   static const MapType &
@@ -95,7 +96,7 @@ public:
   GetDescription(const MapKeyType &);
   static const std::vector<MapKeyType>
   GetAllKeys();
-
+  /** @ITKEndGrouping */
 private:
   BuildInformation();
 

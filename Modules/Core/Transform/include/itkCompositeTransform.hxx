@@ -27,7 +27,7 @@ auto
 CompositeTransform<TParametersValueType, VDimension>::GetTransformCategory() const -> TransformCategoryEnum
 {
   // Check if linear
-  bool isLinearTransform = this->IsLinear();
+  const bool isLinearTransform = this->IsLinear();
   if (isLinearTransform)
   {
     return Self::TransformCategoryEnum::Linear;
@@ -49,10 +49,8 @@ CompositeTransform<TParametersValueType, VDimension>::GetTransformCategory() con
   {
     return Self::TransformCategoryEnum::DisplacementField;
   }
-  else
-  {
-    return Self::TransformCategoryEnum::UnknownTransformCategory;
-  }
+
+  return Self::TransformCategoryEnum::UnknownTransformCategory;
 }
 
 
@@ -410,32 +408,28 @@ template <typename TParametersValueType, unsigned int VDimension>
 bool
 CompositeTransform<TParametersValueType, VDimension>::GetInverse(Self * inverse) const
 {
-  typename TransformQueueType::const_iterator it;
-
   // NOTE: CompositeTransform delegates to
   //      individual transform for setting FixedParameters
   //      inverse->SetFixedParameters( this->GetFixedParameters() );
   inverse->ClearTransformQueue();
-  for (it = this->m_TransformQueue.begin(); it != this->m_TransformQueue.end(); ++it)
+  for (auto it = this->m_TransformQueue.begin(); it != this->m_TransformQueue.end(); ++it)
   {
-    TransformTypePointer inverseTransform = ((*it)->GetInverseTransform()).GetPointer();
+    const TransformTypePointer inverseTransform = ((*it)->GetInverseTransform()).GetPointer();
     if (!inverseTransform)
     {
       inverse->ClearTransformQueue();
       return false;
     }
-    else
-    {
-      /* Push to front to reverse the transform order */
-      inverse->PushFrontTransform(inverseTransform);
-    }
+
+    /* Push to front to reverse the transform order */
+    inverse->PushFrontTransform(inverseTransform);
   }
 
   /* Copy the optimization flags */
   inverse->m_TransformsToOptimizeFlags.clear();
-  for (auto ofit = this->m_TransformsToOptimizeFlags.begin(); ofit != this->m_TransformsToOptimizeFlags.end(); ++ofit)
+  for (const bool m_TransformsToOptimizeFlag : this->m_TransformsToOptimizeFlags)
   {
-    inverse->m_TransformsToOptimizeFlags.push_front(*ofit);
+    inverse->m_TransformsToOptimizeFlags.push_front(m_TransformsToOptimizeFlag);
   }
 
   return true;
@@ -446,17 +440,7 @@ template <typename TParametersValueType, unsigned int VDimension>
 auto
 CompositeTransform<TParametersValueType, VDimension>::GetInverseTransform() const -> InverseTransformBasePointer
 {
-  /* This method can't be defined in Superclass because of the call to New() */
-  Pointer inverseTransform = New();
-
-  if (this->GetInverse(inverseTransform))
-  {
-    return inverseTransform.GetPointer();
-  }
-  else
-  {
-    return nullptr;
-  }
+  return Superclass::InvertTransform(*this);
 }
 
 
@@ -843,7 +827,7 @@ CompositeTransform<TParametersValueType, VDimension>::UpdateTransformParameters(
    * functor to return whether or not it does threading. If all sub-transforms
    * return that they don't thread, we could do each sub-transform in its
    * own thread from here. */
-  NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
+  const NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
 
   if (update.Size() != numberOfParameters)
   {
@@ -961,15 +945,14 @@ CompositeTransform<TParametersValueType, VDimension>::PrintSelf(std::ostream & o
   Superclass::PrintSelf(os, indent);
 
   os << indent << "TransformsToOptimizeFlags: " << std::endl << indent << indent;
-  for (auto it = m_TransformsToOptimizeFlags.begin(); it != m_TransformsToOptimizeFlags.end(); ++it)
+  for (const bool m_TransformsToOptimizeFlag : m_TransformsToOptimizeFlags)
   {
-    os << indent.GetNextIndent() << *it << ' ';
+    os << indent.GetNextIndent() << m_TransformsToOptimizeFlag << ' ';
   }
   os << std::endl;
 
   os << indent << "TransformsToOptimizeQueue: " << std::endl;
-  typename TransformQueueType::const_iterator cit;
-  for (cit = m_TransformsToOptimizeQueue.begin(); cit != m_TransformsToOptimizeQueue.end(); ++cit)
+  for (auto cit = m_TransformsToOptimizeQueue.begin(); cit != m_TransformsToOptimizeQueue.end(); ++cit)
   {
     (*cit)->Print(os, indent.GetNextIndent());
     os << std::endl;
@@ -989,8 +972,8 @@ CompositeTransform<TParametersValueType, VDimension>::InternalClone() const
   // TODO: is it really the right behavior?
   // LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  LightObject::Pointer   loPtr = CreateAnother();
-  typename Self::Pointer clone = dynamic_cast<Self *>(loPtr.GetPointer());
+  LightObject::Pointer         loPtr = CreateAnother();
+  const typename Self::Pointer clone = dynamic_cast<Self *>(loPtr.GetPointer());
   if (clone.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");

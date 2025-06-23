@@ -33,9 +33,9 @@ itkGradientRecursiveGaussianFilterTest4(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  std::string inFileName = argv[1];
+  const std::string inFileName = argv[1];
 
-  std::string outFileName = argv[2];
+  const std::string outFileName = argv[2];
 
   // Define the dimension of the images
   constexpr unsigned int myDimension = 2;
@@ -72,7 +72,6 @@ itkGradientRecursiveGaussianFilterTest4(int argc, char * argv[])
   writer->Update();
 
   // Test also that setting and getting sigma arrays is working
-  itk::FixedArray<DoubleType, 2> sigmas;
 
   if (filter->GetSigma() != 2.5)
   {
@@ -81,7 +80,7 @@ itkGradientRecursiveGaussianFilterTest4(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  sigmas = filter->GetSigmaArray();
+  itk::FixedArray<DoubleType, 2> sigmas = filter->GetSigmaArray();
   if (sigmas[0] != 2.5 || sigmas[1] != 2.5)
   {
     std::cerr << "Exception detected: wrong sigma array after SetSigma" << std::endl;

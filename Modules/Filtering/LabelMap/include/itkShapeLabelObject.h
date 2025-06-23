@@ -34,7 +34,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \ingroup DataRepresentation
  * \ingroup ITKLabelMap
@@ -56,7 +56,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapeLabelObject);
 
   using LabelMapType = LabelMap<Self>;
@@ -167,7 +167,7 @@ public:
     {
       return NUMBER_OF_PIXELS;
     }
-    else if (s == "PhysicalSize")
+    if (s == "PhysicalSize")
     {
       return PHYSICAL_SIZE;
     }
@@ -345,7 +345,7 @@ public:
     m_BoundingBox = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetPhysicalSize() const
   {
     return m_PhysicalSize;
@@ -357,7 +357,7 @@ public:
     m_PhysicalSize = v;
   }
 
-  const SizeValueType &
+  [[nodiscard]] const SizeValueType &
   GetNumberOfPixels() const
   {
     return m_NumberOfPixels;
@@ -381,7 +381,7 @@ public:
     m_Centroid = centroid;
   }
 
-  const SizeValueType &
+  [[nodiscard]] const SizeValueType &
   GetNumberOfPixelsOnBorder() const
   {
     return m_NumberOfPixelsOnBorder;
@@ -393,7 +393,7 @@ public:
     m_NumberOfPixelsOnBorder = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetPerimeterOnBorder() const
   {
     return m_PerimeterOnBorder;
@@ -405,7 +405,7 @@ public:
     m_PerimeterOnBorder = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetFeretDiameter() const
   {
     return m_FeretDiameter;
@@ -441,7 +441,7 @@ public:
     m_PrincipalAxes = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetElongation() const
   {
     return m_Elongation;
@@ -453,7 +453,7 @@ public:
     m_Elongation = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetPerimeter() const
   {
     return m_Perimeter;
@@ -465,7 +465,7 @@ public:
     m_Perimeter = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetRoundness() const
   {
     return m_Roundness;
@@ -477,7 +477,7 @@ public:
     m_Roundness = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetEquivalentSphericalRadius() const
   {
     return m_EquivalentSphericalRadius;
@@ -489,7 +489,7 @@ public:
     m_EquivalentSphericalRadius = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetEquivalentSphericalPerimeter() const
   {
     return m_EquivalentSphericalPerimeter;
@@ -513,7 +513,7 @@ public:
     m_EquivalentEllipsoidDiameter = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetFlatness() const
   {
     return m_Flatness;
@@ -525,7 +525,7 @@ public:
     m_Flatness = v;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetPerimeterOnBorderRatio() const
   {
     return m_PerimeterOnBorderRatio;
@@ -669,7 +669,7 @@ public:
       }
     }
 
-    AffineTransformPointer result = AffineTransformType::New();
+    const AffineTransformPointer result = AffineTransformType::New();
     result->SetMatrix(matrix);
     result->SetOffset(offset);
 
@@ -717,23 +717,12 @@ public:
 
 protected:
   ShapeLabelObject()
+
   {
-    m_NumberOfPixels = 0;
-    m_PhysicalSize = 0;
     m_Centroid.Fill(0);
-    m_NumberOfPixelsOnBorder = 0;
-    m_PerimeterOnBorder = 0;
-    m_FeretDiameter = 0;
     m_PrincipalMoments.Fill(0);
     m_PrincipalAxes.Fill(0);
-    m_Elongation = 0;
-    m_Perimeter = 0;
-    m_Roundness = 0;
-    m_EquivalentSphericalRadius = 0;
-    m_EquivalentSphericalPerimeter = 0;
     m_EquivalentEllipsoidDiameter.Fill(0);
-    m_Flatness = 0;
-    m_PerimeterOnBorderRatio = 0;
     m_OrientedBoundingBoxSize.Fill(0);
     m_OrientedBoundingBoxOrigin.Fill(0);
   }

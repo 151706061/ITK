@@ -25,10 +25,9 @@ namespace itk
 // ---------------------------------------------------------------------
 template <typename TCellInterface>
 QuadEdgeMeshLineCell<TCellInterface>::QuadEdgeMeshLineCell()
+  : m_Identifier(0)
+  , m_QuadEdgeGeom(new QEType)
 {
-  m_Identifier = 0;
-  m_QuadEdgeGeom = new QEType;
-
   auto * e2 = new QEType;
   auto * e1 = new QEDual;
   auto * e3 = new QEDual;
@@ -107,7 +106,7 @@ void
 QuadEdgeMeshLineCell<TCellInterface>::Accept(CellIdentifier cellId, MultiVisitor * mv)
 {
   using IntVis = CellInterfaceVisitor<PixelType, CellTraits>;
-  typename IntVis::Pointer v = mv->GetVisitor(this->GetType());
+  const typename IntVis::Pointer v = mv->GetVisitor(this->GetType());
   if (v)
   {
     v->VisitFromCell(cellId, this);
@@ -135,14 +134,11 @@ QuadEdgeMeshLineCell<TCellInterface>::GetNumberOfBoundaryFeatures(int dimension)
 // ---------------------------------------------------------------------
 template <typename TCellInterface>
 bool
-QuadEdgeMeshLineCell<TCellInterface>::GetBoundaryFeature(int                   dimension,
-                                                         CellFeatureIdentifier cellId,
-                                                         CellAutoPointer &     cell)
+QuadEdgeMeshLineCell<TCellInterface>::GetBoundaryFeature(int                   itkNotUsed(dimension),
+                                                         CellFeatureIdentifier itkNotUsed(cellId),
+                                                         CellAutoPointer &     itkNotUsed(cell))
 {
   // TODO : FIXME
-  (void)dimension;
-  (void)cellId;
-  (void)cell;
   return (false);
 }
 
@@ -173,9 +169,8 @@ QuadEdgeMeshLineCell<TCellInterface>::InternalSetPointIds(PointIdInternalConstIt
 // ---------------------------------------------------------------------
 template <typename TCellInterface>
 void
-QuadEdgeMeshLineCell<TCellInterface>::SetPointIds(PointIdConstIterator first, PointIdConstIterator last)
+QuadEdgeMeshLineCell<TCellInterface>::SetPointIds(PointIdConstIterator first, PointIdConstIterator itkNotUsed(last))
 {
-  (void)last;
   this->GetQEGeom()->SetOrigin(*first);
   ++first;
   this->GetQEGeom()->SetDestination(*first);
@@ -185,9 +180,8 @@ QuadEdgeMeshLineCell<TCellInterface>::SetPointIds(PointIdConstIterator first, Po
 template <typename TCellInterface>
 void
 QuadEdgeMeshLineCell<TCellInterface>::InternalSetPointIds(PointIdInternalConstIterator first,
-                                                          PointIdInternalConstIterator last)
+                                                          PointIdInternalConstIterator itkNotUsed(last))
 {
-  (void)last;
   this->GetQEGeom()->SetOrigin(*first);
   ++first;
   this->GetQEGeom()->SetDestination(*first);
@@ -279,7 +273,7 @@ template <typename TCellInterface>
 unsigned int
 QuadEdgeMeshLineCell<TCellInterface>::GetDimension() const
 {
-  return static_cast<unsigned int>(Self::CellDimension);
+  return CellDimension;
 }
 
 // ---------------------------------------------------------------------

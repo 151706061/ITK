@@ -64,13 +64,14 @@ QuadEdgeMeshEulerOperatorDeleteCenterVertexFunction<TMesh, TQEType>::Evaluate(QE
   // that are incident to g->GetDestination().(This prevents the operation
   // from collapsing a volume into two facets glued together with opposite
   // orientations, such as would happen with any vertex of a tetrahedron.)
-  PointIdentifier PointId1, PointId2;
+  PointIdentifier PointId1;
   PointId1 = pList.back();
   pList.pop_back();
+  PointIdentifier PointId2;
   PointId2 = pList.back();
   pList.pop_back();
-  FaceRefType FirstFace = this->m_Mesh->FindEdge(PointId1, PointId2)->GetLeft();
-  bool        SecondFaceFound = false;
+  const FaceRefType FirstFace = this->m_Mesh->FindEdge(PointId1, PointId2)->GetLeft();
+  bool              SecondFaceFound = false;
   while ((pList.size()) && (!SecondFaceFound))
   {
     PointId1 = PointId2;
@@ -90,7 +91,6 @@ QuadEdgeMeshEulerOperatorDeleteCenterVertexFunction<TMesh, TQEType>::Evaluate(QE
 
   // let's do the job now.
   QEType * h = g->GetLprev();
-  QEType * temp;
   this->m_OldPointID = g->GetDestination();
   this->m_Mesh->LightWeightDeleteEdge(g);
   g = h->GetLnext();
@@ -102,7 +102,7 @@ QuadEdgeMeshEulerOperatorDeleteCenterVertexFunction<TMesh, TQEType>::Evaluate(QE
     }
     if (g != h)
     {
-      temp = g->GetLprev();
+      QEType * temp = g->GetLprev();
       this->m_Mesh->LightWeightDeleteEdge(g);
       g = temp;
     }

@@ -34,7 +34,7 @@ TestGaussianOperator(double variance, double error, unsigned int width, unsigned
 
   GaussianOp op;
 
-  const bool normalizeAcrossScale = false;
+  constexpr bool normalizeAcrossScale = false;
   ITK_TEST_SET_GET_BOOLEAN((&op), NormalizeAcrossScale, normalizeAcrossScale);
 
   op.SetVariance(variance);
@@ -54,12 +54,12 @@ TestGaussianOperator(double variance, double error, unsigned int width, unsigned
 
   op.CreateDirectional();
 
-  double total = std::accumulate(op.Begin(), op.End(), 0.0);
+  const double total = std::accumulate(op.Begin(), op.End(), 0.0);
   std::cout << "total: " << total << std::endl;
 
   std::cout.precision(16);
 
-  const double epsilon = itk::NumericTraits<double>::epsilon() * 32;
+  constexpr double epsilon = itk::NumericTraits<double>::epsilon() * 32;
   if (order == 0 && itk::Math::abs(total - 1.0) > epsilon)
   {
     std::cerr << "Test failed!" << std::endl;
@@ -103,22 +103,22 @@ itkGaussianDerivativeOperatorTest(int argc, char * argv[])
 
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope.
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   if (argc == 6)
   {
-    double       variance = std::stod(argv[1]);
-    double       error = std::stod(argv[2]);
-    unsigned int width = std::stoi(argv[3]);
-    unsigned int order = std::stoi(argv[4]);
-    double       spacing = std::stod(argv[5]);
+    const double       variance = std::stod(argv[1]);
+    const double       error = std::stod(argv[2]);
+    const unsigned int width = std::stoi(argv[3]);
+    const unsigned int order = std::stoi(argv[4]);
+    const double       spacing = std::stod(argv[5]);
 
     TestGaussianOperator(variance, error, width, order, spacing);
 
     std::cout << "Test finished." << std::endl;
     return EXIT_SUCCESS;
   }
-  else if (argc > 1)
+  if (argc > 1)
   {
     std::cerr << "Missing Parameters." << std::endl;
     std::cerr << "Usage: " << itkNameOfTestExecutableMacro(argv) << " [variance error width order spacing]"
@@ -140,12 +140,7 @@ itkGaussianDerivativeOperatorTest(int argc, char * argv[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS((&op1), GaussianDerivativeOperator, NeighborhoodOperator);
 
-  GaussianOp op2;
-
   // Check assignment
-  op2 = op1;
-
-
   bool testStatus = true;
 
   testStatus &= TestGaussianOperator(.2, .001, 30, 0, 1.0);
@@ -182,8 +177,6 @@ itkGaussianDerivativeOperatorTest(int argc, char * argv[])
   {
     return EXIT_SUCCESS;
   }
-  else
-  {
-    return EXIT_FAILURE;
-  }
+
+  return EXIT_FAILURE;
 }

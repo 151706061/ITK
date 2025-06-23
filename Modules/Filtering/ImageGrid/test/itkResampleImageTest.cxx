@@ -36,30 +36,26 @@ itkResampleImageTest(int, char *[])
   using ImagePointerType = ImageType::Pointer;
   using ImageRegionType = ImageType::RegionType;
   using ImageSizeType = ImageType::SizeType;
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
 
 
   // Create and configure an image
-  ImagePointerType image = ImageType::New();
-  ImageIndexType   index = { { 0, 0 } };
-  ImageSizeType    size = { { 18, 12 } };
-  ImageRegionType  region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImagePointerType  image = ImageType::New();
+  ImageIndexType          index = { { 0, 0 } };
+  constexpr ImageSizeType size = { { 18, 12 } };
+  const ImageRegionType   region{ index, size };
   image->SetLargestPossibleRegion(region);
   image->SetBufferedRegion(region);
   image->Allocate();
 
   // Fill image with a ramp
-  itk::ImageRegionIteratorWithIndex<ImageType> iter(image, region);
-  PixelType                                    value;
-  for (iter.GoToBegin(); !iter.IsAtEnd(); ++iter)
+  for (itk::ImageRegionIteratorWithIndex<ImageType> iter(image, region); !iter.IsAtEnd(); ++iter)
   {
     index = iter.GetIndex();
-    value = index[0] + index[1];
+    PixelType value = index[0] + index[1];
     iter.Set(value);
   }
 
@@ -72,7 +68,7 @@ itkResampleImageTest(int, char *[])
   interp->SetInputImage(image);
 
   // Create and configure a resampling filter
-  itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
+  const itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
     itk::ResampleImageFilter<ImageType, ImageType>::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(resample, ResampleImageFilter, ImageToImageFilter);
@@ -93,33 +89,19 @@ itkResampleImageTest(int, char *[])
   resample->SetOutputStartIndex(index);
   ITK_TEST_SET_GET_VALUE(index, resample->GetOutputStartIndex());
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
-  resample->SetOutputOrigin(origin);
-  ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
-
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-  resample->SetOutputSpacing(spacing);
-  ITK_TEST_SET_GET_VALUE(spacing, resample->GetOutputSpacing());
-
-
   // Run the resampling filter
   resample->Update();
 
   // Check if desired results were obtained
-  bool                  passed = true;
-  ImageType::RegionType region2;
-  region2 = resample->GetOutput()->GetRequestedRegion();
-  itk::ImageRegionIteratorWithIndex<ImageType> iter2(resample->GetOutput(), region2);
-  PixelType                                    pixval;
-  const double                                 tolerance = 1e-30;
-  for (iter2.GoToBegin(); !iter2.IsAtEnd(); ++iter2)
+  bool                        passed = true;
+  const ImageType::RegionType region2 = resample->GetOutput()->GetRequestedRegion();
+  constexpr double            tolerance = 1e-30;
+  for (itk::ImageRegionIteratorWithIndex<ImageType> iter2(resample->GetOutput(), region2); !iter2.IsAtEnd(); ++iter2)
   {
     index = iter2.GetIndex();
-    value = iter2.Get();
-    pixval = value;
-    auto expectedValue = static_cast<PixelType>((index[0] + index[1]) / 2.0);
+    PixelType       value = iter2.Get();
+    const PixelType pixval = value;
+    auto            expectedValue = static_cast<PixelType>((index[0] + index[1]) / 2.0);
     if (!itk::Math::FloatAlmostEqual(expectedValue, pixval, 10, tolerance))
     {
       std::cout << "Error in resampled image: Pixel " << index << "value    = " << value << "  "
@@ -128,6 +110,15 @@ itkResampleImageTest(int, char *[])
       passed = false;
     }
   }
+
+  // Test non-default values
+  constexpr auto origin = itk::MakeFilled<ImageType::PointType>(1234.0);
+  resample->SetOutputOrigin(origin);
+  ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
+
+  auto spacing = itk::MakeFilled<ImageType::SpacingType>(9876.0);
+  resample->SetOutputSpacing(spacing);
+  ITK_TEST_SET_GET_VALUE(spacing, resample->GetOutputSpacing());
 
   // Report success or failure
   if (!passed)

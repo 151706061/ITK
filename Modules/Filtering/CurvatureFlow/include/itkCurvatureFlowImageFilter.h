@@ -28,7 +28,7 @@ namespace itk
  * \brief Denoise an image using curvature driven flow.
  *
  * CurvatureFlowImageFilter implements a curvature driven image denoising
- * algorithm. Iso-brightness contours in the grayscale input image are viewed
+ * algorithm \cite sethian1999. Iso-brightness contours in the grayscale input image are viewed
  * as a level set. The level set is then evolved using a curvature-based speed
  * function:
  *
@@ -69,10 +69,6 @@ namespace itk
  * same dimensions. This filter also requires that the output image pixels
  * are of a floating point type. This filter works for any dimensional images.
  *
- * Reference:
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Chapter 16, Second edition, 1999.
- *
  * \sa DenseFiniteDifferenceImageFilter
  * \sa CurvatureFlowFunction
  * \sa MinMaxCurvatureFlowImageFilter
@@ -107,7 +103,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CurvatureFlowImageFilter);
 
   /** InputImage type. */
@@ -140,8 +136,6 @@ public:
   /** Get the timestep parameter. */
   itkGetConstMacro(TimeStep, TimeStepType);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, PixelType>));
   itkConceptMacro(OutputConvertibleToDoubleCheck, (Concept::Convertible<PixelType, double>));
   itkConceptMacro(OutputDivisionOperatorsCheck, (Concept::DivisionOperators<PixelType>));
@@ -149,8 +143,6 @@ public:
   itkConceptMacro(IntOutputMultiplyOperatorCheck, (Concept::MultiplyOperator<int, PixelType, PixelType>));
   itkConceptMacro(OutputLessThanDoubleCheck, (Concept::LessThanComparable<PixelType, double>));
   itkConceptMacro(OutputDoubleAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType, double>));
-  // End concept checking
-#endif
 
 protected:
   CurvatureFlowImageFilter();
@@ -167,10 +159,8 @@ protected:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 
   /** Initialize the state of filter and equation before each iteration.

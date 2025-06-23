@@ -86,7 +86,7 @@ public:
 
     movingReader->SetFileName(argv[3]);
 
-    typename FixedImageType::ConstPointer fixedImage = fixedReader->GetOutput();
+    const typename FixedImageType::ConstPointer fixedImage = fixedReader->GetOutput();
 
 
     using FilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -99,24 +99,24 @@ public:
 
     resampler->SetInterpolator(interpolator);
 
-    typename FixedImageType::SpacingType   fixedSpacing = fixedImage->GetSpacing();
-    typename FixedImageType::PointType     fixedOrigin = fixedImage->GetOrigin();
-    typename FixedImageType::DirectionType fixedDirection = fixedImage->GetDirection();
+    typename FixedImageType::SpacingType         fixedSpacing = fixedImage->GetSpacing();
+    const typename FixedImageType::PointType     fixedOrigin = fixedImage->GetOrigin();
+    const typename FixedImageType::DirectionType fixedDirection = fixedImage->GetDirection();
 
     resampler->SetOutputSpacing(fixedSpacing);
     resampler->SetOutputOrigin(fixedOrigin);
     resampler->SetOutputDirection(fixedDirection);
 
 
-    typename FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
-    typename FixedImageType::SizeType   fixedSize = fixedRegion.GetSize();
+    const typename FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
+    typename FixedImageType::SizeType         fixedSize = fixedRegion.GetSize();
     resampler->SetSize(fixedSize);
     resampler->SetOutputStartIndex(fixedRegion.GetIndex());
 
 
     resampler->SetInput(movingReader->GetOutput());
 
-    const unsigned int SpaceDimension = ImageDimension;
+    constexpr unsigned int SpaceDimension = ImageDimension;
     using CoordinateRepType = double;
 
     using TransformType = itk::BSplineTransform<CoordinateRepType, SpaceDimension, VSplineOrder>;
@@ -135,15 +135,14 @@ public:
     const unsigned int numberOfGridNodes =
       numberOfGridNodesInsideTheImageSupport + numberOfGridNodesOutsideTheImageSupport;
 
-    const unsigned int numberOfGridCells = numberOfGridNodesInsideTheImageSupport - 1;
+    constexpr unsigned int numberOfGridCells = numberOfGridNodesInsideTheImageSupport - 1;
 
     size.Fill(numberOfGridNodes);
     bsplineRegion.SetSize(size);
 
 
     using MeshSizeType = typename TransformType::MeshSizeType;
-    MeshSizeType meshSize;
-    meshSize.Fill(numberOfGridCells);
+    auto meshSize = MeshSizeType::Filled(numberOfGridCells);
 
     using PhysicalDimensionsType = typename TransformType::PhysicalDimensionsType;
     PhysicalDimensionsType fixedDimensions;

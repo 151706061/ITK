@@ -27,7 +27,7 @@
  * This code was contributed in the Insight Journal paper:
  * "Binary morphological closing and opening image filters"
  * by Lehmann G.
- * https://www.insight-journal.org/browse/publication/58
+ * https://doi.org/10.54294/bcwtvq
  *
  */
 
@@ -35,10 +35,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 BinaryMorphologicalOpeningImageFilter<TInputImage, TOutputImage, TKernel>::BinaryMorphologicalOpeningImageFilter()
-{
-  m_ForegroundValue = NumericTraits<PixelType>::max();
-  m_BackgroundValue = PixelType{};
-}
+  : m_ForegroundValue(NumericTraits<PixelType>::max())
+  , m_BackgroundValue(PixelType{})
+{}
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 void
@@ -48,11 +47,9 @@ BinaryMorphologicalOpeningImageFilter<TInputImage, TOutputImage, TKernel>::Gener
   this->AllocateOutputs();
 
   /** set up erosion and dilation methods */
-  typename BinaryDilateImageFilter<TInputImage, TOutputImage, TKernel>::Pointer dilate =
-    BinaryDilateImageFilter<TInputImage, TOutputImage, TKernel>::New();
+  auto dilate = BinaryDilateImageFilter<TInputImage, TOutputImage, TKernel>::New();
 
-  typename BinaryErodeImageFilter<TInputImage, TInputImage, TKernel>::Pointer erode =
-    BinaryErodeImageFilter<TInputImage, TInputImage, TKernel>::New();
+  auto erode = BinaryErodeImageFilter<TInputImage, TInputImage, TKernel>::New();
 
   dilate->SetKernel(this->GetKernel());
   dilate->ReleaseDataFlagOn();

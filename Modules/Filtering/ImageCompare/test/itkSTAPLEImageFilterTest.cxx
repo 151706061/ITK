@@ -34,7 +34,7 @@ public:
     m_OutputFile = s;
   }
 
-  const std::string &
+  [[nodiscard]] const std::string &
   GetOutputFileName() const
   {
     return m_OutputFile;
@@ -43,11 +43,11 @@ public:
   void
   AddFileName(const char * s)
   {
-    std::string tmp(s);
+    const std::string tmp(s);
     m_Files.push_back(tmp);
   }
 
-  const std::string &
+  [[nodiscard]] const std::string &
   GetFileName(unsigned int i) const
   {
     return m_Files[i];
@@ -59,7 +59,7 @@ public:
     m_Files.clear();
   }
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfFiles() const
   {
     return static_cast<unsigned int>(m_Files.size());
@@ -73,17 +73,17 @@ public:
   GetSensitivity(unsigned int) = 0;
   virtual double
   GetSpecificity(unsigned int) = 0;
-  virtual unsigned short
+  [[nodiscard]] virtual unsigned short
   GetForeground() const = 0;
   virtual void
   SetForeground(unsigned short) = 0;
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetMaximumIterations() const = 0;
   virtual void
   SetMaximumIterations(unsigned int) = 0;
   virtual void
   SetConfidenceWeight(double) = 0;
-  virtual double
+  [[nodiscard]] virtual double
   GetConfidenceWeight() const = 0;
 
 
@@ -106,13 +106,13 @@ public:
   using StapleFilterType = itk::STAPLEImageFilter<InputImageType, OutputImageType>;
 
   Stapler()
+    : m_Stapler(StapleFilterType::New())
   {
-    m_Stapler = StapleFilterType::New();
     this->SetForeground(1);
   }
   ~Stapler() override = default;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetMaximumIterations() const override
   {
     return m_Stapler->GetMaximumIterations();
@@ -122,7 +122,7 @@ public:
   {
     m_Stapler->SetMaximumIterations(maximumIterations);
   }
-  double
+  [[nodiscard]] double
   GetConfidenceWeight() const override
   {
     return m_Stapler->GetConfidenceWeight();
@@ -155,7 +155,7 @@ public:
     return m_Stapler->GetSpecificity(i);
   }
 
-  unsigned short
+  [[nodiscard]] unsigned short
   GetForeground() const override
   {
     return m_Stapler->GetForegroundValue();
@@ -184,10 +184,10 @@ template <unsigned int VDimension>
 int
 Stapler<VDimension>::Execute()
 {
-  typename itk::ImageFileReader<InputImageType>::Pointer  reader;
-  typename itk::ImageFileWriter<OutputImageType>::Pointer writer = itk::ImageFileWriter<OutputImageType>::New();
+  typename itk::ImageFileReader<InputImageType>::Pointer        reader;
+  const typename itk::ImageFileWriter<OutputImageType>::Pointer writer = itk::ImageFileWriter<OutputImageType>::New();
 
-  size_t numberOfFiles = m_Files.size();
+  const size_t numberOfFiles = m_Files.size();
 
   // Set the inputs
   for (size_t i = 0; i < numberOfFiles; ++i)
@@ -233,8 +233,7 @@ itkSTAPLEImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(stapleImageFilter, STAPLEImageFilter, ImageToImageFilter);
 
 
-  StaplerBase * stapler;
-
+  StaplerBase * stapler = nullptr;
   if (std::stoi(argv[1]) == 2)
   {
     stapler = new Stapler<2>;
@@ -269,7 +268,7 @@ itkSTAPLEImageFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(confidenceWeight, stapler->GetConfidenceWeight());
 
   // Execute the stapler
-  int ret = stapler->Execute();
+  const int ret = stapler->Execute();
   if (ret != EXIT_SUCCESS)
   {
     std::cerr << "Stapler failed!" << std::endl;
@@ -299,7 +298,7 @@ itkSTAPLEImageFilterTest(int argc, char * argv[])
               << stapler->GetSpecificity(i) << std::endl;
   }
 
-  std::vector<double> specificity = stapler->GetSpecificity();
+  const std::vector<double> specificity = stapler->GetSpecificity();
   std::cout << "Specificity: ";
   for (auto value : specificity)
   {
@@ -307,7 +306,7 @@ itkSTAPLEImageFilterTest(int argc, char * argv[])
   }
   std::cout << std::endl;
 
-  std::vector<double> sensitivity = stapler->GetSensitivity();
+  const std::vector<double> sensitivity = stapler->GetSensitivity();
   std::cout << "Sensitivity: ";
   for (auto value : specificity)
   {
@@ -321,7 +320,7 @@ itkSTAPLEImageFilterTest(int argc, char * argv[])
   std::cout << "Mean:\t\t" << avgP << "\t\t" << avgQ << std::endl;
 
   // Test index exceptions
-  unsigned int i = stapler->GetNumberOfFiles() + 1;
+  const unsigned int i = stapler->GetNumberOfFiles() + 1;
   ITK_TRY_EXPECT_EXCEPTION(stapler->GetSensitivity(i));
   ITK_TRY_EXPECT_EXCEPTION(stapler->GetSpecificity(i));
 

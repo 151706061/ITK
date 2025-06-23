@@ -50,13 +50,8 @@ extern ITKOptimizers_EXPORT std::ostream &
  * \brief An optimizer based on simultaneous perturbation...
  *
  * This optimizer is an implementation of the Simultaneous
- * Perturbation Stochastic Approximation method, described in:
- *
- * - https://www.jhuapl.edu/SPSA/
- *
- * - Spall, J.C. (1998), "An Overview of the Simultaneous
- * Perturbation Method for Efficient Optimization," Johns
- * Hopkins APL Technical Digest, vol. 19, pp. 482-492
+ * Perturbation Stochastic Approximation method, described in
+ * \cite spall1998.
  *
  * \ingroup Optimizers
  * \ingroup ITKOptimizers
@@ -76,7 +71,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SPSAOptimizer);
 
   using StopConditionSPSAOptimizerEnum = SPSAOptimizerEnums::StopConditionSPSAOptimizer;
@@ -123,10 +118,7 @@ public:
    * the MaximumNumberOfIterations, the Scales, and the
    * the InitialPosition before calling this method.
    *
-   * Described in:
-   * Spall, J.C. (1998), "Implementation of the Simultaneous Perturbation
-   * Algorithm for Stochastic Optimization", IEEE Trans. Aerosp. Electron.
-   * Syst. 34(3), 817-823.
+   * Described in \cite spall1998a.
    */
   virtual void
   GuessParameters(SizeValueType numberOfGradientEstimates, double initialStepSize);
@@ -147,6 +139,7 @@ public:
   itkGetConstReferenceMacro(Gradient, DerivativeType);
 
   /** Set/Get a. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sa, double);
   itkGetConstMacro(Sa, double);
   // For backward compatibility
@@ -160,8 +153,9 @@ public:
   {
     return GetSa();
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get c. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sc, double);
   itkGetConstMacro(Sc, double);
   // For backward compatibility
@@ -175,20 +169,24 @@ public:
   {
     return GetSc();
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get A. */
+  /** @ITKStartGrouping */
   itkSetMacro(A, double);
   itkGetConstMacro(A, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get alpha. */
+  /** @ITKStartGrouping */
   itkSetMacro(Alpha, double);
   itkGetConstMacro(Alpha, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get gamma. */
+  /** @ITKStartGrouping */
   itkSetMacro(Gamma, double);
   itkGetConstMacro(Gamma, double);
-
+  /** @ITKEndGrouping */
   /** Methods to configure the cost function. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Maximize, bool);
   itkSetMacro(Maximize, bool);
   itkBooleanMacro(Maximize);
@@ -212,15 +210,16 @@ public:
   {
     this->MaximizeOn();
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of perturbation used to construct
    * a gradient estimate g_k.
    * q = NumberOfPerturbations
    * g_k = 1/q sum_{j=1..q} g^(j)_k
    */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfPerturbations, SizeValueType);
   itkGetConstMacro(NumberOfPerturbations, SizeValueType);
-
+  /** @ITKEndGrouping */
   /**
    * Get the state of convergence in the last iteration. When the
    * StateOfConvergence is lower than the Tolerance, and the minimum
@@ -235,23 +234,27 @@ public:
   itkGetConstMacro(StateOfConvergence, double);
 
   /** Set/Get StateOfConvergenceDecayRate (number between 0 and 1). */
+  /** @ITKStartGrouping */
   itkSetMacro(StateOfConvergenceDecayRate, double);
   itkGetConstMacro(StateOfConvergenceDecayRate, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the minimum number of iterations */
+  /** @ITKStartGrouping */
   itkSetMacro(MinimumNumberOfIterations, SizeValueType);
   itkGetConstMacro(MinimumNumberOfIterations, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the maximum number of iterations. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumNumberOfIterations, SizeValueType);
   itkGetConstMacro(MaximumNumberOfIterations, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get Tolerance */
+  /** @ITKStartGrouping */
   itkSetMacro(Tolerance, double);
   itkGetConstMacro(Tolerance, double);
-
+  /** @ITKEndGrouping */
   /** Get the reason for termination */
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
 protected:

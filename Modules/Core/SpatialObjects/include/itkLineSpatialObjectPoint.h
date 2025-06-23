@@ -43,6 +43,8 @@ template <unsigned int TPointDimension = 3>
 class ITK_TEMPLATE_EXPORT LineSpatialObjectPoint : public SpatialObjectPoint<TPointDimension>
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(LineSpatialObjectPoint);
+
   using Self = LineSpatialObjectPoint;
   using Superclass = SpatialObjectPoint<TPointDimension>;
   using PointType = Point<double, TPointDimension>;
@@ -52,23 +54,16 @@ public:
   /** Constructor */
   LineSpatialObjectPoint();
 
-  /** Copy Constructor */
-  LineSpatialObjectPoint(const LineSpatialObjectPoint & other);
-
   /** Destructor */
   ~LineSpatialObjectPoint() override = default;
 
   /** Get the normal. */
-  const CovariantVectorType &
+  [[nodiscard]] const CovariantVectorType &
   GetNormalInObjectSpace(unsigned int index) const;
 
   /** Set the normal. */
   void
   SetNormalInObjectSpace(CovariantVectorType & normal, unsigned int index);
-
-  /** Copy one LineSpatialObjectPoint to another */
-  Self &
-  operator=(const LineSpatialObjectPoint & rhs);
 
 protected:
   NormalArrayType m_NormalArrayInObjectSpace{};

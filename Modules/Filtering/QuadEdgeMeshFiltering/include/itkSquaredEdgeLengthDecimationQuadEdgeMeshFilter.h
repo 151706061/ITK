@@ -39,7 +39,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = EdgeDecimationQuadEdgeMeshFilter<TInput, TOutput, TCriterion>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SquaredEdgeLengthDecimationQuadEdgeMeshFilter);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -84,11 +84,11 @@ protected:
   MeasureType
   MeasureEdge(OutputQEType * iEdge) override
   {
-    OutputPointIdentifier id_org = iEdge->GetOrigin();
-    OutputPointIdentifier id_dest = iEdge->GetDestination();
+    const OutputPointIdentifier id_org = iEdge->GetOrigin();
+    const OutputPointIdentifier id_dest = iEdge->GetDestination();
 
-    OutputPointType org = this->m_OutputMesh->GetPoint(id_org);
-    OutputPointType dest = this->m_OutputMesh->GetPoint(id_dest);
+    const OutputPointType org = this->m_OutputMesh->GetPoint(id_org);
+    const OutputPointType dest = this->m_OutputMesh->GetPoint(id_dest);
 
     return static_cast<MeasureType>(org.SquaredEuclideanDistanceTo(dest));
   }

@@ -30,14 +30,12 @@ itkLevelSetNeighborhoodExtractorTest(int, char *[])
   using SourceType = itk::FastMarchingImageFilter<ImageType>;
   auto source = SourceType::New();
 
-  ImageType::SizeType size;
-  size.Fill(17);
+  auto size = ImageType::SizeType::Filled(17);
 
   source->SetOutputSize(size);
 
   SourceType::NodeType node;
-  ImageType::IndexType index;
-  index.Fill(8);
+  auto                 index = ImageType::IndexType::Filled(8);
 
   node.SetIndex(index);
   node.SetValue(-4.0);
@@ -61,12 +59,10 @@ itkLevelSetNeighborhoodExtractorTest(int, char *[])
   extractor->Locate();
 
   using Iterator = NodeContainerType::ConstIterator;
-  Iterator iter;
-  Iterator iterEnd;
 
   std::cout << "Inside Points" << std::endl;
-  iter = extractor->GetInsidePoints()->Begin();
-  iterEnd = extractor->GetInsidePoints()->End();
+  Iterator iter = extractor->GetInsidePoints()->Begin();
+  Iterator iterEnd = extractor->GetInsidePoints()->End();
   for (; iter != iterEnd; ++iter)
   {
     std::cout << iter.Value().GetIndex() << ' ';
@@ -93,7 +89,7 @@ itkLevelSetNeighborhoodExtractorTest(int, char *[])
   std::cout << "InputNarrowBand: " << extractor->GetInputNarrowBand() << std::endl;
 
   // exercise error handling
-  bool passed;
+  bool passed = false;
   std::cout << "Testing nullptr inputs" << std::endl;
 
   try

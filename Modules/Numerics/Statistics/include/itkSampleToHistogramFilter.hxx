@@ -20,9 +20,7 @@
 
 #include "itkStatisticsAlgorithm.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample, typename THistogram>
 SampleToHistogramFilter<TSample, THistogram>::SampleToHistogramFilter()
@@ -75,7 +73,7 @@ SampleToHistogramFilter<TSample, THistogram>::GraftOutput(DataObject * graft)
 
 template <typename TSample, typename THistogram>
 typename SampleToHistogramFilter<TSample, THistogram>::DataObjectPointer
-  SampleToHistogramFilter<TSample, THistogram>::MakeOutput(DataObjectPointerArraySizeType)
+SampleToHistogramFilter<TSample, THistogram>::MakeOutput(DataObjectPointerArraySizeType)
 {
   return HistogramType::New().GetPointer();
 }
@@ -125,7 +123,7 @@ SampleToHistogramFilter<TSample, THistogram>::GenerateData()
 
   HistogramSizeType histogramSize = histogramSizeObject->Get();
 
-  HistogramMeasurementType marginalScale = marginalScaleObject->Get();
+  const HistogramMeasurementType marginalScale = marginalScaleObject->Get();
 
   auto * outputHistogram = static_cast<HistogramType *>(this->ProcessObject::GetOutput(0));
 
@@ -249,20 +247,17 @@ SampleToHistogramFilter<TSample, THistogram>::GenerateData()
   // the upper and lower bound from the FindSampleBound function
   outputHistogram->Initialize(histogramSize, h_lower, h_upper);
 
-  typename SampleType::ConstIterator iter = inputSample->Begin();
-  typename SampleType::ConstIterator last = inputSample->End();
+  typename SampleType::ConstIterator       iter = inputSample->Begin();
+  const typename SampleType::ConstIterator last = inputSample->End();
 
-  typename SampleType::MeasurementVectorType lvector;
 
   typename HistogramType::IndexType             index(measurementVectorSize);
   typename HistogramType::MeasurementVectorType hvector(measurementVectorSize);
 
-  unsigned int i;
-
   while (iter != last)
   {
-    lvector = iter.GetMeasurementVector();
-    for (i = 0; i < inputSample->GetMeasurementVectorSize(); ++i)
+    typename SampleType::MeasurementVectorType lvector = iter.GetMeasurementVector();
+    for (unsigned int i = 0; i < inputSample->GetMeasurementVectorSize(); ++i)
     {
       hvector[i] = SafeAssign(lvector[i]);
     }
@@ -281,7 +276,6 @@ SampleToHistogramFilter<TSample, THistogram>::GenerateData()
     ++iter;
   }
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

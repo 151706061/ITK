@@ -45,9 +45,9 @@ namespace itk
  * \ingroup ImageFunctions
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = float>
+template <typename TInputImage, typename TCoordinate = float>
 class ITK_TEMPLATE_EXPORT MeanImageFunction
-  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>
+  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(MeanImageFunction);
@@ -55,12 +55,12 @@ public:
   /** Standard class type aliases. */
   using Self = MeanImageFunction;
   using Superclass =
-    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>;
+    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeanImageFunction);
 
   /** Method for creation through the object factory. */
@@ -118,10 +118,11 @@ public:
 
   /** Get/Set the radius of the neighborhood over which the
       statistics are evaluated */
+  /** @ITKStartGrouping */
   void
   SetNeighborhoodRadius(unsigned int);
   itkGetConstReferenceMacro(NeighborhoodRadius, unsigned int);
-
+  /** @ITKEndGrouping */
 protected:
   MeanImageFunction();
   ~MeanImageFunction() override = default;

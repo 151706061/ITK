@@ -134,8 +134,8 @@ public:
     : ImageConstIteratorWithIndex<TImage>()
   {}
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageSliceConstIteratorWithIndex(const ImageType * ptr, const RegionType & region)
     : ImageConstIteratorWithIndex<TImage>(ptr, region)
     , m_PixelJump(0)
@@ -180,19 +180,19 @@ public:
   PreviousSlice();
 
   /** Test if the index is at the end of line */
-  bool
+  [[nodiscard]] bool
   IsAtEndOfLine() const;
 
   /** Test if the index is at the end of the slice */
-  bool
+  [[nodiscard]] bool
   IsAtEndOfSlice() const;
 
   /** Test if the index is at the begin of line */
-  bool
+  [[nodiscard]] bool
   IsAtReverseEndOfLine() const;
 
   /** Test if the index is at the begin of the slice */
-  bool
+  [[nodiscard]] bool
   IsAtReverseEndOfSlice() const;
 
   /** Set the fastest direction of movement */

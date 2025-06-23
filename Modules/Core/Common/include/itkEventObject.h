@@ -18,6 +18,7 @@
 #ifndef itkEventObject_h
 #define itkEventObject_h
 
+#include "itkMacro.h"
 #include "itkIndent.h"
 
 namespace itk
@@ -71,7 +72,7 @@ public:
 
   /**  Create an Event of this type This method work as a Factory for
    *  creating events of each particular type. */
-  virtual EventObject *
+  [[nodiscard]] virtual EventObject *
   MakeObject() const = 0;
 
   /** Print Event information.  This method can be overridden by
@@ -81,7 +82,7 @@ public:
   Print(std::ostream & os) const;
 
   /** Return the StringName associated with the event. */
-  virtual const char *
+  [[nodiscard]] virtual const char *
   GetEventName() const = 0;
 
   /** Check if given event matches or derives from this event. */
@@ -139,11 +140,11 @@ operator<<(std::ostream & os, const EventObject & e)
     void                                                   \
     operator=(const Self &);                               \
   };                                                       \
-  static_assert(true, "Compile time eliminated. Used to require a semi-colon at end of macro.")
+  ITK_MACROEND_NOOP_STATEMENT
 
 #define itkEventMacroDefinition(classname, super)                            \
   classname::classname(const classname & s)                                  \
-    : super(s){};                                                            \
+    : super(s) {};                                                           \
   classname::~classname() {}                                                 \
   const char * classname::GetEventName() const { return #classname; }        \
   bool         classname::CheckEvent(const itk::EventObject * e) const       \
@@ -151,7 +152,7 @@ operator<<(std::ostream & os, const EventObject & e)
     return (dynamic_cast<const classname *>(e) != nullptr);                  \
   }                                                                          \
   itk::EventObject * classname::MakeObject() const { return new classname; } \
-  static_assert(true, "Compile time eliminated. Used to require a semi-colon at end of macro.")
+  ITK_MACROEND_NOOP_STATEMENT
 
 #if !defined(ITK_LEGACY_REMOVE)
 // Support Pre 2015 code bases
@@ -189,7 +190,7 @@ operator<<(std::ostream & os, const EventObject & e)
         return new Self;                                   \
       }                                                    \
       classname(const Self & s)                            \
-        : super(s){};                                      \
+        : super(s) {};                                     \
                                                            \
     private:                                               \
       void                                                 \
@@ -199,6 +200,7 @@ operator<<(std::ostream & os, const EventObject & e)
 /**
  *      Declare some common ITK events
  */
+/** @ITKStartGrouping */
 itkEventMacroDeclaration(NoEvent, EventObject);
 itkEventMacroDeclaration(AnyEvent, EventObject);
 itkEventMacroDeclaration(DeleteEvent, AnyEvent);
@@ -219,7 +221,7 @@ itkEventMacroDeclaration(FunctionEvaluationIterationEvent, IterationEvent);
 itkEventMacroDeclaration(GradientEvaluationIterationEvent, IterationEvent);
 itkEventMacroDeclaration(FunctionAndGradientEvaluationIterationEvent, IterationEvent);
 itkEventMacroDeclaration(UserEvent, AnyEvent);
-
+/** @ITKEndGrouping */
 #undef ITKEvent_EXPORT
 #define ITKEvent_EXPORT ITK_ABI_EXPORT
 

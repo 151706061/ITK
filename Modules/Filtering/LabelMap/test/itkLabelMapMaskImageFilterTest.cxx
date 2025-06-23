@@ -83,11 +83,11 @@ itkLabelMapMaskImageFilterTest(int argc, char * argv[])
 
   maskFilter->SetFeatureImage(reader2->GetOutput());
 
-  MaskFilterType::InputImagePixelType label = std::stoi(argv[4]);
+  const MaskFilterType::InputImagePixelType label = std::stoi(argv[4]);
   maskFilter->SetLabel(label);
   ITK_TEST_SET_GET_VALUE(label, maskFilter->GetLabel());
 
-  MaskFilterType::OutputImagePixelType backgroundValue = std::stoi(argv[5]);
+  const MaskFilterType::OutputImagePixelType backgroundValue = std::stoi(argv[5]);
   maskFilter->SetBackgroundValue(backgroundValue);
   ITK_TEST_SET_GET_VALUE(backgroundValue, maskFilter->GetBackgroundValue());
 
@@ -119,12 +119,11 @@ itkLabelMapMaskImageFilterTest(int argc, char * argv[])
     ITK_TEST_SET_GET_VALUE(false, maskFilter->GetCrop());
   }
 
-  MaskFilterType::SizeType border;
-  border.Fill(std::stoi(argv[8]));
+  auto border = MaskFilterType::SizeType::Filled(std::stoi(argv[8]));
   maskFilter->SetCropBorder(border);
   ITK_TEST_SET_GET_VALUE(border, maskFilter->GetCropBorder());
 
-  itk::SimpleFilterWatcher watcher(maskFilter, "LabelMapMaskImageFilter");
+  const itk::SimpleFilterWatcher watcher(maskFilter, "LabelMapMaskImageFilter");
 
   // Finally, save the output image.
   using WriterType = itk::ImageFileWriter<ImageType>;

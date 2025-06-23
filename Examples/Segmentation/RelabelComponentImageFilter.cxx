@@ -71,15 +71,7 @@ main(int argc, char * argv[])
   using OutputImageType = itk::Image<OutputPixelType, 2>;
   // Software Guide : EndCodeSnippet
 
-
-  using ReaderType = itk::ImageFileReader<InputImageType>;
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-
-  auto reader = ReaderType::New();
-  auto writer = WriterType::New();
-
-  reader->SetFileName(argv[1]);
-  writer->SetFileName(argv[2]);
+  const auto input = itk::ReadImage<InputImageType>(argv[1]);
 
   //  Software Guide : BeginLatex
   //
@@ -114,9 +106,8 @@ main(int argc, char * argv[])
 
 
   // Software Guide : BeginCodeSnippet
-  relabeler->SetInput(reader->GetOutput());
-  writer->SetInput(relabeler->GetOutput());
-  writer->Update();
+  relabeler->SetInput(input);
+  itk::WriteImage(relabeler->GetOutput(), argv[2]);
   // Software Guide : EndCodeSnippet
 
 

@@ -41,11 +41,7 @@ namespace itk
  *
  * This filter is a sequential thinning algorithm and known to be computational time
  * dependable on the image size.  The algorithm corresponds with the 2D
- * implementation described in:
- *
- * Rafael C. Gonzales and Richard E. Woods.
- * Digital Image Processing.
- * Addison Wesley, 491-494, (1993).
+ * implementation described in \cite gonzales1993.
  *
  * To do: Make this filter ND.
  *
@@ -73,7 +69,7 @@ public:
   /** Method for creation through the object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryThinningImageFilter);
 
   /** Type for input image. */
@@ -114,15 +110,11 @@ public:
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
   itkConceptMacro(InputAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType>));
   itkConceptMacro(InputConvertibleToIntCheck, (Concept::Convertible<PixelType, int>));
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, PixelType>));
   itkConceptMacro(SameTypeCheck, (Concept::SameType<PixelType, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   BinaryThinningImageFilter();

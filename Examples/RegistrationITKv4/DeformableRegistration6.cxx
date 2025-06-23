@@ -160,7 +160,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  const unsigned int     SpaceDimension = ImageDimension;
+  constexpr unsigned int SpaceDimension = ImageDimension;
   constexpr unsigned int SplineOrder = 3;
   using CoordinateRepType = double;
 
@@ -195,7 +195,8 @@ main(int argc, char * argv[])
   fixedImageReader->SetFileName(argv[1]);
   movingImageReader->SetFileName(argv[2]);
 
-  FixedImageType::ConstPointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::ConstPointer fixedImage =
+    fixedImageReader->GetOutput();
 
   registration->SetFixedImage(fixedImage);
   registration->SetMovingImage(movingImageReader->GetOutput());
@@ -221,10 +222,10 @@ main(int argc, char * argv[])
 
   auto transformInitializer = InitializerType::New();
 
-  unsigned int numberOfGridNodesInOneDimension = 8;
+  constexpr unsigned int numberOfGridNodesInOneDimension = 8;
 
-  TransformType::MeshSizeType meshSize;
-  meshSize.Fill(numberOfGridNodesInOneDimension - SplineOrder);
+  auto meshSize = itk::MakeFilled<TransformType::MeshSizeType>(
+    numberOfGridNodesInOneDimension - SplineOrder);
 
   transformInitializer->SetTransform(outputBSplineTransform);
   transformInitializer->SetImage(fixedImage);
@@ -323,7 +324,7 @@ main(int argc, char * argv[])
     bsplineAdaptor->SetRequiredTransformDomainPhysicalDimensions(
       fixedPhysicalDimensions);
 
-    adaptors.push_back(bsplineAdaptor);
+    adaptors.emplace_back(bsplineAdaptor);
   }
 
   registration->SetTransformParametersAdaptorsPerLevel(adaptors);

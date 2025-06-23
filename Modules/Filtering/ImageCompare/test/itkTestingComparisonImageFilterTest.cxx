@@ -73,11 +73,11 @@ itkTestingComparisonImageFilterTest(int argc, char * argv[])
   filter->SetDifferenceThreshold(differenceThreshold);
   ITK_TEST_SET_GET_VALUE(differenceThreshold, filter->GetDifferenceThreshold());
 
-  int toleranceRadius = std::stoi(argv[6]);
+  const int toleranceRadius = std::stoi(argv[6]);
   filter->SetToleranceRadius(toleranceRadius);
   ITK_TEST_SET_GET_VALUE(toleranceRadius, filter->GetToleranceRadius());
 
-  itk::SimpleFilterWatcher watcher(filter, "Difference");
+  const itk::SimpleFilterWatcher watcher(filter, "Difference");
 
   // wire the pipeline
   filter->SetValidInput(reader1->GetOutput());
@@ -94,9 +94,9 @@ itkTestingComparisonImageFilterTest(int argc, char * argv[])
 
   ITK_TRY_EXPECT_NO_EXCEPTION(writer->Update());
 
-  unsigned long numberOfPixelsWithDifferences = filter->GetNumberOfPixelsWithDifferences();
+  const unsigned long numberOfPixelsWithDifferences = filter->GetNumberOfPixelsWithDifferences();
 
-  char * end;
+  char * end = nullptr;
   ITK_TEST_EXPECT_EQUAL(numberOfPixelsWithDifferences, std::strtoul(argv[7], &end, 10));
 
   auto minimumDifference = static_cast<typename FilterType::OutputPixelType>(std::stod(argv[8]));
@@ -107,7 +107,7 @@ itkTestingComparisonImageFilterTest(int argc, char * argv[])
 
   auto meanDifference = static_cast<typename FilterType::RealType>(std::stod(argv[10]));
 
-  const double epsilon = 1e-4;
+  constexpr double epsilon = 1e-4;
   std::cout.precision(static_cast<int>(itk::Math::abs(std::log10(epsilon))));
   if (!itk::Math::FloatAlmostEqual(meanDifference, filter->GetMeanDifference(), 10, epsilon))
   {

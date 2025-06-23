@@ -46,7 +46,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ThreadLogger);
 
   /** New macro for creation of a Smart Pointer */
@@ -59,14 +59,14 @@ public:
   using DelayType = unsigned int;
 
   /** Definition of types of operations for ThreadLogger. */
-  typedef enum
+  enum OperationType
   {
     SET_PRIORITY_LEVEL,
     SET_LEVEL_FOR_FLUSHING,
     ADD_LOG_OUTPUT,
     WRITE,
     FLUSH
-  } OperationType;
+  };
 
   /** Set the priority level for the current logger. Only messages that have
    * priorities equal or greater than the one set here will be posted to the
@@ -103,7 +103,7 @@ public:
   AddLogOutput(OutputType * output) override;
 
   void
-  Write(PriorityLevelEnum level, std::string const & content) override;
+  Write(PriorityLevelEnum level, const std::string & content) override;
 
   void
   Flush() override;

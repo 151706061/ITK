@@ -1,22 +1,28 @@
 #!/usr/bin/env bash
 
-thirdparty_module_name='PNG'
+set -e
+set -x
+shopt -s dotglob
 
-upstream_git_url='git://git.code.sf.net/p/libpng/code'
-upstream_git_branch='libpng16'
+readonly name="png"
+readonly ownership="LIBPNG Upstream <png-mng-implement@lists.sourceforge.net>"
+readonly subtree="Modules/ThirdParty/PNG/src/itk$name"
+readonly repo="git://git.code.sf.net/p/libpng/code"
+readonly tag='v1.6.44' # Sept 12, 2024
+readonly paths="
+png*.c
+png*.h
+arm/*
+LICENSE
+scripts/pnglibconf.h.prebuilt
+"
 
-snapshot_author_name='LIBPNG Upstream'
-snapshot_author_email='png-mng-implement@lists.sourceforge.net'
 
-snapshot_redact_cmd=''
-snapshot_relative_path='src/itkpng'
-snapshot_paths='
-  png*.c
-  png*.h
-  arm/*
-  LICENSE
-  scripts/pnglibconf.h.prebuilt
-  '
+extract_source () {
+    git_archive
+    pushd "${extractdir}/${name}-reduced"
+    echo "* -whitespace" >> .gitattributes
+    popd
+}
 
-source "${BASH_SOURCE%/*}/../../../Utilities/Maintenance/UpdateThirdPartyFromUpstream.sh"
-update_from_upstream
+. "${BASH_SOURCE%/*}/../../../Utilities/Maintenance/update-third-party.bash"

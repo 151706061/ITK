@@ -45,15 +45,14 @@ itkGDCMImageOrientationPatientTest(int argc, char * argv[])
   using ImageIOType = itk::GDCMImageIO;
 
   using DictionaryType = itk::MetaDataDictionary;
-  DictionaryType dict;
+  const DictionaryType dict;
 
   // Create a 2D image
   Image2DType::SpacingType spacing2D;
   spacing2D[0] = 10.0;
   spacing2D[1] = 100.0;
 
-  Image2DType::SizeType size2D;
-  size2D.Fill(16);
+  auto size2D = Image2DType::SizeType::Filled(16);
 
   auto src2D = RandomImageSource2DType::New();
   src2D->SetMin(0);
@@ -91,7 +90,7 @@ itkGDCMImageOrientationPatientTest(int argc, char * argv[])
   itk::EncapsulateMetaData<std::string>(dictionary, "0020|0037", value.str());
 
   // GDCM will not write IPP unless the modality is one of CT, MR or RT.
-  std::string modality("MR");
+  const std::string modality("MR");
   itk::EncapsulateMetaData<std::string>(dictionary, "0008|0060", modality);
 
   src2D->GetOutput()->SetMetaDataDictionary(dictionary);

@@ -67,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryMaskToNarrowBandPointSetFilter);
 
   /** Some type alias associated with the input images. */
@@ -126,9 +126,10 @@ public:
       maximum distance from the binary mask edges to
       the points in the narrow band. The full width of
       the full narrow band will be double of this value. */
+  /** @ITKStartGrouping */
   itkSetMacro(BandWidth, float);
   itkGetConstMacro(BandWidth, float);
-
+  /** @ITKEndGrouping */
 protected:
   BinaryMaskToNarrowBandPointSetFilter();
   ~BinaryMaskToNarrowBandPointSetFilter() override = default;
@@ -141,7 +142,8 @@ protected:
 
   /** Some type alias associated with the output mesh. */
   void
-  GenerateOutputInformation() override;
+  GenerateOutputInformation() override
+  {}
 
 private:
   DistanceFilterPointer m_DistanceFilter{};

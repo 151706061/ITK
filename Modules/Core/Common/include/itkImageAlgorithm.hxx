@@ -207,7 +207,7 @@ ImageAlgorithm::EnlargeRegionOverBox(const typename InputImageType::RegionType &
   {
     numberOfInputCorners *= 2;
   }
-  using ContinuousIndexValueType = double;
+  using ContinuousIndexValueType = ContinuousIndex<SpacePrecisionType>::ValueType;
   using ContinuousInputIndexType = ContinuousIndex<ContinuousIndexValueType, InputImageType::ImageDimension>;
   using ContinuousOutputIndexType = ContinuousIndex<ContinuousIndexValueType, OutputImageType::ImageDimension>;
 
@@ -216,9 +216,8 @@ ImageAlgorithm::EnlargeRegionOverBox(const typename InputImageType::RegionType &
 
   for (unsigned int count = 0; count < numberOfInputCorners; ++count)
   {
-    ContinuousInputIndexType currentInputCornerIndex;
-    currentInputCornerIndex.Fill(0);
-    unsigned int localCount = count;
+    ContinuousInputIndexType currentInputCornerIndex{};
+    unsigned int             localCount = count;
 
     // For each dimension, set the current index to either
     // the highest or lowest index along this dimension.
@@ -241,10 +240,11 @@ ImageAlgorithm::EnlargeRegionOverBox(const typename InputImageType::RegionType &
     }
 
     using InputPointType = Point<SpacePrecisionType, InputImageType::ImageDimension>;
+    const InputPointType inputPoint =
+      inputImage->template TransformContinuousIndexToPhysicalPoint<SpacePrecisionType, ContinuousIndexValueType>(
+        currentInputCornerIndex);
     using OutputPointType = Point<SpacePrecisionType, OutputImageType::ImageDimension>;
-    InputPointType  inputPoint;
-    OutputPointType outputPoint;
-    inputImage->TransformContinuousIndexToPhysicalPoint(currentInputCornerIndex, inputPoint);
+    OutputPointType outputPoint{};
     if (transform != nullptr)
     {
       outputPoint = transform->TransformPoint(inputPoint);
@@ -254,7 +254,6 @@ ImageAlgorithm::EnlargeRegionOverBox(const typename InputImageType::RegionType &
       // if InputDimension < OutputDimension then embed point in Output space.
       // else if InputDimension == OutputDimension copy the points.
       // else if InputDimension > OutputDimension project the point to first N-Dimensions of Output space.
-      outputPoint.Fill(0.0);
       for (unsigned int d = 0; d < std::min(inputPoint.GetPointDimension(), outputPoint.GetPointDimension()); ++d)
       {
         outputPoint[d] = inputPoint[d];

@@ -42,14 +42,14 @@ itkBSplineResampleImageFunctionTest(int, char *[])
   using ImageType = itk::Image<PixelType, ImageDimension>;
   using BSplineInterpolatorFunctionType = itk::BSplineInterpolateImageFunction<ImageType, double, double>;
 
-  constexpr unsigned int                   SplineOrder = 3;
-  BSplineInterpolatorFunctionType::Pointer interpolator =
+  constexpr unsigned int                         SplineOrder = 3;
+  const BSplineInterpolatorFunctionType::Pointer interpolator =
     makeRandomImageInterpolator<BSplineInterpolatorFunctionType>(SplineOrder);
-  ImageType::ConstPointer randImage = interpolator->GetInputImage();
+  const ImageType::ConstPointer randImage = interpolator->GetInputImage();
 
   using FilterType = itk::BSplineDecompositionImageFilter<ImageType, ImageType>;
-  auto                     filter = FilterType::New();
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  auto                           filter = FilterType::New();
+  const itk::SimpleFilterWatcher watcher(filter, "filter");
 
   filter->SetSplineOrder(interpolator->GetSplineOrder());
   filter->SetInput(randImage);
@@ -66,8 +66,7 @@ itkBSplineResampleImageFunctionTest(int, char *[])
 
   /** Compare 10 values at random points. */
 
-  ImageType::IndexType Last;
-  Last.Fill(0);
+  ImageType::IndexType Last{};
   Last[0] = randImage->GetLargestPossibleRegion().GetSize()[0] - 1;
   ImageType::PointType LastPhysicalLocation;
   randImage->TransformIndexToPhysicalPoint(Last, LastPhysicalLocation);

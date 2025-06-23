@@ -30,18 +30,11 @@ template <unsigned int TFixedDimension,
           typename TVirtualImage,
           typename TParametersValueType>
 ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParametersValueType>::ObjectToObjectMetric()
-
-{
   // Both transforms default to an identity transform.
-  using MovingIdentityTransformType = IdentityTransform<TParametersValueType, Self::MovingDimension>;
-  using FixedIdentityTransformType = IdentityTransform<TParametersValueType, Self::FixedDimension>;
-  this->m_FixedTransform = FixedIdentityTransformType::New();
-  this->m_MovingTransform = MovingIdentityTransformType::New();
-
-  this->m_VirtualImage = nullptr;
-
-  this->m_UserHasSetVirtualDomain = false;
-}
+  : m_FixedTransform(IdentityTransform<TParametersValueType, Self::MovingDimension>::New())
+  , m_MovingTransform(IdentityTransform<TParametersValueType, Self::FixedDimension>::New())
+  , m_VirtualImage(nullptr)
+{}
 
 template <unsigned int TFixedDimension,
           unsigned int TMovingDimension,
@@ -189,10 +182,8 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
   {
     return this->m_VirtualImage->TransformPhysicalPointToIndex(point, index);
   }
-  else
-  {
-    itkExceptionMacro("m_VirtualImage is undefined. Cannot transform.");
-  }
+
+  itkExceptionMacro("m_VirtualImage is undefined. Cannot transform.");
 }
 
 template <unsigned int TFixedDimension,
@@ -270,10 +261,8 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
   {
     return this->GetTimeStamp();
   }
-  else
-  {
-    return this->GetVirtualImage()->GetTimeStamp();
-  }
+
+  return this->GetVirtualImage()->GetTimeStamp();
 }
 
 template <unsigned int TFixedDimension,
@@ -331,10 +320,8 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
     }
     return this->ComputeParameterOffsetFromVirtualIndex(index, numberOfLocalParameters);
   }
-  else
-  {
-    itkExceptionMacro("m_VirtualImage is undefined. Cannot calculate offset.");
-  }
+
+  itkExceptionMacro("m_VirtualImage is undefined. Cannot calculate offset.");
 }
 
 template <unsigned int TFixedDimension,
@@ -348,13 +335,11 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
 {
   if (m_VirtualImage)
   {
-    OffsetValueType offset = this->m_VirtualImage->ComputeOffset(index) * numberOfLocalParameters;
+    const OffsetValueType offset = this->m_VirtualImage->ComputeOffset(index) * numberOfLocalParameters;
     return offset;
   }
-  else
-  {
-    itkExceptionMacro("m_VirtualImage is undefined. Cannot calculate offset.");
-  }
+
+  itkExceptionMacro("m_VirtualImage is undefined. Cannot calculate offset.");
 }
 
 template <unsigned int TFixedDimension,
@@ -370,12 +355,9 @@ typename ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, 
   {
     return this->m_VirtualImage->GetSpacing();
   }
-  else
-  {
-    VirtualSpacingType spacing;
-    spacing.Fill(NumericTraits<typename VirtualSpacingType::ValueType>::OneValue());
-    return spacing;
-  }
+
+  auto spacing = MakeFilled<VirtualSpacingType>(NumericTraits<typename VirtualSpacingType::ValueType>::OneValue());
+  return spacing;
 }
 
 template <unsigned int TFixedDimension,
@@ -391,12 +373,10 @@ typename ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, 
   {
     return this->m_VirtualImage->GetDirection();
   }
-  else
-  {
-    VirtualDirectionType direction;
-    direction.Fill(NumericTraits<typename VirtualDirectionType::ValueType>::OneValue());
-    return direction;
-  }
+
+  auto direction =
+    MakeFilled<VirtualDirectionType>(NumericTraits<typename VirtualDirectionType::ValueType>::OneValue());
+  return direction;
 }
 
 template <unsigned int TFixedDimension,
@@ -411,12 +391,9 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
   {
     return this->m_VirtualImage->GetOrigin();
   }
-  else
-  {
-    VirtualOriginType origin;
-    origin.Fill(typename VirtualOriginType::ValueType{});
-    return origin;
-  }
+
+  VirtualOriginType origin{};
+  return origin;
 }
 
 template <unsigned int TFixedDimension,
@@ -431,10 +408,8 @@ const typename ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualI
   {
     return this->m_VirtualImage->GetBufferedRegion();
   }
-  else
-  {
-    itkExceptionMacro("m_VirtualImage is undefined. Cannot return region. ");
-  }
+
+  itkExceptionMacro("m_VirtualImage is undefined. Cannot return region. ");
 }
 
 template <unsigned int TFixedDimension,
@@ -487,9 +462,9 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
                       "or a CompositeTransform with DisplacementFieldTransform as the last to have been added.");
   }
   using FieldType = typename MovingDisplacementFieldTransformType::DisplacementFieldType;
-  typename FieldType::ConstPointer field = displacementTransform->GetDisplacementField();
-  typename FieldType::RegionType   fieldRegion = field->GetBufferedRegion();
-  VirtualRegionType                virtualRegion = this->GetVirtualRegion();
+  const typename FieldType::ConstPointer field = displacementTransform->GetDisplacementField();
+  const typename FieldType::RegionType   fieldRegion = field->GetBufferedRegion();
+  const VirtualRegionType                virtualRegion = this->GetVirtualRegion();
   if (virtualRegion.GetSize() != fieldRegion.GetSize() || virtualRegion.GetIndex() != fieldRegion.GetIndex())
   {
     itkExceptionMacro(
@@ -506,18 +481,21 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
 
   /* tolerance for origin and spacing depends on the size of pixel
    * tolerance for directions a fraction of the unit cube. */
-  const double coordinateTol = 1.0e-6 * this->GetVirtualSpacing()[0];
-  const double directionTol = 1.0e-6;
+  const double     coordinateTol = 1.0e-6 * this->GetVirtualSpacing()[0];
+  constexpr double directionTol = 1.0e-6;
 
   if (!this->GetVirtualOrigin().GetVnlVector().is_equal(field->GetOrigin().GetVnlVector(), coordinateTol) ||
       !this->GetVirtualSpacing().GetVnlVector().is_equal(field->GetSpacing().GetVnlVector(), coordinateTol) ||
       !this->GetVirtualDirection().GetVnlMatrix().is_equal(field->GetDirection().GetVnlMatrix(), directionTol))
   {
-    std::ostringstream originString, spacingString, directionString;
+    std::ostringstream originString;
+
     originString << "Virtual Origin: " << this->GetVirtualOrigin()
                  << ", DisplacementField Origin: " << field->GetOrigin() << std::endl;
+    std::ostringstream spacingString;
     spacingString << "Virtual Spacing: " << this->GetVirtualSpacing()
                   << ", DisplacementField Spacing: " << field->GetSpacing() << std::endl;
+    std::ostringstream directionString;
     directionString << "Virtual Direction: " << this->GetVirtualDirection()
                     << ", DisplacementField Direction: " << field->GetDirection() << std::endl;
     itkExceptionMacro("Virtual Domain and DisplacementField do not "
@@ -566,7 +544,7 @@ ObjectToObjectMetric<TFixedDimension, TMovingDimension, TVirtualImage, TParamete
   itkPrintSelfObjectMacro(MovingTransform);
   itkPrintSelfObjectMacro(VirtualImage);
 
-  os << indent << "UserHasSetVirtualDomain: " << (m_UserHasSetVirtualDomain ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UserHasSetVirtualDomain);
   os << indent
      << "NumberOfValidPoints: " << static_cast<typename NumericTraits<SizeValueType>::PrintType>(m_NumberOfValidPoints)
      << std::endl;

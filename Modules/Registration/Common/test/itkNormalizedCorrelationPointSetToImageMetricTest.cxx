@@ -41,7 +41,7 @@ itkNormalizedCorrelationPointSetToImageMetricTest(int, char *[])
 
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   //------------------------------------------------------------
   // Create two simple images
@@ -65,11 +65,11 @@ itkNormalizedCorrelationPointSetToImageMetricTest(int, char *[])
   FixedImageType::SizeValueType  fixedImageSize[] = { 100, 100 };
   MovingImageType::SizeValueType movingImageSize[] = { 100, 100 };
 
-  FixedImageType::SpacingValueType  fixedImageSpacing[] = { 1.0f, 1.0f };
-  MovingImageType::SpacingValueType movingImageSpacing[] = { 1.0f, 1.0f };
+  constexpr FixedImageType::SpacingValueType  fixedImageSpacing[] = { 1.0f, 1.0f };
+  constexpr MovingImageType::SpacingValueType movingImageSpacing[] = { 1.0f, 1.0f };
 
-  FixedImageType::PointValueType  fixedImageOrigin[] = { 0.0f, 0.0f };
-  MovingImageType::PointValueType movingImageOrigin[] = { 0.0f, 0.0f };
+  constexpr FixedImageType::PointValueType  fixedImageOrigin[] = { 0.0f, 0.0f };
+  constexpr MovingImageType::PointValueType movingImageOrigin[] = { 0.0f, 0.0f };
 
   auto movingImageSource = MovingImageSourceType::New();
   auto fixedImageSource = FixedImageSourceType::New();
@@ -89,8 +89,8 @@ itkNormalizedCorrelationPointSetToImageMetricTest(int, char *[])
   movingImageSource->Update(); // Force the filter to run
   fixedImageSource->Update();  // Force the filter to run
 
-  MovingImageType::Pointer movingImage = movingImageSource->GetOutput();
-  FixedImageType::Pointer  fixedImage = fixedImageSource->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageSource->GetOutput();
+  const FixedImageType::Pointer  fixedImage = fixedImageSource->GetOutput();
 
   //-----------------------------------------------------------
   // Create the point set and load it with data by sampling
@@ -214,12 +214,12 @@ itkNormalizedCorrelationPointSetToImageMetricTest(int, char *[])
   // for parameters[1] = {-10,10}  (arbitrary choice...)
   //---------------------------------------------------------
 
-  MetricType::MeasureType    measure;
+  MetricType::MeasureType    measure = NAN;
   MetricType::DerivativeType derivative;
 
   std::cout << "param[1]   Metric    d(Metric)/d(param[1] " << std::endl;
 
-  bool subtractMean = true;
+  constexpr bool subtractMean = true;
   ITK_TEST_SET_GET_BOOLEAN(metric, SubtractMean, subtractMean);
 
   parameters[1] = -10.2;

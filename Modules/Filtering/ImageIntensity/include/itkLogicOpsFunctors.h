@@ -21,10 +21,7 @@
 #include "itkNumericTraits.h"
 #include "itkMath.h"
 
-
-namespace itk
-{
-namespace Functor
+namespace itk::Functor
 {
 
 /**
@@ -55,16 +52,16 @@ namespace Functor
  *
  * \ingroup ITKImageIntensity
  */
+
 template <typename TInput1, typename TInput2 = TInput1, typename TOutput = TInput1>
 class ITK_TEMPLATE_EXPORT LogicOpBase
 {
 public:
   using Self = LogicOpBase;
   LogicOpBase()
-  {
-    m_ForegroundValue = itk::NumericTraits<TOutput>::OneValue();
-    m_BackgroundValue = TOutput{};
-  }
+    : m_ForegroundValue(itk::NumericTraits<TOutput>::OneValue())
+    , m_BackgroundValue(TOutput{})
+  {}
 
   ~LogicOpBase() = default;
 
@@ -87,12 +84,12 @@ public:
     m_BackgroundValue = BG;
   }
 
-  TOutput
+  [[nodiscard]] TOutput
   GetForegroundValue() const
   {
     return (m_ForegroundValue);
   }
-  TOutput
+  [[nodiscard]] TOutput
   GetBackgroundValue() const
   {
     return (m_BackgroundValue);
@@ -365,14 +362,12 @@ public:
     {
       return static_cast<TOutput>(B);
     }
-    else
-    {
-      return static_cast<TOutput>(C);
-    }
+
+    return static_cast<TOutput>(C);
   }
 };
 
-} // namespace Functor
-} // namespace itk
+} // namespace itk::Functor
+
 
 #endif

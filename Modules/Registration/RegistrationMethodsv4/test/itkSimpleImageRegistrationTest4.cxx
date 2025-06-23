@@ -44,7 +44,7 @@ protected:
   {
     // mark used to avoid warnings
     (void)&Self::Clone;
-  };
+  }
 
 public:
   void
@@ -77,8 +77,9 @@ public:
 
 template <unsigned int TDimension>
 int
-ImageRegistration(int itkNotUsed(argc), char * argv[])
+ImageRegistration(int argc, char * argv[])
 {
+  ITK_TEST_EXPECT_TRUE(argc == 4);
   const unsigned int ImageDimension = TDimension;
 
 
@@ -91,14 +92,14 @@ ImageRegistration(int itkNotUsed(argc), char * argv[])
   auto fixedImageReader = ImageReaderType::New();
   fixedImageReader->SetFileName(argv[2]);
   fixedImageReader->Update();
-  typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   fixedImage->Update();
   fixedImage->DisconnectPipeline();
 
   auto movingImageReader = ImageReaderType::New();
   movingImageReader->SetFileName(argv[3]);
   movingImageReader->Update();
-  typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
   movingImage->Update();
   movingImage->DisconnectPipeline();
 
@@ -127,8 +128,8 @@ ImageRegistration(int itkNotUsed(argc), char * argv[])
   optimizer->SetMinimumConvergenceValue(1e-5);
   optimizer->SetConvergenceWindowSize(2);
 
-  double                                           scaleData[] = { 200000, 1.0, 1.0 };
-  typename Optimizerv4Type::ScalesType::Superclass scales(scaleData, 3);
+  double                                                 scaleData[] = { 200000, 1.0, 1.0 };
+  const typename Optimizerv4Type::ScalesType::Superclass scales(scaleData, 3);
   optimizer->SetScales(scales);
 
   registration->SetOptimizer(optimizer);
@@ -142,7 +143,7 @@ ImageRegistration(int itkNotUsed(argc), char * argv[])
 
   registration->GetTransform()->Print(std::cout);
   std::cout << optimizer->GetStopConditionDescription() << std::endl;
-  typename TransformType::ParametersType results = registration->GetTransform()->GetParameters();
+  const typename TransformType::ParametersType results = registration->GetTransform()->GetParameters();
 
   std::cout << "Expecting close (+/- 0.3) to: ( 0.0, -2.8, 9.5 )" << std::endl;
   std::cout << "Parameters: " << results << std::endl;

@@ -34,7 +34,7 @@ itkNrrdImageIOTestGenerateRandomImage(unsigned int size)
 {
   using ImageType = itk::Image<TPixelType, VImageDimension>;
 
-  typename itk::RandomImageSource<ImageType>::Pointer source = itk::RandomImageSource<ImageType>::New();
+  const typename itk::RandomImageSource<ImageType>::Pointer source = itk::RandomImageSource<ImageType>::New();
 
   typename ImageType::SizeType    sz;
   typename ImageType::SpacingType spacing;
@@ -57,14 +57,17 @@ itkNrrdImageIOTestGenerateRandomImage(unsigned int size)
 
 template <typename TPixelType, unsigned int VImageDimension>
 int
-itkNrrdImageIOTestReadWriteTest(std::string fn, unsigned int size, std::string inputFile, bool compression = false)
+itkNrrdImageIOTestReadWriteTest(const std::string & fn,
+                                unsigned int        size,
+                                const std::string & inputFile,
+                                bool                compression = false)
 {
   using ImageType = itk::Image<TPixelType, VImageDimension>;
 
-  typename itk::ImageFileReader<ImageType>::Pointer reader = itk::ImageFileReader<ImageType>::New();
-  typename itk::ImageFileWriter<ImageType>::Pointer writer = itk::ImageFileWriter<ImageType>::New();
+  const typename itk::ImageFileReader<ImageType>::Pointer reader = itk::ImageFileReader<ImageType>::New();
+  const typename itk::ImageFileWriter<ImageType>::Pointer writer = itk::ImageFileWriter<ImageType>::New();
 
-  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  const itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(io, NrrdImageIO, ImageIOBase);
 
@@ -72,7 +75,7 @@ itkNrrdImageIOTestReadWriteTest(std::string fn, unsigned int size, std::string i
   ITK_TEST_EXPECT_TRUE(io->SupportsDimension(VImageDimension));
 
   constexpr unsigned int NRRD_DIM_MAX = 16; // taken from NrrdIO.h which is not in the include path
-  unsigned long          dim = NRRD_DIM_MAX + 1;
+  const unsigned long    dim = NRRD_DIM_MAX + 1;
   ITK_TEST_EXPECT_TRUE(!io->SupportsDimension(dim));
 
   // Binary files have no image information to read
@@ -86,7 +89,7 @@ itkNrrdImageIOTestReadWriteTest(std::string fn, unsigned int size, std::string i
 
   if (inputFile != "null")
   {
-    typename itk::ImageFileReader<ImageType>::Pointer tmpReader = itk::ImageFileReader<ImageType>::New();
+    const typename itk::ImageFileReader<ImageType>::Pointer tmpReader = itk::ImageFileReader<ImageType>::New();
     tmpReader->SetImageIO(io);
     tmpReader->SetFileName(inputFile.c_str());
 
@@ -120,7 +123,7 @@ itkNrrdImageIOTestReadWriteTest(std::string fn, unsigned int size, std::string i
   try
   {
     writer->SetFileName(fn.c_str());
-    if (compression == true)
+    if (compression)
     {
       writer->UseCompressionOn();
     }

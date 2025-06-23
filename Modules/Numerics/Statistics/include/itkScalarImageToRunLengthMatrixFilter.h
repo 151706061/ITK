@@ -24,9 +24,7 @@
 #include "itkVectorContainer.h"
 #include "itkProcessObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 /**
@@ -36,18 +34,8 @@ namespace Statistics
  *  used for image texture description.
  *
  * This filters creates a grey-level run length matrix from a N-D scalar
- * image. This is another possible texture description.  See the following
- * references.
- * M. M. Galloway. Texture analysis using gray level run lengths. Computer
- * Graphics and Image Processing, 4:172-179, 1975.
- *
- * A. Chu, C. M. Sehgal, and J. F. Greenleaf. Use of gray value distribution of
- * run lengths for texture analysis.  Pattern Recognition Letters, 11:415-420,
- * 1990.
- *
- * B. R. Dasarathy and E. B. Holder. Image characterizations based on joint
- * gray-level run-length distributions. Pattern Recognition Letters, 12:490-502,
- * 1991.
+ * image. This is another possible texture description.
+ * See \cite galloway1975, \cite chu1990 and \cite dasarathy1991.
  *
  * The basic idea is as follows:
  * Given an image and an offset (e.g. (1, -1) for a 2-d image), each element
@@ -93,7 +81,7 @@ namespace Statistics
  * NumericTraits class is the same, and thus cannot hold any larger values,
  * this would cause a float overflow.
  *
- * IJ article: https://www.insight-journal.org/browse/publication/231
+ * IJ article: https://doi.org/10.54294/ex0itu
  *
  * \sa ScalarImageToRunLengthFeaturesFilter
  * \sa HistogramToRunLengthFeaturesFilter
@@ -112,7 +100,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarImageToRunLengthMatrixFilter);
 
   /** standard New() method support */
@@ -233,9 +221,10 @@ public:
    * Set the pixel value of the mask that should be considered "inside" the
    * object. Defaults to 1.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(InsidePixelValue, PixelType);
   itkGetConstMacro(InsidePixelValue, PixelType);
-
+  /** @ITKEndGrouping */
 protected:
   ScalarImageToRunLengthMatrixFilter();
   ~ScalarImageToRunLengthMatrixFilter() override = default;
@@ -276,8 +265,7 @@ private:
   MeasurementVectorType m_UpperBound{};
   OffsetVectorPointer   m_Offsets{};
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkScalarImageToRunLengthMatrixFilter.hxx"

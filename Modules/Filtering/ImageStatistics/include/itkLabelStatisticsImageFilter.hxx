@@ -27,14 +27,12 @@ namespace itk
 {
 template <typename TInputImage, typename TLabelImage>
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::LabelStatisticsImageFilter()
+  : m_LowerBound(static_cast<RealType>(NumericTraits<PixelType>::NonpositiveMin()))
+  , m_UpperBound(static_cast<RealType>(NumericTraits<PixelType>::max()))
 {
   Self::AddRequiredInputName("LabelInput");
-
-  m_UseHistograms = false;
   m_NumBins.SetSize(1);
   m_NumBins[0] = 256;
-  m_LowerBound = static_cast<RealType>(NumericTraits<PixelType>::NonpositiveMin());
-  m_UpperBound = static_cast<RealType>(NumericTraits<PixelType>::max());
   m_ValidLabelValues.clear();
 }
 
@@ -271,234 +269,190 @@ template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetMinimum(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return NumericTraits<PixelType>::max();
   }
-  else
-  {
-    return mapIt->second.m_Minimum;
-  }
+
+  return mapIt->second.m_Minimum;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetMaximum(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return NumericTraits<PixelType>::NonpositiveMin();
   }
-  else
-  {
-    return mapIt->second.m_Maximum;
-  }
+
+  return mapIt->second.m_Maximum;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetMean(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return PixelType{};
   }
-  else
-  {
-    return mapIt->second.m_Mean;
-  }
+
+  return mapIt->second.m_Mean;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetSum(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return PixelType{};
   }
-  else
-  {
-    return mapIt->second.m_Sum;
-  }
+
+  return mapIt->second.m_Sum;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetSigma(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return PixelType{};
   }
-  else
-  {
-    return mapIt->second.m_Sigma;
-  }
+
+  return mapIt->second.m_Sigma;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetVariance(LabelPixelType label) const -> RealType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return PixelType{};
   }
-  else
-  {
-    return mapIt->second.m_Variance;
-  }
+
+  return mapIt->second.m_Variance;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetBoundingBox(LabelPixelType label) const -> BoundingBoxType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     BoundingBoxType emptyBox;
     // label does not exist, return a default value
     return emptyBox;
   }
-  else
-  {
-    return mapIt->second.m_BoundingBox;
-  }
+
+  return mapIt->second.m_BoundingBox;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetRegion(LabelPixelType label) const -> RegionType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
 
   if (mapIt == m_LabelStatistics.end())
   {
-    RegionType emptyRegion;
+    const RegionType emptyRegion;
     // label does not exist, return a default value
     return emptyRegion;
   }
-  else
+
+  BoundingBoxType bbox = this->GetBoundingBox(label);
+  IndexType       index;
+  SizeType        size;
+
+  for (unsigned int i = 0; i < ImageDimension; ++i)
   {
-    BoundingBoxType bbox = this->GetBoundingBox(label);
-    IndexType       index;
-    SizeType        size;
-
-    for (unsigned int i = 0; i < ImageDimension; ++i)
-    {
-      index[i] = bbox[2 * i];
-      size[i] = bbox[2 * i + 1] - bbox[2 * i] + 1;
-    }
-    const RegionType region(index, size);
-
-    return region;
+    index[i] = bbox[2 * i];
+    size[i] = bbox[2 * i + 1] - bbox[2 * i] + 1;
   }
+  const RegionType region(index, size);
+
+  return region;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetCount(LabelPixelType label) const -> MapSizeType
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return 0;
   }
-  else
-  {
-    return mapIt->second.m_Count;
-  }
+
+  return mapIt->second.m_Count;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetMedian(LabelPixelType label) const -> RealType
 {
-  RealType         median = 0.0;
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  RealType   median = 0.0;
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end() || !m_UseHistograms)
   {
     // label does not exist OR histograms not enabled, return the default value
     return median;
   }
-  else
+
+  typename HistogramType::SizeValueType bin = 0;
+
+  typename HistogramType::IndexType index;
+  index.SetSize(1);
+  RealType total = 0;
+
+  // count bins until just over half the distribution is counted
+  while (total <= (mapIt->second.m_Count / 2) && (bin < m_NumBins[0]))
   {
-    typename HistogramType::SizeValueType bin = 0;
-
-    typename HistogramType::IndexType index;
-    index.SetSize(1);
-    RealType total = 0;
-
-    // count bins until just over half the distribution is counted
-    while (total <= (mapIt->second.m_Count / 2) && (bin < m_NumBins[0]))
-    {
-      index[0] = bin;
-      total += mapIt->second.m_Histogram->GetFrequency(index);
-      ++bin;
-    }
-    --bin;
     index[0] = bin;
-
-    // return center of bin range
-    RealType lowRange = mapIt->second.m_Histogram->GetBinMin(0, bin);
-    RealType highRange = mapIt->second.m_Histogram->GetBinMax(0, bin);
-    median = lowRange + (highRange - lowRange) / 2;
-    return median;
+    total += mapIt->second.m_Histogram->GetFrequency(index);
+    ++bin;
   }
+  --bin;
+  index[0] = bin;
+
+  // return center of bin range
+  const RealType lowRange = mapIt->second.m_Histogram->GetBinMin(0, bin);
+  const RealType highRange = mapIt->second.m_Histogram->GetBinMax(0, bin);
+  median = lowRange + (highRange - lowRange) / 2;
+  return median;
 }
 
 template <typename TInputImage, typename TLabelImage>
 auto
 LabelStatisticsImageFilter<TInputImage, TLabelImage>::GetHistogram(LabelPixelType label) const -> HistogramPointer
 {
-  MapConstIterator mapIt;
-
-  mapIt = m_LabelStatistics.find(label);
+  const auto mapIt = m_LabelStatistics.find(label);
   if (mapIt == m_LabelStatistics.end())
   {
     // label does not exist, return a default value
     return nullptr;
   }
-  else
-  {
-    // this will be zero if histograms have not been enabled
-    return mapIt->second.m_Histogram;
-  }
+
+  // this will be zero if histograms have not been enabled
+  return mapIt->second.m_Histogram;
 }
 
 template <typename TImage, typename TLabelImage>
@@ -510,13 +464,13 @@ LabelStatisticsImageFilter<TImage, TLabelImage>::PrintSelf(std::ostream & os, In
   Superclass::PrintSelf(os, indent);
 
   os << indent << "LabelStatistics: " << std::endl;
-  for (auto const & pair : m_LabelStatistics)
+  for (const auto & pair : m_LabelStatistics)
   {
     os << indent.GetNextIndent() << "{" << pair.first << ": " << pair.second << "}" << std::endl;
   }
 
   os << indent << "ValidLabelValues: " << m_ValidLabelValues << std::endl;
-  os << indent << "UseHistograms: " << (m_UseHistograms ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseHistograms);
   os << indent << "NumBins: " << m_NumBins << std::endl;
   os << indent << "LowerBound: " << static_cast<typename NumericTraits<RealType>::PrintType>(m_LowerBound) << std::endl;
   os << indent << "UpperBound: " << static_cast<typename NumericTraits<RealType>::PrintType>(m_UpperBound) << std::endl;

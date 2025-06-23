@@ -56,9 +56,10 @@
 #include "itkHistogram.h"
 #include "itkSampleToHistogramFilter.h"
 // Software Guide : EndCodeSnippet
-
+namespace
+{
 int
-main(int argc, char * argv[])
+ExampleMain(int argc, const char * const argv[])
 {
 
   if (argc < 2)
@@ -84,17 +85,18 @@ main(int argc, char * argv[])
 
   // Software Guide : BeginLatex
   //
-  // Using the same image type we instantiate the type of the image reader
+  // Using the same image type we read the image file
   // that will provide the image source for our example.
+  // As usual, this must be done inside a try/catch block because the read
+  // operation can potentially throw exceptions.
   //
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  using ReaderType = itk::ImageFileReader<ImageType>;
+  ImageType::Pointer input;
 
-  auto reader = ReaderType::New();
+  input = itk::ReadImage<ImageType>(argv[1]);
 
-  reader->SetFileName(argv[1]);
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -104,7 +106,7 @@ main(int argc, char * argv[])
   // samples. We instantiate the type of the adaptor by using the actual image
   // type. Then construct the adaptor by invoking its \code{New()} method and
   // assigning the result to the corresponding smart pointer. Finally we
-  // connect the output of the image reader to the input of the adaptor.
+  // specify the input to the adaptor.
   //
   // \index{itk::Statistics::Scalar\-Image\-To\-List\-Adaptor!instantiation}
   //
@@ -115,31 +117,7 @@ main(int argc, char * argv[])
 
   auto adaptor = AdaptorType::New();
 
-  adaptor->SetImage(reader->GetOutput());
-  // Software Guide : EndCodeSnippet
-
-  // Software Guide : BeginLatex
-  //
-  // You must keep in mind that adaptors are not pipeline objects. This means
-  // that they do not propagate update calls. It is therefore your
-  // responsibility to make sure that you invoke the \code{Update()} method of
-  // the reader before you attempt to use the output of the adaptor. As usual,
-  // this must be done inside a try/catch block because the read operation can
-  // potentially throw exceptions.
-  //
-  // Software Guide : EndLatex
-
-  // Software Guide : BeginCodeSnippet
-  try
-  {
-    reader->Update();
-  }
-  catch (const itk::ExceptionObject & excp)
-  {
-    std::cerr << "Problem reading image file : " << argv[1] << std::endl;
-    std::cerr << excp << std::endl;
-    return EXIT_FAILURE;
-  }
+  adaptor->SetImage(input);
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -206,7 +184,7 @@ main(int argc, char * argv[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  HistogramType::ConstPointer histogram = filter->GetOutput();
+  const HistogramType::ConstPointer histogram = filter->GetOutput();
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -229,4 +207,27 @@ main(int argc, char * argv[])
   // Software Guide : EndCodeSnippet
 
   return EXIT_SUCCESS;
+}
+} // namespace
+
+int
+main(int argc, char * argv[])
+{
+  try
+  {
+    return ExampleMain(argc, argv);
+  }
+  catch (const itk::ExceptionObject & exceptionObject)
+  {
+    std::cerr << "ITK exception caught:\n" << exceptionObject << '\n';
+  }
+  catch (const std::exception & stdException)
+  {
+    std::cerr << "std exception caught:\n" << stdException.what() << '\n';
+  }
+  catch (...)
+  {
+    std::cerr << "Unhandled exception!\n";
+  }
+  return EXIT_FAILURE;
 }

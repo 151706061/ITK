@@ -52,7 +52,7 @@ NaryFunctorImageFilter<TInputImage, TOutputImage, TFunction>::DynamicThreadedGen
   // count the number of inputs that are non-null
   for (unsigned int i = 0; i < numberOfInputImages; ++i)
   {
-    InputImagePointer inputPtr = dynamic_cast<TInputImage *>(ProcessObject::GetInput(i));
+    const InputImagePointer inputPtr = dynamic_cast<TInputImage *>(ProcessObject::GetInput(i));
 
     if (inputPtr)
     {
@@ -71,10 +71,10 @@ NaryFunctorImageFilter<TInputImage, TOutputImage, TFunction>::DynamicThreadedGen
 
   NaryArrayType naryInputArray(numberOfValidInputImages);
 
-  OutputImagePointer outputPtr = this->GetOutput(0);
+  const OutputImagePointer outputPtr = this->GetOutput(0);
 
-  typename std::vector<ImageScanlineConstIteratorType *>::iterator             regionIterators;
-  const typename std::vector<ImageScanlineConstIteratorType *>::const_iterator regionItEnd = inputItrVector.end();
+  typename std::vector<ImageScanlineConstIteratorType *>::iterator regionIterators;
+  const auto                                                       regionItEnd = inputItrVector.end();
 
   typename NaryArrayType::iterator arrayIt;
 

@@ -23,9 +23,7 @@
 #include "itkHistogram.h"
 #include "itkObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class ScalarImageToHistogramGenerator
@@ -45,7 +43,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarImageToHistogramGenerator);
 
   /** standard New() method support */
@@ -118,8 +116,7 @@ private:
 
   GeneratorPointer m_HistogramGenerator{};
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkScalarImageToHistogramGenerator.hxx"

@@ -81,10 +81,10 @@ main(int, char *[])
   using ImageType = itk::Image<unsigned short, Dimension>;
   auto image = ImageType::New();
 
-  const ImageType::SizeType size = {
+  constexpr ImageType::SizeType size = {
     { 200, 200, 200 }
   }; // Size along {X,Y,Z}
-  const ImageType::IndexType start = {
+  constexpr ImageType::IndexType start = {
     { 0, 0, 0 }
   }; // First index on {X,Y,Z}
 
@@ -170,8 +170,7 @@ main(int, char *[])
 
   // Software Guide : BeginCodeSnippet
   // coordinates of the center of the first pixel in N-D
-  ImageType::PointType newOrigin;
-  newOrigin.Fill(0.0);
+  constexpr ImageType::PointType newOrigin{};
   image->SetOrigin(newOrigin);
   // Software Guide : EndCodeSnippet
 
@@ -441,9 +440,9 @@ main(int, char *[])
   // SoftwareGuide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  using MatrixType = itk::Matrix<double, Dimension, Dimension>;
-  MatrixType SpacingMatrix;
-  SpacingMatrix.Fill(0.0F);
+  using MatrixType =
+    itk::Matrix<itk::SpacePrecisionType, Dimension, Dimension>;
+  auto SpacingMatrix = itk::MakeFilled<MatrixType>(0.0F);
 
   const ImageType::SpacingType & ImageSpacing = image->GetSpacing();
   SpacingMatrix(0, 0) = ImageSpacing[0];
@@ -454,13 +453,14 @@ main(int, char *[])
     image->GetDirection();
   const ImageType::PointType & ImageOrigin = image->GetOrigin();
 
-  using VectorType = itk::Vector<double, Dimension>;
+  using VectorType =
+    itk::Vector<ImageType::PointType::CoordinateType, Dimension>;
   VectorType LeftEyeIndexVector;
   LeftEyeIndexVector[0] = LeftEyeIndex[0];
   LeftEyeIndexVector[1] = LeftEyeIndex[1];
   LeftEyeIndexVector[2] = LeftEyeIndex[2];
 
-  ImageType::PointType LeftEyePointByHand =
+  const ImageType::PointType LeftEyePointByHand =
     ImageOrigin + ImageDirectionCosines * SpacingMatrix * LeftEyeIndexVector;
   // Software Guide : EndCodeSnippet
 

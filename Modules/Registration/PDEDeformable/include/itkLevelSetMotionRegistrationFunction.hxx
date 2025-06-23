@@ -27,10 +27,9 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
 LevelSetMotionRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::LevelSetMotionRegistrationFunction()
 {
-  RadiusType   r;
-  unsigned int j;
+  RadiusType r;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     r[j] = 0;
   }
@@ -52,7 +51,6 @@ LevelSetMotionRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField
   m_NumberOfPixelsProcessed = 0L;
   m_RMSChange = NumericTraits<double>::max();
   m_SumOfSquaredChange = 0.0;
-  m_UseImageSpacing = true;
 
   m_MovingImageSmoothingFilter = MovingImageSmoothingFilterType::New();
   m_MovingImageSmoothingFilter->SetSigma(m_GradientSmoothingStandardDeviations);
@@ -91,7 +89,7 @@ LevelSetMotionRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField
   os << indent << "RMSChange: " << m_RMSChange << std::endl;
   os << indent << "SumOfSquaredChange: " << m_SumOfSquaredChange << std::endl;
 
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
 }
 
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
@@ -221,7 +219,7 @@ LevelSetMotionRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField
     mappedPoint[j] += it.GetCenterPixel()[j];
   }
   PixelType update;
-  double    movingValue;
+  double    movingValue = NAN;
   if (m_MovingImageInterpolator->IsInsideBuffer(mappedPoint))
   {
     movingValue = m_MovingImageInterpolator->Evaluate(mappedPoint);

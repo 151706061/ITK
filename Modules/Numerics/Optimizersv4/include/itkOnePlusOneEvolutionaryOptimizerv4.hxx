@@ -24,22 +24,16 @@ namespace itk
 {
 template <typename TInternalComputationValueType>
 OnePlusOneEvolutionaryOptimizerv4<TInternalComputationValueType>::OnePlusOneEvolutionaryOptimizerv4()
+  : m_RandomGenerator(nullptr)
+  , m_MaximumIteration(100)
+  , m_Epsilon(1.5e-4)
+  , m_InitialRadius(1.01)
+  , m_GrowthFactor(1.05)
+  , m_ShrinkFactor(std::pow(m_GrowthFactor, -0.25))
+  , m_CurrentCost(0)
+
 {
-  m_CatchGetValueException = false;
-  m_MetricWorstPossibleValue = 0;
-
-  m_Epsilon = 1.5e-4;
-  m_RandomGenerator = nullptr;
-
-  m_Initialized = false;
-  m_GrowthFactor = 1.05;
-  m_ShrinkFactor = std::pow(m_GrowthFactor, -0.25);
-  m_InitialRadius = 1.01;
-  m_MaximumIteration = 100;
-  m_Stop = false;
   m_StopConditionDescription.str("");
-  m_CurrentCost = 0;
-  m_FrobeniusNorm = 0.0;
 }
 
 template <typename TInternalComputationValueType>
@@ -94,7 +88,7 @@ OnePlusOneEvolutionaryOptimizerv4<TInternalComputationValueType>::StartOptimizat
   this->InvokeEvent(StartEvent());
   m_Stop = false;
 
-  unsigned int       spaceDimension = this->m_Metric->GetNumberOfParameters();
+  const unsigned int spaceDimension = this->m_Metric->GetNumberOfParameters();
   vnl_matrix<double> A(spaceDimension, spaceDimension);
   vnl_vector<double> parent(this->m_Metric->GetParameters());
   vnl_vector<double> f_norm(spaceDimension);
@@ -253,7 +247,7 @@ OnePlusOneEvolutionaryOptimizerv4<TInternalComputationValueType>::StartOptimizat
     // f_norm, f_norm)
 
     // A = A + (adjust - 1.0) * A;
-    double alpha = ((adjust - 1.0) / dot_product(f_norm, f_norm));
+    const double alpha = ((adjust - 1.0) / dot_product(f_norm, f_norm));
     for (unsigned int c = 0; c < spaceDimension; ++c)
     {
       for (unsigned int r = 0; r < spaceDimension; ++r)
@@ -275,7 +269,7 @@ OnePlusOneEvolutionaryOptimizerv4<TInternalComputationValueType>::StartOptimizat
 }
 
 template <typename TInternalComputationValueType>
-const std::string
+std::string
 OnePlusOneEvolutionaryOptimizerv4<TInternalComputationValueType>::GetStopConditionDescription() const
 {
   return m_StopConditionDescription.str();

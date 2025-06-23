@@ -27,8 +27,9 @@ namespace itk
  * \class HessianToObjectnessMeasureImageFilter
  * \brief A filter to enhance M-dimensional objects in N-dimensional images
  *
- * The objectness measure is a generalization of Frangi's vesselness measure,
- * which is based on the analysis of the the Hessian eigen system. The filter
+ * The objectness measure is a generalization of Frangi's vesselness
+ * measure \cite frangi1998,
+ * which is based on the analysis of the Hessian eigen system. The filter
  * can enhance blob-like structures (M=0), vessel-like structures (M=1), 2D
  * plate-like structures (M=2), hyper-plate-like structures (M=3) in N-dimensional
  * images, with M<N.
@@ -36,15 +37,8 @@ namespace itk
  * pixels ) and produces an enhanced image. The Hessian input image can be produced
  * using itk::HessianRecursiveGaussianImageFilter.
  *
- *
- * \par References
- * Frangi, AF, Niessen, WJ, Vincken, KL, & Viergever, MA (1998). Multiscale Vessel
- * Enhancement Filtering. In Wells, WM, Colchester, A, & Delp, S, Editors, MICCAI '98
- * Medical Image Computing and Computer-Assisted Intervention, Lecture Notes in Computer
- * Science, pages 130-137, Springer Verlag, 1998.
- *
  * Additional information can be from in the Insight Journal:
- * https://www.insight-journal.org/browse/publication/175
+ * https://doi.org/10.54294/urgadx
  *
  * \author Luca Antiga Ph.D.  Medical Imaging Unit,
  *                            Bioengineering Department, Mario Negri Institute, Italy.
@@ -84,49 +78,51 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HessianToObjectnessMeasureImageFilter);
 
   /** Set/Get Alpha, the weight corresponding to R_A
    * (the ratio of the smallest eigenvalue that has to be large to the larger ones).
    * Smaller values lead to increased sensitivity to the object dimensionality. */
+  /** @ITKStartGrouping */
   itkSetMacro(Alpha, double);
   itkGetConstMacro(Alpha, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get Beta, the weight corresponding to R_B
    * (the ratio of the largest eigenvalue that has to be small to the larger ones).
    * Smaller values lead to increased sensitivity to the object dimensionality. */
+  /** @ITKStartGrouping */
   itkSetMacro(Beta, double);
   itkGetConstMacro(Beta, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get Gamma, the weight corresponding to S
    * (the Frobenius norm of the Hessian matrix, or second-order structureness) */
+  /** @ITKStartGrouping */
   itkSetMacro(Gamma, double);
   itkGetConstMacro(Gamma, double);
-
+  /** @ITKEndGrouping */
   /** Toggle scaling the objectness measure with the magnitude of the largest
     absolute eigenvalue */
+  /** @ITKStartGrouping */
   itkSetMacro(ScaleObjectnessMeasure, bool);
   itkGetConstMacro(ScaleObjectnessMeasure, bool);
   itkBooleanMacro(ScaleObjectnessMeasure);
-
+  /** @ITKEndGrouping */
   /** Set/Get the dimensionality of the object (0: points (blobs),
    * 1: lines (vessels), 2: planes (plate-like structures), 3: hyper-planes.
    * ObjectDimension must be smaller than ImageDimension. */
+  /** @ITKStartGrouping */
   itkSetMacro(ObjectDimension, unsigned int);
   itkGetConstMacro(ObjectDimension, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Enhance bright structures on a dark background if true, the opposite if
     false. Default is "On" (equivalent to vesselness). */
+  /** @ITKStartGrouping */
   itkSetMacro(BrightObject, bool);
   itkGetConstMacro(BrightObject, bool);
   itkBooleanMacro(BrightObject);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   HessianToObjectnessMeasureImageFilter();
@@ -135,7 +131,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
 
   void
   DynamicThreadedGenerateData(const OutputImageRegionType & outputRegionForThread) override;

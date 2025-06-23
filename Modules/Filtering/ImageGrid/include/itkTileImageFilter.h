@@ -63,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TileImageFilter);
 
   /** Image pixel value type alias. */
@@ -86,6 +86,7 @@ public:
   /** Image related type alias. */
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
+
   /**
    * \class TileInfo
    * Define a tile structure
@@ -107,9 +108,10 @@ public:
   /** Set/Get the layout of the tiles. If the last Layout value is 0,
    * the filter will compute a value that will accommodate all of the
    * images. */
+  /** @ITKStartGrouping */
   itkSetMacro(Layout, LayoutArrayType);
   itkGetConstMacro(Layout, LayoutArrayType);
-
+  /** @ITKEndGrouping */
   /** Set the pixel value for locations that are not covered by an
    * input image. The default default pixel value is Zero. */
   itkSetMacro(DefaultPixelValue, OutputPixelType);
@@ -118,13 +120,9 @@ public:
    * input image. */
   itkGetConstMacro(DefaultPixelValue, OutputPixelType);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputPixelType>));
   itkConceptMacro(SameTypeCheck, (Concept::SameType<InputPixelType, OutputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   TileImageFilter();
@@ -148,7 +146,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override;
+  VerifyInputInformation() const override;
 
 private:
   typename TileImageType::Pointer m_TileImage{};

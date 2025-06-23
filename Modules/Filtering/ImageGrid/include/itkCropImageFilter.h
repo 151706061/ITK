@@ -55,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CropImageFilter);
 
   /** Typedef to describe the output and input image region types. */
@@ -78,11 +78,12 @@ public:
   static constexpr unsigned int OutputImageDimension = Superclass::OutputImageDimension;
 
   /** Set/Get the cropping sizes for the upper and lower boundaries. */
+  /** @ITKStartGrouping */
   itkSetMacro(UpperBoundaryCropSize, SizeType);
   itkGetConstMacro(UpperBoundaryCropSize, SizeType);
   itkSetMacro(LowerBoundaryCropSize, SizeType);
   itkGetConstMacro(LowerBoundaryCropSize, SizeType);
-
+  /** @ITKEndGrouping */
   void
   SetBoundaryCropSize(const SizeType & s)
   {
@@ -90,12 +91,8 @@ public:
     this->SetLowerBoundaryCropSize(s);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   CropImageFilter()
@@ -113,7 +110,7 @@ protected:
   GenerateOutputInformation() override;
 
   void
-  VerifyInputInformation() ITKv5_CONST override;
+  VerifyInputInformation() const override;
 
 private:
   SizeType m_UpperBoundaryCropSize{};

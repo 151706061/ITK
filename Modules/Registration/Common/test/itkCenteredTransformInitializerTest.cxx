@@ -91,7 +91,7 @@ RunTest(itk::SmartPointer<TFixedImage> fixedImage, itk::SmartPointer<TMovingImag
   const TransformType::InputPointType &   center1 = transform->GetCenter();
   const TransformType::OutputVectorType & translation1 = transform->GetTranslation();
   const TransformType::OffsetType &       offset1 = transform->GetOffset();
-  const double                            tolerance = 1e-3;
+  constexpr double                        tolerance = 1e-3;
 
   // Verfications for the Geometry Mode
   for (unsigned int k = 0; k < Dimension; ++k)
@@ -270,9 +270,7 @@ itkCenteredTransformInitializerTest(int, char *[])
     index[1] = 0;
     index[2] = 0;
 
-    RegionType region;
-    region.SetSize(size);
-    region.SetIndex(index);
+    const RegionType region{ index, size };
 
 
     auto fixedImage = FixedImageType::New();
@@ -337,13 +335,9 @@ itkCenteredTransformInitializerTest(int, char *[])
     movingIndex[1] = 20;
     movingIndex[2] = 30;
 
-    RegionType fixedRegion;
-    fixedRegion.SetSize(size);
-    fixedRegion.SetIndex(fixedIndex);
+    const RegionType fixedRegion{ fixedIndex, size };
 
-    RegionType movingRegion;
-    movingRegion.SetSize(size);
-    movingRegion.SetIndex(movingIndex);
+    const RegionType movingRegion{ movingIndex, size };
 
     using VersorType = itk::Versor<itk::SpacePrecisionType>;
     VersorType x;
@@ -353,8 +347,8 @@ itkCenteredTransformInitializerTest(int, char *[])
     VersorType z;
     z.SetRotationAroundZ(1.5);
 
-    DirectionType fixedDirection = (x * y * z).GetMatrix();
-    DirectionType movingDirection = (z * y * x).GetMatrix();
+    const DirectionType fixedDirection = (x * y * z).GetMatrix();
+    const DirectionType movingDirection = (z * y * x).GetMatrix();
 
 
     auto fixedImage = FixedImageType::New();

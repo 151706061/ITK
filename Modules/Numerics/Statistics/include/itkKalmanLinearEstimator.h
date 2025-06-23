@@ -111,7 +111,7 @@ public:
 
   /** This method returns the vector of estimated parameters
    * \sa Estimator */
-  const VectorType &
+  [[nodiscard]] const VectorType &
   GetEstimator() const
   {
     return m_Estimator;
@@ -119,7 +119,7 @@ public:
 
   /** This method returns the covariance matrix of the estimated parameters
    * \sa Variance */
-  const MatrixType &
+  [[nodiscard]] const MatrixType &
   GetVariance() const
   {
     return m_Variance;
@@ -151,9 +151,9 @@ void
 KalmanLinearEstimator<T, VEstimatorDimension>::UpdateWithNewMeasure(const ValueType &  newMeasure,
                                                                     const VectorType & newPredictor)
 {
-  ValueType measurePrediction = dot_product(newPredictor, m_Estimator);
+  const ValueType measurePrediction = dot_product(newPredictor, m_Estimator);
 
-  ValueType errorMeasurePrediction = newMeasure - measurePrediction;
+  const ValueType errorMeasurePrediction = newMeasure - measurePrediction;
 
   VectorType Corrector = m_Variance * newPredictor;
 
@@ -171,7 +171,7 @@ KalmanLinearEstimator<T, VEstimatorDimension>::UpdateVariance(const VectorType &
 {
   VectorType aux = m_Variance * newPredictor;
 
-  ValueType denominator = 1.0 / (1.0 + dot_product(aux, newPredictor));
+  const ValueType denominator = 1.0 / (1.0 + dot_product(aux, newPredictor));
 
   for (unsigned int col = 0; col < VEstimatorDimension; ++col)
   {

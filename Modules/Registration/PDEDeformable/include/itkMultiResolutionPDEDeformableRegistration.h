@@ -100,7 +100,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiResolutionPDEDeformableRegistration);
 
   /** Fixed image type. */
@@ -190,21 +190,24 @@ public:
    * MultiResolutionPDEDeformableRegistration can take a third input
    * as an initial deformation field, this input is not a required input.
    */
-  std::vector<SmartPointer<DataObject>>::size_type
+  [[nodiscard]] std::vector<SmartPointer<DataObject>>::size_type
   GetNumberOfValidRequiredInputs() const override;
 
   /** Get/Set the internal registrator. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(RegistrationFilter, RegistrationType);
   itkGetModifiableObjectMacro(RegistrationFilter, RegistrationType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the fixed image pyramid. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(FixedImagePyramid, FixedImagePyramidType);
   itkGetModifiableObjectMacro(FixedImagePyramid, FixedImagePyramidType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the moving image pyramid. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(MovingImagePyramid, MovingImagePyramidType);
   itkGetModifiableObjectMacro(MovingImagePyramid, MovingImagePyramidType);
-
+  /** @ITKEndGrouping */
   /** Set number of multi-resolution levels. */
   virtual void
   SetNumberOfLevels(unsigned int num);
@@ -216,13 +219,16 @@ public:
   itkGetConstReferenceMacro(CurrentLevel, unsigned int);
 
   /** Get/Set the moving image pyramid. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(FieldExpander, FieldExpanderType);
   itkGetModifiableObjectMacro(FieldExpander, FieldExpanderType);
-
+  /** @ITKEndGrouping */
   /** Set number of iterations per multi-resolution levels. */
-  itkSetMacro(NumberOfIterations, NumberOfIterationsType);
+  /** @ITKStartGrouping */
+  virtual void
+  SetNumberOfIterations(NumberOfIterationsType numberOfIterations);
   itkSetVectorMacro(NumberOfIterations, unsigned int, m_NumberOfLevels);
-
+  /** @ITKEndGrouping */
   /** Get number of iterations per multi-resolution levels. */
   itkGetConstReferenceMacro(NumberOfIterations, NumberOfIterationsType);
 
@@ -283,7 +289,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override
+  VerifyInputInformation() const override
   {}
 
 private:

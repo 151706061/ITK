@@ -44,7 +44,7 @@ namespace itk
  *
  *
  *  This implementation was taken from the Insight Journal paper:
- *  https://www.insight-journal.org/browse/publication/202
+ *  https://doi.org/10.54294/8ga88z
  *
  * \ingroup ITKQuadEdgeMeshFiltering
  *
@@ -69,7 +69,11 @@ public:
   using InputMeshType = TInputMesh;
   using InputMeshPointer = typename InputMeshType::Pointer;
   using InputMeshConstPointer = typename InputMeshType::ConstPointer;
-  using InputCoordRepType = typename InputMeshType::CoordRepType;
+  using InputCoordinateType = typename InputMeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using InputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `InputCoordRepType`. Please use `InputCoordinateType` instead!") = InputCoordinateType;
+#endif
   using InputPointType = typename InputMeshType::PointType;
   using InputPointVectorType = typename InputPointType::VectorType;
   using InputPointIdentifier = typename InputMeshType::PointIdentifier;
@@ -98,7 +102,11 @@ public:
   using OutputMeshType = TOutputMesh;
   using OutputMeshPointer = typename OutputMeshType::Pointer;
   using OutputMeshConstPointer = typename OutputMeshType::ConstPointer;
-  using OutputCoordRepType = typename OutputMeshType::CoordRepType;
+  using OutputCoordinateType = typename OutputMeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using OutputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `OutputCoordRepType`. Please use `OutputCoordinateType` instead!") = OutputCoordinateType;
+#endif
   using OutputPointType = typename OutputMeshType::PointType;
   using OutputPointIdentifier = typename OutputMeshType::PointIdentifier;
   using OutputQEType = typename OutputMeshType::QEType;

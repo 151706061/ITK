@@ -33,9 +33,7 @@
 
 #include "vnl/algo/vnl_determinant.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 template <typename TMovingImage, typename TFixedImage, typename TFemObject>
@@ -112,25 +110,11 @@ template <typename TMovingImage, typename TFixedImage, typename TFemObject>
 void
 FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::SetStandardDeviations(double value)
 {
-  unsigned int j;
-
-  for (j = 0; j < ImageDimension; ++j)
-  {
-    if (Math::NotExactlyEquals(value, m_StandardDeviations[j]))
-    {
-      break;
-    }
-  }
-  if (j < ImageDimension)
+  if (ContainerFillWithCheck(m_StandardDeviations, value, ImageDimension))
   {
     this->Modified();
-    for (j = 0; j < ImageDimension; ++j)
-    {
-      m_StandardDeviations[j] = value;
-    }
   }
 }
-
 
 template <typename TMovingImage, typename TFixedImage, typename TFemObject>
 void
@@ -242,8 +226,8 @@ void
 FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::WarpImage(const MovingImageType * ImageToWarp)
 {
   auto warper = WarperType::New();
-  using WarperCoordRepType = typename WarperType::CoordRepType;
-  using InterpolatorType1 = itk::LinearInterpolateImageFunction<MovingImageType, WarperCoordRepType>;
+  using WarperCoordinateType = typename WarperType::CoordinateType;
+  using InterpolatorType1 = itk::LinearInterpolateImageFunction<MovingImageType, WarperCoordinateType>;
   auto interpolator = InterpolatorType1::New();
 
   warper = WarperType::New();
@@ -421,8 +405,8 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::ApplyLoads(ImageSi
 
   Element::VectorType coord;
 
-  bool         EdgeFound;
-  unsigned int nodect = 0;
+  bool EdgeFound;
+  itkDebugStatement(unsigned int nodect = 0);
   for (int i = 0; i < numNodes; ++i)
   {
     if (EdgeCounter >= ImageDimension)
@@ -493,7 +477,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::ApplyLoads(ImageSi
         }
       } // end elt loop
     }
-    ++nodect;
+    itkDebugStatement(++nodect);
     itkDebugMacro(" Node: " << nodect);
   }
 }
@@ -658,7 +642,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::InterpolateVectorF
   Sol.set_size(ImageDimension);
   Gpt.set_size(ImageDimension);
 
-  if (ImageDimension == 2)
+  if constexpr (ImageDimension == 2)
   {
     Element::ConstPointer eltp;
     for (; !fieldIter.IsAtEnd(); ++fieldIter)
@@ -697,7 +681,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::InterpolateVectorF
     }
   }
 
-  if (ImageDimension == 3)
+  if constexpr (ImageDimension == 3)
   {
     // FIXME SHOULD BE 2.0 over meshpixperelt
     rstep = 1.25 / (static_cast<double>(m_MeshPixelsPerElementAtEachResolution[m_CurrentLevel]));
@@ -765,7 +749,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::InterpolateVectorF
           }
         }
       } // end of for loops
-    }   // end of elt array loop
+    } // end of elt array loop
   }
 
   // Ensure that the values are exact at the nodes. They won't necessarily be unless we use this code.
@@ -811,8 +795,8 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::EnforceDiffeomorph
   }
 
   auto warper = WarperType::New();
-  using WarperCoordRepType = typename WarperType::CoordRepType;
-  using InterpolatorType1 = itk::LinearInterpolateImageFunction<MovingImageType, WarperCoordRepType>;
+  using WarperCoordinateType = typename WarperType::CoordinateType;
+  using InterpolatorType1 = itk::LinearInterpolateImageFunction<MovingImageType, WarperCoordinateType>;
   auto interpolator = InterpolatorType1::New();
 
   // If using landmarks, warp them
@@ -857,8 +841,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::EnforceDiffeomorph
     m_TotalField->SetLargestPossibleRegion(m_FieldRegion);
     m_TotalField->Allocate();
 
-    VectorType disp;
-    disp.Fill(0.0);
+    VectorType disp{};
 
     FieldIterator fieldIter(m_TotalField, m_FieldRegion);
 
@@ -897,13 +880,13 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::EnforceDiffeomorph
     FieldIterator                      totalFieldIter(m_TotalField, m_TotalField->GetLargestPossibleRegion());
     totalFieldIter.GoToBegin();
     unsigned int jj;
-    float        pathsteplength = 0;
+    itkDebugStatement(float pathsteplength = 0);
     while (!totalFieldIter.IsAtEnd())
     {
       index = totalFieldIter.GetIndex();
       for (jj = 0; jj < ImageDimension; ++jj)
       {
-        inputIndex[jj] = (WarperCoordRepType)index[jj];
+        inputIndex[jj] = (WarperCoordinateType)index[jj];
         interpolatedValue[jj] = 0.0;
       }
 
@@ -918,7 +901,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::EnforceDiffeomorph
         interped[jj] = interpolatedValue[jj];
         temp += interped[jj] * interped[jj];
       }
-      pathsteplength += std::sqrt(temp);
+      itkDebugStatement(pathsteplength += std::sqrt(temp));
       m_TotalField->SetPixel(index, m_TotalField->GetPixel(index) + interped);
       ++totalFieldIter;
     }
@@ -930,8 +913,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::EnforceDiffeomorph
     fieldIter.GoToBegin();
     while (!fieldIter.IsAtEnd())
     {
-      VectorType disp;
-      disp.Fill(0.0);
+      VectorType disp{};
       fieldIter.Set(disp);
       ++fieldIter;
     }
@@ -1045,7 +1027,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::SampleVectorFieldA
     InterpolatedType interpolatedValue;
     for (unsigned int jj = 0; jj < ImageDimension; ++jj)
     {
-      inputIndex[jj] = (CoordRepType)coord[jj];
+      inputIndex[jj] = (CoordinateType)coord[jj];
       interpolatedValue[jj] = 0.0;
     }
     if (m_Interpolator->IsInsideBuffer(inputIndex))
@@ -1133,8 +1115,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::MultiResSolve()
       unsigned int ndofpernode = m_Element->GetNumberOfDegreesOfFreedomPerNode();
       unsigned int numnodesperelt = m_Element->GetNumberOfNodes() + 1;
       unsigned int ndof = solver->GetInput()->GetNumberOfDegreesOfFreedom();
-      unsigned int nzelts;
-      nzelts = numnodesperelt * ndofpernode * ndof;
+      unsigned int nzelts = numnodesperelt * ndofpernode * ndof;
 
       // Used when reading a mesh from file
       // nzelts=((2*numnodesperelt*ndofpernode*ndof > 25*ndof) ? 2*numnodesperelt*ndofpernode*ndof : 25*ndof);
@@ -1439,9 +1420,7 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::GetLandmark(unsign
                                                                           PointType &  target)
 {
   Element::VectorType localSource;
-  Element::VectorType localTarget;
-
-  localTarget = m_LandmarkArray[index]->GetTarget();
+  Element::VectorType localTarget = m_LandmarkArray[index]->GetTarget();
   localSource = m_LandmarkArray[index]->GetSource();
   for (unsigned int i = 0; i < ImageDimension; ++i)
   {
@@ -1482,10 +1461,10 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::PrintSelf(std::ost
   os << indent << "MinJacobian: " << m_MinJacobian << std::endl;
   os << indent << "Alpha: " << m_Alpha << std::endl;
 
-  os << indent << "UseLandmarks: " << (m_UseLandmarks ? "On" : "Off") << std::endl;
-  os << indent << "UseMassMatrix: " << (m_UseNormalizedGradient ? "On" : "Off") << std::endl;
-  os << indent << "UseNormalizedGradient: " << (m_UseNormalizedGradient ? "On" : "Off") << std::endl;
-  os << indent << "CreateMeshFromImage: " << (m_CreateMeshFromImage ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseLandmarks);
+  itkPrintSelfBooleanMacro(UseNormalizedGradient);
+  itkPrintSelfBooleanMacro(UseNormalizedGradient);
+  itkPrintSelfBooleanMacro(CreateMeshFromImage);
   os << indent << "EmployRegridding: " << m_EmployRegridding << std::endl;
   os << indent << "DescentDirection: " << m_DescentDirection << std::endl;
   os << indent << "EnergyReductionFactor: " << m_EnergyReductionFactor << std::endl;
@@ -1541,7 +1520,6 @@ FEMRegistrationFilter<TMovingImage, TFixedImage, TFemObject>::PrintSelf(std::ost
      << static_cast<typename NumericTraits<StandardDeviationsType>::PrintType>(m_StandardDeviations) << std::endl;
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif

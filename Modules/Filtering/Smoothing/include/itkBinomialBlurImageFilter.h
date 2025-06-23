@@ -55,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinomialBlurImageFilter);
 
   /** Number of dimensions */
@@ -82,9 +82,10 @@ public:
   using OutputImageRegionType = typename TOutputImage::RegionType;
 
   /** Get and set the number of times to repeat the filter. */
+  /** @ITKStartGrouping */
   itkSetMacro(Repetitions, unsigned int);
   itkGetConstMacro(Repetitions, unsigned int);
-
+  /** @ITKEndGrouping */
   /** This filter needs to request a larger input than its requested output.
    * If this filter runs "Repetitions" iterations, then it needs an input
    * that is 2*Repetitions larger than the output. In other words, this
@@ -92,13 +93,9 @@ public:
   void
   GenerateInputRequestedRegion() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<Self::NDimensions, Self::NOutputDimensions>));
   itkConceptMacro(InputConvertibleToDoubleCheck, (Concept::Convertible<typename TInputImage::PixelType, double>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, PixelType>));
-  // End concept checking
-#endif
 
 protected:
   BinomialBlurImageFilter();

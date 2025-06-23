@@ -24,7 +24,7 @@
  *         The Pennsylvania State University 2005
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://insight-journal.org/midas/handle.php?handle=1926/1381
+ * https://doi.org/10.54294/o8w4c0
  *
  */
 
@@ -57,7 +57,7 @@ Bruker2dseqImageIOFactory::GetDescription() const
 // Undocumented API used to register during static initialization.
 // DO NOT CALL DIRECTLY.
 void ITKIOBruker_EXPORT
-     Bruker2dseqImageIOFactoryRegister__Private()
+Bruker2dseqImageIOFactoryRegister__Private()
 {
   ObjectFactoryBase::RegisterInternalFactoryOnce<Bruker2dseqImageIOFactory>();
 }

@@ -39,7 +39,7 @@ itkGrayscaleMorphologicalClosingImageFilterTest2(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  unsigned int const dim = 2;
+  constexpr unsigned int dim = 2;
   using ImageType = itk::Image<unsigned char, dim>;
 
   using ReaderType = itk::ImageFileReader<ImageType>;
@@ -52,20 +52,19 @@ itkGrayscaleMorphologicalClosingImageFilterTest2(int argc, char * argv[])
   auto filter = FilterType::New();
   filter->SetInput(reader->GetOutput());
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  const itk::SimpleFilterWatcher watcher(filter, "filter");
 
   using RadiusType = FilterType::RadiusType;
 
   // Test default values
-  RadiusType r1;
-  r1.Fill(1);
+  auto r1 = itk::MakeFilled<RadiusType>(1);
   ITK_TEST_SET_GET_VALUE(r1, filter->GetRadius());
 
   ITK_TEST_SET_GET_VALUE(FilterType::AlgorithmEnum::HISTO, filter->GetAlgorithm());
 
   ITK_TEST_SET_GET_VALUE(true, filter->GetSafeBorder());
 
-  itk::SizeValueType radiusValue{ static_cast<itk::SizeValueType>(std::stoi(argv[2])) };
+  const itk::SizeValueType radiusValue{ static_cast<itk::SizeValueType>(std::stoi(argv[2])) };
   filter->SetRadius(radiusValue);
   RadiusType radius{};
   radius.Fill(radiusValue);

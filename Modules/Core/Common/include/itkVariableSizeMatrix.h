@@ -56,10 +56,12 @@ public:
   using InternalMatrixType = vnl_matrix<T>;
 
   /** Matrix by Vector multiplication.  */
-  Array<T> operator*(const Array<T> & vect) const;
+  Array<T>
+  operator*(const Array<T> & vect) const;
 
   /** Matrix by Matrix multiplication.  */
-  Self operator*(const Self & matrix) const;
+  Self
+  operator*(const Self & matrix) const;
 
   /** Matrix addition.  */
   Self
@@ -80,7 +82,8 @@ public:
   operator-();
 
   /** Matrix by vnl_matrix multiplication.  */
-  vnl_matrix<T> operator*(const vnl_matrix<T> & matrix) const;
+  vnl_matrix<T>
+  operator*(const vnl_matrix<T> & matrix) const;
 
   /** Matrix by Matrix multiplication.  */
   void
@@ -91,7 +94,8 @@ public:
   operator*=(const vnl_matrix<T> & matrix);
 
   /** Matrix by vnl_vector multiplication.  */
-  vnl_vector<T> operator*(const vnl_vector<T> & vc) const;
+  vnl_vector<T>
+  operator*(const vnl_vector<T> & vc) const;
 
   /** Matrix by scalar multiplication.  */
   void
@@ -101,7 +105,8 @@ public:
   }
 
   /** Matrix by scalar multiplication.  */
-  Self operator*(const T & value) const
+  Self
+  operator*(const T & value) const
   {
     Self result(*this);
 
@@ -141,10 +146,18 @@ public:
   }
 
   /** Return a row of the matrix. */
-  inline T * operator[](unsigned int i) { return m_Matrix[i]; }
+  inline T *
+  operator[](unsigned int i)
+  {
+    return m_Matrix[i];
+  }
 
   /** Return a row of the matrix. */
-  inline const T * operator[](unsigned int i) const { return m_Matrix[i]; }
+  inline const T *
+  operator[](unsigned int i) const
+  {
+    return m_Matrix[i];
+  }
 
   /** Return the matrix. */
   inline InternalMatrixType &
@@ -154,7 +167,7 @@ public:
   }
 
   /** Return the matrix. */
-  inline const InternalMatrixType &
+  [[nodiscard]] inline const InternalMatrixType &
   GetVnlMatrix() const
   {
     return m_Matrix;
@@ -190,21 +203,17 @@ public:
 
   /** Assignment operator. */
   inline Self &
-  operator=(const Self & matrix)
-  {
-    m_Matrix = matrix.m_Matrix;
-    return *this;
-  }
+  operator=(const Self & matrix) = default;
 
   /** Return the inverse matrix. */
-  inline vnl_matrix<T>
+  [[nodiscard]] inline vnl_matrix<T>
   GetInverse() const
   {
     return vnl_matrix_inverse<T>(m_Matrix).as_matrix();
   }
 
   /** Return the transposed matrix. */
-  inline vnl_matrix<T>
+  [[nodiscard]] inline vnl_matrix<T>
   GetTranspose() const
   {
     return m_Matrix.transpose();
@@ -223,14 +232,14 @@ public:
   {}
 
   /** Return number of rows in the matrix */
-  inline unsigned int
+  [[nodiscard]] inline unsigned int
   Rows() const
   {
     return m_Matrix.rows();
   }
 
   /** Return number of columns in the matrix */
-  inline unsigned int
+  [[nodiscard]] inline unsigned int
   Cols() const
   {
     return m_Matrix.cols();

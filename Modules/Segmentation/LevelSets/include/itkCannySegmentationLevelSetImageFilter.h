@@ -151,7 +151,7 @@ public:
 
   using ScalarValueType = typename CannyFunctionType::ScalarValueType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CannySegmentationLevelSetImageFilter);
 
   /** Method for creation through the object factory */
@@ -159,6 +159,7 @@ public:
 
   /** Set the Threshold parameter of the CannyEdgeDetectionImageFilter
    * used by the underlying level set function. */
+  /** @ITKStartGrouping */
   void
   SetThreshold(ScalarValueType v)
   {
@@ -169,20 +170,21 @@ public:
   {
     return this->m_CannyFunction->GetThreshold();
   }
-
+  /** @ITKEndGrouping */
   /** Set the Variance parameter of the CannyEdgeDetectionImageFilter
    * used by the underlying level set function. */
+  /** @ITKStartGrouping */
   void
   SetVariance(double v)
   {
     this->m_CannyFunction->SetVariance(v);
   }
-  double
+  [[nodiscard]] double
   GetVariance() const
   {
     return this->m_CannyFunction->GetVariance();
   }
-
+  /** @ITKEndGrouping */
   /** Get the Canny image that was used to create the speed and
       advection images */
   OutputImageType *
@@ -191,11 +193,7 @@ public:
     return this->m_CannyFunction->GetCannyImage();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<TOutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ~CannySegmentationLevelSetImageFilter() override = default;

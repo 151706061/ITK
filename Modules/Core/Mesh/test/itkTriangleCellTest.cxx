@@ -45,16 +45,16 @@ itkTriangleCellTest(int, char *[])
   class TriangleHelper : public TriangleCellType
   {
     using Superclass = TriangleCellType;
-    using CoordRepType = Superclass::CoordRepType;
+    using CoordinateType = Superclass::CoordinateType;
     using PointsContainer = Superclass::PointsContainer;
     using InterpolationWeightType = Superclass::InterpolationWeightType;
 
   public:
     bool
-    EvaluatePosition(CoordRepType *            inputPoint,
+    EvaluatePosition(CoordinateType *          inputPoint,
                      PointsContainer *         points,
-                     CoordRepType *            closestPoint,
-                     CoordRepType              pcoord[],
+                     CoordinateType *          closestPoint,
+                     CoordinateType            pcoord[],
                      double *                  distance,
                      InterpolationWeightType * weights) override
     {
@@ -88,7 +88,7 @@ itkTriangleCellTest(int, char *[])
   /**
    * Define the 3d geometric positions for 4 points in a square.
    */
-  MeshType::CoordRepType testPointCoords[numberOfPoints][3] = {
+  constexpr MeshType::CoordinateType testPointCoords[numberOfPoints][3] = {
     { 0, 0, 0 }, { 10, 0, 0 }, { 10, 10, 0 }, { 0, 10, 0 }
   };
 
@@ -132,7 +132,7 @@ itkTriangleCellTest(int, char *[])
    * mesh->SetCell(cellId, cell)
    */
   mesh->SetCell(0, testCell); // Transfer ownership to the mesh
-  std::cout << "TriangleCell pointer = " << (void const *)testCell.GetPointer() << std::endl;
+  std::cout << "TriangleCell pointer = " << (const void *)testCell.GetPointer() << std::endl;
   std::cout << "TriangleCell Owner   = " << testCell.IsOwner() << std::endl;
 
   {
@@ -152,16 +152,13 @@ itkTriangleCellTest(int, char *[])
   //
   // Exercise the EvaluatePosition() method of the TriangleCell
   //
-  TriangleCellType::CoordRepType            inputPoint[3];
+  TriangleCellType::CoordinateType          inputPoint[3];
   TriangleCellType::PointsContainer *       points = mesh->GetPoints();
-  TriangleCellType::CoordRepType            closestPoint[3];
-  TriangleCellType::CoordRepType            pcoords[3];
-  double                                    distance;
+  TriangleCellType::CoordinateType          closestPoint[3];
+  TriangleCellType::CoordinateType          pcoords[3];
   TriangleCellType::InterpolationWeightType weights[3];
 
-  const double tolerance = 1e-5;
-
-  bool isInside;
+  constexpr double tolerance = 1e-5;
 
   // Test 1:
   inputPoint[0] = 5.0;
@@ -172,8 +169,8 @@ itkTriangleCellTest(int, char *[])
   std::cout << inputPoint[0] << ", ";
   std::cout << inputPoint[1] << ", ";
   std::cout << inputPoint[2] << std::endl;
-
-  isInside = testCell->EvaluatePosition(inputPoint, points, closestPoint, pcoords, &distance, weights);
+  double distance = NAN;
+  bool   isInside = testCell->EvaluatePosition(inputPoint, points, closestPoint, pcoords, &distance, weights);
 
   if (!isInside)
   {

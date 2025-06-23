@@ -28,9 +28,7 @@
 #include "itkFEMException.h"
 #include <iostream>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class FEMLightObject
@@ -53,7 +51,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FEMLightObject);
 
   /**
@@ -87,9 +85,8 @@ protected:
    */
   FEMLightObject(const FEMLightObject & o)
     : itk::LightObject()
-  {
-    m_GlobalNumber = o.m_GlobalNumber;
-  }
+    , m_GlobalNumber(o.m_GlobalNumber)
+  {}
 
   /**
    * Global number of an object (ID of an object)
@@ -100,7 +97,6 @@ protected:
    */
   int m_GlobalNumber{ -1 };
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMLightObject_h

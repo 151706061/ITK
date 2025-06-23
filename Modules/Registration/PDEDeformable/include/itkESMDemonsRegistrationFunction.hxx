@@ -26,10 +26,9 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
 ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::ESMDemonsRegistrationFunction()
 {
-  RadiusType   r;
-  unsigned int j;
+  RadiusType r;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     r[j] = 0;
   }
@@ -133,7 +132,7 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::In
     {
       m_Normalizer += m_FixedImageSpacing[k] * m_FixedImageSpacing[k];
     }
-    m_Normalizer *= m_MaximumUpdateStepLength * m_MaximumUpdateStepLength / static_cast<double>(ImageDimension);
+    m_Normalizer *= m_MaximumUpdateStepLength * m_MaximumUpdateStepLength / double{ ImageDimension };
   }
   else
   {
@@ -172,7 +171,7 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Co
   const FloatOffsetType &  itkNotUsed(offset)) -> PixelType
 {
   auto *    globalData = (GlobalDataStruct *)gd;
-  PixelType update;
+  PixelType update{};
   IndexType FirstIndex = this->GetFixedImage()->GetLargestPossibleRegion().GetIndex();
   IndexType LastIndex = this->GetFixedImage()->GetLargestPossibleRegion().GetIndex() +
                         this->GetFixedImage()->GetLargestPossibleRegion().GetSize();
@@ -191,7 +190,6 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Co
 
   if (movingPixValue == NumericTraits<MovingPixelType>::max())
   {
-    update.Fill(0.0);
     return update;
   }
 
@@ -216,7 +214,7 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Co
         warpedMovingGradient[dim] = 0.0;
         continue;
       }
-      else if (index[dim] == FirstIndex[dim])
+      if (index[dim] == FirstIndex[dim])
       {
         // compute derivative
         tmpIndex[dim] += 1;
@@ -325,7 +323,7 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Co
   }
   else if (this->m_UseGradientType == GradientEnum::MappedMoving)
   {
-    PointType mappedPoint;
+    PointType mappedPoint{};
     this->GetFixedImage()->TransformIndexToPhysicalPoint(index, mappedPoint);
     for (unsigned int j = 0; j < ImageDimension; ++j)
     {
@@ -353,29 +351,17 @@ ESMDemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Co
   const double usedGradientTimes2SquaredMagnitude = usedGradientTimes2.GetSquaredNorm();
 
   const double speedValue = fixedValue - movingValue;
-  if (itk::Math::abs(speedValue) < m_IntensityDifferenceThreshold)
+  if (itk::Math::abs(speedValue) >= m_IntensityDifferenceThreshold)
   {
-    update.Fill(0.0);
-  }
-  else
-  {
-    double denom;
+    // least square solution of the system
+    double denom = usedGradientTimes2SquaredMagnitude;
     if (m_Normalizer > 0.0)
     {
       // "ITK-Thirion" normalization
       denom = usedGradientTimes2SquaredMagnitude + (itk::Math::sqr(speedValue) / m_Normalizer);
     }
-    else
-    {
-      // least square solution of the system
-      denom = usedGradientTimes2SquaredMagnitude;
-    }
 
-    if (denom < m_DenominatorThreshold)
-    {
-      update.Fill(0.0);
-    }
-    else
+    if (denom >= m_DenominatorThreshold)
     {
       const double factor = 2.0 * speedValue / denom;
 

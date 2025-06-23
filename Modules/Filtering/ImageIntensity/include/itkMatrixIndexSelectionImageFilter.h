@@ -100,7 +100,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MatrixIndexSelectionImageFilter);
 
   /** Method for creation through the object factory. */
@@ -120,11 +120,7 @@ public:
     return this->GetFunctor().GetIndices(i, j);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   MatrixIndexSelectionImageFilter() = default;

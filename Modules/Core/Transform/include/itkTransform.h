@@ -91,7 +91,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Transform);
 
   /** Dimension of the domain space. */
@@ -114,20 +114,6 @@ public:
   {
     return VOutputDimension;
   }
-
-
-  /* For storing the  name of InputSpace */
-  itkSetMacro(InputSpaceName, std::string);
-  itkGetConstReferenceMacro(InputSpaceName, std::string);
-
-  /** For storing the  name of InputSpace/OutputSpace.
-
-  InputSpaceName, OutputSpaceName provide identifiers for the world spaces
-  that the transform applied to and the direction of the spatial transformation.
-  The direction of the transform goes from the input space to output space.
-  Typical values include the names of an atlas or a dataset. */
-  itkSetMacro(OutputSpaceName, std::string);
-  itkGetConstReferenceMacro(OutputSpaceName, std::string);
 
   /** Type of the input parameters. */
   using typename Superclass::FixedParametersType;
@@ -250,6 +236,7 @@ public:
                       "unimplemented for "
                       << this->GetNameOfClass());
   }
+
   /** Method to transform a CovariantVector, using a point. Global transforms
    * can ignore the \c point parameter. Local transforms (e.g. deformation
    * field transform) must override and provide required behavior.
@@ -543,9 +530,11 @@ public:
                       " is unimplemented for "
                       << this->GetNameOfClass());
   }
-  itkLegacyMacro(virtual void ComputeJacobianWithRespectToPosition(const InputPointType & x, JacobianType & jacobian)
-                   const);
 
+#if !defined(ITK_LEGACY_REMOVE)
+  itkLegacyMacro(virtual void ComputeJacobianWithRespectToPosition(const InputPointType & x, JacobianType & jacobian)
+                   const;)
+#endif
 
   /** This provides the ability to get a local jacobian value
    *  in a dense/local transform, e.g. DisplacementFieldTransform. For such
@@ -554,8 +543,11 @@ public:
    *  since there is no change with respect to position. */
   virtual void
   ComputeInverseJacobianWithRespectToPosition(const InputPointType & pnt, InverseJacobianPositionType & jacobian) const;
+
+#if !defined(ITK_LEGACY_REMOVE)
   itkLegacyMacro(virtual void ComputeInverseJacobianWithRespectToPosition(const InputPointType & x,
-                                                                          JacobianType &         jacobian) const);
+                                                                          JacobianType &         jacobian) const;)
+#endif
 
   /** Apply this transform to an image without resampling.
    *
@@ -566,6 +558,7 @@ public:
    *
    * The image parameter may be either a SmartPointer or a raw pointer.
    * */
+  /** @ITKStartGrouping */
   template <typename TImage>
   std::enable_if_t<TImage::ImageDimension == VInputDimension && TImage::ImageDimension == VOutputDimension, void>
   ApplyToImageMetadata(TImage * image) const;
@@ -575,7 +568,7 @@ public:
   {
     this->ApplyToImageMetadata(image.GetPointer()); // Delegate to the raw pointer signature
   }
-
+  /** @ITKEndGrouping */
 protected:
   /**
    * Clone the current transform.
@@ -589,16 +582,8 @@ protected:
   Transform() = default;
 
   Transform(NumberOfParametersType numberOfParameters);
-#if defined(__GNUC__)
-  // A bug in some versions of the GCC and Clang compilers
-  // result in an ICE or linker error when "= default" is requested.
-  // This was observed in at least gcc 4.8 and 5.4.0, and
-  // AppleClang 7.0.2 and 8.0.0. Probably others too.
-  // "= default" doesn't gain us much, so just don't use it here.
-  ~Transform() override{};
-#else
   ~Transform() override = default;
-#endif
+
   mutable ParametersType      m_Parameters{};
   mutable FixedParametersType m_FixedParameters{};
 
@@ -606,10 +591,17 @@ protected:
   PreservationOfPrincipalDirectionDiffusionTensor3DReorientation(const InputDiffusionTensor3DType &,
                                                                  const InverseJacobianPositionType &) const;
 
-private:
-  std::string m_InputSpaceName{};
-  std::string m_OutputSpaceName{};
+  /** Returns the inverse of the specified transform. Returns null if it cannot invert the transform. Helper function
+   * for the implementation of `GetInverseTransform()` in derived transform classes. */
+  template <typename TTransform>
+  static InverseTransformBasePointer
+  InvertTransform(const TTransform & transform)
+  {
+    const auto inverse = TTransform::New();
+    return transform.GetInverse(inverse) ? inverse.GetPointer() : nullptr;
+  }
 
+private:
   template <typename TType>
   static std::string
   GetTransformTypeAsString(TType *)

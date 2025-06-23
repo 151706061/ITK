@@ -45,17 +45,13 @@ itkTimeVaryingVelocityFieldIntegrationImageFilterTest(int argc, char * argv[])
   using DisplacementFieldType = itk::Image<VectorType, 3>;
   using TimeVaryingVelocityFieldType = itk::Image<VectorType, 4>;
 
-  TimeVaryingVelocityFieldType::PointType origin;
-  origin.Fill(0.0);
+  TimeVaryingVelocityFieldType::PointType origin{};
 
-  TimeVaryingVelocityFieldType::SpacingType spacing;
-  spacing.Fill(2.0);
+  auto spacing = itk::MakeFilled<TimeVaryingVelocityFieldType::SpacingType>(2.0);
 
-  TimeVaryingVelocityFieldType::SizeType size;
-  size.Fill(25);
+  auto size = TimeVaryingVelocityFieldType::SizeType::Filled(25);
 
-  VectorType constantVelocity;
-  constantVelocity.Fill(0.1);
+  auto constantVelocity = itk::MakeFilled<VectorType>(0.1);
 
   auto constantVelocityField = TimeVaryingVelocityFieldType::New();
 
@@ -107,9 +103,7 @@ itkTimeVaryingVelocityFieldIntegrationImageFilterTest(int argc, char * argv[])
 
   integrator->Update();
 
-  DisplacementFieldType::IndexType index;
-  index.Fill(0);
-  VectorType displacement;
+  DisplacementFieldType::IndexType index{};
 
   auto inverseIntegrator = IntegratorType::New();
 
@@ -133,7 +127,7 @@ itkTimeVaryingVelocityFieldIntegrationImageFilterTest(int argc, char * argv[])
   // -( 0.1 * 1.0 - ( 0.1 * 0.0 ) ) = -0.1 with ~epsilon deviation
   // due to numerical computations
   const DisplacementFieldType * inverseField = inverseIntegrator->GetOutput();
-  displacement = inverseField->GetPixel(index);
+  VectorType                    displacement = inverseField->GetPixel(index);
 
   std::cout << "Estimated inverse displacement vector: " << displacement << std::endl;
   if (itk::Math::abs(displacement[0] + 0.101852) > 0.01)
@@ -178,19 +172,16 @@ itkTimeVaryingVelocityFieldIntegrationImageFilterTest(int argc, char * argv[])
   size[1] = 3;
   size[2] = 401;
   size[3] = 61;
-  ImportFilterType::IndexType start;
-  start.Fill(0);
+  constexpr ImportFilterType::IndexType start{};
 
-  ImportFilterType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const ImportFilterType::RegionType region{ start, size };
 
   importFilter->SetRegion(region);
 
   origin.Fill(0.);
   importFilter->SetOrigin(origin);
 
-  double spaceTimeSpan[4] = { 20., 20., 20., 1.5 };
+  constexpr double spaceTimeSpan[4] = { 20., 20., 20., 1.5 };
   for (unsigned int i = 0; i < 4; i++)
   {
     spacing[i] = spaceTimeSpan[i] / (size[i] - 1);
@@ -219,10 +210,10 @@ itkTimeVaryingVelocityFieldIntegrationImageFilterTest(int argc, char * argv[])
     }
   }
 
-  const bool importImageFilterWillOwnTheBuffer = true;
+  constexpr bool importImageFilterWillOwnTheBuffer = true;
   importFilter->SetImportPointer(localBuffer, numberOfPixels, importImageFilterWillOwnTheBuffer);
 
-  TimeVaryingVelocityFieldType::Pointer timeVaryingVelocityField = importFilter->GetOutput();
+  const TimeVaryingVelocityFieldType::Pointer timeVaryingVelocityField = importFilter->GetOutput();
 
   lowerTimeBound = static_cast<typename IntegratorType::RealType>(std::stod(argv[4]));
   integrator->SetLowerTimeBound(lowerTimeBound);

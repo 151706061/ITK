@@ -27,7 +27,6 @@ itkSubsampleTest3(int, char *[])
 
   constexpr unsigned int MeasurementVectorSize = 2;
   constexpr unsigned int numberOfMeasurementVectors = 5;
-  unsigned int           counter;
 
   using MeasurementVectorType = itk::FixedArray<float, MeasurementVectorSize>;
   using SampleType = itk::Statistics::ListSample<MeasurementVectorType>;
@@ -39,7 +38,7 @@ itkSubsampleTest3(int, char *[])
   MeasurementVectorType measure;
 
   // reset counter
-  counter = 0;
+  unsigned int counter = 0;
 
   while (counter < numberOfMeasurementVectors)
   {
@@ -85,7 +84,7 @@ itkSubsampleTest3(int, char *[])
 
   std::cout << meanOutput[0] << ' ' << mean[0] << ' ' << meanOutput[1] << ' ' << mean[1] << ' ' << std::endl;
 
-  FilterType::MeasurementVectorType::ValueType epsilon = 1e-6;
+  constexpr FilterType::MeasurementVectorType::ValueType epsilon = 1e-6;
 
   if ((itk::Math::abs(meanOutput[0] - mean[0]) > epsilon) || (itk::Math::abs(meanOutput[1] - mean[1]) > epsilon))
   {

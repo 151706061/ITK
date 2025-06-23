@@ -21,9 +21,7 @@
 
 #include "itkFEMSolver.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 /**
@@ -48,7 +46,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SolverHyperbolic);
 
   using Float = Element::Float;
@@ -66,7 +64,7 @@ public:
   itkGetMacro(NumberOfIterations, unsigned int);
 
   /** Returns the time step used for dynamic problems. */
-  Float
+  [[nodiscard]] Float
   GetTimeStep() const override
   {
     return this->m_TimeStep;
@@ -155,8 +153,7 @@ protected:
   unsigned int m_NumberOfIterations{};
 };
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMSolverHyperbolic.hxx"

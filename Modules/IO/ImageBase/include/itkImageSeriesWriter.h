@@ -36,22 +36,13 @@ public:
   /** Has to have empty throw(). */
   ~ImageSeriesWriterException() noexcept override;
 
-  /** Run-time information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageSeriesWriterException);
 
   /** Constructor. */
-  ImageSeriesWriterException(char * file, unsigned int line, const char * message = "Error in IO")
-    : ExceptionObject(file, line)
-  {
-    SetDescription(message);
-  }
-
-  /** Constructor. */
-  ImageSeriesWriterException(const std::string & file, unsigned int line, const char * message = "Error in IO")
-    : ExceptionObject(file, line)
-  {
-    SetDescription(message);
-  }
+  ImageSeriesWriterException(std::string file, unsigned int line, std::string message = "Error in IO")
+    : ExceptionObject(std::move(file), line, std::move(message))
+  {}
 };
 
 /** \class ImageSeriesWriter
@@ -95,7 +86,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageSeriesWriter);
 
   /** Some convenient type alias. */
@@ -129,8 +120,10 @@ public:
    * get the ImageIO instance that is created, or to manually set one
    * when the factory mechanism may not work (e.g., for raw files or
    * for non-standard file suffix). */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(ImageIO, ImageIOBase);
   itkGetModifiableObjectMacro(ImageIO, ImageIOBase);
+  /** @ITKEndGrouping */
 
   /** A special version of the Update() method for writers.  It
    * invokes start and end events and handles releasing data. It
@@ -149,23 +142,30 @@ public:
 
   /** Use this method to set the starting index of the series.
    * The default value is 1. */
+  /** @ITKStartGrouping */
   itkSetMacro(StartIndex, SizeValueType);
   itkGetConstMacro(StartIndex, SizeValueType);
+  /** @ITKEndGrouping */
 
   /** Set the increment of the index of the series. The
    * default value is 1.  */
+  /** @ITKStartGrouping */
   itkSetMacro(IncrementIndex, SizeValueType);
   itkGetConstMacro(IncrementIndex, SizeValueType);
+  /** @ITKEndGrouping */
 
   /** The format string used to generate each filename in the
    * series. The filename is built with snprintf(filename, length, SeriesFormat,
    * number) where number starts at StartIndex and is incremented by
    * IncrementIndex. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(SeriesFormat);
   itkGetStringMacro(SeriesFormat);
+  /** @ITKEndGrouping */
 
   /** Set/Get the vector of strings that contains the file names. Files
    *  are processed in sequential order. */
+  /** @ITKStartGrouping */
   void
   SetFileNames(const FileNamesContainer & name)
   {
@@ -181,11 +181,12 @@ public:
   {
     return m_FileNames;
   }
+  /** @ITKEndGrouping */
 
   /** Set the first file name to be processed. This deletes previous
    * filenames. */
   void
-  SetFileName(std::string const & name)
+  SetFileName(const std::string & name)
   {
     m_FileNames.clear();
     m_FileNames.push_back(name);
@@ -195,7 +196,7 @@ public:
   /** Add a single filename to the list of files. To add a vector of
    * filenames, use the AddFileNames method. */
   void
-  AddFileName(std::string const & name)
+  AddFileName(const std::string & name)
   {
     m_FileNames.push_back(name);
     this->Modified();
@@ -206,10 +207,11 @@ public:
   itkSetMacro(MetaDataDictionaryArray, DictionaryArrayRawPointer);
 
   /** Set the compression On or Off */
+  /** @ITKStartGrouping */
   itkSetMacro(UseCompression, bool);
   itkGetConstReferenceMacro(UseCompression, bool);
   itkBooleanMacro(UseCompression);
-
+  /** @ITKEndGrouping */
 protected:
   ImageSeriesWriter();
   ~ImageSeriesWriter() override = default;

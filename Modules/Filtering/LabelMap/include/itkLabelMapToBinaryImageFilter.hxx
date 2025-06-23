@@ -27,9 +27,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 LabelMapToBinaryImageFilter<TInputImage, TOutputImage>::LabelMapToBinaryImageFilter()
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_ForegroundValue(NumericTraits<OutputImagePixelType>::max())
 {
-  this->m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  this->m_ForegroundValue = NumericTraits<OutputImagePixelType>::max();
   this->DynamicMultiThreadingOn();
 }
 
@@ -41,7 +41,7 @@ LabelMapToBinaryImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRe
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
 
   if (input)
   {

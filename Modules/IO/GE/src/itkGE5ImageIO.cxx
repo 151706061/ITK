@@ -34,14 +34,10 @@ namespace itk
 static constexpr char GE_PROD_STR[] = "SIGNA";
 // Default constructor
 GE5ImageIO::GE5ImageIO() = default;
-
-GE5ImageIO::~GE5ImageIO()
-{
-  // Purposefully left blank
-}
+GE5ImageIO::~GE5ImageIO() = default;
 
 int
-GE5ImageIO::CheckGE5xImages(char const * const imageFileTemplate, std::string & reason)
+GE5ImageIO::CheckGE5xImages(const char * const imageFileTemplate, std::string & reason)
 {
   //
   // Does it exist?
@@ -69,11 +65,7 @@ GE5ImageIO::CheckGE5xImages(char const * const imageFileTemplate, std::string & 
     return -1;
   }
 
-  Ge5xPixelHeader imageHdr;     /* Header Structure for GE 5x images
-                                 */
-  char hdr[GENESIS_SU_HDR_LEN]; /* Header to hold GE Suite header */
-  char prod[16];                /* Product name from Suite Header */
-
+  Ge5xPixelHeader imageHdr; /* Header Structure for GE 5x images */
   // First pass see if image is a raw MR extracted via ximg
   if (!this->ReadBufferAsBinary(f, (void *)&imageHdr, sizeof(imageHdr)))
   {
@@ -92,12 +84,14 @@ GE5ImageIO::CheckGE5xImages(char const * const imageFileTemplate, std::string & 
   // Second pass see if image was extracted via tape by Gene's tape
   // reading software.
   //
+  char hdr[GENESIS_SU_HDR_LEN]; /* Header to hold GE Suite header */
   if (!this->ReadBufferAsBinary(f, (void *)hdr, GENESIS_SU_HDR_LEN))
   {
     reason = "Failed to read study header";
     f.close();
     return -1;
   }
+  char prod[16]; /* Product name from Suite Header */
   strncpy(prod, hdr + GENESIS_SU_PRODID, 13);
   prod[13] = '\0';
   if (strcmp(prod, GE_PROD_STR) == 0)
@@ -170,37 +164,20 @@ SwapPixHdr(Ge5xPixelHeader * hdr)
 GEImageHeader *
 GE5ImageIO::ReadHeader(const char * FileNameToRead)
 {
-  //#define VERBOSE_DEBUGGING
-#if defined(VERBOSE_DEBUGGING)
-#  define RGEDEBUG(x) x
-#else
-#  define RGEDEBUG(x)
-#endif
-
-  Ge5xPixelHeader imageHdr; // GE 5x Header
-  GEImageHeader * curImage;
-  bool            pixelHdrFlag;
-  std::string     reason;
+  std::string reason;
   if (this->CheckGE5xImages(FileNameToRead, reason) != 0)
   {
     itkExceptionMacro("GE5ImageIO could not open file " << FileNameToRead << " for reading." << std::endl
                                                         << "Reason: " << reason);
   }
 
-  curImage = new GEImageHeader;
-  if (curImage == nullptr)
-  {
-    itkExceptionMacro("GE5ImageIO failed to create a GEImageHeader while reading " << FileNameToRead << " ."
-                                                                                   << std::endl
-                                                                                   << "Reason: "
-                                                                                   << "new GEImageHeader failed.");
-  }
-  memset(curImage, 0, sizeof(GEImageHeader));
+  auto * curImage = new GEImageHeader();
 
   std::ifstream f;
   this->OpenFileForReading(f, FileNameToRead);
 
-  f.read((char *)&imageHdr, sizeof(imageHdr));
+  Ge5xPixelHeader imageHdr; // GE 5x Header
+  f.read(reinterpret_cast<char *>(&imageHdr), sizeof(imageHdr));
   if (f.fail())
   {
     itkExceptionMacro("GE5ImageIO IO error while reading  " << FileNameToRead << " ." << std::endl
@@ -214,19 +191,16 @@ GE5ImageIO::ReadHeader(const char * FileNameToRead)
   //
   // if i didn't see it with my own eyes I wouldn't believe it.
   // Signa 5x either have a proper header or they don't!
-  // Appparently Version 2 files do always have a header or
+  // Apparently Version 2 files do always have a header or
   // we'd be totally lost!
   // if they don't have a header, we have to make assumptions
   // about where they start and hope we're right; below, the offset
   // is computed once the X & Y dims are known
+  bool pixelHdrFlag = false;
   if (imageHdr.GENESIS_IH_img_magic == GE_5X_MAGIC_NUMBER)
   {
     pixelHdrFlag = true;
     curImage->offset = imageHdr.GENESIS_IH_img_hdr_length;
-  }
-  else
-  {
-    pixelHdrFlag = false;
   }
   strncpy(curImage->filename, FileNameToRead, IOCommon::ITK_MAXPATHLEN);
 
@@ -279,7 +253,7 @@ GE5ImageIO::ReadHeader(const char * FileNameToRead)
 
   // patient id
   std::string tmpId(buffer.get() + VOff(84, 88), 13);
-  (void)std::remove(tmpId.begin(), tmpId.end(), '-');
+  tmpId.erase(std::remove(tmpId.begin(), tmpId.end(), '-'), tmpId.end());
   strncpy(curImage->patientId, tmpId.c_str(), sizeof(curImage->patientId) - 1);
   curImage->patientId[sizeof(curImage->patientId) - 1] = '\0';
 
@@ -372,24 +346,32 @@ GE5ImageIO::ReadHeader(const char * FileNameToRead)
   curImage->imageXres = hdr2Float(buffer.get() + VOff(50, 52));
   curImage->imageYres = hdr2Float(buffer.get() + VOff(54, 56));
 
-  short GE_Plane(hdr2Short(buffer.get() + VOff(114, 116)));
+  const short GE_Plane(hdr2Short(buffer.get() + VOff(114, 116)));
   switch (GE_Plane)
   {
     case GE_CORONAL:
       curImage->coordinateOrientation =
-        itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP;
+        AnatomicalOrientation(AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                              AnatomicalOrientation::CoordinateEnum::SuperiorToInferior,
+                              AnatomicalOrientation::CoordinateEnum::PosteriorToAnterior);
       break;
     case GE_SAGITTAL:
       curImage->coordinateOrientation =
-        itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_AIR;
+        AnatomicalOrientation(AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior,
+                              AnatomicalOrientation::CoordinateEnum::InferiorToSuperior,
+                              AnatomicalOrientation::CoordinateEnum::RightToLeft);
       break;
     case GE_AXIAL:
       curImage->coordinateOrientation =
-        itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI;
+        AnatomicalOrientation(AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                              AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior,
+                              AnatomicalOrientation::CoordinateEnum::InferiorToSuperior);
       break;
     default:
       curImage->coordinateOrientation =
-        itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSP;
+        AnatomicalOrientation(AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                              AnatomicalOrientation::CoordinateEnum::SuperiorToInferior,
+                              AnatomicalOrientation::CoordinateEnum::PosteriorToAnterior);
       break;
   }
 
@@ -459,22 +441,21 @@ GE5ImageIO::ReadHeader(const char * FileNameToRead)
 void
 GE5ImageIO::ModifyImageInformation()
 {
-  vnl_vector<double> dirx(3), diry(3), dirz(3);
-
   // NOTE: itk use LPS coordinates while the GE system uses RAS
   // coordinates. Consequently, the R and A coordinates must be negated
   // to convert them to L and P.
-
+  vnl_vector<double> dirx(3);
   dirx[0] = -(m_ImageHeader->trhcR - m_ImageHeader->tlhcR);
   dirx[1] = -(m_ImageHeader->trhcA - m_ImageHeader->tlhcA);
   dirx[2] = (m_ImageHeader->trhcS - m_ImageHeader->tlhcS);
   dirx.normalize();
-
+  vnl_vector<double> diry(3);
   diry[0] = -(m_ImageHeader->brhcR - m_ImageHeader->trhcR);
   diry[1] = -(m_ImageHeader->brhcA - m_ImageHeader->trhcA);
   diry[2] = (m_ImageHeader->brhcS - m_ImageHeader->trhcS);
   diry.normalize();
 
+  vnl_vector<double> dirz(3);
   dirz[0] = -m_ImageHeader->normR;
   dirz[1] = -m_ImageHeader->normA;
   dirz[2] = m_ImageHeader->normS;
@@ -489,7 +470,7 @@ GE5ImageIO::ModifyImageInformation()
   // coordinate system. If the computed slice direction is opposite
   // the direction in the header, the files have to be read in reverse
   // order.
-  vnl_vector<double> sliceDirection = vnl_cross_3d(dirx, diry);
+  const vnl_vector<double> sliceDirection = vnl_cross_3d(dirx, diry);
   if (dot_product(sliceDirection, dirz) < 0)
   {
     // Use the computed direction
@@ -507,32 +488,26 @@ GE5ImageIO::ModifyImageInformation()
     auto it = m_FilenameList->begin();
 
     // The first file
-    std::string file1 = (*it)->GetImageFileName();
+    const std::string file1 = (*it)->GetImageFileName();
 
     // The second file
     ++it;
-    std::string file2 = (*it)->GetImageFileName();
+    const std::string file2 = (*it)->GetImageFileName();
 
     const std::unique_ptr<const GEImageHeader> hdr1{ this->ReadHeader(file1.c_str()) };
     const std::unique_ptr<const GEImageHeader> hdr2{ this->ReadHeader(file2.c_str()) };
 
-    float origin1[3], origin2[3];
-    origin1[0] = hdr1->tlhcR;
-    origin1[1] = hdr1->tlhcA;
-    origin1[2] = hdr1->tlhcS;
+    const float origin1[3] = { hdr1->tlhcR, hdr1->tlhcA, hdr1->tlhcS };
 
-    // Origin shopuld always come from the first slice
+    // Origin should always come from the first slice
     this->SetOrigin(0, -hdr1->tlhcR);
     this->SetOrigin(1, -hdr1->tlhcA);
     this->SetOrigin(2, hdr1->tlhcS);
+    const float origin2[3] = { hdr2->tlhcR, hdr2->tlhcA, hdr2->tlhcS };
 
-    origin2[0] = hdr2->tlhcR;
-    origin2[1] = hdr2->tlhcA;
-    origin2[2] = hdr2->tlhcS;
-
-    float distanceBetweenTwoSlices = std::sqrt((origin1[0] - origin2[0]) * (origin1[0] - origin2[0]) +
-                                               (origin1[1] - origin2[1]) * (origin1[1] - origin2[1]) +
-                                               (origin1[2] - origin2[2]) * (origin1[2] - origin2[2]));
+    const float distanceBetweenTwoSlices = std::sqrt((origin1[0] - origin2[0]) * (origin1[0] - origin2[0]) +
+                                                     (origin1[1] - origin2[1]) * (origin1[1] - origin2[1]) +
+                                                     (origin1[2] - origin2[2]) * (origin1[2] - origin2[2]));
 
     this->SetSpacing(2, distanceBetweenTwoSlices);
   }

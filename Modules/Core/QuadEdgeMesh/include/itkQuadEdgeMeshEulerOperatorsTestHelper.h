@@ -49,16 +49,16 @@ std::vector<typename TMesh::PointType>
 GeneratePointCoordinates(const unsigned int iN)
 {
   using PointType = typename TMesh::PointType;
-  using CoordRepType = typename PointType::CoordRepType;
+  using CoordinateType = typename PointType::CoordinateType;
   std::vector<PointType> oPt(iN * iN);
 
   for (unsigned int i = 0; i < iN; ++i)
   {
     for (unsigned int j = 0; j < iN; ++j)
     {
-      oPt[i * iN + j][0] = static_cast<CoordRepType>(j);
-      oPt[i * iN + j][1] = static_cast<CoordRepType>(i);
-      oPt[i * iN + j][2] = static_cast<CoordRepType>(0.);
+      oPt[i * iN + j][0] = static_cast<CoordinateType>(j);
+      oPt[i * iN + j][1] = static_cast<CoordinateType>(i);
+      oPt[i * iN + j][2] = static_cast<CoordinateType>(0.);
     }
   }
 
@@ -82,11 +82,12 @@ CreateSquareQuadMesh(typename TMesh::Pointer mesh)
   }
 
   /////////////////////////////////////////////////////////////
-  int expectedNumPts = 25;
-  int expectedNumCells = 16;
-  int simpleSquareCells[64] = { 0,  1,  6,  5,  1,  2,  7,  6,  2,  3,  8,  7,  3,  4,  9,  8,  5,  6,  11, 10, 6,  7,
-                                12, 11, 7,  8,  13, 12, 8,  9,  14, 13, 10, 11, 16, 15, 11, 12, 17, 16, 12, 13, 18, 17,
-                                13, 14, 19, 18, 15, 16, 21, 20, 16, 17, 22, 21, 17, 18, 23, 22, 18, 19, 24, 23 };
+  constexpr int expectedNumPts = 25;
+  constexpr int expectedNumCells = 16;
+  const int     simpleSquareCells[64] = { 0,  1,  6,  5,  1,  2,  7,  6,  2,  3,  8,  7,  3,  4,  9,  8,
+                                          5,  6,  11, 10, 6,  7,  12, 11, 7,  8,  13, 12, 8,  9,  14, 13,
+                                          10, 11, 16, 15, 11, 12, 17, 16, 12, 13, 18, 17, 13, 14, 19, 18,
+                                          15, 16, 21, 20, 16, 17, 22, 21, 17, 18, 23, 22, 18, 19, 24, 23 };
 
   using PointType = typename MeshType::PointType;
 
@@ -98,11 +99,9 @@ CreateSquareQuadMesh(typename TMesh::Pointer mesh)
   }
 
   typename CellType::CellAutoPointer cellpointer;
-  QEPolygonCellType *                poly;
-
   for (int i = 0; i < expectedNumCells; ++i)
   {
-    poly = new QEPolygonCellType(4);
+    auto * poly = new QEPolygonCellType(4);
     cellpointer.TakeOwnership(poly);
     cellpointer->SetPointId(0, simpleSquareCells[4 * i]);
     cellpointer->SetPointId(1, simpleSquareCells[4 * i + 1]);
@@ -129,13 +128,13 @@ CreateSquareTriangularMesh(typename TMesh::Pointer mesh)
   }
 
   /////////////////////////////////////////////////////////////
-  int expectedNumPts = 25;
-  int expectedNumCells = 32;
-  int simpleSquareCells[96] = { 0,  1,  6,  0,  6,  5,  1,  2,  7,  1,  7,  6,  2,  3,  8,  2,  8,  7,  3,  4,
-                                9,  3,  9,  8,  5,  6,  11, 5,  11, 10, 6,  7,  12, 6,  12, 11, 7,  8,  13, 7,
-                                13, 12, 8,  9,  14, 8,  14, 13, 10, 11, 16, 10, 16, 15, 11, 12, 17, 11, 17, 16,
-                                12, 13, 18, 12, 18, 17, 13, 14, 19, 13, 19, 18, 15, 16, 21, 15, 21, 20, 16, 17,
-                                22, 16, 22, 21, 17, 18, 23, 17, 23, 22, 18, 19, 24, 18, 24, 23 };
+  constexpr int expectedNumPts = 25;
+  constexpr int expectedNumCells = 32;
+  const int     simpleSquareCells[96] = { 0,  1,  6,  0,  6,  5,  1,  2,  7,  1,  7,  6,  2,  3,  8,  2,  8,  7,  3,  4,
+                                          9,  3,  9,  8,  5,  6,  11, 5,  11, 10, 6,  7,  12, 6,  12, 11, 7,  8,  13, 7,
+                                          13, 12, 8,  9,  14, 8,  14, 13, 10, 11, 16, 10, 16, 15, 11, 12, 17, 11, 17, 16,
+                                          12, 13, 18, 12, 18, 17, 13, 14, 19, 13, 19, 18, 15, 16, 21, 15, 21, 20, 16, 17,
+                                          22, 16, 22, 21, 17, 18, 23, 17, 23, 22, 18, 19, 24, 18, 24, 23 };
 
   using PointType = typename TMesh::PointType;
   std::vector<PointType> pts = GeneratePointCoordinates<TMesh>(5);
@@ -146,11 +145,9 @@ CreateSquareTriangularMesh(typename TMesh::Pointer mesh)
   }
 
   typename CellType::CellAutoPointer cellpointer;
-  QEPolygonCellType *                poly;
-
   for (int i = 0; i < expectedNumCells; ++i)
   {
-    poly = new QEPolygonCellType(3);
+    auto * poly = new QEPolygonCellType(3);
     cellpointer.TakeOwnership(poly);
     cellpointer->SetPointId(0, simpleSquareCells[3 * i]);
     cellpointer->SetPointId(1, simpleSquareCells[3 * i + 1]);
@@ -176,37 +173,37 @@ CreateTetraedronMesh(typename TMesh::Pointer mesh)
   }
 
   /////////////////////////////////////////////////////////////
-  int expectedNumPts = 4;
-  int expectedNumCells = 4;
-  int simpleSquareCells[12] = { 0, 1, 2, 1, 0, 3, 1, 3, 2, 2, 3, 0 };
+  constexpr int expectedNumPts = 4;
+  constexpr int expectedNumCells = 4;
+  const int     simpleSquareCells[12] = { 0, 1, 2, 1, 0, 3, 1, 3, 2, 2, 3, 0 };
 
   using PointType = typename TMesh::PointType;
   std::vector<PointType> pts(4);
-  int                    i(0);
-  pts[i][0] = 0.;
-  pts[i][1] = 1.;
-  pts[i++][2] = 0.;
-  pts[i][0] = 0.;
-  pts[i][1] = -1.;
-  pts[i++][2] = 0.;
-  pts[i][0] = -1.;
-  pts[i][1] = 0.;
-  pts[i++][2] = 0.;
-  pts[i][0] = 0.;
-  pts[i][1] = 0.;
-  pts[i++][2] = 1.;
-
-  for (i = 0; i < expectedNumPts; ++i)
+  {
+    int i(0);
+    pts[i][0] = 0.;
+    pts[i][1] = 1.;
+    pts[i++][2] = 0.;
+    pts[i][0] = 0.;
+    pts[i][1] = -1.;
+    pts[i++][2] = 0.;
+    pts[i][0] = -1.;
+    pts[i][1] = 0.;
+    pts[i++][2] = 0.;
+    pts[i][0] = 0.;
+    pts[i][1] = 0.;
+    pts[i++][2] = 1.;
+  }
+  for (int i = 0; i < expectedNumPts; ++i)
   {
     mesh->SetPoint(i, pts[i]);
   }
 
   typename CellType::CellAutoPointer cellpointer;
-  QEPolygonCellType *                poly;
 
-  for (i = 0; i < expectedNumCells; ++i)
+  for (int i = 0; i < expectedNumCells; ++i)
   {
-    poly = new QEPolygonCellType(3);
+    auto * poly = new QEPolygonCellType(3);
     cellpointer.TakeOwnership(poly);
     cellpointer->SetPointId(0, simpleSquareCells[3 * i]);
     cellpointer->SetPointId(1, simpleSquareCells[3 * i + 1]);
@@ -233,34 +230,33 @@ CreateSamosa(typename TMesh::Pointer mesh)
   }
 
   /////////////////////////////////////////////////////////////
-  int expectedNumPts = 3;
-  int expectedNumCells = 2;
-  int simpleSquareCells[6] = { 0, 1, 2, 1, 0, 2 };
+  constexpr int expectedNumPts = 3;
+  constexpr int expectedNumCells = 2;
+  const int     simpleSquareCells[6] = { 0, 1, 2, 1, 0, 2 };
 
   using PointType = typename TMesh::PointType;
   std::vector<PointType> pts(3);
-  int                    i(0);
-  pts[i][0] = 0.;
-  pts[i][1] = 1.;
-  pts[i++][2] = 0.;
-  pts[i][0] = 0.;
-  pts[i][1] = -1.;
-  pts[i++][2] = 0.;
-  pts[i][0] = -1.;
-  pts[i][1] = 0.;
-  pts[i++][2] = 0.;
-
-  for (i = 0; i < expectedNumPts; ++i)
+  {
+    int i(0);
+    pts[i][0] = 0.;
+    pts[i][1] = 1.;
+    pts[i++][2] = 0.;
+    pts[i][0] = 0.;
+    pts[i][1] = -1.;
+    pts[i++][2] = 0.;
+    pts[i][0] = -1.;
+    pts[i][1] = 0.;
+    pts[i++][2] = 0.;
+  }
+  for (int i = 0; i < expectedNumPts; ++i)
   {
     mesh->SetPoint(i, pts[i]);
   }
 
   typename CellType::CellAutoPointer cellpointer;
-  QEPolygonCellType *                poly;
-
-  for (i = 0; i < expectedNumCells; ++i)
+  for (int i = 0; i < expectedNumCells; ++i)
   {
-    poly = new QEPolygonCellType(3);
+    auto * poly = new QEPolygonCellType(3);
     cellpointer.TakeOwnership(poly);
     cellpointer->SetPointId(0, simpleSquareCells[3 * i]);
     cellpointer->SetPointId(1, simpleSquareCells[3 * i + 1]);

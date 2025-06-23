@@ -101,15 +101,23 @@ public:
 
 
     /**  Returns a reference to the current index. */
-    reference operator*() const noexcept { return m_Index; }
+    constexpr reference
+    operator*() const noexcept
+    {
+      return m_Index;
+    }
 
 
     /**  Returns a pointer to the current index. */
-    pointer operator->() const noexcept { return &(**this); }
+    constexpr pointer
+    operator->() const noexcept
+    {
+      return &(**this);
+    }
 
 
     /** Prefix increment ('++it'). */
-    const_iterator &
+    constexpr const_iterator &
     operator++() noexcept
     {
       for (unsigned int i = 0; i < (VDimension - 1); ++i)
@@ -132,7 +140,7 @@ public:
 
     /** Postfix increment ('it++').
      * \note Usually prefix increment ('++it') is preferable. */
-    const_iterator
+    constexpr const_iterator
     operator++(int) noexcept
     {
       auto result = *this;
@@ -142,7 +150,7 @@ public:
 
 
     /** Prefix decrement ('--it'). */
-    const_iterator &
+    constexpr const_iterator &
     operator--() noexcept
     {
       for (unsigned int i = 0; i < (VDimension - 1); ++i)
@@ -164,7 +172,7 @@ public:
 
     /** Postfix increment ('it--').
      * \note  Usually prefix increment ('--it') is preferable. */
-    const_iterator
+    constexpr const_iterator
     operator--(int) noexcept
     {
       auto result = *this;
@@ -195,7 +203,7 @@ public:
 
 
     /** Returns (it1 < it2) for iterators it1 and it2. */
-    friend bool
+    friend constexpr bool
     operator<(const const_iterator & lhs, const const_iterator & rhs) noexcept
     {
       for (unsigned int i = VDimension; i > 0; --i)
@@ -216,7 +224,7 @@ public:
 
 
     /** Returns (it1 > it2) for iterators it1 and it2. */
-    friend bool
+    friend constexpr bool
     operator>(const const_iterator & lhs, const const_iterator & rhs) noexcept
     {
       // Implemented just like the corresponding std::rel_ops operator.
@@ -225,7 +233,7 @@ public:
 
 
     /** Returns (it1 <= it2) for iterators it1 and it2. */
-    friend bool
+    friend constexpr bool
     operator<=(const const_iterator & lhs, const const_iterator & rhs) noexcept
     {
       // Implemented just like the corresponding std::rel_ops operator.
@@ -234,7 +242,7 @@ public:
 
 
     /** Returns (it1 >= it2) for iterators it1 and it2. */
-    friend bool
+    friend constexpr bool
     operator>=(const const_iterator & lhs, const const_iterator & rhs) noexcept
     {
       // Implemented just like the corresponding std::rel_ops operator.
@@ -250,10 +258,18 @@ public:
     struct ZeroIndex
     {
       // The "index" operator.
-      constexpr IndexValueType operator[](unsigned int) const { return 0; }
+      constexpr IndexValueType
+      operator[](unsigned int) const
+      {
+        return 0;
+      }
 
       // Implicitly converts to a default-initialized itk::Index<N>.
-      constexpr operator IndexType() const { return IndexType(); }
+      constexpr
+      operator IndexType() const
+      {
+        return IndexType();
+      }
     };
 
 
@@ -261,7 +277,9 @@ public:
     using MinIndexType = std::conditional_t<VBeginAtZero, ZeroIndex, IndexType>;
 
     // Private constructor, only used by friend class IndexRange.
-    const_iterator(const IndexType & index, const MinIndexType & minIndex, const IndexType & maxIndex) noexcept
+    constexpr const_iterator(const IndexType &    index,
+                             const MinIndexType & minIndex,
+                             const IndexType &    maxIndex) noexcept
       : // Note: Use parentheses instead of curly braces to initialize data members,
         // to avoid AppleClang 6.0.0.6000056 compilation error, "no viable conversion..."
       m_Index(index)
@@ -296,7 +314,7 @@ public:
 
   /** Constructs a range of indices for the specified grid size.
    */
-  explicit IndexRange(const SizeType & gridSize)
+  constexpr explicit IndexRange(const SizeType & gridSize)
     : // Note: Use parentheses instead of curly braces to initialize data members,
       // to avoid AppleClang 6.0.0.6000056 compile errors, "no viable conversion..."
     m_MinIndex()
@@ -326,14 +344,14 @@ public:
 
 
   /** Returns an iterator to the first index. */
-  iterator
+  [[nodiscard]] constexpr iterator
   begin() const noexcept
   {
     return iterator(m_MinIndex, m_MinIndex, m_MaxIndex);
   }
 
   /** Returns an 'end iterator' for this range. */
-  iterator
+  [[nodiscard]] constexpr iterator
   end() const noexcept
   {
     IndexType index = m_MinIndex;
@@ -343,42 +361,42 @@ public:
 
   /** Returns a const iterator to the first index.
    * Provides only read-only access to the index data. */
-  const_iterator
+  [[nodiscard]] constexpr const_iterator
   cbegin() const noexcept
   {
     return this->begin();
   }
 
   /** Returns a const 'end iterator' for this range. */
-  const_iterator
+  [[nodiscard]] constexpr const_iterator
   cend() const noexcept
   {
     return this->end();
   }
 
   /** Returns a reverse 'begin iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rbegin() const noexcept
   {
     return reverse_iterator(this->end());
   }
 
   /** Returns a reverse 'end iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rend() const noexcept
   {
     return reverse_iterator(this->begin());
   }
 
   /** Returns a const reverse 'begin iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crbegin() const noexcept
   {
     return this->rbegin();
   }
 
   /** Returns a const reverse 'end iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crend() const noexcept
   {
     return this->rend();
@@ -386,7 +404,7 @@ public:
 
 
   /** Returns the size of the range, that is the number of indices. */
-  size_t
+  [[nodiscard]] constexpr size_t
   size() const noexcept
   {
     size_t result = 1;
@@ -400,7 +418,7 @@ public:
 
 
   /** Tells whether the range is empty. */
-  bool
+  [[nodiscard]] constexpr bool
   empty() const noexcept
   {
     // When an IndexRange is empty, each index value of m_MaxIndex is less than the corresponding
@@ -414,7 +432,7 @@ public:
 private:
   using MinIndexType = typename iterator::MinIndexType;
 
-  static IndexType
+  static constexpr IndexType
   CalculateMaxIndex(const MinIndexType & minIndex, const SizeType & size)
   {
     const bool sizeHasZeroValue = [&size] {
@@ -431,7 +449,8 @@ private:
     // Treat any size that has a zero value equally.
     const SizeType normalizedSize = sizeHasZeroValue ? SizeType{ { 0 } } : size;
 
-    IndexType index;
+    // The `index` is initialized (`{}`), just to support C++17 constexpr.
+    IndexType index{};
 
     for (unsigned int i = 0; i < VDimension; ++i)
     {

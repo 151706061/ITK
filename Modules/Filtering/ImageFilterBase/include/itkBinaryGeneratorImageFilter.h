@@ -67,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryGeneratorImageFilter);
 
   /** Some convenient type alias. */
@@ -94,13 +94,14 @@ public:
   using ValueFunctionType = OutputImagePixelType(Input1ImagePixelType, Input2ImagePixelType);
 
   /** Connect the first operand for pixel-wise operation. */
+  /** @ITKStartGrouping */
   virtual void
   SetInput1(const TInputImage1 * image1);
   virtual void
   SetInput1(const DecoratedInput1ImagePixelType * input1);
   virtual void
   SetInput1(const Input1ImagePixelType & input1);
-
+  /** @ITKEndGrouping */
   /** Set the first operand as a constant. */
   virtual void
   SetConstant1(const Input1ImagePixelType & input1);
@@ -111,15 +112,17 @@ public:
   GetConstant1() const;
 
   /** Connect the second operand for pixel-wise operation. */
+  /** @ITKStartGrouping */
   virtual void
   SetInput2(const TInputImage2 * image2);
   virtual void
   SetInput2(const DecoratedInput2ImagePixelType * input2);
   virtual void
   SetInput2(const Input2ImagePixelType & input2);
-
+  /** @ITKEndGrouping */
 
   /** Set the second operand as a constant. */
+  /** @ITKStartGrouping */
   virtual void
   SetConstant2(const Input2ImagePixelType & input2);
   void
@@ -127,16 +130,18 @@ public:
   {
     this->SetConstant2(ct);
   }
+  /** @ITKEndGrouping */
+  /** Get the constant value of the second operand. An exception is thrown if
+   * the second operand is not a constant. */
+  /** @ITKStartGrouping */
+  virtual const Input2ImagePixelType &
+  GetConstant2() const;
   const Input2ImagePixelType &
   GetConstant() const
   {
     return this->GetConstant2();
   }
-
-  /** Get the constant value of the second operand. An exception is thrown if
-   * the second operand is not a constant. */
-  virtual const Input2ImagePixelType &
-  GetConstant2() const;
+  /** @ITKEndGrouping */
 
 #if !defined(ITK_WRAPPING_PARSER)
   /** Set the pixel functor
@@ -215,14 +220,10 @@ public:
   static constexpr unsigned int InputImage2Dimension = TInputImage2::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck1,
                   (Concept::SameDimension<Self::InputImage1Dimension, Self::InputImage2Dimension>));
   itkConceptMacro(SameDimensionCheck2,
                   (Concept::SameDimension<Self::InputImage1Dimension, Self::OutputImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   BinaryGeneratorImageFilter();
@@ -237,6 +238,7 @@ protected:
    *
    * \sa ImageToImageFilter::ThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData()  */
+  /** @ITKStartGrouping */
   template <typename TFunctor>
   void
   DynamicThreadedGenerateDataWithFunctor(const TFunctor &, const OutputImageRegionType & outputRegionForThread);
@@ -247,7 +249,7 @@ protected:
   {
     this->UpdateProgress(1.0);
   }
-
+  /** @ITKEndGrouping */
   // Needed to take the image information from the 2nd input, if the first one is
   // a simple decorated object.
   void

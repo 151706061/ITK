@@ -45,7 +45,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VoronoiPartitioningImageFilter);
 
   /** Convenient type alias. */
@@ -75,19 +75,16 @@ public:
    * homogeneous. If the standard deviation of the intensities in the
    * Voronoi region is below this threshold, then the region is
    * considered homogeneous. */
+  /** @ITKStartGrouping */
   itkSetMacro(SigmaThreshold, double);
   itkGetConstMacro(SigmaThreshold, double);
-
+  /** @ITKEndGrouping */
   /** ImageDimension enumeration   */
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
   itkConceptMacro(IntConvertibleToOutputCheck, (Concept::Convertible<int, OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   VoronoiPartitioningImageFilter() = default;

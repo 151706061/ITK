@@ -28,18 +28,15 @@ namespace itk
  */
 template <typename TInputImage, typename TOutputImage>
 ExponentialDisplacementFieldImageFilter<TInputImage, TOutputImage>::ExponentialDisplacementFieldImageFilter()
+  : m_AutomaticNumberOfIterations(true)
+  , m_MaximumNumberOfIterations(20)
+  , m_Divider(DivideByConstantType::New())
+  , m_Caster(CasterType::New())
+  , m_Warper(VectorWarperType::New())
+  , m_Adder(AdderType::New())
 {
-  m_AutomaticNumberOfIterations = true;
-  m_MaximumNumberOfIterations = 20;
-  m_ComputeInverse = false;
-  m_Divider = DivideByConstantType::New();
-  m_Caster = CasterType::New();
-  m_Warper = VectorWarperType::New();
-
-  FieldInterpolatorPointer VectorInterpolator = FieldInterpolatorType::New();
+  const FieldInterpolatorPointer VectorInterpolator = FieldInterpolatorType::New();
   m_Warper->SetInterpolator(VectorInterpolator);
-
-  m_Adder = AdderType::New();
   m_Adder->InPlaceOn();
 }
 
@@ -68,7 +65,7 @@ ExponentialDisplacementFieldImageFilter<TInputImage, TOutputImage>::GenerateData
 {
   itkDebugMacro("Actually executing");
 
-  InputImageConstPointer inputPtr = this->GetInput();
+  const InputImageConstPointer inputPtr = this->GetInput();
 
   unsigned int numiter = 0;
 
@@ -96,7 +93,7 @@ ExponentialDisplacementFieldImageFilter<TInputImage, TOutputImage>::GenerateData
 
     for (InputIt.GoToBegin(); !InputIt.IsAtEnd(); ++InputIt)
     {
-      InputPixelRealValueType norm2 = InputIt.Get().GetSquaredNorm();
+      const InputPixelRealValueType norm2 = InputIt.Get().GetSquaredNorm();
       if (norm2 > maxnorm2)
       {
         maxnorm2 = norm2;
@@ -107,8 +104,8 @@ ExponentialDisplacementFieldImageFilter<TInputImage, TOutputImage>::GenerateData
     maxnorm2 /= itk::Math::sqr(minpixelspacing);
 
     // Protect against maxnorm2 being zero.
-    InputPixelRealValueType numiterfloat = (maxnorm2 > 0) ? 2.0 + 0.5 * std::log(maxnorm2) / itk::Math::ln2
-                                                          : itk::NumericTraits<InputPixelRealValueType>::min();
+    const InputPixelRealValueType numiterfloat = (maxnorm2 > 0) ? 2.0 + 0.5 * std::log(maxnorm2) / itk::Math::ln2
+                                                                : itk::NumericTraits<InputPixelRealValueType>::min();
 
     if (numiterfloat >= 0.0)
     {
@@ -190,7 +187,7 @@ ExponentialDisplacementFieldImageFilter<TInputImage, TOutputImage>::GenerateData
 
     m_Warper->Update();
 
-    OutputImagePointer warpedIm = m_Warper->GetOutput();
+    const OutputImagePointer warpedIm = m_Warper->GetOutput();
     warpedIm->DisconnectPipeline();
 
     // Remember we chose to use an inplace adder

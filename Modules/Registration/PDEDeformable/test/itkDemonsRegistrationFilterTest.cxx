@@ -33,7 +33,9 @@ template <typename TRegistration>
 class ShowProgressObject
 {
 public:
-  ShowProgressObject(TRegistration * o) { m_Process = o; }
+  ShowProgressObject(TRegistration * o)
+    : m_Process(o)
+  {}
   void
   ShowProgress()
   {
@@ -66,7 +68,7 @@ FillWithCircle(TImage *                   image,
   it.GoToBegin();
 
   typename TImage::IndexType index;
-  double                     r2 = itk::Math::sqr(radius);
+  const double               r2 = itk::Math::sqr(radius);
 
   while (!it.IsAtEnd())
   {
@@ -124,12 +126,9 @@ itkDemonsRegistrationFilterTest(int, char *[])
   SizeType                 size;
   size.SetSize(sizeArray);
 
-  IndexType index;
-  index.Fill(0);
+  constexpr IndexType index{};
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const RegionType region{ index, size };
 
   auto moving = ImageType::New();
   auto fixed = ImageType::New();
@@ -147,15 +146,14 @@ itkDemonsRegistrationFilterTest(int, char *[])
   initField->SetBufferedRegion(region);
   initField->Allocate();
 
-  double    center[ImageDimension];
-  double    radius;
-  PixelType fgnd = 250;
-  PixelType bgnd = 15;
+  double              center[ImageDimension];
+  constexpr PixelType fgnd = 250;
+  constexpr PixelType bgnd = 15;
 
   // fill moving with circle
   center[0] = 64;
   center[1] = 64;
-  radius = 30;
+  double radius = 30;
   FillWithCircle<ImageType>(moving, center, radius, fgnd, bgnd);
 
   // fill fixed with circle
@@ -165,8 +163,7 @@ itkDemonsRegistrationFilterTest(int, char *[])
   FillWithCircle<ImageType>(fixed, center, radius, fgnd, bgnd);
 
   // fill initial deformation with zero vectors
-  VectorType zeroVec;
-  zeroVec.Fill(0.0);
+  constexpr VectorType zeroVec{};
   initField->FillBuffer(zeroVec);
 
   using CasterType = itk::CastImageFilter<FieldType, FieldType>;
@@ -195,8 +192,8 @@ itkDemonsRegistrationFilterTest(int, char *[])
   registrator->SetNumberOfIterations(numberOfIterations);
   ITK_TEST_SET_GET_VALUE(numberOfIterations, registrator->GetNumberOfIterations());
 
-  double                                   standardDeviationsVal = 1.0;
-  RegistrationType::StandardDeviationsType standardDeviations{ standardDeviationsVal };
+  constexpr double                               standardDeviationsVal = 1.0;
+  const RegistrationType::StandardDeviationsType standardDeviations{ standardDeviationsVal };
   registrator->SetStandardDeviations(standardDeviationsVal);
   ITK_TEST_SET_GET_VALUE(standardDeviations, registrator->GetStandardDeviations());
 
@@ -207,7 +204,7 @@ itkDemonsRegistrationFilterTest(int, char *[])
   registrator->SetMaximumError(maximumError);
   ITK_TEST_SET_GET_VALUE(maximumError, registrator->GetMaximumError());
 
-  unsigned int maximumKernelWidth = 10;
+  constexpr unsigned int maximumKernelWidth = 10;
   registrator->SetMaximumKernelWidth(maximumKernelWidth);
   ITK_TEST_SET_GET_VALUE(maximumKernelWidth, registrator->GetMaximumKernelWidth());
 
@@ -221,8 +218,8 @@ itkDemonsRegistrationFilterTest(int, char *[])
   auto smoothUpdateField = false;
   ITK_TEST_SET_GET_BOOLEAN(registrator, SmoothUpdateField, smoothUpdateField);
 
-  double                                   updateFieldStandardDeviationsVal = 1.0;
-  RegistrationType::StandardDeviationsType updateFieldStandardDeviations{ updateFieldStandardDeviationsVal };
+  constexpr double                               updateFieldStandardDeviationsVal = 1.0;
+  const RegistrationType::StandardDeviationsType updateFieldStandardDeviations{ updateFieldStandardDeviationsVal };
   registrator->SetUpdateFieldStandardDeviations(updateFieldStandardDeviationsVal);
   ITK_TEST_SET_GET_VALUE(updateFieldStandardDeviations, registrator->GetUpdateFieldStandardDeviations());
 
@@ -245,9 +242,8 @@ itkDemonsRegistrationFilterTest(int, char *[])
   }
 
   using ProgressType = ShowProgressObject<RegistrationType>;
-  ProgressType                                    progressWatch(registrator);
-  itk::SimpleMemberCommand<ProgressType>::Pointer command;
-  command = itk::SimpleMemberCommand<ProgressType>::New();
+  ProgressType                                          progressWatch(registrator);
+  const itk::SimpleMemberCommand<ProgressType>::Pointer command = itk::SimpleMemberCommand<ProgressType>::New();
   command->SetCallbackFunction(&progressWatch, &ProgressType::ShowProgress);
   registrator->AddObserver(itk::ProgressEvent(), command);
 
@@ -255,8 +251,8 @@ itkDemonsRegistrationFilterTest(int, char *[])
   using WarperType = itk::WarpImageFilter<ImageType, ImageType, FieldType>;
   auto warper = WarperType::New();
 
-  using CoordRepType = WarperType::CoordRepType;
-  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
+  using CoordinateType = WarperType::CoordinateType;
+  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
   auto interpolator = InterpolatorType::New();
 
 

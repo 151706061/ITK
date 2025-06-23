@@ -28,7 +28,7 @@ namespace itk
  * This class implements a vector-valued version of
  * AnisotropicDiffusionFunction.  Typically in vector-valued diffusion, vector
  * components are diffused independently of one another using a conductance
- * term that is linked across the components. Refer to the the documentation of
+ * term that is linked across the components. Refer to the documentation of
  * AnisotropicDiffusionFunction for an overview of anisotropic diffusion.  The
  * way that the conductance term is calculated is specific to the specific type
  * of diffusion function.
@@ -61,7 +61,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorAnisotropicDiffusionFunction);
 
   /** Inherit some parameters from the superclass type */

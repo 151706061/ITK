@@ -34,9 +34,7 @@
 #include "itkMath.h"
 #include "itkTotalProgressReporter.h"
 
-namespace itk
-{
-namespace Testing
+namespace itk::Testing
 {
 
 template <typename TInputImage, typename TOutputImage>
@@ -105,13 +103,10 @@ StretchIntensityImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateD
 
   TotalProgressReporter progress(this, outputPtr->GetRequestedRegion().GetNumberOfPixels());
 
-  InputImageRegionType inputRegionForThread = outputRegionForThread;
+  const InputImageRegionType inputRegionForThread = outputRegionForThread;
 
   ImageRegionConstIterator<TInputImage> inputIt(inputPtr, inputRegionForThread);
   ImageRegionIterator<TOutputImage>     outputIt(outputPtr, outputRegionForThread);
-
-  inputIt.GoToBegin();
-  outputIt.GoToBegin();
 
   while (!inputIt.IsAtEnd())
   {
@@ -166,7 +161,6 @@ StretchIntensityImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream &
   os << indent << "Output Maximum: " << static_cast<typename NumericTraits<OutputPixelType>::PrintType>(m_OutputMaximum)
      << std::endl;
 }
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #endif

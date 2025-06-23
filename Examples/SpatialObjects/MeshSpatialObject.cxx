@@ -63,14 +63,12 @@ main(int, char *[])
   // Software Guide : BeginCodeSnippet
   auto myMesh = MeshType::New();
 
-  MeshType::CoordRepType testPointCoords[4][3] = {
+  constexpr MeshType::CoordinateType testPointCoords[4][3] = {
     { 0, 0, 0 }, { 9, 0, 0 }, { 9, 9, 0 }, { 0, 0, 9 }
   };
 
   MeshType::PointIdentifier tetraPoints[4] = { 0, 1, 2, 4 };
-
-  int i;
-  for (i = 0; i < 4; ++i)
+  for (int i = 0; i < 4; ++i)
   {
     myMesh->SetPoint(i, PointType(testPointCoords[i]));
   }
@@ -134,8 +132,7 @@ main(int, char *[])
     << "Mesh bounds : "
     << myMeshSpatialObject->GetMyBoundingBoxInWorldSpace()->GetBounds()
     << std::endl;
-  MeshSpatialObjectType::PointType myPhysicalPoint;
-  myPhysicalPoint.Fill(1);
+  auto myPhysicalPoint = itk::MakeFilled<MeshSpatialObjectType::PointType>(1);
   std::cout << "Is my physical point inside? : "
             << myMeshSpatialObject->IsInsideInWorldSpace(myPhysicalPoint)
             << std::endl;
@@ -239,7 +236,7 @@ main(int, char *[])
   //  Software Guide : EndLatex
 
   //  Software Guide : BeginCodeSnippet
-  ImageType::Pointer myBinaryMeshImage = imageFilter->GetOutput();
+  const ImageType::Pointer myBinaryMeshImage = imageFilter->GetOutput();
   //  Software Guide : EndCodeSnippet
 
   return EXIT_SUCCESS;

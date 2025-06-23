@@ -33,13 +33,13 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 VectorConfidenceConnectedImageFilter<TInputImage, TOutputImage>::VectorConfidenceConnectedImageFilter()
+  : m_Multiplier(2.5)
+  , m_NumberOfIterations(4)
+  , m_ReplaceValue(NumericTraits<OutputImagePixelType>::OneValue())
+  , m_InitialNeighborhoodRadius(1)
+  , m_ThresholdFunction(DistanceThresholdFunctionType::New())
 {
-  m_Multiplier = 2.5;
-  m_NumberOfIterations = 4;
   m_Seeds.clear();
-  m_InitialNeighborhoodRadius = 1;
-  m_ReplaceValue = NumericTraits<OutputImagePixelType>::OneValue();
-  m_ThresholdFunction = DistanceThresholdFunctionType::New();
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -95,7 +95,7 @@ VectorConfidenceConnectedImageFilter<TInputImage, TOutputImage>::GenerateInputRe
   Superclass::GenerateInputRequestedRegion();
   if (this->GetInput())
   {
-    InputImagePointer input = const_cast<TInputImage *>(this->GetInput());
+    const InputImagePointer input = const_cast<TInputImage *>(this->GetInput());
     input->SetRequestedRegionToLargestPossibleRegion();
   }
 }
@@ -119,13 +119,11 @@ VectorConfidenceConnectedImageFilter<TInputImage, TOutputImage>::GenerateData()
   using IteratorType = FloodFilledImageFunctionConditionalIterator<OutputImageType, DistanceThresholdFunctionType>;
   using SecondIteratorType = FloodFilledImageFunctionConditionalConstIterator<InputImageType, SecondFunctionType>;
 
-  unsigned int loop;
-
-  typename Superclass::InputImageConstPointer inputImage = this->GetInput();
-  typename Superclass::OutputImagePointer     outputImage = this->GetOutput();
+  const typename Superclass::InputImageConstPointer inputImage = this->GetInput();
+  const typename Superclass::OutputImagePointer     outputImage = this->GetOutput();
 
   // Zero the output
-  OutputImageRegionType region = outputImage->GetRequestedRegion();
+  const OutputImageRegionType region = outputImage->GetRequestedRegion();
   outputImage->SetBufferedRegion(region);
   outputImage->AllocateInitialized();
 
@@ -160,9 +158,9 @@ VectorConfidenceConnectedImageFilter<TInputImage, TOutputImage>::GenerateData()
   using MeanFunctionVectorType = typename VectorMeanImageFunctionType::OutputType;
   using CovarianceFunctionMatrixType = typename CovarianceImageFunctionType::OutputType;
 
-  typename SeedsContainerType::const_iterator si = m_Seeds.begin();
-  typename SeedsContainerType::const_iterator li = m_Seeds.end();
-  SizeValueType                               seed_cnt = 0;
+  auto          si = m_Seeds.begin();
+  auto          li = m_Seeds.end();
+  SizeValueType seed_cnt = 0;
   while (si != li)
   {
     if (region.IsInside(*si))
@@ -249,8 +247,7 @@ VectorConfidenceConnectedImageFilter<TInputImage, TOutputImage>::GenerateData()
   }
 
   ProgressReporter progress(this, 0, region.GetNumberOfPixels() * m_NumberOfIterations);
-
-  for (loop = 0; loop < m_NumberOfIterations; ++loop)
+  for (unsigned int loop = 0; loop < m_NumberOfIterations; ++loop)
   {
     // Now that we have an initial segmentation, let's recalculate the
     // statistics.  Since we have already labelled the output, we visit

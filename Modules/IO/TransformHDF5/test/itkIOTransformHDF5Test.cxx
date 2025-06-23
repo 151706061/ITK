@@ -39,36 +39,30 @@
 
 template <typename TParametersValueType, typename DisplacementTransformType>
 static int
-ReadWriteTest(const std::string fileName, const bool isRealDisplacementField, const bool useCompression)
+ReadWriteTest(const std::string & fileName, const bool isRealDisplacementField, const bool useCompression)
 {
   // First make a DisplacementField with known values
-  const double aNumberThatCanNotBeRepresentedInFloatingPoint = 1e-5 + 1e-7 + 1e-9 + 1e-13;
-  const double requiredSpacing = 1.2 + aNumberThatCanNotBeRepresentedInFloatingPoint;
-  const double requiredOrigin = 23.0 + aNumberThatCanNotBeRepresentedInFloatingPoint;
-  auto         displacementTransform = DisplacementTransformType::New();
+  constexpr double aNumberThatCanNotBeRepresentedInFloatingPoint = 1e-5 + 1e-7 + 1e-9 + 1e-13;
+  constexpr double requiredSpacing = 1.2 + aNumberThatCanNotBeRepresentedInFloatingPoint;
+  constexpr double requiredOrigin = 23.0 + aNumberThatCanNotBeRepresentedInFloatingPoint;
+  auto             displacementTransform = DisplacementTransformType::New();
   using FieldType = typename DisplacementTransformType::DisplacementFieldType;
   auto knownField = FieldType::New(); // This is based on itk::Image
   {
-    constexpr int                dimLength = 20;
-    typename FieldType::SizeType size;
-    size.Fill(dimLength);
-    typename FieldType::IndexType start;
-    start.Fill(0);
-    typename FieldType::RegionType region;
-    region.SetSize(size);
-    region.SetIndex(start);
+    constexpr int                        dimLength = 20;
+    auto                                 size = FieldType::SizeType::Filled(dimLength);
+    const typename FieldType::IndexType  start{};
+    const typename FieldType::RegionType region{ start, size };
     knownField->SetRegions(region);
 
-    typename FieldType::SpacingType spacing;
-    spacing.Fill(requiredSpacing);
+    auto spacing = itk::MakeFilled<typename FieldType::SpacingType>(requiredSpacing);
     knownField->SetSpacing(spacing);
-    typename FieldType::PointType origin;
-    origin.Fill(requiredOrigin);
+    auto origin = itk::MakeFilled<typename FieldType::PointType>(requiredOrigin);
     knownField->SetOrigin(origin);
     knownField->Allocate();
 
-    typename DisplacementTransformType::OutputVectorType zeroVector;
-    zeroVector.Fill(aNumberThatCanNotBeRepresentedInFloatingPoint);
+    auto zeroVector = itk::MakeFilled<typename DisplacementTransformType::OutputVectorType>(
+      aNumberThatCanNotBeRepresentedInFloatingPoint);
     knownField->FillBuffer(zeroVector);
 
     displacementTransform->SetDisplacementField(knownField);
@@ -136,7 +130,7 @@ ReadWriteTest(const std::string fileName, const bool isRealDisplacementField, co
     // Read first transform
     const typename itk::TransformFileReaderTemplate<TParametersValueType>::TransformListType * list =
       reader->GetTransformList();
-    typename DisplacementTransformType::ConstPointer readDisplacementTransform =
+    const typename DisplacementTransformType::ConstPointer readDisplacementTransform =
       static_cast<DisplacementTransformType *>((*(list->begin())).GetPointer());
     if (readDisplacementTransform.IsNull())
     {
@@ -145,7 +139,7 @@ ReadWriteTest(const std::string fileName, const bool isRealDisplacementField, co
       std::cerr << typeid(DisplacementTransformType).name() << std::endl;
       return EXIT_FAILURE;
     }
-    typename DisplacementTransformType::DisplacementFieldType::ConstPointer readDisplacement =
+    const typename DisplacementTransformType::DisplacementFieldType::ConstPointer readDisplacement =
       readDisplacementTransform->GetDisplacementField();
     if (readDisplacement.IsNull())
     {
@@ -183,7 +177,7 @@ ReadWriteTest(const std::string fileName, const bool isRealDisplacementField, co
 
 template <typename TParametersValueType>
 static int
-oneTest(const std::string goodname, const std::string badname, const bool useCompression)
+oneTest(const std::string & goodname, const std::string badname, const bool useCompression)
 {
   using AffineTransformType = typename itk::AffineTransform<TParametersValueType, 4>;
   using AffineTransformTypeNotRegistered = typename itk::AffineTransform<TParametersValueType, 10>;
@@ -206,10 +200,10 @@ oneTest(const std::string goodname, const std::string badname, const bool useCom
     }
     affine->SetFixedParameters(p);
   }
-  typename itk::TransformFileWriterTemplate<TParametersValueType>::Pointer writer =
+  const typename itk::TransformFileWriterTemplate<TParametersValueType>::Pointer writer =
     itk::TransformFileWriterTemplate<TParametersValueType>::New();
   writer->SetUseCompression(useCompression);
-  typename itk::TransformFileReaderTemplate<TParametersValueType>::Pointer reader =
+  const typename itk::TransformFileReaderTemplate<TParametersValueType>::Pointer reader =
     itk::TransformFileReaderTemplate<TParametersValueType>::New();
 
   writer->AddTransform(affine);
@@ -243,6 +237,8 @@ oneTest(const std::string goodname, const std::string badname, const bool useCom
     while (lit != list->end())
     {
       (*lit)->Print(std::cout);
+      std::cout << "Input space name: " << (*lit)->GetInputSpaceName() << std::endl;
+      std::cout << "Output space name: " << (*lit)->GetOutputSpaceName() << std::endl;
       ++lit;
     }
   }
@@ -275,10 +271,10 @@ oneTest(const std::string goodname, const std::string badname, const bool useCom
     }
     Bogus->SetFixedParameters(p);
   }
-  typename itk::TransformFileWriterTemplate<TParametersValueType>::Pointer badwriter =
+  const typename itk::TransformFileWriterTemplate<TParametersValueType>::Pointer badwriter =
     itk::TransformFileWriterTemplate<TParametersValueType>::New();
   badwriter->SetUseCompression(useCompression);
-  typename itk::TransformFileReaderTemplate<TParametersValueType>::Pointer badreader =
+  const typename itk::TransformFileReaderTemplate<TParametersValueType>::Pointer badreader =
     itk::TransformFileReaderTemplate<TParametersValueType>::New();
   badwriter->AddTransform(Bogus);
   badwriter->SetFileName(badname);
@@ -398,7 +394,7 @@ itkIOTransformHDF5Test(int argc, char * argv[])
       const int result2 = oneTest<double>("Transforms_double.hdf5", "TransformsBad_double.hdf5", false);
       return (!(result1 == EXIT_SUCCESS && result2 == EXIT_SUCCESS));
     }
-    else if (testType == "compressed")
+    if (testType == "compressed")
     {
       const int result1 = oneTest<float>("Transforms_float_compressed.h5", "TransformsBad_float_compressed.h5", true);
       const int result2 =
@@ -412,7 +408,7 @@ itkIOTransformHDF5Test(int argc, char * argv[])
       auto reader = TFM_READER_TYPE::New();
       reader->SetFileName(testType);
       reader->Update();
-      TFM_READER_TYPE::TransformListType const * const myTransformList = reader->GetTransformList();
+      const TFM_READER_TYPE::TransformListType * const myTransformList = reader->GetTransformList();
       if (myTransformList->size() != 1)
       {
         return EXIT_FAILURE;

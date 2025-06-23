@@ -19,7 +19,7 @@
 #include "itkObjectFactoryBase.h"
 #include <mutex>
 
-// Better name demanging for gcc
+// Better name demangling for gcc
 #if defined(__GNUC__) && !defined(__EMSCRIPTEN__)
 #  define GCC_USEDEMANGLE
 #endif
@@ -40,14 +40,13 @@ LightObject::LightObject()
 LightObject::Pointer
 LightObject::New()
 {
-  Pointer       smartPtr;
   LightObject * rawPtr = ObjectFactoryBase::CreateInstance(typeid(LightObject).name());
 
   if (rawPtr == nullptr)
   {
     rawPtr = new LightObject;
   }
-  smartPtr = rawPtr;
+  Pointer smartPtr = rawPtr;
   rawPtr->UnRegister();
   return smartPtr;
 }
@@ -96,13 +95,13 @@ LightObject::operator new[](size_t n)
 void
 LightObject::operator delete(void * m)
 {
-  delete[](char *) m;
+  delete[] (char *)m;
 }
 
 void
 LightObject::operator delete[](void * m, size_t)
 {
-  delete[](char *) m;
+  delete[] (char *)m;
 }
 
 #endif
@@ -191,8 +190,8 @@ void
 LightObject::PrintSelf(std::ostream & os, Indent indent) const
 {
 #ifdef GCC_USEDEMANGLE
-  char const * mangledName = typeid(*this).name();
-  int          status;
+  const char * mangledName = typeid(*this).name();
+  int          status = 0;
   char *       unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
 
   os << indent << "RTTI typeinfo:   ";

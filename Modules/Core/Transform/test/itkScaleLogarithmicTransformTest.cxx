@@ -26,7 +26,7 @@ itkScaleLogarithmicTransformTest(int, char *[])
 {
   using TransformType = itk::ScaleLogarithmicTransform<double>;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 3;
 
   bool testStatus = true;
@@ -95,15 +95,14 @@ itkScaleLogarithmicTransformTest(int, char *[])
 
     {
       // scale an itk::Point
-      TransformType::InputPointType::ValueType pInit[3] = { 10, 10, 10 };
-      TransformType::InputPointType            p = pInit;
-      TransformType::InputPointType            q;
+      constexpr TransformType::InputPointType::ValueType pInit[3] = { 10, 10, 10 };
+      TransformType::InputPointType                      p = pInit;
+      TransformType::InputPointType                      q;
       for (unsigned int j = 0; j < N; ++j)
       {
         q[j] = p[j] * iscale[j];
       }
-      TransformType::OutputPointType r;
-      r = scaleTransform->TransformPoint(p);
+      TransformType::OutputPointType r = scaleTransform->TransformPoint(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -119,10 +118,8 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "Reported Result is  : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful scaling an itk::Point " << std::endl;
-      }
+
+      std::cout << "Successful scaling an itk::Point " << std::endl;
     }
 
     {
@@ -134,8 +131,7 @@ itkScaleLogarithmicTransformTest(int, char *[])
       {
         q[j] = p[j] * iscale[j];
       }
-      TransformType::OutputVectorType r;
-      r = scaleTransform->TransformVector(p);
+      TransformType::OutputVectorType r = scaleTransform->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -150,10 +146,8 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful scaling an itk::Vector " << std::endl;
-      }
+
+      std::cout << "Successful scaling an itk::Vector " << std::endl;
     }
 
     {
@@ -165,8 +159,7 @@ itkScaleLogarithmicTransformTest(int, char *[])
       {
         q[j] = p[j] / iscale[j];
       }
-      TransformType::OutputCovariantVectorType r;
-      r = scaleTransform->TransformCovariantVector(p);
+      TransformType::OutputCovariantVectorType r = scaleTransform->TransformCovariantVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -181,10 +174,8 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful scaling an itk::CovariantVector " << std::endl;
-      }
+
+      std::cout << "Successful scaling an itk::CovariantVector " << std::endl;
     }
 
     {
@@ -198,8 +189,7 @@ itkScaleLogarithmicTransformTest(int, char *[])
       {
         q[j] = p[j] * iscale[j];
       }
-      TransformType::OutputVnlVectorType r;
-      r = scaleTransform->TransformVector(p);
+      TransformType::OutputVnlVectorType r = scaleTransform->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -214,10 +204,8 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful scaling an vnl_Vector " << std::endl;
-      }
+
+      std::cout << "Successful scaling an vnl_Vector " << std::endl;
     }
 
 
@@ -231,7 +219,7 @@ itkScaleLogarithmicTransformTest(int, char *[])
 
       scaleTransform->SetCenter(center);
 
-      CenterType c2 = scaleTransform->GetCenter();
+      const CenterType c2 = scaleTransform->GetCenter();
       if (c2.EuclideanDistanceTo(center) > 1e-5)
       {
         std::cerr << "Error in Set/Get center." << std::endl;
@@ -239,19 +227,16 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "but GetCenter() returned : " << c2 << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful SetCenter() / GetCenter() " << std::endl;
-      }
+
+      std::cout << "Successful SetCenter() / GetCenter() " << std::endl;
     }
 
 
     // Exercise Set/Get parameters
     {
       using ParametersType = TransformType::ParametersType;
-      ParametersType parameters;
 
-      parameters = scaleTransform->GetParameters();
+      ParametersType parameters = scaleTransform->GetParameters();
       parameters[0] = 0.0; // log(1);
       parameters[1] = 0.0; // log(1);
       parameters[2] = 0.0; // log(1);
@@ -275,10 +260,8 @@ itkScaleLogarithmicTransformTest(int, char *[])
         std::cerr << "but GetParameters() returned : " << p2 << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Successful SetParameters() / GetParameters() " << std::endl;
-      }
+
+      std::cout << "Successful SetParameters() / GetParameters() " << std::endl;
     }
   }
 

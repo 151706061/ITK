@@ -26,9 +26,8 @@ namespace itk
 /** \class MinimumProjectionImageFilter
  * \brief Minimum projection
  *
- * This class was contributed to the Insight Journal by Gaetan Lehmann.
- * The original paper can be found at
- * https://www.insight-journal.org/browse/publication/71
+ * This class was contributed to the Insight Journal by Gaetan Lehmann
+ * \cite Lehmann_2006_a.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction,
  * INRA de Jouy-en-Josas, France.
@@ -54,13 +53,39 @@ public:
   inline void
   Initialize()
   {
-    m_Minimum = NumericTraits<TInputPixel>::max();
+    if constexpr (std::is_same<TInputPixel, typename NumericTraits<TInputPixel>::ValueType>::value)
+    {
+      m_Minimum = NumericTraits<TInputPixel>::max();
+    }
+    else
+    {
+      m_Minimum = TInputPixel();
+      m_Minimum.Fill(NumericTraits<typename TInputPixel::ValueType>::max());
+    }
   }
 
   inline void
   operator()(const TInputPixel & input)
   {
-    m_Minimum = std::min(m_Minimum, input);
+
+    if constexpr (std::is_same<TInputPixel, typename NumericTraits<TInputPixel>::ValueType>::value)
+    {
+      m_Minimum = std::min(m_Minimum, input);
+    }
+    else
+    {
+      if (itk::NumericTraits<TInputPixel>::GetLength(m_Minimum) == 0)
+      {
+        m_Minimum = input;
+      }
+      else
+      {
+        for (unsigned int i = 0; i < itk::NumericTraits<TInputPixel>::GetLength(m_Minimum); ++i)
+        {
+          m_Minimum[i] = std::min(m_Minimum[i], input[i]);
+        }
+      }
+    }
   }
 
   inline TInputPixel
@@ -92,18 +117,15 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MinimumProjectionImageFilter);
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-  itkConceptMacro(InputPixelTypeGreaterThanComparable, (Concept::LessThanComparable<InputPixelType>));
+  itkConceptMacro(InputPixelTypeGreaterThanComparable,
+                  (Concept::LessThanComparable<typename itk::NumericTraits<InputPixelType>::ValueType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   MinimumProjectionImageFilter() = default;

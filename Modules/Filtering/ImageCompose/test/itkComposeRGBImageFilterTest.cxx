@@ -19,6 +19,7 @@
 #include <iostream>
 #include "itkRGBPixel.h"
 #include "itkComposeImageFilter.h"
+#include "itkTestingMacros.h"
 
 int
 itkComposeRGBImageFilterTest(int, char *[])
@@ -47,8 +48,7 @@ itkComposeRGBImageFilterTest(int, char *[])
   size[1] = 2;
   size[2] = 2;
 
-  IndexType start;
-  start.Fill(0);
+  constexpr IndexType start{};
 
   RegionType region;
   region.SetIndex(start);
@@ -70,19 +70,9 @@ itkComposeRGBImageFilterTest(int, char *[])
   filter->SetInput2(greenImage);
   filter->SetInput3(blueImage);
 
-  try
-  {
-    filter->Update();
-  }
+  ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());
 
-  catch (const itk::ExceptionObject & excp)
-  {
-    std::cerr << "Exception caught !" << std::endl;
-    std::cerr << excp << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  OutputImageType::Pointer rgbImage = filter->GetOutput();
+  const OutputImageType::Pointer rgbImage = filter->GetOutput();
 
   using OutputIterator = itk::ImageRegionIterator<OutputImageType>;
   using InputIterator = itk::ImageRegionIterator<InputImageType>;
@@ -103,7 +93,7 @@ itkComposeRGBImageFilterTest(int, char *[])
 
   while (!ot.IsAtEnd())
   {
-    OutputPixelType outp = ot.Get();
+    const OutputPixelType outp = ot.Get();
     if (ir.Get() != outp.GetRed())
     {
       std::cerr << "Error in red component" << std::endl;
@@ -125,7 +115,6 @@ itkComposeRGBImageFilterTest(int, char *[])
     ++ib;
   }
 
-  std::cout << "Test Passed !" << std::endl;
-
+  std::cout << "Test finished." << std::endl;
   return EXIT_SUCCESS;
 }

@@ -47,7 +47,7 @@ public:
 };
 /** Define how to print enumeration values. */
 extern ITKFastMarching_EXPORT std::ostream &
-                              operator<<(std::ostream & out, const FastMarchingUpwindGradientImageFilterEnums::TargetCondition value);
+operator<<(std::ostream & out, const FastMarchingUpwindGradientImageFilterEnums::TargetCondition value);
 
 
 /**
@@ -99,7 +99,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingUpwindGradientImageFilter);
 
   /** Inherited type alias. */
@@ -180,19 +180,22 @@ public:
   itkSetMacro(GenerateGradientImage, bool);
 
   /** Get the GenerateGradientImage flag. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(GenerateGradientImage, bool);
   itkBooleanMacro(GenerateGradientImage);
-
+  /** @ITKEndGrouping */
   /** Set how long (in terms of arrival times) after targets are reached the
    * front must stop.  This is useful to ensure that the level set of target
    * arrival time is smooth. */
   itkSetMacro(TargetOffset, double);
+
   /** Get the TargetOffset ivar. */
   itkGetConstReferenceMacro(TargetOffset, double);
 
   /** Choose whether the front must stop when the first target has been reached
    * or all targets have been reached.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(TargetReachedMode, TargetConditionEnum);
   itkGetConstReferenceMacro(TargetReachedMode, TargetConditionEnum);
   void
@@ -213,7 +216,7 @@ public:
     this->SetTargetReachedMode(TargetConditionEnum::SomeTargets);
     m_NumberOfTargets = numberOfTargets;
   }
-
+  /** @ITKEndGrouping */
   void
   SetTargetReachedModeToAllTargets()
   {
@@ -230,14 +233,10 @@ public:
    */
   itkGetConstReferenceMacro(TargetValue, double);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(LevelSetDoubleDivisionOperatorsCheck,
                   (Concept::DivisionOperators<typename TLevelSet::PixelType, double>));
   itkConceptMacro(LevelSetDoubleDivisionAndAssignOperatorsCheck,
                   (Concept::DivisionAndAssignOperators<typename TLevelSet::PixelType, double>));
-  // End concept checking
-#endif
 
 protected:
   FastMarchingUpwindGradientImageFilter();
@@ -245,8 +244,8 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  virtual void
-  VerifyPreconditions() ITKv5_CONST override;
+  void
+  VerifyPreconditions() const override;
 
   void
   Initialize(LevelSetImageType *) override;
@@ -266,17 +265,15 @@ protected:
   /** Check that target points are set.
    *  Returns true if at least a target point exists; returns false otherwise.
    */
-  bool
+  [[nodiscard]] bool
   IsTargetPointsExistenceConditionSatisfied() const
   {
     if (!m_TargetPoints || m_TargetPoints->Size() == 0)
     {
       return false;
     }
-    else
-    {
-      return true;
-    }
+
+    return true;
   }
 
   /** Check that the conditions to set the target reached mode are satisfied.
@@ -289,7 +286,7 @@ protected:
   void
   VerifyTargetReachedModeConditions(unsigned int targetModeMinPoints = 1) const
   {
-    bool targetPointsExist = this->IsTargetPointsExistenceConditionSatisfied();
+    const bool targetPointsExist = this->IsTargetPointsExistenceConditionSatisfied();
 
     if (!targetPointsExist)
     {
@@ -297,7 +294,7 @@ protected:
     }
     else
     {
-      SizeValueType availableNumberOfTargets = m_TargetPoints->Size();
+      const SizeValueType availableNumberOfTargets = m_TargetPoints->Size();
       if (targetModeMinPoints > availableNumberOfTargets)
       {
         itkExceptionMacro("Not enough target points: Available: " << availableNumberOfTargets

@@ -53,7 +53,7 @@ itkBinaryImageToWhitakerSparseLevelSetAdaptorTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  InputImageType::Pointer input = reader->GetOutput();
+  const InputImageType::Pointer input = reader->GetOutput();
   std::cout << "Input image read" << std::endl;
 
   using LevelSetType = itk::WhitakerSparseLevelSetImage<OutputPixelType, Dimension>;
@@ -67,7 +67,7 @@ itkBinaryImageToWhitakerSparseLevelSetAdaptorTest(int argc, char * argv[])
   std::cout << "Finished converting to sparse format" << std::endl;
 
   using LayerIdType = LevelSetType::LayerIdType;
-  LevelSetType::Pointer sparseLevelSet = adaptor->GetModifiableLevelSet();
+  const LevelSetType::Pointer sparseLevelSet = adaptor->GetModifiableLevelSet();
 
   using OutputImageType = itk::Image<OutputPixelType, Dimension>;
   auto output = OutputImageType::New();
@@ -91,11 +91,9 @@ itkBinaryImageToWhitakerSparseLevelSetAdaptorTest(int argc, char * argv[])
   StatusIteratorType sIt(statusImage, statusImage->GetLargestPossibleRegion());
   sIt.GoToBegin();
 
-  StatusImageType::IndexType idx;
-
   while (!oIt.IsAtEnd())
   {
-    idx = oIt.GetIndex();
+    const StatusImageType::IndexType idx = oIt.GetIndex();
     oIt.Set(sparseLevelSet->Evaluate(idx));
     sIt.Set(sparseLevelSet->Status(idx));
     ++oIt;
@@ -149,8 +147,8 @@ itkBinaryImageToWhitakerSparseLevelSetAdaptorTest(int argc, char * argv[])
   using LabelObjectType = itk::LabelObject<unsigned long, 2>;
   using LabelObjectPointer = LabelObjectType::Pointer;
 
-  LabelObjectPointer labelObject = LabelObjectType::New();
-  LabelObjectPointer labelObjectSrc = sparseLevelSet->GetAsLabelObject<unsigned long>();
+  const LabelObjectPointer labelObject = LabelObjectType::New();
+  const LabelObjectPointer labelObjectSrc = sparseLevelSet->GetAsLabelObject<unsigned long>();
   labelObject->CopyAllFrom<LabelObjectType>(labelObjectSrc);
   labelObject->SetLabel(sparseLevelSet->PlusOneLayer());
 

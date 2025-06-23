@@ -79,9 +79,10 @@ public:
    * Transform.
    * By selecting INVERSE, this filter will perform an inverse Fourier
    * Transform. */
+  /** @ITKStartGrouping */
   itkSetMacro(TransformDirection, TransformDirectionType);
   itkGetConstMacro(TransformDirection, TransformDirectionType);
-
+  /** @ITKEndGrouping */
   /** Get the direction in which the filter is to be applied. */
   itkGetConstMacro(Direction, unsigned int);
 
@@ -89,7 +90,7 @@ public:
   itkSetClampMacro(Direction, unsigned int, 0, InputImageType::ImageDimension - 1);
 
   /** Get the greatest supported prime factor. */
-  virtual SizeValueType
+  [[nodiscard]] virtual SizeValueType
   GetSizeGreatestPrimeFactor() const
   {
     return 2;

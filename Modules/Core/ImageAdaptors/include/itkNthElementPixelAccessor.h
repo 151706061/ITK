@@ -71,14 +71,14 @@ public:
   }
 
   /** Read access to the NthElement component */
-  inline ExternalType
+  [[nodiscard]] inline ExternalType
   Get(const InternalType & input) const
   {
     return static_cast<ExternalType>(DefaultConvertPixelTraits<InternalType>::GetNthComponent(m_ElementNumber, input));
   }
 
   /** Get the element number to access in the container */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetElementNumber() const
   {
     return m_ElementNumber;
@@ -103,18 +103,14 @@ public:
 
   /** Assignment operator */
   NthElementPixelAccessor &
-  operator=(const NthElementPixelAccessor & accessor)
-  {
-    m_ElementNumber = accessor.m_ElementNumber;
-    return *this;
-  }
+  operator=(const NthElementPixelAccessor & accessor) = default;
 
   /** Constructor */
-  NthElementPixelAccessor() { m_ElementNumber = 0; }
+  NthElementPixelAccessor() = default;
 
 private:
   // Identifier of the N-th element to be accessed
-  unsigned int m_ElementNumber;
+  unsigned int m_ElementNumber{ 0 };
 };
 
 
@@ -144,7 +140,7 @@ public:
   }
 
   inline void
-  Set(InternalType & output, const ExternalType & input, const unsigned long offset) const
+  Set(InternalType & output, const ExternalType & input, const SizeValueType offset) const
   {
     // note: v is a reference to the internal buffer, this method of
     // access relies on return value optimization to work
@@ -153,16 +149,14 @@ public:
     return Set(v, input);
   }
 
-  inline ExternalType
+  [[nodiscard]] inline ExternalType
   Get(const ActualPixelType & input) const
   {
-    ExternalType output;
-
-    output = static_cast<ExternalType>(input[m_ElementNumber]);
+    const auto output = static_cast<ExternalType>(input[m_ElementNumber]);
     return output;
   }
 
-  inline ExternalType
+  [[nodiscard]] inline ExternalType
   Get(const InternalType & input, const SizeValueType offset) const
   {
     return Get(Superclass::Get(input, offset));
@@ -170,7 +164,7 @@ public:
 
 
   /** Get the element number to access in the container */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetElementNumber() const
   {
     return m_ElementNumber;
@@ -191,7 +185,7 @@ public:
   }
 
   /** Get Vector lengths */
-  VectorLengthType
+  [[nodiscard]] VectorLengthType
   GetVectorLength() const
   {
     return Superclass::GetVectorLength();

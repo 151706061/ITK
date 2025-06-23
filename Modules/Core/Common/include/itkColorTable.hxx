@@ -87,8 +87,8 @@ ColorTable<TComponent>::UseDiscreteColors()
   // max for TComponent.  Exceptions were happening
   // on this assignment, even if realMax was
   // set to NumericTraits<TComponent>::max().
-  typename NumericTraits<TComponent>::RealType realMax(1.0 * scale + shift);
-  TComponent                                   pixelMax(NumericTraits<TComponent>::max());
+  const typename NumericTraits<TComponent>::RealType realMax(1.0 * scale + shift);
+  TComponent                                         pixelMax(NumericTraits<TComponent>::max());
   // Converting from TComponent to RealType may introduce a rounding error, so do static_cast
   constexpr auto max_value_converted =
     static_cast<typename NumericTraits<TComponent>::RealType>(NumericTraits<TComponent>::max());
@@ -104,8 +104,6 @@ template <typename TComponent>
 void
 ColorTable<TComponent>::UseGrayColors(unsigned int n)
 {
-  unsigned int i;
-
   this->DeleteColors();
 
   m_NumberOfColors = n;
@@ -138,9 +136,9 @@ ColorTable<TComponent>::UseGrayColors(unsigned int n)
   // Converting from TComponent to RealType may introduce a rounding error, so do static_cast
   constexpr auto max_value_converted =
     static_cast<typename NumericTraits<TComponent>::RealType>(NumericTraits<TComponent>::max());
-  for (i = 0; i < m_NumberOfColors; ++i)
+  for (unsigned int i = 0; i < m_NumberOfColors; ++i)
   {
-    typename NumericTraits<TComponent>::RealType realGray(minimum + i * delta);
+    const typename NumericTraits<TComponent>::RealType realGray(minimum + i * delta);
 
     TComponent gray = NumericTraits<TComponent>::max();
     if (realGray < max_value_converted)
@@ -159,8 +157,6 @@ template <typename TComponent>
 void
 ColorTable<TComponent>::UseHeatColors(unsigned int n)
 {
-  unsigned int i;
-
   this->DeleteColors();
 
   m_NumberOfColors = n;
@@ -183,12 +179,12 @@ ColorTable<TComponent>::UseHeatColors(unsigned int n)
   // Converting from TComponent to RealType may introduce a rounding error, so do static_cast
   constexpr auto max_value_converted =
     static_cast<typename NumericTraits<TComponent>::RealType>(NumericTraits<TComponent>::max());
-  for (i = 0; i < n / 2.0; ++i)
+  for (unsigned int i = 0; i < n / 2.0; ++i)
   {
     //
     // avoid overflow
-    typename NumericTraits<TComponent>::RealType realR(((i + 1) / (n / 2.0 + 1)) * scale + shift);
-    TComponent                                   r(NumericTraits<TComponent>::max());
+    const typename NumericTraits<TComponent>::RealType realR(((i + 1) / (n / 2.0 + 1)) * scale + shift);
+    TComponent                                         r(NumericTraits<TComponent>::max());
     if (realR < max_value_converted)
     {
       r = static_cast<TComponent>(realR);
@@ -201,17 +197,17 @@ ColorTable<TComponent>::UseHeatColors(unsigned int n)
     m_ColorName[i] = name.str();
   }
 
-  for (i = 0; i < n / 2; ++i)
+  for (unsigned int i = 0; i < n / 2; ++i)
   {
-    typename NumericTraits<TComponent>::RealType rdouble(1.0 * scale + shift);
-    TComponent                                   r(NumericTraits<TComponent>::max());
+    const typename NumericTraits<TComponent>::RealType rdouble(1.0 * scale + shift);
+    TComponent                                         r(NumericTraits<TComponent>::max());
     if (rdouble < max_value_converted)
     {
       r = static_cast<TComponent>(rdouble);
     }
     auto g = static_cast<TComponent>(((i + 1) / (n / 2.0 + 1)) * scale + shift);
     auto b = static_cast<TComponent>(((i + 1) / (n / 2.0 + 1)) * scale + shift);
-    m_Color[(size_t)(i + n / 2.0)].Set(r, g, b);
+    m_Color[static_cast<size_t>(i + n / 2.0)].Set(r, g, b);
     std::ostringstream name;
     name << "Heat" << std::fixed << std::setprecision(2) << (i + n / 2.0) / static_cast<float>(n);
     m_ColorName[static_cast<size_t>((i + n / 2.0))] = name.str();
@@ -222,15 +218,14 @@ template <typename TComponent>
 void
 ColorTable<TComponent>::UseRandomColors(unsigned int n)
 {
-  unsigned int i;
-
   this->DeleteColors();
 
   m_NumberOfColors = n;
   m_Color.resize(m_NumberOfColors);
   m_ColorName.resize(m_NumberOfColors);
-  TComponent r, g, b;
-  TComponent minimum, maximum;
+
+  TComponent minimum;
+  TComponent maximum;
   if (NumericTraits<TComponent>::is_integer)
   {
     minimum = NumericTraits<TComponent>::NonpositiveMin();
@@ -241,13 +236,13 @@ ColorTable<TComponent>::UseRandomColors(unsigned int n)
     minimum = TComponent{};
     maximum = NumericTraits<TComponent>::OneValue();
   }
-  for (i = 0; i < n; ++i)
+  for (unsigned int i = 0; i < n; ++i)
   {
-    r = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
+    auto r = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
     m_Color[i][0] = r;
-    g = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
+    auto g = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
     m_Color[i][1] = g;
-    b = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
+    auto b = static_cast<TComponent>(vnl_sample_uniform(minimum, maximum));
     m_Color[i][2] = b;
     std::ostringstream name;
     name << "Random(" << std::fixed << std::setprecision(2) << static_cast<float>(r) << ',' << static_cast<float>(g)
@@ -286,12 +281,10 @@ ColorTable<TComponent>::GetColor(unsigned int c)
   {
     return m_Color[c];
   }
-  else
-  {
-    RGBPixel<TComponent> pixel;
-    pixel.Set(0, 0, 0);
-    return pixel;
-  }
+
+  RGBPixel<TComponent> pixel;
+  pixel.Set(0, 0, 0);
+  return pixel;
 }
 
 template <typename TComponent>
@@ -334,10 +327,8 @@ ColorTable<TComponent>::GetColorName(unsigned int c)
   {
     return m_ColorName[c];
   }
-  else
-  {
-    return "";
-  }
+
+  return "";
 }
 
 template <typename TComponent>
@@ -349,8 +340,7 @@ ColorTable<TComponent>::GetClosestColorTableId(TComponent r, TComponent g, TComp
 
   for (unsigned int i = 0; i < m_NumberOfColors; ++i)
   {
-    double match;
-    match = (r - static_cast<double>(m_Color[i].GetRed())) * (r - static_cast<double>(m_Color[i].GetRed()));
+    double match = (r - static_cast<double>(m_Color[i].GetRed())) * (r - static_cast<double>(m_Color[i].GetRed()));
     match += (g - static_cast<double>(m_Color[i].GetGreen())) * (g - static_cast<double>(m_Color[i].GetGreen()));
     match += (b - static_cast<double>(m_Color[i].GetGreen())) * (b - static_cast<double>(m_Color[i].GetBlue()));
     if (i == 0 || match < bestMatch)

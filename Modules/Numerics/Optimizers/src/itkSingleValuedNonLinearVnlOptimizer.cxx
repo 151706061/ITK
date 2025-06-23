@@ -22,34 +22,27 @@ namespace itk
 {
 /** Constructor */
 SingleValuedNonLinearVnlOptimizer::SingleValuedNonLinearVnlOptimizer()
+  : m_CostFunctionAdaptor(nullptr)
+
 {
-  m_CostFunctionAdaptor = nullptr;
-  m_Maximize = false;
   m_Command = CommandType::New();
   m_Command->SetCallbackFunction(this, &SingleValuedNonLinearVnlOptimizer::IterationReport);
-  m_CachedValue = 0;
   m_CachedCurrentPosition.Fill(0);
   m_CachedDerivative.Fill(0);
 }
 
 /** Destructor */
-SingleValuedNonLinearVnlOptimizer::~SingleValuedNonLinearVnlOptimizer()
-{
-  delete m_CostFunctionAdaptor;
-  m_CostFunctionAdaptor = nullptr;
-}
+SingleValuedNonLinearVnlOptimizer::~SingleValuedNonLinearVnlOptimizer() = default;
 
 void
 SingleValuedNonLinearVnlOptimizer::SetCostFunctionAdaptor(CostFunctionAdaptorType * adaptor)
 {
-  if (m_CostFunctionAdaptor == adaptor)
+  if (m_CostFunctionAdaptor.get() == adaptor)
   {
     return;
   }
 
-  delete m_CostFunctionAdaptor;
-
-  m_CostFunctionAdaptor = adaptor;
+  m_CostFunctionAdaptor.reset(adaptor);
 
   m_CostFunctionAdaptor->AddObserver(IterationEvent(), m_Command);
 }
@@ -57,13 +50,13 @@ SingleValuedNonLinearVnlOptimizer::SetCostFunctionAdaptor(CostFunctionAdaptorTyp
 const SingleValuedNonLinearVnlOptimizer::CostFunctionAdaptorType *
 SingleValuedNonLinearVnlOptimizer::GetCostFunctionAdaptor() const
 {
-  return m_CostFunctionAdaptor;
+  return m_CostFunctionAdaptor.get();
 }
 
 SingleValuedNonLinearVnlOptimizer::CostFunctionAdaptorType *
 SingleValuedNonLinearVnlOptimizer::GetCostFunctionAdaptor()
 {
-  return m_CostFunctionAdaptor;
+  return m_CostFunctionAdaptor.get();
 }
 
 /** The purpose of this method is to get around the lack of
@@ -71,7 +64,7 @@ SingleValuedNonLinearVnlOptimizer::GetCostFunctionAdaptor()
 SingleValuedNonLinearVnlOptimizer::CostFunctionAdaptorType *
 SingleValuedNonLinearVnlOptimizer::GetNonConstCostFunctionAdaptor() const
 {
-  return m_CostFunctionAdaptor;
+  return m_CostFunctionAdaptor.get();
 }
 
 /** The purpose of this method is to get around the lack of iteration reporting
@@ -98,11 +91,11 @@ void
 SingleValuedNonLinearVnlOptimizer::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-  os << indent << "Maximize flag: " << (m_Maximize ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Maximize);
   os << indent << "Cached Value: " << m_CachedValue << std::endl;
   os << indent << "Cached Derivative: " << m_CachedDerivative << std::endl;
   os << indent << "Cached current positiion: " << m_CachedCurrentPosition << std::endl;
   os << indent << "Command observer " << m_Command.GetPointer() << std::endl;
-  os << indent << "Cost Function adaptor" << m_CostFunctionAdaptor << std::endl;
+  os << indent << "Cost Function adaptor" << m_CostFunctionAdaptor.get() << std::endl;
 }
 } // end namespace itk

@@ -24,10 +24,9 @@ namespace itk
 {
 template <typename TInputImage, typename TFeatureImage>
 StatisticsRelabelImageFilter<TInputImage, TFeatureImage>::StatisticsRelabelImageFilter()
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_Attribute(LabelObjectType::MEAN)
 {
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ReverseOrdering = false;
-  m_Attribute = LabelObjectType::MEAN;
   this->SetNumberOfRequiredInputs(2);
 }
 
@@ -39,7 +38,7 @@ StatisticsRelabelImageFilter<TInputImage, TFeatureImage>::GenerateInputRequested
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());

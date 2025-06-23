@@ -26,7 +26,15 @@
 // template argument and the size of these dimensions are taken from
 // the array.The data types used are float and double.
 int
-itkFFTWF_RealFFTTest(int argc, char * argv[])
+itkFFTWF_RealFFTTest(
+#  ifndef ITK_USE_CUFFTW
+  int    argc,
+  char * argv[]
+#  else
+  int    itkNotUsed(argc),
+  char * itkNotUsed(argv)[]
+#  endif
+)
 {
   using ImageF1 = itk::Image<float, 1>;
   using ImageCF1 = itk::Image<std::complex<float>, 1>;
@@ -53,9 +61,6 @@ itkFFTWF_RealFFTTest(int argc, char * argv[])
   std::cout << "WisdomCacheBase " << itk::FFTWGlobalConfiguration::GetWisdomCacheBase() << std::endl;
   std::cout << "WisdomeFile     " << itk::FFTWGlobalConfiguration::GetWisdomFileDefaultBaseName() << std::endl;
 #  endif
-  // Avoid unused parameter warnings.
-  (void)argc;
-  (void)argv;
 
   unsigned int SizeOfDimensions1[] = { 4, 4, 4 };
   unsigned int SizeOfDimensions2[] = { 3, 5, 4 };
@@ -98,7 +103,7 @@ itkFFTWF_RealFFTTest(int argc, char * argv[])
     rval++;
 
   // Exercise the plan rigor methods
-  itk::FFTWRealToHalfHermitianForwardFFTImageFilter<ImageF3>::Pointer fft =
+  const itk::FFTWRealToHalfHermitianForwardFFTImageFilter<ImageF3>::Pointer fft =
     itk::FFTWRealToHalfHermitianForwardFFTImageFilter<ImageF3>::New();
   fft->SetPlanRigor(FFTW_ESTIMATE);
   if (fft->GetPlanRigor() != FFTW_ESTIMATE)
@@ -108,7 +113,7 @@ itkFFTWF_RealFFTTest(int argc, char * argv[])
   }
   fft->SetPlanRigor(FFTW_MEASURE);
 
-  itk::FFTWHalfHermitianToRealInverseFFTImageFilter<ImageCF3>::Pointer ifft =
+  const itk::FFTWHalfHermitianToRealInverseFFTImageFilter<ImageCF3>::Pointer ifft =
     itk::FFTWHalfHermitianToRealInverseFFTImageFilter<ImageCF3>::New();
   ifft->SetPlanRigor(FFTW_ESTIMATE);
   if (ifft->GetPlanRigor() != FFTW_ESTIMATE)

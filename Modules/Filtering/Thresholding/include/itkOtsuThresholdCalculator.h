@@ -56,7 +56,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(OtsuThresholdCalculator);
 
   /** Type definition for the input image. */
@@ -65,10 +65,11 @@ public:
 
   /** Should the threshold value be mid-point of the bin or the maximum?
    * Default is to return bin maximum. */
+  /** @ITKStartGrouping */
   itkSetMacro(ReturnBinMidpoint, bool);
   itkGetConstReferenceMacro(ReturnBinMidpoint, bool);
   itkBooleanMacro(ReturnBinMidpoint);
-
+  /** @ITKEndGrouping */
   /** for backward compatibility. Update() should be preferred. */
   void
   Compute()
@@ -78,10 +79,8 @@ public:
 
 protected:
   OtsuThresholdCalculator()
-
-  {
-    m_OtsuMultipleThresholdsCalculator = OtsuMultipleThresholdsCalculator<THistogram>::New();
-  }
+    : m_OtsuMultipleThresholdsCalculator(OtsuMultipleThresholdsCalculator<THistogram>::New())
+  {}
   ~OtsuThresholdCalculator() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
@@ -90,11 +89,7 @@ protected:
 
 private:
   typename OtsuMultipleThresholdsCalculator<THistogram>::Pointer m_OtsuMultipleThresholdsCalculator{};
-#if defined(ITKV4_COMPATIBILITY)
-  bool m_ReturnBinMidpoint{ true };
-#else
-  bool m_ReturnBinMidpoint{ false };
-#endif
+  bool                                                           m_ReturnBinMidpoint{ false };
 };
 
 } // end namespace itk

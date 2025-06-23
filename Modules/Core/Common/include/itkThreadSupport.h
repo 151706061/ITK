@@ -22,16 +22,6 @@
 
 #include "itkConfigure.h" // For ITK_USE_WIN32_THREADS, ITK_USE_PTHREADS, etc.
 
-// This implementation uses a routine called SignalObjectAndWait()
-// which is only defined on WinNT 4.0 or greater systems.  We need to
-// define this symbol in order to get the prototype for the
-// routine. This needs to be done before we load any system headers.
-#ifdef ITK_USE_WIN32_THREADS
-#  ifndef _WIN32_WINNT
-#    define _WIN32_WINNT 0x0501 // TBB 4.4 requires WinXP (0x0501 or greater)
-#  endif
-#endif
-
 #if defined(ITK_USE_PTHREADS)
 #  include <pthread.h>
 #elif defined(ITK_USE_WIN32_THREADS)
@@ -44,6 +34,7 @@ namespace itk
 {
 /** Platform specific type alias for simple types
  */
+/** @ITKStartGrouping */
 #if defined(ITK_USE_PTHREADS)
 constexpr size_t ITK_MAX_THREADS = ITK_DEFAULT_MAX_THREADS;
 using MutexType = pthread_mutex_t;
@@ -51,10 +42,10 @@ using FastMutexType = pthread_mutex_t;
 using ThreadFunctionType = void * (*)(void *);
 using ThreadProcessIdType = pthread_t;
 #  if !defined(ITK_FUTURE_LEGACY_REMOVE)
-constexpr ThreadProcessIdType ITK_DEFAULT_THREAD_ID = 0;
+constexpr ThreadProcessIdType ITK_DEFAULT_THREAD_ID = {};
 #  endif
 using ITK_THREAD_RETURN_TYPE = void *;
-
+/** @ITKEndGrouping */
 constexpr ITK_THREAD_RETURN_TYPE ITK_THREAD_RETURN_DEFAULT_VALUE = nullptr;
 using itk::ITK_THREAD_RETURN_DEFAULT_VALUE; // We need this out of the itk namespace for #define to work below
 using ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION = itk::ITK_THREAD_RETURN_TYPE;
@@ -107,8 +98,8 @@ struct ConditionVariableType
                            // threads to wake up and
                            // release the semaphore
 
-  int m_WasBroadcast;                       // Used as boolean. Keeps track of whether
-                                            // we were broadcasting or signaling
+  int m_WasBroadcast; // Used as boolean. Keeps track of whether
+                      // we were broadcasting or signaling
 #endif
 };
 
@@ -117,7 +108,7 @@ struct ConditionVariableType
 // Compile-time conditional code for different threading models
 // require that some items are #defines (always global scope) or
 // can sometimes be rigorously typed.  When rigorously typed,
-// we need to re-exposed to the global namespace to keep the
+// we need to re-expose to the global namespace to keep the
 // use of these items consistent.
 #if defined(ITK_USE_PTHREADS)
 using itk::ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION;

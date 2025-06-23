@@ -87,7 +87,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PointSetToPointSetMetricWithIndexv4);
 
   /**  Type of the measure. */
@@ -151,7 +151,11 @@ public:
 
   using PointType = FixedPointType;
   using PixelType = FixedPixelType;
-  using CoordRepType = typename PointType::CoordRepType;
+  using CoordinateType = typename PointType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using PointsContainer = FixedPointsContainer;
   using PointsConstIterator = typename PointsContainer::ConstIterator;
   using PointIdentifier = typename PointsContainer::ElementIdentifier;
@@ -212,15 +216,19 @@ public:
   }
 
   /** Get/Set the fixed pointset.  */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(FixedPointSet, FixedPointSetType);
   itkGetConstObjectMacro(FixedPointSet, FixedPointSetType);
+  /** @ITKEndGrouping */
 
   /** Get the fixed transformed point set.  */
   itkGetModifiableObjectMacro(FixedTransformedPointSet, FixedTransformedPointSetType);
 
   /** Get/Set the moving point set.  */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(MovingPointSet, MovingPointSetType);
   itkGetConstObjectMacro(MovingPointSet, MovingPointSetType);
+  /** @ITKEndGrouping */
 
   /** Get the moving transformed point set.  */
   itkGetModifiableObjectMacro(MovingTransformedPointSet, MovingTransformedPointSetType);
@@ -303,16 +311,20 @@ public:
    * If this variable is set to false, then the derivative array will be of length
    * = PointDimension * m_FixedPointSet->GetNumberOfPoints().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(StoreDerivativeAsSparseFieldForLocalSupportTransforms, bool);
   itkGetConstMacro(StoreDerivativeAsSparseFieldForLocalSupportTransforms, bool);
   itkBooleanMacro(StoreDerivativeAsSparseFieldForLocalSupportTransforms);
+  /** @ITKEndGrouping */
 
   /**
    *
    */
+  /** @ITKStartGrouping */
   itkSetMacro(CalculateValueAndDerivativeInTangentSpace, bool);
   itkGetConstMacro(CalculateValueAndDerivativeInTangentSpace, bool);
   itkBooleanMacro(CalculateValueAndDerivativeInTangentSpace);
+  /** @ITKEndGrouping */
 
 protected:
   PointSetToPointSetMetricWithIndexv4();
@@ -418,13 +430,13 @@ protected:
   RequiresMovingPointsLocator() const
   {
     return true;
-  };
+  }
 
   virtual bool
   RequiresFixedPointsLocator() const
   {
     return true;
-  };
+  }
 
   /**
    * Function to be defined in the appropriate derived classes.  Calculates
@@ -433,6 +445,7 @@ protected:
    */
   virtual MeasureType
   GetLocalNeighborhoodValueWithIndex(const PointIdentifier &, const PointType &, const PixelType & pixel) const = 0;
+
   /**
    * Function to be defined in the appropriate derived classes.  Calculates
    * the local metric value for a single point.  The \c PixelType may or

@@ -48,7 +48,7 @@ itk_fetch_module(
 
 McCormick, M.
 An Open Source, Fast Ultrasound B-Mode Implementation for Commodity Hardware.
-Insight Journal. 2010 January-June. URL: https://www.insight-journal.org/browse/publication/722
+Insight Journal. 2010 January-June. URL: https://doi.org/10.54294/yjowe4
 
 McCormick, M, Rubert, N and Varghese, T.
 Bayesian Regularization Applied to Ultrasound Strain Imaging.
@@ -63,5 +63,5 @@ https://dx.doi.org/10.1109/ISBI.2016.7493437
 https://pdfs.semanticscholar.org/6bcd/1e7adbc24e15c928a7ad5af77bbd5da29c30.pdf"
   MODULE_COMPLIANCE_LEVEL 3
   GIT_REPOSITORY https://github.com/KitwareMedical/ITKUltrasound.git
-  GIT_TAG b351ac104616b715b06e83aeec7fd793e126460b
+  GIT_TAG c11814f25ca1fe6086cc3bc7220a36f22d12ae6c
   )

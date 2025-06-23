@@ -39,55 +39,45 @@ void
 NoiseImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  unsigned int i;
-
   ZeroFluxNeumannBoundaryCondition<InputImageType> nbc;
 
-  ConstNeighborhoodIterator<InputImageType> bit;
-  ImageRegionIterator<OutputImageType>      it;
-
   // Allocate output
-  typename OutputImageType::Pointer     output = this->GetOutput();
-  typename InputImageType::ConstPointer input = this->GetInput();
+  const typename OutputImageType::Pointer     output = this->GetOutput();
+  const typename InputImageType::ConstPointer input = this->GetInput();
 
   // Find the data-set boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                        bC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                              bC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
     bC(input, outputRegionForThread, this->GetRadius());
 
   TotalProgressReporter progress(this, output->GetRequestedRegion().GetNumberOfPixels());
-
-  InputRealType value;
-  InputRealType sum;
-  InputRealType sumOfSquares;
-  InputRealType var;
-  InputRealType num;
 
   // Process each of the boundary faces.  These are N-d regions which border
   // the edge of the buffer.
   for (const auto & face : faceList)
   {
-    bit = ConstNeighborhoodIterator<InputImageType>(this->GetRadius(), input, face);
-    unsigned int neighborhoodSize = bit.Size();
-    num = static_cast<InputRealType>(bit.Size());
+    ConstNeighborhoodIterator<InputImageType> bit =
+      ConstNeighborhoodIterator<InputImageType>(this->GetRadius(), input, face);
+    const unsigned int neighborhoodSize = bit.Size();
+    auto               num = static_cast<InputRealType>(bit.Size());
 
-    it = ImageRegionIterator<OutputImageType>(output, face);
+    ImageRegionIterator<OutputImageType> it = ImageRegionIterator<OutputImageType>(output, face);
     bit.OverrideBoundaryCondition(&nbc);
     bit.GoToBegin();
 
     while (!bit.IsAtEnd())
     {
-      sum = InputRealType{};
-      sumOfSquares = InputRealType{};
-      for (i = 0; i < neighborhoodSize; ++i)
+      auto sum = InputRealType{};
+      auto sumOfSquares = InputRealType{};
+      for (unsigned int i = 0; i < neighborhoodSize; ++i)
       {
-        value = static_cast<InputRealType>(bit.GetPixel(i));
+        auto value = static_cast<InputRealType>(bit.GetPixel(i));
         sum += value;
         sumOfSquares += (value * value);
       }
 
       // calculate the standard deviation value
-      var = (sumOfSquares - (sum * sum / num)) / (num - 1.0);
+      InputRealType var = (sumOfSquares - (sum * sum / num)) / (num - 1.0);
       it.Set(static_cast<OutputPixelType>(std::sqrt(var)));
 
       ++bit;

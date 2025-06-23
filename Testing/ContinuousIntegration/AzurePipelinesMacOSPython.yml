@@ -3,7 +3,7 @@ name: ITK.macOS.Python
 trigger:
   branches:
     include:
-    - master
+    - main
     - release*
   paths:
     exclude:
@@ -25,13 +25,14 @@ pr:
     - Utilities/ITKv5Preparation/*
     - Utilities/Maintenance/*
 variables:
-  ExternalDataVersion: 5.3.0
+  ExternalDataVersion: 5.4.3
 jobs:
 - job: macOS
   timeoutInMinutes: 0
   cancelTimeoutInMinutes: 300
   pool:
-    vmImage: macos-11
+    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+    vmImage: macos-13
   steps:
     - checkout: self
       clean: true
@@ -65,7 +66,7 @@ jobs:
 
         curl -L https://github.com/InsightSoftwareConsortium/ITK/releases/download/v$(ExternalDataVersion)/InsightData-$(ExternalDataVersion).tar.gz -O
         cmake -E tar xfz InsightData-$(ExternalDataVersion).tar.gz
-        cmake -E rename InsightToolkit-$(ExternalDataVersion)/.ExternalData/MD5 $(Build.SourcesDirectory)/.ExternalData/MD5
+        cmake -E rename InsightToolkit-$(ExternalDataVersion)/.ExternalData/CID $(Build.SourcesDirectory)/.ExternalData/CID
       workingDirectory: $(Agent.BuildDirectory)
       displayName: 'Download dashboard script and testing data'
 

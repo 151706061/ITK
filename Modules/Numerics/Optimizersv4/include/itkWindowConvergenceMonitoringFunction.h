@@ -20,9 +20,7 @@
 
 #include "itkConvergenceMonitoringFunction.h"
 
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 /**
  * \class WindowConvergenceMonitoringFunction
@@ -49,7 +47,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WindowConvergenceMonitoringFunction);
 
   using ScalarType = TScalar;
@@ -70,9 +68,10 @@ public:
   ClearEnergyValues() override;
 
   /** Set/Get window size over which the convergence value is calculated */
+  /** @ITKStartGrouping */
   itkSetMacro(WindowSize, EnergyValueContainerSizeType);
   itkGetConstMacro(WindowSize, EnergyValueContainerSizeType);
-
+  /** @ITKEndGrouping */
   /** Calculate convergence value by fitting to a window of the energy profile */
   RealType
   GetConvergenceValue() const override;
@@ -90,8 +89,7 @@ private:
 
   RealType m_TotalEnergy{};
 };
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWindowConvergenceMonitoringFunction.hxx"

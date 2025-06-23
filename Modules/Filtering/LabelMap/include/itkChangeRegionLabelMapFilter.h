@@ -43,7 +43,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Label object representation and manipulation with ITK"
  * by Lehmann G.
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
@@ -64,7 +64,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ChangeRegionLabelMapFilter);
 
   /** Standard New method. */
@@ -98,9 +98,10 @@ public:
   static constexpr unsigned int ImageDimension = TOutputImage::ImageDimension;
 
   /** The output region to use */
+  /** @ITKStartGrouping */
   itkSetMacro(Region, OutputImageRegionType);
   itkGetConstReferenceMacro(Region, OutputImageRegionType);
-
+  /** @ITKEndGrouping */
 protected:
   ChangeRegionLabelMapFilter() = default;
   ~ChangeRegionLabelMapFilter() override = default;

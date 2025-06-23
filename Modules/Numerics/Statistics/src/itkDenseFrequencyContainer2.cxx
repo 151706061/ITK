@@ -17,14 +17,12 @@
  *=========================================================================*/
 #include "itkDenseFrequencyContainer2.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 DenseFrequencyContainer2::DenseFrequencyContainer2()
+  : m_TotalFrequency(TotalAbsoluteFrequencyType{})
 {
   m_FrequencyContainer = FrequencyContainerType::New();
-  m_TotalFrequency = TotalAbsoluteFrequencyType{};
 }
 
 void
@@ -48,7 +46,7 @@ DenseFrequencyContainer2::SetFrequency(const InstanceIdentifier id, const Absolu
   {
     return false;
   }
-  AbsoluteFrequencyType frequency = this->GetFrequency(id);
+  const AbsoluteFrequencyType frequency = this->GetFrequency(id);
   (*m_FrequencyContainer)[id] = value;
   m_TotalFrequency += (value - frequency);
   return true;
@@ -71,7 +69,7 @@ DenseFrequencyContainer2::IncreaseFrequency(const InstanceIdentifier id, const A
   {
     return false;
   }
-  AbsoluteFrequencyType frequency = this->GetFrequency(id);
+  const AbsoluteFrequencyType frequency = this->GetFrequency(id);
   (*m_FrequencyContainer)[id] = frequency + value;
   m_TotalFrequency += value;
   return true;
@@ -82,5 +80,4 @@ DenseFrequencyContainer2::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics

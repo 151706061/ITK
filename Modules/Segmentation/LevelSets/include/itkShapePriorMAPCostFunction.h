@@ -38,10 +38,7 @@ namespace itk
  *
  * \sa ShapePriorSegmentationLevelSetImageFilter
  *
- * \par REFERENCES
- * \par
- * [1] Leventon, M.E. et al. "Statistical Shape Influence in Geodesic Active Contours", CVPR 2000.
- *
+ * For algorithmic details see \cite leventon2000.
  *
  * \ingroup Numerics Optimizers
  * \ingroup ITKLevelSets
@@ -61,7 +58,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapePriorMAPCostFunction);
 
   /**  ParametersType type alias.
@@ -96,21 +93,24 @@ public:
   using ArrayType = Array<double>;
 
   /** Set/Get the array of shape parameters mean. */
+  /** @ITKStartGrouping */
   itkSetMacro(ShapeParameterMeans, ArrayType);
   itkGetConstMacro(ShapeParameterMeans, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the array of shape parameters standard deviation. */
+  /** @ITKStartGrouping */
   itkSetMacro(ShapeParameterStandardDeviations, ArrayType);
   itkGetConstMacro(ShapeParameterStandardDeviations, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the weights for each term. Default is a vector of all ones.
    * The weights are applied to terms in the following order:
    * LogInsideTerm, LogGradientTerm, LogShapePriorTerm and
    * LogPosePriorTerm. */
+  /** @ITKStartGrouping */
   using WeightsType = FixedArray<double, 4>;
   itkSetMacro(Weights, WeightsType);
   itkGetConstReferenceMacro(Weights, WeightsType);
-
+  /** @ITKEndGrouping */
   /** Compute the inside term component of the MAP cost function.
    * In particular, the method sums the number of pixels inside
    * the current contour (defined by nodes of the active region

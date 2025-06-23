@@ -25,11 +25,10 @@ namespace itk
 template <typename TTransform>
 BSplineSmoothingOnUpdateDisplacementFieldTransformParametersAdaptor<
   TTransform>::BSplineSmoothingOnUpdateDisplacementFieldTransformParametersAdaptor()
+
 {
   this->m_NumberOfControlPointsForTheUpdateField.Fill(4);
   this->m_NumberOfControlPointsForTheTotalField.Fill(0);
-  this->m_NumberOfControlPointsForTheUpdateFieldSetTime = 0;
-  this->m_NumberOfControlPointsForTheTotalFieldSetTime = 0;
 }
 
 /**
@@ -40,8 +39,7 @@ void
 BSplineSmoothingOnUpdateDisplacementFieldTransformParametersAdaptor<TTransform>::SetMeshSizeForTheUpdateField(
   const ArrayType & meshSize)
 {
-  ArrayType numberOfControlPoints;
-  numberOfControlPoints.Fill(0);
+  ArrayType numberOfControlPoints{};
   for (unsigned int d = 0; d < SpaceDimension; ++d)
   {
     if (meshSize[d] > 0)
@@ -60,8 +58,7 @@ void
 BSplineSmoothingOnUpdateDisplacementFieldTransformParametersAdaptor<TTransform>::SetMeshSizeForTheTotalField(
   const ArrayType & meshSize)
 {
-  ArrayType numberOfControlPoints;
-  numberOfControlPoints.Fill(0);
+  ArrayType numberOfControlPoints{};
   for (unsigned int d = 0; d < SpaceDimension; ++d)
   {
     if (meshSize[d] > 0)

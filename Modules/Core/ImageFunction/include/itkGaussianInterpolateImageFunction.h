@@ -42,7 +42,7 @@ namespace itk
  *
  * This work was originally described in the Insight Journal article:
  * P. Yushkevich, N. Tustison, J. Gee, Gaussian interpolation.
- * \sa{https://www.insight-journal.org/browse/publication/705}
+ * \sa{https://doi.org/10.54294/n8k79e}
  *
  * \author Paul Yushkevich
  * \author Nick Tustison
@@ -50,19 +50,19 @@ namespace itk
  * \ingroup ITKImageFunction
  */
 
-template <typename TInputImage, typename TCoordRep = double>
-class ITK_TEMPLATE_EXPORT GaussianInterpolateImageFunction : public InterpolateImageFunction<TInputImage, TCoordRep>
+template <typename TInputImage, typename TCoordinate = double>
+class ITK_TEMPLATE_EXPORT GaussianInterpolateImageFunction : public InterpolateImageFunction<TInputImage, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(GaussianInterpolateImageFunction);
 
   /** Standard class type aliases. */
   using Self = GaussianInterpolateImageFunction;
-  using Superclass = InterpolateImageFunction<TInputImage, TCoordRep>;
+  using Superclass = InterpolateImageFunction<TInputImage, TCoordinate>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianInterpolateImageFunction);
 
   /** Method for creation through the object factory. */
@@ -102,6 +102,7 @@ public:
   }
 
   /** Set/Get sigma. */
+  /** @ITKStartGrouping */
   virtual void
   SetSigma(const ArrayType s)
   {
@@ -123,8 +124,10 @@ public:
     this->SetSigma(sigma);
   }
   itkGetConstMacro(Sigma, ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set/Get alpha. */
+  /** @ITKStartGrouping */
   virtual void
   SetAlpha(const RealType a)
   {
@@ -136,6 +139,7 @@ public:
     }
   }
   itkGetConstMacro(Alpha, RealType);
+  /** @ITKEndGrouping */
 
   /** Set/Get sigma and alpha. */
   virtual void
@@ -179,17 +183,22 @@ protected:
                             bool                   evaluateGradient = false) const;
 
   /** Set/Get the bounding box starting point. */
+  /** @ITKStartGrouping */
   itkSetMacro(BoundingBoxStart, ArrayType);
   itkGetConstMacro(BoundingBoxStart, ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the bounding box end point. */
+  /** @ITKStartGrouping */
   itkSetMacro(BoundingBoxEnd, ArrayType);
   itkGetConstMacro(BoundingBoxEnd, ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the cut-off distance. */
+  /** @ITKStartGrouping */
   itkSetMacro(CutOffDistance, ArrayType);
   itkGetConstMacro(CutOffDistance, ArrayType);
-
+  /** @ITKEndGrouping */
 
 private:
   /** Evaluate function value. */

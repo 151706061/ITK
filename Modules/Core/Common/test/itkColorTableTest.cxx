@@ -78,7 +78,7 @@ ColorTableTestSpecialConditionChecker(typename itk::ColorTable<TComponent>::Poin
     return EXIT_FAILURE;
   }
 
-  RGBPixelType pixel = colors->GetColor(numberOfColors);
+  const RGBPixelType pixel = colors->GetColor(numberOfColors);
   if (pixel != zeroPixel)
   {
     std::cerr << "Test failed!" << std::endl;
@@ -87,7 +87,7 @@ ColorTableTestSpecialConditionChecker(typename itk::ColorTable<TComponent>::Poin
     return EXIT_FAILURE;
   }
 
-  bool tf = colors->SetColor(numberOfColors, 0, 0, 0, "NoMatterTheName");
+  const bool tf = colors->SetColor(numberOfColors, 0, 0, 0, "NoMatterTheName");
   if (tf != false)
   {
     std::cerr << "Test failed!" << std::endl;
@@ -96,7 +96,7 @@ ColorTableTestSpecialConditionChecker(typename itk::ColorTable<TComponent>::Poin
     return EXIT_FAILURE;
   }
 
-  std::string name = colors->GetColorName(numberOfColors);
+  const std::string name = colors->GetColorName(numberOfColors);
   if (!name.empty())
   {
     std::cerr << "Test failed!" << std::endl;
@@ -174,6 +174,7 @@ itkColorTableTest(int argc, char * argv[])
 {
   if (argc != 2)
   {
+    std::cerr << "Missing parameters." << std::endl;
     std::cerr << "Usage: " << itkNameOfTestExecutableMacro(argv) << " numberOfColors" << std::endl;
     return EXIT_FAILURE;
   }
@@ -204,12 +205,11 @@ itkColorTableTest(int argc, char * argv[])
   testStatus |= ColorTableTestHelper<double>("double", numberOfColors);
 
   // Find the closest color for a few colors
-  unsigned int id;
   using RGBPixelType = itk::RGBPixel<unsigned char>;
   RGBPixelType pixel;
   colors->UseRandomColors(10000);
   pixel.Set(255, 0, 0);
-  id = colors->GetClosestColorTableId(pixel[0], pixel[1], pixel[2]);
+  unsigned int id = colors->GetClosestColorTableId(pixel[0], pixel[1], pixel[2]);
   std::cout << "Pixel : " << pixel << " is closest to id: " << id << " which has the color: " << colors->GetColor(id)
             << " and name " << colors->GetColorName(id) << std::endl;
 

@@ -18,6 +18,7 @@
 #ifndef itkLabelObjectLine_h
 #define itkLabelObjectLine_h
 
+#include "itkMacro.h"
 #include "itkIndex.h"
 #include "itkIndent.h"
 
@@ -33,7 +34,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \ingroup LabeledImageObject
  * \ingroup ITKLabelMap
@@ -42,6 +43,8 @@ template <unsigned int VImageDimension>
 class ITK_TEMPLATE_EXPORT LabelObjectLine
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(LabelObjectLine);
+
   static constexpr unsigned int ImageDimension = VImageDimension;
 
   using IndexType = Index<VImageDimension>;
@@ -57,7 +60,7 @@ public:
   void
   SetIndex(const IndexType & idx);
 
-  const IndexType &
+  [[nodiscard]] const IndexType &
   GetIndex() const;
 
   /**
@@ -66,16 +69,16 @@ public:
   void
   SetLength(const LengthType length);
 
-  const LengthType &
+  [[nodiscard]] const LengthType &
   GetLength() const;
 
   /**
    *  Check for index
    */
-  bool
+  [[nodiscard]] bool
   HasIndex(const IndexType idx) const;
 
-  bool
+  [[nodiscard]] bool
   IsNextIndex(const IndexType & idx) const;
 
   /** Cause the object to print itself out. */
@@ -94,7 +97,8 @@ protected:
   PrintHeader(std::ostream & os, Indent indent) const;
 
   virtual void
-  PrintTrailer(std::ostream & os, Indent indent) const;
+  PrintTrailer(std::ostream & itkNotUsed(os), Indent itkNotUsed(indent)) const
+  {}
 
 private:
   IndexType  m_Index{};

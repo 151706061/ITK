@@ -34,9 +34,8 @@ namespace itk
 /**
  * \class KernelTransform
  * Intended to be a base class for elastic body spline and thin plate spline.
- * This is implemented in as straightforward a manner as possible from the
- * IEEE TMI paper by Davis, Khotanzad, Flamig, and Harms, Vol. 16,
- * No. 3 June 1997. Notation closely follows their paper, so if you have it
+ * This is implemented in as straightforward a manner as possible from
+ * \cite davis1997. Notation closely follows the paper, so if you have it
  * in front of you, this code will make a lot more sense.
  *
  * KernelTransform:
@@ -49,10 +48,7 @@ namespace itk
  * This formulation allows the stiffness of the spline to
  * be adjusted, allowing the spline to vary from interpolating the
  * landmarks to approximating the landmarks.  This part of the
- * formulation is based on the short paper by R. Sprengel, K. Rohr,
- * H. Stiehl. "Thin-Plate Spline Approximation for Image
- * Registration". In 18th International Conference of the IEEE
- * Engineering in Medicine and Biology Society. 1996.
+ * formulation is based on \cite sprengel1996.
  *
  *
  * \ingroup ITKTransform
@@ -69,7 +65,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KernelTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -125,19 +121,21 @@ public:
   using PointIdentifier = typename PointSetType::PointIdentifier;
 
   /** VectorSet type alias. */
-  using VectorSetType = itk::VectorContainer<SizeValueType, InputVectorType>;
+  using VectorSetType = itk::VectorContainer<InputVectorType>;
   using VectorSetPointer = typename VectorSetType::Pointer;
 
   /** Get/Set the source landmarks list, which we will denote \f$ p \f$. */
+  /** @ITKStartGrouping */
   itkGetModifiableObjectMacro(SourceLandmarks, PointSetType); // NOTE: This is used to circumvent the SetTargetLandmarks
   virtual void
   SetSourceLandmarks(PointSetType *);
-
+  /** @ITKEndGrouping */
   /** Get the target landmarks list, which we will denote  \f$ q \f$. */
+  /** @ITKStartGrouping */
   itkGetModifiableObjectMacro(TargetLandmarks, PointSetType); // NOTE: This is used to circumvent the SetTargetLandmarks
   virtual void
   SetTargetLandmarks(PointSetType *);
-
+  /** @ITKEndGrouping */
   /** Get the displacements list, which we will denote \f$ d \f$,
    * where \f$ d_i = q_i - p_i \f$. */
   itkGetModifiableObjectMacro(Displacements, VectorSetType);
@@ -151,13 +149,14 @@ public:
   TransformPoint(const InputPointType & thisPoint) const override;
 
   /** These vector transforms are not implemented for this transform */
+  /** @ITKStartGrouping */
   using Superclass::TransformVector;
   OutputVectorType
   TransformVector(const InputVectorType &) const override
   {
     itkExceptionMacro("TransformVector(const InputVectorType &) is not implemented for KernelTransform");
   }
-
+  /** @ITKEndGrouping */
   OutputVnlVectorType
   TransformVector(const InputVnlVectorType &) const override
   {
@@ -165,6 +164,7 @@ public:
   }
 
   /**  Method to transform a CovariantVector. */
+  /** @ITKStartGrouping */
   using Superclass::TransformCovariantVector;
   OutputCovariantVectorType
   TransformCovariantVector(const InputCovariantVectorType &) const override
@@ -172,7 +172,7 @@ public:
     itkExceptionMacro(
       << "TransformCovariantVector(const InputCovariantVectorType &) is not implemented for KernelTransform");
   }
-
+  /** @ITKEndGrouping */
   /** 'I' (identity) matrix type alias. */
   using IMatrixType = vnl_matrix_fixed<TParametersValueType, VDimension, VDimension>;
 
@@ -230,14 +230,12 @@ public:
    * spline to approximate rather than interpolate the landmarks.
    * Stiffness values are usually rather small, typically in the range
    * of 0.001 to 0.1. The approximating spline formulation is based on
-   * the short paper by R. Sprengel, K. Rohr, H. Stiehl. "Thin-Plate
-   * Spline Approximation for Image Registration". In 18th
-   * International Conference of the IEEE Engineering in Medicine and
-   * Biology Society. 1996.
+   * \cite sprengel1996.
    */
+  /** @ITKStartGrouping */
   itkSetClampMacro(Stiffness, double, 0.0, NumericTraits<double>::max());
   itkGetConstMacro(Stiffness, double);
-
+  /** @ITKEndGrouping */
 protected:
   KernelTransform();
   ~KernelTransform() override = default;

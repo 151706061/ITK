@@ -21,9 +21,7 @@
 #include <vector>
 #include "itkNumericTraits.h"
 
-namespace itk
-{
-namespace Functor
+namespace itk::Functor
 {
 /**
  * \class LabelToRGBFunctor
@@ -34,7 +32,7 @@ namespace Functor
  * This code was contributed in the Insight Journal paper:
  * "The watershed transform in ITK - discussion and new developments"
  * by Beare R., Lehmann G.
- * https://www.insight-journal.org/browse/publication/92
+ * https://doi.org/10.54294/lf8u75
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction,
  * INRA de Jouy-en-Josas, France.
@@ -53,6 +51,7 @@ public:
   using Self = LabelToRGBFunctor;
 
   LabelToRGBFunctor()
+    : m_BackgroundValue(TLabel{})
   {
     using ValueType = typename TRGBPixel::ValueType;
 
@@ -86,7 +85,6 @@ public:
     // Inside LabelToRGBImageFilter, the values are always initialized
     NumericTraits<TRGBPixel>::SetLength(m_BackgroundColor, 3);
     m_BackgroundColor.Fill(ValueType{});
-    m_BackgroundValue = TLabel{};
   }
 
   inline TRGBPixel
@@ -111,7 +109,7 @@ public:
 
     using ValueType = typename TRGBPixel::ValueType;
 
-    ValueType m = NumericTraits<ValueType>::max();
+    const ValueType m = NumericTraits<ValueType>::max();
 
     rgbPixel[0] = static_cast<ValueType>(static_cast<double>(r) / 255 * m);
     rgbPixel[1] = static_cast<ValueType>(static_cast<double>(g) / 255 * m);
@@ -127,7 +125,7 @@ public:
   }
 
   // Get number of colors in the LUT
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfColors() const
   {
     return static_cast<unsigned int>(m_Colors.size());
@@ -162,7 +160,6 @@ public:
 
   TLabel m_BackgroundValue;
 };
-} // end namespace Functor
-} // end namespace itk
+} // namespace itk::Functor
 
 #endif

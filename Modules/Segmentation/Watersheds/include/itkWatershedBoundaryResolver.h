@@ -21,9 +21,7 @@
 
 #include "itkWatershedSegmenter.h"
 
-namespace itk
-{
-namespace watershed
+namespace itk::watershed
 {
 /**
  * \class BoundaryResolver
@@ -68,13 +66,14 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(BoundaryResolver);
 
   /** Set up smart pointer and object factory definitions.   */
+  /** @ITKStartGrouping */
   using Self = BoundaryResolver;
   using Superclass = ProcessObject;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
   itkNewMacro(Self);
   itkOverrideGetNameOfClassMacro(BoundaryResolver);
-
+  /** @ITKEndGrouping */
   /** Expose the image dimension at run time. */
   static constexpr unsigned int ImageDimension = TDimension;
 
@@ -86,6 +85,7 @@ public:
   using DataObjectPointer = DataObject::Pointer;
 
   /** Set/Get the first of two boundaries that are to be resolved.   */
+  /** @ITKStartGrouping */
   void
   SetBoundaryA(BoundaryType * bd)
   {
@@ -96,8 +96,9 @@ public:
   {
     return static_cast<BoundaryType *>(this->GetInput(0));
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the second of two boundaries that are to be resolved.  */
+  /** @ITKStartGrouping */
   void
   SetBoundaryB(BoundaryType * bd)
   {
@@ -108,15 +109,17 @@ public:
   {
     return static_cast<BoundaryType *>(this->GetInput(1));
   }
-
+  /** @ITKEndGrouping */
   /**  Set/Get the face of the boundary object that we are going to
    *  resolve. */
+  /** @ITKStartGrouping */
   itkSetMacro(Face, unsigned short);
   itkGetConstMacro(Face, unsigned short);
-
+  /** @ITKEndGrouping */
   /** This method sets/gets the equivalency table used to store equivalencies
    *  among segments that are generated from the boundary resolution
    *  algorithm.  */
+  /** @ITKStartGrouping */
   void
   SetEquivalencyTable(EquivalencyTableType::Pointer a)
   {
@@ -127,7 +130,7 @@ public:
   {
     return static_cast<EquivalencyTableType *>(this->ProcessObject::GetOutput(0));
   }
-
+  /** @ITKEndGrouping */
   /** Standard non-threaded pipeline method */
   void
   GenerateData() override;
@@ -141,7 +144,7 @@ public:
 protected:
   BoundaryResolver()
   {
-    EquivalencyTable::Pointer eq = static_cast<EquivalencyTable *>(this->MakeOutput(0).GetPointer());
+    const EquivalencyTable::Pointer eq = static_cast<EquivalencyTable *>(this->MakeOutput(0).GetPointer());
 
     this->SetNumberOfRequiredOutputs(1);
     this->ProcessObject::SetNthOutput(0, eq.GetPointer());
@@ -154,10 +157,10 @@ protected:
 
   unsigned short m_Face{ 0 };
   void
-  GenerateOutputRequestedRegion(DataObject * output) override;
+  GenerateOutputRequestedRegion(DataObject * itkNotUsed(output)) override
+  {}
 };
-} // end namespace watershed
-} // end namespace itk
+} // namespace itk::watershed
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWatershedBoundaryResolver.hxx"

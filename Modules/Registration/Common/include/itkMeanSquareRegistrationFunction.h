@@ -65,7 +65,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeanSquareRegistrationFunction);
 
   /** MovingImage image type. */
@@ -95,11 +95,15 @@ public:
   using typename Superclass::TimeStepType;
 
   /** Interpolator type. */
-  using CoordRepType = double;
-  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordRepType>;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
+  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
   using PointType = typename InterpolatorType::PointType;
-  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordRepType>;
+  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordinateType>;
 
   /** Covariant vector type. */
   using CovariantVectorType = CovariantVector<double, Self::ImageDimension>;
@@ -131,7 +135,7 @@ public:
 
   /** Return a pointer to a global data structure that is passed to
    * this object from the solver at each calculation.  */
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     auto * global = new GlobalDataStruct();

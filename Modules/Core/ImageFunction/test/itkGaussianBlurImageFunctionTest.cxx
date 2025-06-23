@@ -58,8 +58,7 @@ itkGaussianBlurImageFunctionTest(int, char *[])
   // Test the derivative of Gaussian image function
   auto gaussianFunction = GFunctionType::New();
   gaussianFunction->SetInputImage(image);
-  itk::Index<2> index;
-  index.Fill(25);
+  auto index = itk::Index<2>::Filled(25);
 
   // Testing Set/GetVariance()
   std::cout << "Testing Set/GetVariance(): ";
@@ -102,9 +101,7 @@ itkGaussianBlurImageFunctionTest(int, char *[])
   // Testing Set/GetMaximumError()
   {
     std::cout << "Testing Set/GetMaximumError(): ";
-    GFunctionType::ErrorArrayType setError;
-
-    setError.Fill(0.05);
+    auto setError = itk::MakeFilled<GFunctionType::ErrorArrayType>(0.05);
     gaussianFunction->SetMaximumError(setError);
 
     const GFunctionType::ErrorArrayType & readError = gaussianFunction->GetMaximumError();
@@ -123,11 +120,11 @@ itkGaussianBlurImageFunctionTest(int, char *[])
   // Testing Set/GetMaximumKernelWidth()
   {
     std::cout << "Testing Set/GetMaximumKernelWidth(): ";
-    int setKernelWidth = 47;
+    constexpr int setKernelWidth = 47;
 
     gaussianFunction->SetMaximumKernelWidth(setKernelWidth);
 
-    int readKernelWidth = gaussianFunction->GetMaximumKernelWidth();
+    const int readKernelWidth = gaussianFunction->GetMaximumKernelWidth();
 
     if (readKernelWidth != setKernelWidth)
     {
@@ -178,20 +175,17 @@ itkGaussianBlurImageFunctionTest(int, char *[])
   }
 
 
-  GFunctionType::OutputType blurredvalue_index;
-  blurredvalue_index = gaussianFunction->EvaluateAtIndex(index);
+  const GFunctionType::OutputType blurredvalue_index = gaussianFunction->EvaluateAtIndex(index);
 
   GFunctionType::PointType pt;
   pt[0] = 25.0;
   pt[1] = 25.0;
-  GFunctionType::OutputType blurredvalue_point;
-  blurredvalue_point = gaussianFunction->Evaluate(pt);
+  const GFunctionType::OutputType blurredvalue_point = gaussianFunction->Evaluate(pt);
 
 
-  GFunctionType::ContinuousIndexType continuousIndex;
-  continuousIndex.Fill(25);
-  GFunctionType::OutputType blurredvalue_continuousIndex;
-  blurredvalue_continuousIndex = gaussianFunction->EvaluateAtContinuousIndex(continuousIndex);
+  auto                            continuousIndex = itk::MakeFilled<GFunctionType::ContinuousIndexType>(25);
+  const GFunctionType::OutputType blurredvalue_continuousIndex =
+    gaussianFunction->EvaluateAtContinuousIndex(continuousIndex);
 
 
   std::cout << "Testing Evaluate(), EvaluateAtIndex() and EvaluateIndex: ";

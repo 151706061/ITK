@@ -35,8 +35,7 @@ namespace itk
  *  If the number of points is high, the possibility of setting a distance map
  *  should improve the speed of the closest point computation.
  *
- *  Reference: "A Method for Registration of 3-D Shapes",
- *             IEEE PAMI, Vol 14, No. 2, February 1992
+ *  For more details see \cite besl1992.
  *
  * \ingroup RegistrationMetrics
  * \ingroup ITKRegistrationCommon
@@ -60,7 +59,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EuclideanDistancePointMetric);
 
   /** Types transferred from the base class. */
@@ -86,12 +85,14 @@ public:
   using DistanceMapPointer = typename DistanceMapType::ConstPointer;
 
   /** Get the number of values, i.e. the number of points in the moving set. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfValues() const override;
 
   /** Get the derivatives of the match measure. */
   void
-  GetDerivative(const TransformParametersType & parameters, DerivativeType & Derivative) const override;
+  GetDerivative(const TransformParametersType & itkNotUsed(parameters),
+                DerivativeType &                itkNotUsed(derivative)) const override
+  {}
 
   /**  Get the match measure, i.e. the value for single valued optimizers. */
   MeasureType
@@ -104,17 +105,19 @@ public:
                         DerivativeType &                derivative) const;
 
   /** Set/Get the distance map. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(DistanceMap, DistanceMapType);
   itkGetConstObjectMacro(DistanceMap, DistanceMapType);
-
+  /** @ITKEndGrouping */
   /** Set/Get if the distance should be squared.
    *  When set to true, the filter's computational speed is substantially improved
    *  (by avoiding numerous sqrt() calls), but it will result in minimizing the sum
    *  of distances^4 instead of the sum of distances^2. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(ComputeSquaredDistance, bool);
   itkGetConstMacro(ComputeSquaredDistance, bool);
   itkBooleanMacro(ComputeSquaredDistance);
-
+  /** @ITKEndGrouping */
 protected:
   EuclideanDistancePointMetric();
   ~EuclideanDistancePointMetric() override = default;

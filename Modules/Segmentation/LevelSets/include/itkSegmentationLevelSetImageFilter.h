@@ -176,11 +176,12 @@ public:
   using VectorImageType = typename SegmentationFunctionType::VectorImageType;
   using SpeedImageType = typename SegmentationFunctionType::ImageType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SegmentationLevelSetImageFilter);
 
   /** Set/Get the maximum number of iterations allowed for the solver.  This
    *  prevents infinite loops if a solution "bounces". */
+  /** @ITKStartGrouping */
   void
   SetMaximumIterations(unsigned int i)
   {
@@ -194,9 +195,11 @@ public:
     itkWarningMacro("GetMaximumIterations is deprecated. Please use GetNumberOfIterations instead.");
     return this->GetNumberOfIterations();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the feature image to be used for speed function of the level set
    *  equation.  Equivalent to calling Set/GetInput(1, ..) */
+  /** @ITKStartGrouping */
   virtual void
   SetFeatureImage(const FeatureImageType * f)
   {
@@ -209,11 +212,14 @@ public:
     }
   }
   itkGetInputMacro(FeatureImage, FeatureImageType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the initial level set model.  Equivalent to calling SetInput(..)
    */
+  /** @ITKStartGrouping */
   itkSetInputMacro(InitialImage, InputImageType);
   itkGetInputMacro(InitialImage, InputImageType);
+  /** @ITKEndGrouping */
 
   /** Set the feature image */
   void
@@ -259,6 +265,7 @@ public:
   /** THIS METHOD IS DEPRECATED AND SHOULD NOT BE USED.  This method reverses
    * the speed function direction, effectively changing inside feature values to
    * outside feature values and vice versa. */
+  /** @ITKStartGrouping */
   void
   SetUseNegativeFeaturesOn()
   {
@@ -274,14 +281,16 @@ public:
       << "SetUseNegativeFeaturesOff has been deprecated.  Please use ReverseExpansionDirectionOff() instead");
     this->ReverseExpansionDirectionOff();
   }
+  /** @ITKEndGrouping */
 
   /** THIS METHOD IS DEPRECATED AND SHOULD NOT BE USED. Set/Get the value of the UseNegativeFeatures flag.  This method
    * is deprecated.  Use Set/Get ReverseExpansionDirection instead. */
+  /** @ITKStartGrouping */
   void
   SetUseNegativeFeatures(bool u)
   {
     itkWarningMacro("SetUseNegativeFeatures has been deprecated.  Please use SetReverseExpansionDirection instead");
-    if (u == true)
+    if (u)
     {
       this->SetReverseExpansionDirection(false);
     }
@@ -291,7 +300,7 @@ public:
     }
   }
 
-  bool
+  [[nodiscard]] bool
   GetUseNegativeFeatures() const
   {
     itkWarningMacro(
@@ -300,11 +309,10 @@ public:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
+  /** @ITKEndGrouping */
 
   /** Turn On/Off the flag which determines whether Positive or Negative speed
    * terms will cause surface expansion.  If set to TRUE then negative speed
@@ -314,18 +322,22 @@ public:
    * surface to contract.  This method can be safely used to reverse the
    * expansion/contraction as appropriate to a particular application or data
    * set. */
+  /** @ITKStartGrouping */
   itkSetMacro(ReverseExpansionDirection, bool);
   itkGetConstMacro(ReverseExpansionDirection, bool);
   itkBooleanMacro(ReverseExpansionDirection);
+  /** @ITKEndGrouping */
 
   /** Turn On/Off automatic generation of Speed and Advection terms when Update
       is called.  If set to Off, the Speed and Advection images must be set
       explicitly using SetSpeedImage, SetAdvectionImage OR the methods
       GenerateSpeedImage() and GenerateAdvectionImage() should be called prior
       to updating the filter. */
+  /** @ITKStartGrouping */
   itkSetMacro(AutoGenerateSpeedAdvection, bool);
   itkGetConstMacro(AutoGenerateSpeedAdvection, bool);
   itkBooleanMacro(AutoGenerateSpeedAdvection);
+  /** @ITKEndGrouping */
 
   /** Combined scaling of the propagation and advection speed
       terms. You should use either this -or- Get/SetPropagationScaling and
@@ -346,6 +358,7 @@ public:
 
   /** Set/Get the scaling of the propagation speed.  Setting the FeatureScaling
       parameter overrides any previous values set for PropagationScaling. */
+  /** @ITKStartGrouping */
   void
   SetPropagationScaling(ValueType v)
   {
@@ -361,9 +374,11 @@ public:
   {
     return m_SegmentationFunction->GetPropagationWeight();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the scaling of the advection field.  Setting the FeatureScaling
       parameter will override any existing value for AdvectionScaling. */
+  /** @ITKStartGrouping */
   void
   SetAdvectionScaling(ValueType v)
   {
@@ -379,11 +394,13 @@ public:
   {
     return m_SegmentationFunction->GetAdvectionWeight();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the scaling of the curvature. Use this parameter to
    *  increase the influence of curvature on the movement of the
    *  surface.  Higher values relative to Advection and Propagation
    *  values will give smoother surfaces. */
+  /** @ITKStartGrouping */
   void
   SetCurvatureScaling(ValueType v)
   {
@@ -399,8 +416,10 @@ public:
   {
     return m_SegmentationFunction->GetCurvatureWeight();
   }
+  /** @ITKEndGrouping */
 
   /** */
+  /** @ITKStartGrouping */
   void
   SetUseMinimalCurvature(bool b)
   {
@@ -411,11 +430,12 @@ public:
     }
   }
 
-  bool
+  [[nodiscard]] bool
   GetUseMinimalCurvature() const
   {
     return m_SegmentationFunction->GetUseMinimalCurvature();
   }
+  /** @ITKEndGrouping */
 
   void
   UseMinimalCurvatureOn()
@@ -439,8 +459,7 @@ public:
   {
     m_SegmentationFunction = s;
 
-    typename SegmentationFunctionType::RadiusType r;
-    r.Fill(1);
+    constexpr auto r = MakeFilled<typename SegmentationFunctionType::RadiusType>(1);
 
     m_SegmentationFunction->Initialize(r);
     this->SetDifferenceFunction(m_SegmentationFunction);
@@ -457,6 +476,7 @@ public:
    *  calculation.  Changing this value from the default is not recommended or
    *   necessary but could be used to speed up the surface evolution at the risk
    *   of creating an unstable solution. */
+  /** @ITKStartGrouping */
   void
   SetMaximumCurvatureTimeStep(double n)
   {
@@ -467,16 +487,18 @@ public:
     }
   }
 
-  double
+  [[nodiscard]] double
   GetMaximumCurvatureTimeStep() const
   {
     return m_SegmentationFunction->GetMaximumCurvatureTimeStep();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the maximum constraint for the scalar/vector term factor of the time step
    *  calculation.  Changing this value from the default is not recommended or
    *  necessary but could be used to speed up the surface evolution at the risk
    *  of creating an unstable solution. */
+  /** @ITKStartGrouping */
   void
   SetMaximumPropagationTimeStep(double n)
   {
@@ -486,12 +508,13 @@ public:
       this->Modified();
     }
   }
+  [[nodiscard]] double
 
-  double
   GetMaximumPropagationTimeStep() const
   {
     return m_SegmentationFunction->GetMaximumPropagationTimeStep();
   }
+  /** @ITKEndGrouping */
 
   /** Allocate and calculate the speed term image in the SegmentationFunction
       object.  This method is called automatically on filter execution
@@ -505,11 +528,7 @@ public:
   void
   GenerateAdvectionImage();
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<TOutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ~SegmentationLevelSetImageFilter() override = default;

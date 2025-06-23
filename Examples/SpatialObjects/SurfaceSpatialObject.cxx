@@ -53,7 +53,7 @@ main(int, char *[])
   using CovariantVectorType = SurfaceType::CovariantVectorType;
   using PointType = SurfaceType::PointType;
 
-  SurfacePointer surface = SurfaceType::New();
+  const SurfacePointer surface = SurfaceType::New();
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -109,7 +109,7 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  SurfaceType::SurfacePointListType pointList = surface->GetPoints();
+  const SurfaceType::SurfacePointListType pointList = surface->GetPoints();
   std::cout << "Number of points representing the surface: ";
   std::cout << pointList.size() << std::endl;
   // Software Guide : EndCodeSnippet
@@ -127,16 +127,14 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  SurfaceType::SurfacePointListType::const_iterator it =
-    surface->GetPoints().begin();
-  while (it != surface->GetPoints().end())
+  for (auto & currentPoint : surface->GetPoints())
   {
-    std::cout << "Position = " << (*it).GetPositionInObjectSpace()
+    std::cout << "Position = " << currentPoint.GetPositionInObjectSpace()
               << std::endl;
-    std::cout << "Normal = " << (*it).GetNormalInObjectSpace() << std::endl;
-    std::cout << "Color = " << (*it).GetColor() << std::endl;
+    std::cout << "Normal = " << currentPoint.GetNormalInObjectSpace()
+              << std::endl;
+    std::cout << "Color = " << currentPoint.GetColor() << std::endl;
     std::cout << std::endl;
-    it++;
   }
   // Software Guide : EndCodeSnippet
 

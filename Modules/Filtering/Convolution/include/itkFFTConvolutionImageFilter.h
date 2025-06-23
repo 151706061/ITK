@@ -41,11 +41,8 @@ namespace itk
  * of the kernel image and treats them as identical to those in the
  * input image.
  *
- * This code was adapted from the Insight Journal contribution:
- *
- * "FFT Based Convolution"
- * by Gaetan Lehmann
- * https://www.insight-journal.org/browse/publication/717
+ * This code was adapted from the Insight Journal contribution
+ * \cite Lehmann_2010_b.
  *
  * \ingroup ITKConvolution
  * \sa ConvolutionImageFilter
@@ -72,7 +69,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information ( and related methods ) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FFTConvolutionImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -107,7 +104,6 @@ public:
 
   /** Typedef to describe the boundary condition. */
   using typename Superclass::BoundaryConditionType;
-  using typename Superclass::BoundaryConditionPointerType;
 
   itkSetMacro(SizeGreatestPrimeFactor, SizeValueType);
   itkGetMacro(SizeGreatestPrimeFactor, SizeValueType);
@@ -200,7 +196,7 @@ protected:
   GetFFTPadSize() const;
 
   /** Get whether the X dimension has an odd size. */
-  bool
+  [[nodiscard]] bool
   GetXDimensionIsOdd() const;
 
   void

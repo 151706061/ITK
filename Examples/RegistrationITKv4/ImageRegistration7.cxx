@@ -295,7 +295,7 @@ main(int argc, char * argv[])
   // Software Guide : BeginCodeSnippet
   using OptimizerScalesType = OptimizerType::ScalesType;
   OptimizerScalesType optimizerScales(transform->GetNumberOfParameters());
-  const double        translationScale = 1.0 / 100.0;
+  constexpr double    translationScale = 1.0 / 100.0;
 
   optimizerScales[0] = 10.0;
   optimizerScales[1] = 1.0;
@@ -490,7 +490,7 @@ main(int argc, char * argv[])
   resampler->SetTransform(transform);
   resampler->SetInput(movingImageReader->GetOutput());
 
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
 
   resampler->SetSize(fixedImage->GetLargestPossibleRegion().GetSize());
   resampler->SetOutputOrigin(fixedImage->GetOrigin());

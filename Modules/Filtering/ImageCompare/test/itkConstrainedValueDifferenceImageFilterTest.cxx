@@ -123,8 +123,8 @@ itkConstrainedValueDifferenceImageFilterTest(int argc, char * argv[])
   // Execute the filter
   filter->Update();
 
-  // Get the the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  // Get the filter output
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
   // Write the result image
   using WriterType = itk::ImageFileWriter<OutputImageType>;

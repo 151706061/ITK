@@ -36,7 +36,7 @@ Sleep(unsigned int milliseconds)
 int
 itkMemoryProbesCollecterBaseTest(int, char *[])
 {
-  const size_t bufsize = 256L * 1024L * 1024L; // 256 MiB
+  constexpr size_t bufsize = 768L * 1024L * 1024L; // 768 MiB
 
   itk::MemoryProbesCollectorBase mcollecter;
   itk::MemoryProbe               probe;
@@ -55,7 +55,7 @@ itkMemoryProbesCollecterBaseTest(int, char *[])
   Sleep(5000);
   mcollecter.Stop("Update");
   probe.Stop();
-  itk::MemoryProbe::MemoryLoadType total = probe.GetTotal();
+  const itk::MemoryProbe::MemoryLoadType total = probe.GetTotal();
   std::cout << " Total Value " << probe.GetTotal() << std::endl;
   if (total == 0)
   {
@@ -69,7 +69,7 @@ itkMemoryProbesCollecterBaseTest(int, char *[])
   delete[] buf;
   Sleep(5000);
   probe.Stop();
-  if (total != 0 && total < probe.GetTotal())
+  if (total < probe.GetTotal())
   {
     std::cerr << "Freeing memory should result in less memory but it is " << probe.GetTotal() << probe.GetUnit()
               << " instead of " << total << probe.GetUnit() << std::endl;

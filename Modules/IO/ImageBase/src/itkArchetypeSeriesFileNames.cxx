@@ -84,15 +84,15 @@ ArchetypeSeriesFileNames::Scan()
   std::string unixArchetype = m_Archetype;
   itksys::SystemTools::ConvertToUnixSlashes(unixArchetype);
 
-  if (itksys::SystemTools::FileIsDirectory(unixArchetype.c_str()))
+  if (itksys::SystemTools::FileIsDirectory(unixArchetype))
   {
     return;
   }
 
   // Parse the fileNameName and fileNamePath
-  std::string origFileName = itksys::SystemTools::GetFilenameName(unixArchetype.c_str());
-  std::string fileNamePath = itksys::SystemTools::GetFilenamePath(unixArchetype.c_str());
-  std::string pathPrefix;
+  const std::string origFileName = itksys::SystemTools::GetFilenameName(unixArchetype);
+  std::string       fileNamePath = itksys::SystemTools::GetFilenamePath(unixArchetype);
+  std::string       pathPrefix;
 
   // "Clean" the filename by escaping any special characters with backslashes.
   // This allows us to pass in filenames that include these special characters.
@@ -120,16 +120,16 @@ ArchetypeSeriesFileNames::Scan()
     pathPrefix = "";
   }
 
-  StringVectorType regExpFileNameVector;
-  std::string      regExpString = "([0-9]+)";
-  IntVectorType    numGroupStart;
-  IntVectorType    numGroupLength;
+  StringVectorType  regExpFileNameVector;
+  const std::string regExpString = "([0-9]+)";
+  IntVectorType     numGroupStart;
+  IntVectorType     numGroupLength;
   for (std::string::iterator sit = fileName.begin(); sit < fileName.end(); ++sit)
   {
     // If the element is a number, find its starting index and length.
     if ((*sit) >= '0' && (*sit) <= '9')
     {
-      int sIndex = static_cast<int>(sit - fileName.begin());
+      const int sIndex = static_cast<int>(sit - fileName.begin());
       numGroupStart.push_back(sIndex);
 
       // Loop to one past the end of the group of numbers.
@@ -173,18 +173,17 @@ ArchetypeSeriesFileNames::Scan()
   // Use a RegularExpressionSeriesFileNames to find the files to return
   StringVectorType names;
 
-  StringVectorType::const_iterator regExpFileNameVectorItr = regExpFileNameVector.begin();
+  auto regExpFileNameVectorItr = regExpFileNameVector.begin();
   while (regExpFileNameVectorItr != regExpFileNameVector.end())
   {
-    itk::RegularExpressionSeriesFileNames::Pointer fit = itk::RegularExpressionSeriesFileNames::New();
+    auto fit = itk::RegularExpressionSeriesFileNames::New();
     fit->SetDirectory(fileNamePath.c_str());
     fit->SetRegularExpression(regExpFileNameVectorItr->c_str());
     fit->SetSubMatch(1);
     fit->NumericSortOn();
     names = fit->GetFileNames();
 
-    std::vector<std::string>::iterator ait;
-    ait = std::find(names.begin(), names.end(), pathPrefix + unixArchetype);
+    const auto ait = std::find(names.begin(), names.end(), pathPrefix + unixArchetype);
 
     // Accept the list if it contains the archetype and is not the
     // "trivial" list (containing only the archetype)
@@ -220,9 +219,9 @@ ArchetypeSeriesFileNames::PrintSelf(std::ostream & os, Indent indent) const
   for (unsigned int j = 0; j < const_cast<ArchetypeSeriesFileNames *>(this)->GetNumberOfGroupings(); ++j)
   {
     os << indent << "Grouping #" << j << std::endl;
-    StringVectorType                 group = const_cast<ArchetypeSeriesFileNames *>(this)->GetFileNames(j);
-    StringVectorType::const_iterator groupItr = group.begin();
-    unsigned int                     i = 0;
+    StringVectorType group = const_cast<ArchetypeSeriesFileNames *>(this)->GetFileNames(j);
+    auto             groupItr = group.begin();
+    unsigned int     i = 0;
     while (groupItr != group.end())
     {
       os << indent << indent << "FileNames[" << i << "]: " << *groupItr << std::endl;

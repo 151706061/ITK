@@ -67,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabeledPointSetToPointSetMetricv4);
 
   using FixedPointSetType = TFixedPointSet;
@@ -116,9 +116,10 @@ public:
    * Set/get the specific unlabeled point set metric type.  Default is
    * the \c EuclideanDistancePointSetToPointSetMetricv4.
    */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(PointSetMetric, PointSetMetricType);
   itkGetModifiableObjectMacro(PointSetMetric, PointSetMetricType);
-
+  /** @ITKEndGrouping */
   /**
    * Ensure label type is an integer type
    */

@@ -110,7 +110,7 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
 
 template <typename TInputImage, typename TOutputImage, typename THistogramMeasurement>
 void
-HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::VerifyPreconditions() ITKv5_CONST
+HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::VerifyPreconditions() const
 {
   Superclass::VerifyPreconditions();
 
@@ -143,7 +143,7 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
 
   if (m_GenerateReferenceHistogramFromImage)
   {
-    InputImageConstPointer reference = this->GetReferenceImage();
+    const InputImageConstPointer reference = this->GetReferenceImage();
     if (reference.IsNull())
     {
       itkExceptionMacro("ERROR: ReferenceImage required when GenerateReferenceHistogramFromImage is true.\n");
@@ -158,7 +158,7 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
       referenceIntensityThreshold = static_cast<InputPixelType>(m_ReferenceMinValue);
     }
     {
-      HistogramPointer tempHistptr = HistogramType::New();
+      const HistogramPointer tempHistptr = HistogramType::New();
       this->ConstructHistogramFromIntensityRange(reference,
                                                  tempHistptr,
                                                  referenceIntensityThreshold,
@@ -196,7 +196,7 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
     }
   }
 
-  InputImageConstPointer source = this->GetSourceImage();
+  const InputImageConstPointer source = this->GetSourceImage();
 
   this->ComputeMinMaxMean(source, m_SourceMinValue, m_SourceMaxValue, sourceMeanValue);
 
@@ -281,7 +281,7 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
 
   OutputPixelType outputIntensityThreshold;
 
-  OutputImagePointer output = this->GetOutput();
+  const OutputImagePointer output = this->GetOutput();
 
   this->ComputeMinMaxMean(output, outputMinValue, outputMaxValue, outputMeanValue);
 
@@ -316,8 +316,8 @@ void
 HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  InputImageConstPointer input = this->GetSourceImage();
-  OutputImagePointer     output = this->GetOutput();
+  const InputImageConstPointer input = this->GetSourceImage();
+  const OutputImagePointer     output = this->GetOutput();
 
   // Transform the source image and write to output.
   using InputConstIterator = ImageRegionConstIterator<InputImageType>;
@@ -338,23 +338,20 @@ HistogramMatchingImageFilter<TInputImage, TOutputImage, THistogramMeasurement>::
       }
     }
 
-    double mappedValue;
-    if (j == 0)
-    {
-      // Linear interpolate from min to point[0]
-      mappedValue = m_ReferenceMinValue + (srcValue - m_SourceMinValue) * m_LowerGradient;
-    }
-    else if (j == m_NumberOfMatchPoints + 2)
-    {
-      // Linear interpolate from point[m_NumberOfMatchPoints+1] to max
-      mappedValue = m_ReferenceMaxValue + (srcValue - m_SourceMaxValue) * m_UpperGradient;
-    }
-    else
-    {
-      // Linear interpolate from point[j] and point[j+1].
-      mappedValue = m_QuantileTable[1][j - 1] + (srcValue - m_QuantileTable[0][j - 1]) * m_Gradients[j - 1];
-    }
-
+    const double mappedValue = [this, j, srcValue]() -> double {
+      if (j == 0)
+      {
+        // Linearly interpolate from min to point[0]
+        return m_ReferenceMinValue + (srcValue - m_SourceMinValue) * m_LowerGradient;
+      }
+      if (j == m_NumberOfMatchPoints + 2)
+      {
+        // Linearly interpolate from point[m_NumberOfMatchPoints+1] to max
+        return m_ReferenceMaxValue + (srcValue - m_SourceMaxValue) * m_UpperGradient;
+      }
+      // Linearly interpolate from point[j] and point[j+1].
+      return m_QuantileTable[1][j - 1] + (srcValue - m_QuantileTable[0][j - 1]) * m_Gradients[j - 1];
+    }();
     outIter.Set(static_cast<OutputPixelType>(mappedValue));
   }
 }

@@ -32,17 +32,17 @@ namespace itk
  * \author Alexandre Gouaillard, Leonardo Florez-Valencia, Eric Boix
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/122
+ * https://doi.org/10.54294/4mx7kk
  *
  * \ingroup ITKQuadEdgeMesh
  */
 template <int VPointDimension,
-          typename TCoordRep = float,
+          typename TCoordinate = float,
           typename TInterpolationWeight = float,
           typename TPointIdentifier = IdentifierType,
           typename TCellIdentifier = IdentifierType,
           typename TCellFeatureIdentifier = unsigned char,
-          typename TPoint = QuadEdgeMeshPoint<TCoordRep, VPointDimension>,
+          typename TPoint = QuadEdgeMeshPoint<TCoordinate, VPointDimension>,
           typename TPointsContainer = MapContainer<TPointIdentifier, TPoint>,
           typename TUsingCellsContainer = std::set<TPointIdentifier>,
           typename TQE = GeometricalQuadEdge<unsigned long, unsigned long, bool, bool, true>>
@@ -50,7 +50,11 @@ class QuadEdgeMeshCellTraitsInfo
 {
 public:
   static constexpr unsigned int PointDimension = VPointDimension;
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = TInterpolationWeight;
   using PointIdentifier = TPointIdentifier;
   using CellIdentifier = TCellIdentifier;

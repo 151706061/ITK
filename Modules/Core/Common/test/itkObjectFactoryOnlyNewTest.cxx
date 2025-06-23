@@ -40,7 +40,7 @@ public:
   /** Method for creation through the object factory.*/
   itkFactoryOnlyNewMacro(TestImageInterfaceClass);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TestImageInterfaceClass);
 
   // Methods from itkObject
@@ -64,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(TestImageImplementationClass);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TestImageImplementationClass);
 
   // Methods from itkObject
@@ -98,7 +98,7 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TestFactory);
 
   /** Register one factory of this type  */
@@ -141,7 +141,7 @@ itkObjectFactoryOnlyNewTest(int, char *[])
   // Verify that interface class cannot be instantiated
   // if no implementation factory is registered
   using PixelType = short;
-  const size_t Dimension = 2;
+  constexpr size_t Dimension = 2;
   using TestImageInterfaceType = TestImageInterfaceClass<PixelType, Dimension>;
   ITK_TRY_EXPECT_EXCEPTION(TestImageInterfaceType::New());
 
@@ -157,14 +157,14 @@ itkObjectFactoryOnlyNewTest(int, char *[])
     std::cout << "  Factory version: " << oneFactory->GetITKSourceVersion() << std::endl
               << "  Factory description: " << oneFactory->GetDescription() << std::endl;
 
-    std::list<std::string>                 overrides = oneFactory->GetClassOverrideNames();
-    std::list<std::string>                 names = oneFactory->GetClassOverrideWithNames();
-    std::list<std::string>                 descriptions = oneFactory->GetClassOverrideDescriptions();
-    std::list<bool>                        enableflags = oneFactory->GetEnableFlags();
-    std::list<std::string>::const_iterator n = names.begin();
-    std::list<std::string>::const_iterator d = descriptions.begin();
-    std::list<bool>::const_iterator        e = enableflags.begin();
-    for (std::list<std::string>::const_iterator o = overrides.begin(); o != overrides.end(); ++o, ++n, ++d, ++e)
+    std::list<std::string> overrides = oneFactory->GetClassOverrideNames();
+    std::list<std::string> names = oneFactory->GetClassOverrideWithNames();
+    std::list<std::string> descriptions = oneFactory->GetClassOverrideDescriptions();
+    std::list<bool>        enableflags = oneFactory->GetEnableFlags();
+    auto                   n = names.begin();
+    auto                   d = descriptions.begin();
+    auto                   e = enableflags.begin();
+    for (auto o = overrides.begin(); o != overrides.end(); ++o, ++n, ++d, ++e)
     {
       std::cout << "    Override " << *o << " with " << *n << std::endl
                 << "      described as \"" << *d << '"' << std::endl

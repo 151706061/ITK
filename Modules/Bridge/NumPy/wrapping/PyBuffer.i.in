@@ -9,6 +9,7 @@
         i.e. k,j,i versus i,j,k. However C-order indexing is expected by most
         algorithms in NumPy / SciPy.
         """
+        import itk
 
         if image.GetBufferPointer() is None:
             return None
@@ -20,11 +21,11 @@
             if source:
                 source.UpdateLargestPossibleRegion()
 
-        itksize = image.GetLargestPossibleRegion().GetSize()
+        itksize = image.GetBufferedRegion().GetSize()
         dim     = len(itksize)
         shape   = [int(itksize[idx]) for idx in range(dim)]
 
-        if(image.GetNumberOfComponentsPerPixel() > 1):
+        if image.GetNumberOfComponentsPerPixel() > 1 or isinstance(image, itk.VectorImage):
             shape = [image.GetNumberOfComponentsPerPixel(), ] + shape
 
         if keep_axes == False:
@@ -98,11 +99,11 @@
 
         if is_vector:
             if ndarr.flags['C_CONTIGUOUS']:
-                imgview = itkPyBuffer@PyBufferTypes@._GetImageViewFromArray(ndarr, ndarr.shape[-2::-1], ndarr.shape[-1])
+                imgview = itkPyBuffer@PyBufferTypes@._get_image_view_from_contiguous_array(ndarr, ndarr.shape[-2::-1], ndarr.shape[-1])
             else:
-                imgview = itkPyBuffer@PyBufferTypes@._GetImageViewFromArray(ndarr, ndarr.shape[-1:0:-1], ndarr.shape[0])
+                imgview = itkPyBuffer@PyBufferTypes@._get_image_view_from_contiguous_array(ndarr, ndarr.shape[-1:0:-1], ndarr.shape[0])
         else:
-            imgview = itkPyBuffer@PyBufferTypes@._GetImageViewFromArray(ndarr, ndarr.shape[::-1], 1)
+            imgview = itkPyBuffer@PyBufferTypes@._get_image_view_from_contiguous_array(ndarr, ndarr.shape[::-1], 1)
 
         # Keep a reference
         imgview._SetBase(ndarr)

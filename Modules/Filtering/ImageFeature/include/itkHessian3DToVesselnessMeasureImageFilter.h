@@ -101,7 +101,7 @@ public:
   using EigenAnalysisFilterType =
     SymmetricEigenAnalysisFixedDimensionImageFilter<ImageDimension, InputImageType, EigenValueImageType>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Hessian3DToVesselnessMeasureImageFilter);
 
   /** Method for creation through the object factory. */
@@ -109,19 +109,17 @@ public:
 
   /** Set/Get macros for alpha_1. Please refer to
    * http://www.image.med.osaka-u.ac.jp/member/yoshi/paper/linefilter.pdf */
+  /** @ITKStartGrouping */
   itkSetMacro(Alpha1, double);
   itkGetConstMacro(Alpha1, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get macros for alpha_2. Please refer to
    * http://www.image.med.osaka-u.ac.jp/member/yoshi/paper/linefilter.pdf */
+  /** @ITKStartGrouping */
   itkSetMacro(Alpha2, double);
   itkGetConstMacro(Alpha2, double);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   Hessian3DToVesselnessMeasureImageFilter();

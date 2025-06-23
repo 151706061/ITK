@@ -24,13 +24,13 @@ namespace itk
 
 template <typename TImage, typename TAccessor>
 ImageAdaptor<TImage, TAccessor>::ImageAdaptor()
+  : m_Image(TImage::New())
 {
   // Allocate an internal image.  A process object might try to allocate an
   // temporary image that is the same type as its input or output.  If that
   // image type is an adaptor, we need to make sure that an internal image is
   // available because the process object will not know to call SetImage on
   // the adaptor.
-  m_Image = TImage::New();
 }
 
 template <typename TImage, typename TAccessor>
@@ -83,7 +83,7 @@ ImageAdaptor<TImage, TAccessor>::Graft(const DataObject * data)
   if (data)
   {
     // Attempt to cast data to an ImageAdaptor
-    const Self * imgData;
+    const Self * imgData = nullptr;
 
     try
     {
@@ -317,10 +317,8 @@ template <typename TImage, typename TAccessor>
 ModifiedTimeType
 ImageAdaptor<TImage, TAccessor>::GetMTime() const
 {
-  ModifiedTimeType mtime1, mtime2;
-
-  mtime1 = Superclass::GetMTime();
-  mtime2 = m_Image->GetMTime();
+  const ModifiedTimeType mtime1 = Superclass::GetMTime();
+  const ModifiedTimeType mtime2 = m_Image->GetMTime();
 
   return (mtime1 >= mtime2 ? mtime1 : mtime2);
 }

@@ -106,7 +106,7 @@ public:
   using ThresholdFunctionType = ThresholdSegmentationLevelSetFunction<OutputImageType, FeatureImageType>;
   using ThresholdFunctionPointer = typename ThresholdFunctionType::Pointer;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NarrowBandThresholdSegmentationLevelSetImageFilter);
 
   /** Method for creation through the object factory */
@@ -114,6 +114,7 @@ public:
 
   /** Get/Set the threshold values that will be used to calculate the speed
     function. */
+  /** @ITKStartGrouping */
   void
   SetUpperThreshold(ValueType v)
   {
@@ -139,9 +140,11 @@ public:
   {
     return m_ThresholdFunction->GetLowerThreshold();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the weight applied to the edge (Laplacian) attractor in the speed
    *  term function. Zero will turn this term off. */
+  /** @ITKStartGrouping */
   void
   SetEdgeWeight(ValueType v)
   {
@@ -154,10 +157,12 @@ public:
   {
     return m_ThresholdFunction->GetEdgeWeight();
   }
+  /** @ITKEndGrouping */
 
   /** Anisotropic diffusion is applied to the FeatureImage before calculating
    * the Laplacian (edge) term. This method sets/gets the number of diffusion
    * iterations. */
+  /** @ITKStartGrouping */
   void
   SetSmoothingIterations(int v)
   {
@@ -165,15 +170,17 @@ public:
     this->Modified();
   }
 
-  int
+  [[nodiscard]] int
   GetSmoothingIterations() const
   {
     return m_ThresholdFunction->GetSmoothingIterations();
   }
+  /** @ITKEndGrouping */
 
   /** Anisotropic diffusion is applied to the FeatureImage before calculating
    * the Laplacian (edge) term. This method sets/gets the diffusion time
    * step. */
+  /** @ITKStartGrouping */
   void
   SetSmoothingTimeStep(ValueType v)
   {
@@ -186,10 +193,12 @@ public:
   {
     return m_ThresholdFunction->GetSmoothingTimeStep();
   }
+  /** @ITKEndGrouping */
 
   /** Anisotropic diffusion is applied to the FeatureImage before calculating
    * the Laplacian (edge) term. This method sets/gets the smoothing
    * conductance. */
+  /** @ITKStartGrouping */
   void
   SetSmoothingConductance(ValueType v)
   {
@@ -202,12 +211,9 @@ public:
   {
     return m_ThresholdFunction->GetSmoothingConductance();
   }
+  /** @ITKEndGrouping */
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<TOutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ~NarrowBandThresholdSegmentationLevelSetImageFilter() override = default;

@@ -76,13 +76,14 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CyclicShiftImageFilter);
 
   /** Set/get the shift. Shifts may be positive or negative. */
+  /** @ITKStartGrouping */
   itkSetMacro(Shift, OffsetType);
   itkGetConstMacro(Shift, OffsetType);
-
+  /** @ITKEndGrouping */
 protected:
   CyclicShiftImageFilter();
   ~CyclicShiftImageFilter() override = default;

@@ -106,7 +106,7 @@ public:
   /** ImageDimension constants */
   static constexpr unsigned int ImageDimension = TFixedImage::ImageDimension;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TimeVaryingBSplineVelocityFieldImageRegistrationMethod);
 
   /** Input type alias for the images and transforms. */
@@ -154,7 +154,7 @@ public:
   using DisplacementFieldType = typename OutputTransformType::DisplacementFieldType;
   using DisplacementFieldPointType = typename DisplacementFieldType::PointType;
 
-  using ContinuousIndexType = ContinuousIndex<typename DisplacementFieldPointType::CoordRepType, ImageDimension>;
+  using ContinuousIndexType = ContinuousIndex<typename DisplacementFieldPointType::CoordinateType, ImageDimension>;
 
   using TimeVaryingVelocityFieldControlPointLatticeType =
     typename OutputTransformType::TimeVaryingVelocityFieldControlPointLatticeType;
@@ -186,25 +186,30 @@ public:
   using TimeVaryingWeightedMaskImageType = Image<WeightsElementType, ImageDimension + 1>;
 
   /** Set/Get the learning rate. */
+  /** @ITKStartGrouping */
   itkSetMacro(LearningRate, RealType);
   itkGetConstMacro(LearningRate, RealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of iterations per level. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfIterationsPerLevel, NumberOfIterationsArrayType);
   itkGetConstMacro(NumberOfIterationsPerLevel, NumberOfIterationsArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the convergence threshold */
+  /** @ITKStartGrouping */
   itkSetMacro(ConvergenceThreshold, RealType);
   itkGetConstMacro(ConvergenceThreshold, RealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the convergence window size */
+  /** @ITKStartGrouping */
   itkSetMacro(ConvergenceWindowSize, unsigned int);
   itkGetConstMacro(ConvergenceWindowSize, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of time point samples. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfTimePointSamples, SizeValueType);
   itkGetConstMacro(NumberOfTimePointSamples, SizeValueType);
-
+  /** @ITKEndGrouping */
 protected:
   TimeVaryingBSplineVelocityFieldImageRegistrationMethod();
   ~TimeVaryingBSplineVelocityFieldImageRegistrationMethod() override = default;

@@ -42,9 +42,7 @@ namespace itk
  * the level set, the type of the auxiliary/velocity variables and the
  * number of auxiliary/velocity variables.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * \ingroup LevelSetSegmentation
  *
@@ -65,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetVelocityNeighborhoodExtractor);
 
   /** The type of the level set. */
@@ -105,10 +103,8 @@ public:
     {
       return nullptr;
     }
-    else
-    {
-      return m_AuxImage[idx];
-    }
+
+    return m_AuxImage[idx];
   }
 
   /** Get the container of auxiliary values associated with the inside

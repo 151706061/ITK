@@ -35,15 +35,13 @@ namespace itk
  * volume) while attribute closings fill dark regions that meet the
  * attribute criteria.
  *
- * This filter is implemented using the method of Wilkinson, "A
- * comparison of algorithms for Connected set openings and Closings",
- * A. Meijster and M. H. Wilkinson, PAMI, vol 24, no. 4, April 2002.
+ * This filter is implemented using the method describe in \cite meijster2002.
  *
  * This code was contributed in the Insight Journal paper
  *
  * "Grayscale morphological attribute operations"
  * by Beare R.
- * https://www.insight-journal.org/browse/publication/203
+ * https://doi.org/10.54294/ifvjls
  *
  * \author Richard Beare. Department of Medicine, Monash University, Melbourne, Australia.
  *
@@ -126,11 +124,9 @@ public:
 
 protected:
   AttributeMorphologyBaseImageFilter()
-  {
-    m_FullyConnected = false;
-    m_AttributeValuePerPixel = 1;
-    m_Lambda = 0;
-  }
+    : m_AttributeValuePerPixel(1)
+    , m_Lambda(0)
+  {}
 
   ~AttributeMorphologyBaseImageFilter() override = default;
   AttributeMorphologyBaseImageFilter(const Self &) {}
@@ -196,7 +192,7 @@ private:
     // largest or smallest pixel.
     InputPixelType * buf;
     bool
-    operator()(OffsetValueType const & l, OffsetValueType const & r) const
+    operator()(const OffsetValueType & l, const OffsetValueType & r) const
     {
       return (m_TFunction(buf[l], buf[r]));
     }

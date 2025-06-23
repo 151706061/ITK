@@ -36,11 +36,8 @@ namespace itk
  * This filter automatically finds the greatest prime factor required by the
  * available implementation and pads the input appropriately.
  *
- * This code was adapted from the Insight Journal contribution:
- *
- * "FFT Based Convolution"
- * by Gaetan Lehmann
- * https://www.insight-journal.org/browse/publication/717
+ * This code was adapted from the Insight Journal contribution
+ * \cite Lehmann_2010_b.
  *
  * \author Gaetan Lehmann
  *
@@ -77,25 +74,27 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FFTPadImageFilter);
 
   /**
    * Set/Get the greatest prime factor allowed on the size of the padded image.
-   * The filter increase the size of the image to reach a size with the greatest
-   * prime factor smaller or equal to the specified value. The default value is
-   * 13, which is the greatest prime number for which the FFT are precomputed
-   * in FFTW, and thus gives very good performance.
+   *
+   * The filter increases the dimensional sizes of the image to reach a size with the greatest
+   * prime factor smaller or equal to the specified value. The default values is
+   * obtained from the ForwardFFTImageFilter, which is 13 for FFTW,
+   * and 5 for VNL.
+   *
    * A greatest prime factor of 2 produce a size which is a power of 2, and thus
    * is suitable for vnl base fft filters.
    * A greatest prime factor of 1 or less - typically 0 - disable the extra padding.
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(SizeGreatestPrimeFactor, SizeValueType);
   itkSetMacro(SizeGreatestPrimeFactor, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Typedef to describe the boundary condition. */
   using BoundaryConditionType = ImageBoundaryCondition<TInputImage, TOutputImage>;
-  using BoundaryConditionPointerType = BoundaryConditionType *;
   using DefaultBoundaryConditionType = ZeroFluxNeumannBoundaryCondition<TInputImage, TOutputImage>;
 
 protected:

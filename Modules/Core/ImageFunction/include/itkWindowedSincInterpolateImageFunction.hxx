@@ -23,36 +23,13 @@
 
 namespace itk
 {
-
-// Constant definitions for functions
-namespace Function
-{
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double CosineWindowFunction<VRadius, TInput, TOutput>::m_Factor = itk::Math::pi / (2 * VRadius);
-
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double HammingWindowFunction<VRadius, TInput, TOutput>::m_Factor = itk::Math::pi / VRadius;
-
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double WelchWindowFunction<VRadius, TInput, TOutput>::m_Factor = 1.0 / (VRadius * VRadius);
-
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double LanczosWindowFunction<VRadius, TInput, TOutput>::m_Factor = itk::Math::pi / VRadius;
-
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double BlackmanWindowFunction<VRadius, TInput, TOutput>::m_Factor1 = itk::Math::pi / VRadius;
-
-template <unsigned int VRadius, typename TInput, typename TOutput>
-const double BlackmanWindowFunction<VRadius, TInput, TOutput>::m_Factor2 = 2.0 * itk::Math::pi / VRadius;
-} // end namespace Function
-
 template <typename TInputImage,
           unsigned int VRadius,
           typename TWindowFunction,
           typename TBoundaryCondition,
-          typename TCoordRep>
+          typename TCoordinate>
 void
-WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordRep>::
+WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordinate>::
   SetInputImage(const ImageType * image)
 {
   // Call the parent implementation
@@ -64,16 +41,15 @@ WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBou
   }
 
   // Set the radius for the neighborhood
-  Size<ImageDimension> radius;
-  radius.Fill(VRadius);
+  constexpr auto radius = Size<ImageDimension>::Filled(VRadius);
 
   // Initialize the neighborhood
-  IteratorType it(radius, image, image->GetBufferedRegion());
+  const IteratorType it(radius, image, image->GetBufferedRegion());
 
   // Compute the offset tables (we ignore all the zero indices
   // in the neighborhood)
   unsigned int iOffset = 0;
-  int          empty = VRadius;
+  const int    empty = VRadius;
   for (unsigned int iPos = 0; iPos < it.Size(); ++iPos)
   {
     // Get the offset (index)
@@ -112,9 +88,9 @@ template <typename TInputImage,
           unsigned int VRadius,
           typename TWindowFunction,
           typename TBoundaryCondition,
-          typename TCoordRep>
+          typename TCoordinate>
 void
-WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordRep>::PrintSelf(
+WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordinate>::PrintSelf(
   std::ostream & os,
   Indent         indent) const
 {
@@ -128,9 +104,9 @@ template <typename TInputImage,
           unsigned int VRadius,
           typename TWindowFunction,
           typename TBoundaryCondition,
-          typename TCoordRep>
+          typename TCoordinate>
 auto
-WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordRep>::
+WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBoundaryCondition, TCoordinate>::
   EvaluateAtContinuousIndex(const ContinuousIndexType & index) const -> OutputType
 {
   IndexType baseIndex;
@@ -145,8 +121,7 @@ WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBou
   }
 
   // Position the neighborhood at the index of interest
-  Size<ImageDimension> radius;
-  radius.Fill(VRadius);
+  auto         radius = Size<ImageDimension>::Filled(VRadius);
   IteratorType nit(radius, this->GetInputImage(), this->GetInputImage()->GetBufferedRegion());
   nit.SetLocation(baseIndex);
 
@@ -189,7 +164,7 @@ WindowedSincInterpolateImageFunction<TInputImage, VRadius, TWindowFunction, TBou
   for (unsigned int j = 0; j < m_OffsetTableSize; ++j)
   {
     // Get the offset for this neighbor
-    unsigned int off = m_OffsetTable[j];
+    const unsigned int off = m_OffsetTable[j];
 
     // Get the intensity value at the pixel
     PixelType xVal = nit.GetPixel(off);

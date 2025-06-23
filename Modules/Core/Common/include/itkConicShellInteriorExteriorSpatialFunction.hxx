@@ -41,8 +41,7 @@ ConicShellInteriorExteriorSpatialFunction<VDimension, TInput>::Evaluate(const In
   VectorType vecOriginToTest = position - m_Origin;
 
   // Compute the length of this vector
-  // double vecDistance = vecOriginToTest.GetVnlVector().magnitude();
-  double vecDistance = vecOriginToTest.GetNorm();
+  const double vecDistance = vecOriginToTest.GetNorm();
 
   // Check to see if this an allowed distance
   if (!((vecDistance > m_DistanceMin) && (vecDistance < m_DistanceMax)))
@@ -54,7 +53,7 @@ ConicShellInteriorExteriorSpatialFunction<VDimension, TInput>::Evaluate(const In
   vecOriginToTest.Normalize();
 
   // Create a temp vector to get around const problems
-  GradientType originGradient = m_OriginGradient;
+  const GradientType originGradient = m_OriginGradient;
 
   // Now compute the dot product
   double dotprod = originGradient * vecOriginToTest;
@@ -84,16 +83,15 @@ ConicShellInteriorExteriorSpatialFunction<VDimension, TInput>::PrintSelf(std::os
 {
   Superclass::PrintSelf(os, indent);
 
-  unsigned int i;
   os << indent << "Origin: [";
-  for (i = 0; i < VDimension - 1; ++i)
+  for (unsigned int i = 0; i < VDimension - 1; ++i)
   {
     os << m_Origin[i] << ", ";
   }
   os << ']' << std::endl;
 
   os << indent << "Gradient at origin: [";
-  for (i = 0; i < VDimension - 1; ++i)
+  for (unsigned int i = 0; i < VDimension - 1; ++i)
   {
     os << m_OriginGradient[i] << ", ";
   }

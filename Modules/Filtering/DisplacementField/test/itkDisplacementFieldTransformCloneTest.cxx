@@ -28,8 +28,8 @@ template <typename TVector>
 bool
 testVector(const TVector & v1, const TVector & v2)
 {
-  bool         pass = true;
-  const double tolerance = 1e-10;
+  bool             pass = true;
+  constexpr double tolerance = 1e-10;
 
   for (unsigned int i = 0; i < v1.Size() && i < v2.Size(); ++i)
   {
@@ -58,7 +58,7 @@ itkDisplacementFieldTransformCloneTest(int, char *[])
   FieldType::SizeType   size;
   FieldType::IndexType  start;
   FieldType::RegionType region;
-  int                   dimLength = 20;
+  constexpr int         dimLength = 20;
   size.Fill(dimLength);
   start.Fill(0);
   region.SetSize(size);
@@ -66,12 +66,11 @@ itkDisplacementFieldTransformCloneTest(int, char *[])
   field->SetRegions(region);
   field->Allocate();
 
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(1);
+  auto zeroVector = itk::MakeFilled<DisplacementTransformType::OutputVectorType>(1);
   field->FillBuffer(zeroVector);
   displacementTransform->SetDisplacementField(field);
 
-  DisplacementTransformType::Pointer displacementTransformClone = displacementTransform->Clone();
+  const DisplacementTransformType::Pointer displacementTransformClone = displacementTransform->Clone();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(displacementTransformClone, DisplacementFieldTransform, Transform);
 
@@ -90,8 +89,8 @@ itkDisplacementFieldTransformCloneTest(int, char *[])
     return EXIT_FAILURE;
   }
 
-  FieldType::ConstPointer originalField = displacementTransform->GetDisplacementField();
-  FieldType::ConstPointer cloneField = displacementTransformClone->GetDisplacementField();
+  const FieldType::ConstPointer originalField = displacementTransform->GetDisplacementField();
+  const FieldType::ConstPointer cloneField = displacementTransformClone->GetDisplacementField();
 
   itk::ImageRegionConstIterator<FieldType> originalIt(originalField, originalField->GetLargestPossibleRegion());
   itk::ImageRegionConstIterator<FieldType> cloneIt(cloneField, cloneField->GetLargestPossibleRegion());

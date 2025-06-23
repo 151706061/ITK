@@ -56,7 +56,7 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TestFactory3);
 
   /** Register one factory of this type  */
@@ -106,7 +106,7 @@ ListRegisteredFactories(const std::string & TestName, const DescriptionListType 
 
   while (registeredFactoryItr != factories.end())
   {
-    std::string description = (*registeredFactoryItr)->GetDescription();
+    const std::string description = (*registeredFactoryItr)->GetDescription();
     std::cout << "  Description: " << description << std::endl;
 
     if (description != *expectedItr)
@@ -151,9 +151,9 @@ itkObjectFactoryTest3(int, char *[])
   itk::ObjectFactoryBase::RegisterFactory(factory2);
   itk::ObjectFactoryBase::RegisterFactory(factory3);
 
-  descriptionList.push_back("factory1");
-  descriptionList.push_back("factory2");
-  descriptionList.push_back("factory3");
+  descriptionList.emplace_back("factory1");
+  descriptionList.emplace_back("factory2");
+  descriptionList.emplace_back("factory3");
 
   int result = ListRegisteredFactories("TryA", descriptionList);
 
@@ -171,10 +171,10 @@ itkObjectFactoryTest3(int, char *[])
   itk::ObjectFactoryBase::RegisterFactory(factory3);
   itk::ObjectFactoryBase::RegisterFactory(factory4, itk::ObjectFactoryBase::InsertionPositionEnum::INSERT_AT_FRONT);
 
-  descriptionList.push_back("factory4");
-  descriptionList.push_back("factory1");
-  descriptionList.push_back("factory2");
-  descriptionList.push_back("factory3");
+  descriptionList.emplace_back("factory4");
+  descriptionList.emplace_back("factory1");
+  descriptionList.emplace_back("factory2");
+  descriptionList.emplace_back("factory3");
 
   result = ListRegisteredFactories("TryB", descriptionList);
 
@@ -185,7 +185,7 @@ itkObjectFactoryTest3(int, char *[])
 
 
   itk::ObjectFactoryBase::RegisterFactory(factory5, itk::ObjectFactoryBase::InsertionPositionEnum::INSERT_AT_BACK);
-  descriptionList.push_back("factory5");
+  descriptionList.emplace_back("factory5");
 
   result = ListRegisteredFactories("TryC", descriptionList);
 
@@ -198,12 +198,12 @@ itkObjectFactoryTest3(int, char *[])
   itk::ObjectFactoryBase::RegisterFactory(
     factory6, itk::ObjectFactoryBase::InsertionPositionEnum::INSERT_AT_POSITION, 3);
   descriptionList.clear();
-  descriptionList.push_back("factory4"); // position 0
-  descriptionList.push_back("factory1"); // position 1
-  descriptionList.push_back("factory2"); // position 2
-  descriptionList.push_back("factory6"); // position 3
-  descriptionList.push_back("factory3"); // position 4
-  descriptionList.push_back("factory5"); // position 5
+  descriptionList.emplace_back("factory4"); // position 0
+  descriptionList.emplace_back("factory1"); // position 1
+  descriptionList.emplace_back("factory2"); // position 2
+  descriptionList.emplace_back("factory6"); // position 3
+  descriptionList.emplace_back("factory3"); // position 4
+  descriptionList.emplace_back("factory5"); // position 5
 
   result = ListRegisteredFactories("TryD", descriptionList);
 
@@ -214,7 +214,7 @@ itkObjectFactoryTest3(int, char *[])
 
 
   itk::ObjectFactoryBase::RegisterFactory(factory7, itk::ObjectFactoryBase::InsertionPositionEnum::INSERT_AT_BACK);
-  descriptionList.push_back("factory7");
+  descriptionList.emplace_back("factory7");
 
   result = ListRegisteredFactories("TryE", descriptionList);
 

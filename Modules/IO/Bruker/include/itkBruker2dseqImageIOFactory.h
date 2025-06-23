@@ -32,7 +32,7 @@ namespace itk
  *         The Pennsylvania State University 2005
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/237
+ * https://doi.org/10.54294/o8w4c0
  *
  * \ingroup ITKIOBruker
  */
@@ -57,7 +57,7 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Bruker2dseqImageIOFactory);
 
   /** Register one factory of this type  */

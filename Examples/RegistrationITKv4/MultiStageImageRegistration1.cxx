@@ -113,8 +113,8 @@ public:
 
     const auto * registration = static_cast<const RegistrationType *>(object);
 
-    unsigned int currentLevel = registration->GetCurrentLevel();
-    typename RegistrationType::ShrinkFactorsPerDimensionContainerType
+    const unsigned int currentLevel = registration->GetCurrentLevel();
+    const typename RegistrationType::ShrinkFactorsPerDimensionContainerType
       shrinkFactors =
         registration->GetShrinkFactorsPerDimension(currentLevel);
     typename RegistrationType::SmoothingSigmasArrayType smoothingSigmas =
@@ -170,9 +170,10 @@ public:
 private:
   unsigned int m_CumulativeIterationIndex{ 0 };
 };
-
+namespace
+{
 int
-main(int argc, char * argv[])
+ExampleMain(int argc, const char * const argv[])
 {
   if (argc < 4)
   {
@@ -314,17 +315,11 @@ main(int argc, char * argv[])
   compositeTransform->AddTransform(movingInitTx);
   // Software Guide : EndCodeSnippet
 
-  using FixedImageReaderType = itk::ImageFileReader<FixedImageType>;
-  using MovingImageReaderType = itk::ImageFileReader<MovingImageType>;
+  const auto fixedImage = itk::ReadImage<FixedImageType>(argv[1]);
+  const auto movingImage = itk::ReadImage<MovingImageType>(argv[2]);
 
-  auto fixedImageReader = FixedImageReaderType::New();
-  auto movingImageReader = MovingImageReaderType::New();
-
-  fixedImageReader->SetFileName(argv[1]);
-  movingImageReader->SetFileName(argv[2]);
-
-  transRegistration->SetFixedImage(fixedImageReader->GetOutput());
-  transRegistration->SetMovingImage(movingImageReader->GetOutput());
+  transRegistration->SetFixedImage(fixedImage);
+  transRegistration->SetMovingImage(movingImage);
   transRegistration->SetObjectName("TranslationRegistration");
 
   //  Software Guide : BeginLatex
@@ -399,20 +394,13 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  try
-  {
-    transRegistration->Update();
-    std::cout
-      << "Optimizer stop condition: "
-      << transRegistration->GetOptimizer()->GetStopConditionDescription()
-      << std::endl;
-  }
-  catch (const itk::ExceptionObject & err)
-  {
-    std::cout << "ExceptionObject caught !" << std::endl;
-    std::cout << err << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  transRegistration->Update();
+  std::cout
+    << "Optimizer stop condition: "
+    << transRegistration->GetOptimizer()->GetStopConditionDescription()
+    << std::endl;
+
 
   compositeTransform->AddTransform(
     transRegistration->GetModifiableTransform());
@@ -478,8 +466,8 @@ main(int argc, char * argv[])
   affineRegistration->SetMovingInitialTransform(compositeTransform);
   // Software Guide : EndCodeSnippet
 
-  affineRegistration->SetFixedImage(fixedImageReader->GetOutput());
-  affineRegistration->SetMovingImage(movingImageReader->GetOutput());
+  affineRegistration->SetFixedImage(fixedImage);
+  affineRegistration->SetMovingImage(movingImage);
   affineRegistration->SetObjectName("AffineRegistration");
 
   affineMetric->SetNumberOfHistogramBins(24);
@@ -532,8 +520,6 @@ main(int argc, char * argv[])
   using OriginType = FixedImageType::PointType;
   using RegionType = FixedImageType::RegionType;
   using SizeType = FixedImageType::SizeType;
-
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
 
   const SpacingType fixedSpacing = fixedImage->GetSpacing();
   const OriginType  fixedOrigin = fixedImage->GetOrigin();
@@ -749,20 +735,12 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  try
-  {
-    affineRegistration->Update();
-    std::cout
-      << "Optimizer stop condition: "
-      << affineRegistration->GetOptimizer()->GetStopConditionDescription()
-      << std::endl;
-  }
-  catch (const itk::ExceptionObject & err)
-  {
-    std::cout << "ExceptionObject caught !" << std::endl;
-    std::cout << err << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  affineRegistration->Update();
+  std::cout
+    << "Optimizer stop condition: "
+    << affineRegistration->GetOptimizer()->GetStopConditionDescription()
+    << std::endl;
 
   compositeTransform->AddTransform(
     affineRegistration->GetModifiableTransform());
@@ -881,7 +859,7 @@ main(int argc, char * argv[])
   auto resample = ResampleFilterType::New();
 
   resample->SetTransform(compositeTransform);
-  resample->SetInput(movingImageReader->GetOutput());
+  resample->SetInput(movingImage);
 
   PixelType backgroundGrayLevel = 100;
   if (argc > 4)
@@ -899,16 +877,10 @@ main(int argc, char * argv[])
   using OutputImageType = itk::Image<OutputPixelType, Dimension>;
   using CastFilterType =
     itk::CastImageFilter<FixedImageType, OutputImageType>;
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-
-  auto writer = WriterType::New();
   auto caster = CastFilterType::New();
 
-  writer->SetFileName(argv[3]);
-
   caster->SetInput(resample->GetOutput());
-  writer->SetInput(caster->GetOutput());
-  writer->Update();
+  itk::WriteImage(caster->GetOutput(), argv[3]);
 
   //  Software Guide : BeginLatex
   //
@@ -937,9 +909,7 @@ main(int argc, char * argv[])
 
   checker->SetInput1(fixedImage);
   checker->SetInput2(resample->GetOutput());
-
   caster->SetInput(checker->GetOutput());
-  writer->SetInput(caster->GetOutput());
 
   resample->SetDefaultPixelValue(0);
 
@@ -947,31 +917,47 @@ main(int argc, char * argv[])
   // Before registration
   using TransformType = itk::IdentityTransform<double, Dimension>;
   TransformType::Pointer identityTransform;
-  try
-  {
-    identityTransform = TransformType::New();
-  }
-  catch (const itk::ExceptionObject & err)
-  {
-    err.Print(std::cerr);
-    return EXIT_FAILURE;
-  }
+
+  identityTransform = TransformType::New();
+
   identityTransform->SetIdentity();
   resample->SetTransform(identityTransform);
 
   if (argc > 5)
   {
-    writer->SetFileName(argv[5]);
-    writer->Update();
+    itk::WriteImage(caster->GetOutput(), argv[5]);
   }
 
   // After registration
   resample->SetTransform(compositeTransform);
   if (argc > 6)
   {
-    writer->SetFileName(argv[6]);
-    writer->Update();
+    itk::WriteImage(caster->GetOutput(), argv[6]);
   }
 
   return EXIT_SUCCESS;
+}
+} // namespace
+
+
+int
+main(int argc, char * argv[])
+{
+  try
+  {
+    return ExampleMain(argc, argv);
+  }
+  catch (const itk::ExceptionObject & exceptionObject)
+  {
+    std::cerr << "ITK exception caught:\n" << exceptionObject << '\n';
+  }
+  catch (const std::exception & stdException)
+  {
+    std::cerr << "std exception caught:\n" << stdException.what() << '\n';
+  }
+  catch (...)
+  {
+    std::cerr << "Unhandled exception!\n";
+  }
+  return EXIT_FAILURE;
 }

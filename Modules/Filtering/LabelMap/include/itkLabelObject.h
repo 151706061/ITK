@@ -54,7 +54,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa LabelMapFilter, AttributeLabelObject
  * \ingroup DataRepresentation
@@ -78,7 +78,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelObject);
 
   static constexpr unsigned int ImageDimension = VImageDimension;
@@ -214,29 +214,22 @@ public:
     ConstLineIterator() = default;
 
     ConstLineIterator(const Self * lo)
+      : m_Begin(lo->m_LineContainer.begin())
+      , m_End(lo->m_LineContainer.end())
     {
-      m_Begin = lo->m_LineContainer.begin();
-      m_End = lo->m_LineContainer.end();
       m_Iterator = m_Begin;
     }
 
     ConstLineIterator(const ConstLineIterator & iter)
-    {
-      m_Iterator = iter.m_Iterator;
-      m_Begin = iter.m_Begin;
-      m_End = iter.m_End;
-    }
+      : m_Iterator(iter.m_Iterator)
+      , m_Begin(iter.m_Begin)
+      , m_End(iter.m_End)
+    {}
 
     ConstLineIterator &
-    operator=(const ConstLineIterator & iter)
-    {
-      m_Iterator = iter.m_Iterator;
-      m_Begin = iter.m_Begin;
-      m_End = iter.m_End;
-      return *this;
-    }
+    operator=(const ConstLineIterator & iter) = default;
 
-    const LineType &
+    [[nodiscard]] const LineType &
     GetLine() const
     {
       return *m_Iterator;
@@ -245,7 +238,7 @@ public:
     ConstLineIterator
     operator++(int)
     {
-      ConstLineIterator tmp = *this;
+      const ConstLineIterator tmp = *this;
       ++(*this);
       return tmp;
     }
@@ -271,7 +264,7 @@ public:
       m_Iterator = m_Begin;
     }
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       return m_Iterator == m_End;
@@ -302,31 +295,23 @@ public:
     }
 
     ConstIndexIterator(const Self * lo)
+      : m_Begin(lo->m_LineContainer.begin())
+      , m_End(lo->m_LineContainer.end())
     {
-      m_Begin = lo->m_LineContainer.begin();
-      m_End = lo->m_LineContainer.end();
       GoToBegin();
     }
 
     ConstIndexIterator(const ConstIndexIterator & iter)
-    {
-      m_Iterator = iter.m_Iterator;
-      m_Index = iter.m_Index;
-      m_Begin = iter.m_Begin;
-      m_End = iter.m_End;
-    }
+      : m_Iterator(iter.m_Iterator)
+      , m_Begin(iter.m_Begin)
+      , m_End(iter.m_End)
+      , m_Index(iter.m_Index)
+    {}
 
     ConstIndexIterator &
-    operator=(const ConstIndexIterator & iter)
-    {
-      m_Iterator = iter.m_Iterator;
-      m_Index = iter.m_Index;
-      m_Begin = iter.m_Begin;
-      m_End = iter.m_End;
-      return *this;
-    }
+    operator=(const ConstIndexIterator & iter) = default;
 
-    const IndexType &
+    [[nodiscard]] const IndexType &
     GetIndex() const
     {
       return m_Index;
@@ -369,7 +354,7 @@ public:
       NextValidLine();
     }
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       return m_Iterator == m_End;

@@ -61,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImportImageFilter);
 
   /** Index type alias support An index is used to access pixel values. */
@@ -117,16 +117,18 @@ public:
 
   /** Set the spacing (size of a pixel) of the image.
    * \sa GetSpacing() */
+  /** @ITKStartGrouping */
   itkSetMacro(Spacing, SpacingType);
   itkGetConstReferenceMacro(Spacing, SpacingType);
   itkSetVectorMacro(Spacing, const float, VImageDimension);
-
+  /** @ITKEndGrouping */
   /** Set the origin of the image.
    * \sa GetOrigin() */
+  /** @ITKStartGrouping */
   itkSetMacro(Origin, OriginType);
   itkGetConstReferenceMacro(Origin, OriginType);
   itkSetVectorMacro(Origin, const float, VImageDimension);
-
+  /** @ITKEndGrouping */
   using DirectionType = Matrix<SpacePrecisionType, VImageDimension, VImageDimension>;
 
   /** Set the direction of the image

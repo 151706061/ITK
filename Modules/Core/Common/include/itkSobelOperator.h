@@ -35,8 +35,7 @@ namespace itk
  * 1) Set the direction by calling  \code SetDirection \endcode
  * 2) call
    \code
-   itk::Size<2> radius;
-   radius.Fill(1);
+   constexpr auto radius = itk::Size<2>::Filled(1);
    sobelOperator.CreateToRadius(radius);
    \endcode
  * 3) You may optionally scale the coefficients of this operator using the
@@ -62,9 +61,7 @@ namespace itk
  * The current implementation of the Sobel operator is for 2 and 3 dimensions only.
  * The ND version is planned for future releases.
  *
- * The extension to 3D is from the publication
- *  "Irwin Sobel. An Isotropic 3x3x3 Volume Gradient Operator.
- * Technical report, Hewlett-Packard Laboratories, April 1995."
+ * The extension to 3D was described in \cite sobel1995.
  *
  * The Sobel operator in 3D has the kernel
  *
@@ -121,11 +118,7 @@ public:
   // virtual void CreateToRadius(const unsigned long);
 
 protected:
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SignedOutputPixelType, (Concept::Signed<typename NumericTraits<TPixel>::ValueType>));
-  // End concept checking
-#endif
 
   /** Type alias support for coefficient vector type.*/
   using typename Superclass::CoefficientVector;

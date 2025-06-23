@@ -62,7 +62,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEquationAdvectionTerm);
 
   using typename Superclass::InputImageType;
@@ -109,7 +109,8 @@ public:
 
   /** \todo to be documented. */
   void
-  Update() override;
+  Update() override
+  {}
 
   /** Initialize the parameters in the terms prior to an iteration */
   void
@@ -117,13 +118,15 @@ public:
 
   /** \todo to be documented. */
   void
-  Initialize(const LevelSetInputIndexType &) override;
+  Initialize(const LevelSetInputIndexType &) override
+  {}
 
   /** Supply updates at pixels to keep the term parameters always updated */
   void
-  UpdatePixel(const LevelSetInputIndexType & iP,
-              const LevelSetOutputRealType & oldValue,
-              const LevelSetOutputRealType & newValue) override;
+  UpdatePixel(const LevelSetInputIndexType & itkNotUsed(iP),
+              const LevelSetOutputRealType & itkNotUsed(oldValue),
+              const LevelSetOutputRealType & itkNotUsed(newValue)) override
+  {}
 
 protected:
   LevelSetEquationAdvectionTerm();
@@ -139,11 +142,12 @@ protected:
 
   /** Returns the term contribution for a given location iP, i.e.
    *  \f$ \omega_i( p ) \f$. */
+  /** @ITKStartGrouping */
   LevelSetOutputRealType
   Value(const LevelSetInputIndexType & iP) override;
   LevelSetOutputRealType
   Value(const LevelSetInputIndexType & iP, const LevelSetDataType & iData) override;
-
+  /** @ITKEndGrouping */
   LevelSetOutputRealType m_NeighborhoodScales[ImageDimension]{};
 
 private:

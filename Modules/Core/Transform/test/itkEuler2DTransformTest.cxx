@@ -26,9 +26,9 @@
 namespace
 {
 bool
-CheckEqual(itk::Point<double, 2> p1, itk::Point<double, 2> p2)
+CheckEqual(const itk::Point<double, 2> & p1, const itk::Point<double, 2> & p2)
 {
-  const double epsilon = 1e-5;
+  constexpr double epsilon = 1e-5;
 
   for (unsigned int i = 0; i < 2; ++i)
   {
@@ -50,7 +50,7 @@ itkEuler2DTransformTest(int, char *[])
   std::cout << "==================================" << std::endl;
   std::cout << "Testing Euler Angles 2D Transform" << std::endl << std::endl;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 2;
   bool                   Ok = true;
 
@@ -79,9 +79,9 @@ itkEuler2DTransformTest(int, char *[])
   eulerTransform->SetRotation(angle);
 
   // Rotate an itk::Point
-  EulerTransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
-  EulerTransformType::InputPointType            p = pInit;
-  EulerTransformType::InputPointType            q;
+  constexpr EulerTransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
+  EulerTransformType::InputPointType                      p = pInit;
+  EulerTransformType::InputPointType                      q;
 
   q[0] = p[0] * costh - p[1] * sinth;
   q[1] = p[0] * sinth + p[1] * costh;
@@ -103,17 +103,16 @@ itkEuler2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   std::cout << "Testing Translation:";
 
   eulerTransform->SetRotation(0);
 
   EulerTransformType::OffsetType::ValueType ioffsetInit[2] = { 1, 4 };
-  EulerTransformType::OffsetType            ioffset = ioffsetInit;
+  const EulerTransformType::OffsetType      ioffset = ioffsetInit;
 
   eulerTransform->SetOffset(ioffset);
 
@@ -135,10 +134,9 @@ itkEuler2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   // Testing Parameters
   std::cout << "Testing Parameters: ";
@@ -185,12 +183,12 @@ itkEuler2DTransformTest(int, char *[])
 
     // Set parameters
     TransformType::ParametersType parameters2(t1->GetNumberOfParameters());
-    TransformType::InputPointType center;
 
     parameters2[0] = -21.0 / 180.0 * itk::Math::pi;
     parameters2[1] = 67.8;
     parameters2[2] = -0.2;
 
+    TransformType::InputPointType center;
     center[0] = 12.0;
     center[1] = -8.9;
 
@@ -271,10 +269,9 @@ itkEuler2DTransformTest(int, char *[])
     t1->CloneTo(t5);
     t5->Compose(t4, false);
 
-    TransformType::InputPointType p5, p6, p7;
-    p5 = t1->TransformPoint(p1);
-    p6 = t4->TransformPoint(p5);
-    p7 = t5->TransformPoint(p1);
+    TransformType::InputPointType p5 = t1->TransformPoint(p1);
+    TransformType::InputPointType p6 = t4->TransformPoint(p5);
+    TransformType::InputPointType p7 = t5->TransformPoint(p1);
 
     std::cout << "Test Compose(.,false): ";
     if (!CheckEqual(p6, p7))
@@ -321,8 +318,8 @@ itkEuler2DTransformTest(int, char *[])
       minusPoint = t4->TransformPoint(p1);
       for (unsigned int j = 0; j < 2; ++j)
       {
-        double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
-        double computedDerivative = jacobian2[j][k];
+        const double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
+        const double computedDerivative = jacobian2[j][k];
         approxJacobian[j][k] = approxDerivative;
         if (itk::Math::abs(approxDerivative - computedDerivative) > 1e-4)
         {
@@ -332,7 +329,7 @@ itkEuler2DTransformTest(int, char *[])
           std::cerr << " [ FAILED ] " << std::endl;
           return EXIT_FAILURE;
         } // if
-      }   // for j
+      } // for j
 
     } // for k
 
@@ -368,9 +365,8 @@ itkEuler2DTransformTest(int, char *[])
     ip[0] = 8.0;
     ip[1] = 9.0;
 
-    TransformType::OutputPointType op1, op2;
-    op1 = t1->TransformPoint(ip);
-    op2 = t23->TransformPoint(ip);
+    const TransformType::OutputPointType op1 = t1->TransformPoint(ip);
+    const TransformType::OutputPointType op2 = t23->TransformPoint(ip);
 
     std::cout << "Test Set/GetMatrix() and Set/GetOffset(): ";
     if (!CheckEqual(op1, op2))

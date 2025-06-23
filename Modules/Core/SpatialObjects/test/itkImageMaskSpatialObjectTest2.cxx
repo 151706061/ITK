@@ -56,13 +56,13 @@ itkImageMaskSpatialObjectTest2(int, char *[])
   // Set the direction for a non-oriented image
   // to better test the frequently encountered case
   // Use non axis aligned image directions
-  itk::Euler3DTransform<double>::Pointer tfm = itk::Euler3DTransform<double>::New();
+  auto tfm = itk::Euler3DTransform<itk::SpacePrecisionType>::New();
   tfm->SetRotation(30.0 * itk::Math::pi_over_180, 15.0 * itk::Math::pi_over_180, 10.0 * itk::Math::pi_over_180);
   const ImageType::DirectionType direction = tfm->GetMatrix();
   image->SetDirection(direction);
 
-  const ImageType::SizeType size = { { 50, 50, 50 } };
-  ImageType::PointType      origin;
+  constexpr ImageType::SizeType size = { { 50, 50, 50 } };
+  ImageType::PointType          origin;
   origin[0] = 1.51;
   origin[1] = 2.10;
   origin[2] = -300;
@@ -73,12 +73,10 @@ itkImageMaskSpatialObjectTest2(int, char *[])
   spacing[1] = 0.7;
   spacing[2] = 1.1;
   image->SetSpacing(spacing);
-  constexpr unsigned int     index_offset = 6543;
-  const ImageType::IndexType index = { { index_offset, index_offset, index_offset } };
+  constexpr unsigned int         index_offset = 6543;
+  constexpr ImageType::IndexType index = { { index_offset, index_offset, index_offset } };
 
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImageType::RegionType region{ index, size };
   image->SetRegions(region);
   image->AllocateInitialized();
 
@@ -86,11 +84,11 @@ itkImageMaskSpatialObjectTest2(int, char *[])
   constexpr unsigned int INSIDE_SIZE = 30;
   constexpr unsigned int INSIDE_INDEX = index_offset + 10;
   {
-    const ImageType::SizeType insideSize = { { INSIDE_SIZE, INSIDE_SIZE, INSIDE_SIZE } };
+    constexpr ImageType::SizeType insideSize = { { INSIDE_SIZE, INSIDE_SIZE, INSIDE_SIZE } };
     insideRegion.SetSize(insideSize);
   }
   {
-    const ImageType::IndexType insideIndex = { { INSIDE_INDEX, INSIDE_INDEX, INSIDE_INDEX } };
+    constexpr ImageType::IndexType insideIndex = { { INSIDE_INDEX, INSIDE_INDEX, INSIDE_INDEX } };
     insideRegion.SetIndex(insideIndex);
   }
   {
@@ -118,7 +116,7 @@ itkImageMaskSpatialObjectTest2(int, char *[])
       image->TransformIndexToPhysicalPoint(constIndex, point);
       const bool isInsideTest = maskSO->IsInsideInWorldSpace(point);
 
-      double outsideIfZeroValue;
+      double outsideIfZeroValue = NAN;
       maskSO->ValueAtInWorldSpace(point, outsideIfZeroValue);
       if (isInsideTest && itk::Math::AlmostEquals(outsideIfZeroValue, 0.0))
       {
@@ -178,8 +176,8 @@ itkImageMaskSpatialObjectTest2(int, char *[])
 
   // Check if insideregion is properly computed at the image boundary
   {
-    ImageType::IndexType startPointIndex = { { INSIDE_SIZE - 2, INSIDE_SIZE - 2, INSIDE_SIZE - 2 } };
-    ImageType::IndexType endPointIndex = {
+    constexpr ImageType::IndexType startPointIndex = { { INSIDE_SIZE - 2, INSIDE_SIZE - 2, INSIDE_SIZE - 2 } };
+    constexpr ImageType::IndexType endPointIndex = {
       { INSIDE_INDEX + INSIDE_SIZE + 2, INSIDE_INDEX + INSIDE_SIZE + 2, INSIDE_INDEX + INSIDE_SIZE + 2 }
     };
     ImageType::PointType startPoint;
@@ -204,7 +202,7 @@ itkImageMaskSpatialObjectTest2(int, char *[])
       const bool isZero = (itk::Math::ExactlyEquals(value, PixelType{}));
       if ((isInside && isZero) || (!isInside && !isZero))
       {
-        ImageType::IndexType pointIndex = image->TransformPhysicalPointToIndex(point);
+        const ImageType::IndexType pointIndex = image->TransformPhysicalPointToIndex(point);
         std::cerr
           << "Error in the evaluation ValueAt and IsInside (all the points inside the mask shall have non-zero value) "
           << std::endl;

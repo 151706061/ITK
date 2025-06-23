@@ -19,11 +19,7 @@
 #include <iostream>
 #include "itkMembershipFunctionBase.h"
 
-namespace itk
-{
-namespace Statistics
-{
-namespace MembershipFunctionBaseTest
+namespace itk::Statistics::MembershipFunctionBaseTest
 {
 
 template <typename TMeasurementVector>
@@ -39,7 +35,7 @@ public:
 
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MyMembershipFunctionBase);
 
   /** Method for creation through the object factory. */
@@ -49,15 +45,13 @@ public:
   double
   Evaluate(const TMeasurementVector &) const override
   {
-    double score;
-    score = 1;
+    constexpr double score = 1;
     return score;
   }
 };
 
-} // namespace MembershipFunctionBaseTest
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics::MembershipFunctionBaseTest
+
 
 /* Test MembershipFunctionBase using a resizable vector type */
 int
@@ -94,7 +88,7 @@ itkMembershipFunctionBaseTest2(int, char *[])
   }
 
   // test if it is possible to change the measurement vector size
-  MembershipFunctionBaseType::MeasurementVectorSizeType newSize = 5;
+  constexpr MembershipFunctionBaseType::MeasurementVectorSizeType newSize = 5;
   function->SetMeasurementVectorSize(newSize); // for code coverage
 
   if (function->GetMeasurementVectorSize() != newSize)

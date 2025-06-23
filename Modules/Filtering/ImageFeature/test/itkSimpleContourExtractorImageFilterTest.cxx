@@ -63,16 +63,16 @@ itkSimpleContourExtractorImageFilterTest(int argc, char * argv[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, SimpleContourExtractorImageFilter, BoxImageFilter);
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  const itk::SimpleFilterWatcher watcher(filter, "filter");
 
   // Connect the pipeline
   filter->SetInput(reader->GetOutput());
   writer->SetInput(filter->GetOutput());
 
-  FilterType::InputPixelType  inputForegroundValue = 255;
-  FilterType::InputPixelType  inputBackgroundValue = 0;
-  FilterType::OutputPixelType outputForegroundValue = itk::NumericTraits<FilterType::OutputPixelType>::max();
-  FilterType::OutputPixelType outputBackgroundValue{};
+  constexpr FilterType::InputPixelType  inputForegroundValue = 255;
+  constexpr FilterType::InputPixelType  inputBackgroundValue = 0;
+  constexpr FilterType::OutputPixelType outputForegroundValue = itk::NumericTraits<FilterType::OutputPixelType>::max();
+  constexpr FilterType::OutputPixelType outputBackgroundValue{};
 
   filter->SetInputForegroundValue(inputForegroundValue);
 
@@ -91,9 +91,7 @@ itkSimpleContourExtractorImageFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(outputBackgroundValue, filter->GetOutputBackgroundValue());
 
 
-  FilterType::InputSizeType radius;
-
-  radius.Fill(1);
+  auto radius = FilterType::InputSizeType::Filled(1);
 
   filter->SetRadius(radius);
 

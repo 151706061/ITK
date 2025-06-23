@@ -69,7 +69,7 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
   //                                &ShowProgressObject::ShowProgress);
   //   marcher->AddObserver( itk::ProgressEvent(), command);
 
-  itk::SimpleFilterWatcher MarcherWatcher(marcher);
+  const itk::SimpleFilterWatcher MarcherWatcher(marcher);
 
   using NodeType = FloatFMType::NodeType;
   using NodePairType = FloatFMType::NodePairType;
@@ -79,10 +79,9 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
   // setup alive points
   auto AlivePoints = NodePairContainerType::New();
 
-  FloatImageType::OffsetType offset0 = { { 28, 35 } };
+  constexpr FloatImageType::OffsetType offset0 = { { 28, 35 } };
 
-  itk::Index<2> index;
-  index.Fill(0);
+  itk::Index<2> index{};
 
   AlivePoints->push_back(NodePairType(index + offset0, 0.));
   AlivePoints->push_back(NodePairType(index + offset0, 42.));
@@ -116,7 +115,7 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
   marcher->SetTrialPoints(TrialPoints);
 
   // specify the size of the output image
-  FloatImageType::SizeType size = { { 64, 64 } };
+  constexpr FloatImageType::SizeType size = { { 64, 64 } };
   marcher->SetOutputSize(size);
 
   // setup a speed image of ones
@@ -141,29 +140,25 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
   // check the results
   using FloatGradientImage = FloatFMType::GradientImageType;
   using GradientPixelType = FloatGradientImage::PixelType;
-  FloatGradientImage::Pointer                  gradientOutput = marcher->GetGradientImage();
+  const FloatGradientImage::Pointer            gradientOutput = marcher->GetGradientImage();
   itk::ImageRegionIterator<FloatGradientImage> iterator(gradientOutput, gradientOutput->GetBufferedRegion());
 
   bool passed = true;
 
   while (!iterator.IsAtEnd())
   {
-    FloatGradientImage::IndexType tempIndex;
-    double                        distance;
-    GradientPixelType             outputPixel;
-
-    tempIndex = iterator.GetIndex();
+    FloatGradientImage::IndexType tempIndex = iterator.GetIndex();
     tempIndex -= offset0;
-    distance = 0.0;
+    double distance = 0.0;
     for (int j = 0; j < 2; ++j)
     {
       distance += tempIndex[j] * tempIndex[j];
     }
     distance = std::sqrt(distance);
 
-    outputPixel = iterator.Get();
+    GradientPixelType outputPixel = iterator.Get();
 
-    double outputPixelNorm{ outputPixel.GetNorm() };
+    const double outputPixelNorm{ outputPixel.GetNorm() };
 
     if (itk::Math::AlmostEquals(distance, 0.0))
     {
@@ -207,7 +202,7 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
   }
   criterion->SetTargetNodes(TargetNodes);
 
-  typename CriterionType::OutputPixelType targetOffset{};
+  constexpr typename CriterionType::OutputPixelType targetOffset{};
   criterion->SetTargetOffset(targetOffset);
   ITK_TEST_SET_GET_VALUE(targetOffset, criterion->GetTargetOffset());
 
@@ -240,9 +235,7 @@ itkFastMarchingUpwindGradientBaseTest(int, char *[])
     std::cout << "Fast Marching Upwind Gradient test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Fast Marching Upwind Gradient test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Fast Marching Upwind Gradient test failed" << std::endl;
+  return EXIT_FAILURE;
 }

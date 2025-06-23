@@ -38,9 +38,9 @@ namespace
 bool
 SameImage(ImagePointer testImage, ImagePointer baselineImage)
 {
-  PixelType     intensityTolerance = 5; // need this for compression
-  int           radiusTolerance = 0;
-  unsigned long numberOfPixelTolerance = 0;
+  constexpr PixelType     intensityTolerance = 5; // need this for compression
+  constexpr int           radiusTolerance = 0;
+  constexpr unsigned long numberOfPixelTolerance = 0;
 
   // NOTE ALEX: it look slike this filter does not take the spacing
   // into account, to check later.
@@ -52,7 +52,7 @@ SameImage(ImagePointer testImage, ImagePointer baselineImage)
   diff->SetToleranceRadius(radiusTolerance);
   diff->UpdateLargestPossibleRegion();
 
-  unsigned long status = diff->GetNumberOfPixelsWithDifferences();
+  const unsigned long status = diff->GetNumberOfPixelsWithDifferences();
 
   if (status > numberOfPixelTolerance)
   {
@@ -87,13 +87,13 @@ SameImage(std::string testImageFileName, ImagePointer baselineImage)
 }
 
 bool
-ActualTest(std::string inputFileName,
-           std::string outputFileNameBase,
-           std::string outputFileNameExtension,
-           bool        streamWriting,
-           bool        pasteWriting,
-           bool        compressWriting,
-           int         expectException = -1)
+ActualTest(const std::string & inputFileName,
+           const std::string & outputFileNameBase,
+           const std::string & outputFileNameExtension,
+           bool                streamWriting,
+           bool                pasteWriting,
+           bool                compressWriting,
+           int                 expectException = -1)
 {
 
   std::cout << "Writing Combination: ";
@@ -104,14 +104,14 @@ ActualTest(std::string inputFileName,
   outputFileNameStream << outputFileNameBase << streamWriting;
   outputFileNameStream << pasteWriting << compressWriting;
   outputFileNameStream << '.' << outputFileNameExtension;
-  std::string outputFileName = outputFileNameStream.str();
+  const std::string outputFileName = outputFileNameStream.str();
 
   std::cout << "Writing to File: " << outputFileName << std::endl;
-  unsigned int m_NumberOfPieces = 10;
+  constexpr unsigned int numberOfPieces = 10;
 
   // We remove the output file
   // NOTE ALEX: should we check it exists first?
-  itksys::SystemTools::RemoveFile(outputFileName.c_str());
+  itksys::SystemTools::RemoveFile(outputFileName);
 
   using PixelType = unsigned char;
   using ImageType = itk::Image<PixelType, 3>;
@@ -137,7 +137,7 @@ ActualTest(std::string inputFileName,
   pasteSize[0] = largestRegion.GetSize()[0] / 3;
   pasteSize[1] = largestRegion.GetSize()[1] / 3;
   pasteSize[2] = 1;
-  ImageType::RegionType pasteRegion(pasteIndex, pasteSize);
+  const ImageType::RegionType pasteRegion(pasteIndex, pasteSize);
 
   // TODO: drew, check and save the spacing of the input image here
 
@@ -151,13 +151,13 @@ ActualTest(std::string inputFileName,
   writer->SetFileName(outputFileName);
   writer->SetInput(monitor->GetOutput());
 
-  // create a vaild region from the largest
+  // create a valid region from the largest
   itk::ImageIORegion ioregion(3);
   itk::ImageIORegionAdaptor<3>::Convert(pasteRegion, ioregion, largestRegion.GetIndex());
 
   if (streamWriting)
   {
-    writer->SetNumberOfStreamDivisions(m_NumberOfPieces);
+    writer->SetNumberOfStreamDivisions(numberOfPieces);
   }
 
   if (pasteWriting)
@@ -181,13 +181,11 @@ ActualTest(std::string inputFileName,
       std::cout << "TEST PASSED" << std::endl;
       return EXIT_SUCCESS;
     }
-    else
-    {
-      std::cout << "UnExpected ExceptionObject caught !" << std::endl;
-      std::cout << err << std::endl;
-      std::cout << "TEST FAILED" << std::endl;
-      return EXIT_FAILURE;
-    }
+
+    std::cout << "UnExpected ExceptionObject caught !" << std::endl;
+    std::cout << err << std::endl;
+    std::cout << "TEST FAILED" << std::endl;
+    return EXIT_FAILURE;
   }
 
   if (expectException == 1)
@@ -249,8 +247,7 @@ itkImageFileWriterStreamingPastingCompressingTest1(int argc, char * argv[])
 
   int           expectException[8];
   constexpr int expectedExceptionOffset = 4;
-  int           i;
-  for (i = 0; i < 8; ++i)
+  for (int i = 0; i < 8; ++i)
   {
     if (argc > i + expectedExceptionOffset)
     {
@@ -266,7 +263,7 @@ itkImageFileWriterStreamingPastingCompressingTest1(int argc, char * argv[])
     }
   }
 
-  i = 0;
+  int i = 0;
 
   int retValue = ActualTest(argv[1], argv[2], argv[3], false, false, false, expectException[i++]);
   retValue = (retValue == EXIT_FAILURE)

@@ -99,12 +99,13 @@ public:
   }
 
   /** Get/Set level set value. */
+  /** @ITKStartGrouping */
   PixelType &
   GetValue()
   {
     return m_Value;
   }
-  const PixelType &
+  [[nodiscard]] const PixelType &
   GetValue() const
   {
     return m_Value;
@@ -114,14 +115,16 @@ public:
   {
     m_Value = input;
   }
+  /** @ITKEndGrouping */
 
   /** Get/Set index. */
+  /** @ITKStartGrouping */
   IndexType &
   GetIndex()
   {
     return m_Index;
   }
-  const IndexType &
+  [[nodiscard]] const IndexType &
   GetIndex() const
   {
     return m_Index;
@@ -131,6 +134,7 @@ public:
   {
     m_Index = input;
   }
+  /** @ITKEndGrouping */
 
   /** Default constructor */
   LevelSetNode()

@@ -91,6 +91,7 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
         # scalarImage.Allocate(True)
 
         import pickle
+
         pickled = pickle.dumps(image)
         reloaded = pickle.loads(pickled)
         reloaded_spacing = reloaded.GetSpacing()
@@ -187,6 +188,19 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
         vectorImage = VectorImageType.New()
         vectorImage.SetRegions(region)
         vectorImage.SetNumberOfComponentsPerPixel(3)
+        vectorImage.Allocate()
+        vectorndarr = itk.PyBuffer[VectorImageType].GetArrayViewFromImage(vectorImage)
+
+        convertedvectorImage = itk.PyBuffer[VectorImageType].GetImageViewFromArray(
+            vectorndarr, is_vector=True
+        )
+        self.assertEqual(vectorndarr.ndim, convertedvectorImage.ndim)
+        self.assertEqual(vectorndarr.dtype, convertedvectorImage.dtype)
+        self.assertTupleEqual(vectorndarr.shape, convertedvectorImage.shape)
+
+        vectorImage = VectorImageType.New()
+        vectorImage.SetRegions(region)
+        vectorImage.SetNumberOfComponentsPerPixel(1)
         vectorImage.Allocate()
         vectorndarr = itk.PyBuffer[VectorImageType].GetArrayViewFromImage(vectorImage)
 

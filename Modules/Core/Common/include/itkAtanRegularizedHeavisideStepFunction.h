@@ -28,21 +28,9 @@ namespace itk
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
- *
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ITKCommon
  */

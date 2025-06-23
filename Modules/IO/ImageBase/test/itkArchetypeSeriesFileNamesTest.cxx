@@ -37,21 +37,20 @@ itkArchetypeSeriesFileNamesTest(int argc, char * argv[])
     std::cout << "Testing argument " << i << std::endl;
     std::cout << "Archetype name: " << argv[i] << std::endl;
 
-    itk::ArchetypeSeriesFileNames::Pointer fit = itk::ArchetypeSeriesFileNames::New();
+    const itk::ArchetypeSeriesFileNames::Pointer fit = itk::ArchetypeSeriesFileNames::New();
 
     ITK_EXERCISE_BASIC_OBJECT_METHODS(fit, ArchetypeSeriesFileNames, Object);
 
-    std::string archetype = argv[i];
+    const std::string archetype = argv[i];
     fit->SetArchetype(archetype);
     ITK_TEST_SET_GET_VALUE(archetype, fit->GetArchetype());
 
-    std::vector<std::string>           names = fit->GetFileNames();
-    std::vector<std::string>::iterator nit;
+    const std::vector<std::string> names = fit->GetFileNames();
 
     std::cout << "List of returned filenames: " << std::endl;
-    for (nit = names.begin(); nit != names.end(); ++nit)
+    for (auto & name : names)
     {
-      std::cout << "File: " << nit->c_str() << std::endl;
+      std::cout << "File: " << name.c_str() << std::endl;
     }
 
     std::cout << fit;

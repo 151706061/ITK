@@ -33,8 +33,8 @@ GenerateKernelForStreamingTest()
 {
   using SourceType = itk::GaussianImageSource<KernelImageType>;
   using KernelSizeType = typename SourceType::SizeType;
-  auto           source = SourceType::New();
-  KernelSizeType kernelSize{ { 3, 5 } };
+  auto                     source = SourceType::New();
+  constexpr KernelSizeType kernelSize{ { 3, 5 } };
   source->SetSize(kernelSize);
   source->SetMean(2);
   source->SetSigma(3.0);
@@ -63,7 +63,7 @@ doConvolutionImageFilterStreamingTest(int argc, char * argv[])
   SizeType requestedSize;
   requestedSize[0] = std::atoi(argv[6]);
   requestedSize[1] = std::atoi(argv[7]);
-  RegionType requestedRegion(requestedIndex, requestedSize);
+  const RegionType requestedRegion(requestedIndex, requestedSize);
 
   auto regionMode = (argc > 9 && std::string("valid").compare(argv[8]) == 0
                        ? itk::ConvolutionImageFilterBaseEnums::ConvolutionImageFilterOutputRegion::VALID
@@ -82,14 +82,14 @@ doConvolutionImageFilterStreamingTest(int argc, char * argv[])
   auto inputMonitor = PipelineMonitorType::New();
   inputMonitor->SetInput(reader1->GetOutput());
 
-  KernelImageType::Pointer kernelImage = GenerateKernelForStreamingTest();
+  const KernelImageType::Pointer kernelImage = GenerateKernelForStreamingTest();
 
   auto convoluter = ConvolutionFilterType::New();
   convoluter->SetInput(inputMonitor->GetOutput());
   convoluter->SetKernelImage(kernelImage);
   convoluter->SetOutputRegionMode(regionMode);
   convoluter->SetReleaseDataFlag(true);
-  itk::SimpleFilterWatcher watcher(convoluter, "filter");
+  const itk::SimpleFilterWatcher watcher(convoluter, "filter");
 
   using PipelineMonitorType = itk::PipelineMonitorImageFilter<ImageType>;
   auto outputMonitor = PipelineMonitorType::New();
@@ -98,7 +98,7 @@ doConvolutionImageFilterStreamingTest(int argc, char * argv[])
   using StreamingFilterType = itk::StreamingImageFilter<ImageType, ImageType>;
   auto streamer = StreamingFilterType::New();
   streamer->SetInput(outputMonitor->GetOutput());
-  const unsigned int numStreamDivisions = 10;
+  constexpr unsigned int numStreamDivisions = 10;
   streamer->SetNumberOfStreamDivisions(numStreamDivisions);
   streamer->GetOutput()->SetRequestedRegion(requestedRegion);
   ITK_TRY_EXPECT_NO_EXCEPTION(streamer->Update());
@@ -106,7 +106,7 @@ doConvolutionImageFilterStreamingTest(int argc, char * argv[])
   // Verify the pipeline executed as expected
   // Expect requested region propagates twice due to ConvolutionImageFilter having
   // two inputs (Primary and KernelImage)
-  const unsigned int requestsPerStream = 2;
+  constexpr unsigned int requestsPerStream = 2;
   // Verify ConvolutionImageFilter upstream requests
   ITK_TEST_EXPECT_EQUAL(inputMonitor->GetOutputRequestedRegions().size(), requestsPerStream * numStreamDivisions);
   ITK_TEST_EXPECT_EQUAL(inputMonitor->GetNumberOfUpdates(), numStreamDivisions);
@@ -165,14 +165,12 @@ itkConvolutionImageFilterStreamingTest(int argc, char * argv[])
 
     return doConvolutionImageFilterStreamingTest<FrequencyConvolutionType>(argc, argv);
   }
-  else // spatial
-  {
-    using SpatialConvolutionType = itk::ConvolutionImageFilter<ImageType>;
+  // spatial
+  using SpatialConvolutionType = itk::ConvolutionImageFilter<ImageType>;
 
-    // Do a quick filter sanity check before the test
-    auto convoluter = SpatialConvolutionType::New();
-    ITK_EXERCISE_BASIC_OBJECT_METHODS(convoluter, ConvolutionImageFilter, ConvolutionImageFilterBase);
+  // Do a quick filter sanity check before the test
+  auto convoluter = SpatialConvolutionType::New();
+  ITK_EXERCISE_BASIC_OBJECT_METHODS(convoluter, ConvolutionImageFilter, ConvolutionImageFilterBase);
 
-    return doConvolutionImageFilterStreamingTest<SpatialConvolutionType>(argc, argv);
-  }
+  return doConvolutionImageFilterStreamingTest<SpatialConvolutionType>(argc, argv);
 }

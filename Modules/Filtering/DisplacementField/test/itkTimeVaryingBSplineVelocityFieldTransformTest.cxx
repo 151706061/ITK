@@ -29,19 +29,15 @@ itkTimeVaryingBSplineVelocityFieldTransformTest(int, char *[])
 
   constexpr unsigned int splineOrder = 3;
 
-  TimeVaryingVelocityFieldControlPointLatticeType::PointType origin;
-  origin.Fill(-2.0);
+  auto origin = itk::MakeFilled<TimeVaryingVelocityFieldControlPointLatticeType::PointType>(-2.0);
 
-  TimeVaryingVelocityFieldControlPointLatticeType::SpacingType spacing;
-  spacing.Fill(2.0);
+  auto spacing = itk::MakeFilled<TimeVaryingVelocityFieldControlPointLatticeType::SpacingType>(2.0);
 
-  TimeVaryingVelocityFieldControlPointLatticeType::SizeType size;
-  size.Fill(25);
+  auto size = TimeVaryingVelocityFieldControlPointLatticeType::SizeType::Filled(25);
 
-  VectorType displacement1;
-  displacement1.Fill(0.1);
+  auto displacement1 = itk::MakeFilled<VectorType>(0.1);
 
-  TimeVaryingVelocityFieldControlPointLatticeType::Pointer timeVaryingVelocityFieldControlPointLattice =
+  const TimeVaryingVelocityFieldControlPointLatticeType::Pointer timeVaryingVelocityFieldControlPointLattice =
     TimeVaryingVelocityFieldControlPointLatticeType::New();
 
   timeVaryingVelocityFieldControlPointLattice->SetOrigin(origin);
@@ -60,16 +56,14 @@ itkTimeVaryingBSplineVelocityFieldTransformTest(int, char *[])
   integrator->SetUpperTimeBound(0.75);
   integrator->Update();
 
-  DisplacementFieldType::IndexType index;
-  index.Fill(0);
-  VectorType displacementPixel;
+  constexpr DisplacementFieldType::IndexType index{};
 
   // This integration should result in a constant image of value
   // 0.75 * 0.1 - 0.3 * 0.1 = 0.045 with ~epsilon deviation
   // due to numerical computations
   const DisplacementFieldType * displacementField = integrator->GetOutput();
 
-  displacementPixel = displacementField->GetPixel(index);
+  VectorType displacementPixel = displacementField->GetPixel(index);
 
   std::cout << "Estimated forward displacement vector: " << displacementPixel << std::endl;
   if (itk::Math::abs(displacementPixel[0] - 0.045) > 0.01)
@@ -106,7 +100,7 @@ itkTimeVaryingBSplineVelocityFieldTransformTest(int, char *[])
   timeVaryingVelocityFieldSpacing.Fill(1.0);
   for (unsigned int d = 0; d < 4; ++d)
   {
-    float physicalDimensions = (size[d] - splineOrder) * spacing[d];
+    const float physicalDimensions = (size[d] - splineOrder) * spacing[d];
     timeVaryingVelocityFieldSize[d] =
       static_cast<unsigned int>(physicalDimensions / timeVaryingVelocityFieldSpacing[d] + 1);
     timeVaryingVelocityFieldSpacing[d] = physicalDimensions / (timeVaryingVelocityFieldSize[d] - 1);
@@ -146,16 +140,14 @@ itkTimeVaryingBSplineVelocityFieldTransformTest(int, char *[])
 
   transform->IntegrateVelocityField();
 
-  TransformType::InputPointType point;
-  point.Fill(1.3);
+  auto point = itk::MakeFilled<TransformType::InputPointType>(1.3);
 
   using OutputPointType = TransformType::OutputPointType;
   OutputPointType transformedPoint = transform->TransformPoint(point);
 
   std::cout << point << ", " << transformedPoint << transform->TransformPoint(point) << std::endl;
 
-  VectorType displacement;
-  displacement.Fill(0.1);
+  auto displacement = itk::MakeFilled<VectorType>(0.1);
 
   point += displacement;
   if (point.EuclideanDistanceTo(transformedPoint) > 0.1)
@@ -169,7 +161,7 @@ itkTimeVaryingBSplineVelocityFieldTransformTest(int, char *[])
   point2.CastFrom(transformedPoint);
 
   using InverseTransformBasePointer = TransformType::InverseTransformBasePointer;
-  InverseTransformBasePointer inverseTransform = transform->GetInverseTransform();
+  const InverseTransformBasePointer inverseTransform = transform->GetInverseTransform();
 
   transformedPoint = inverseTransform->TransformPoint(point2);
 

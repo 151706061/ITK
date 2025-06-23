@@ -61,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PlatformMultiThreader);
 
 #if !defined(ITK_LEGACY_REMOVE)
@@ -70,6 +70,7 @@ public:
    * are already statically allocated using the ITK_MAX_THREADS number.
    * Therefore the caller of this method should check that the requested number
    * of threads was accepted. Legacy: use MultiThreaderBase to invoke these. */
+  /** @ITKStartGrouping */
   itkLegacyMacro(static void SetGlobalMaximumNumberOfThreads(ThreadIdType val))
   {
     itkGenericOutputMacro("Warning: SetGlobalMaximumNumberOfThreads should now be called on itk::MultiThreaderBase. It "
@@ -82,11 +83,13 @@ public:
                           "can affect all MultiThreaderBase's derived classes in ITK");
     return Superclass::GetGlobalMaximumNumberOfThreads();
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the value which is used to initialize the NumberOfThreads in the
    * constructor.  It will be clamped to the range [1, m_GlobalMaximumNumberOfThreads ].
    * Therefore the caller of this method should check that the requested number
    * of threads was accepted. Legacy: use MultiThreaderBase to invoke these. */
+  /** @ITKStartGrouping */
   itkLegacyMacro(static void SetGlobalDefaultNumberOfThreads(ThreadIdType val))
   {
     itkGenericOutputMacro("Warning: SetGlobalDefaultNumberOfThreads should now be called on itk::MultiThreaderBase. It "
@@ -99,6 +102,7 @@ public:
                           "can affect all MultiThreaderBase's derived classes in ITK");
     return Superclass::GetGlobalDefaultNumberOfThreads();
   }
+  /** @ITKEndGrouping */
 #endif
 
   /** Execute the SingleMethod (as define by SetSingleMethod) using
@@ -112,7 +116,7 @@ public:
    * each of the required m_NumberOfWorkUnits methods) using m_NumberOfWorkUnits
    * threads. As a side effect the m_NumberOfWorkUnits will be checked against the
    * current m_GlobalMaximumNumberOfThreads and clamped if necessary. */
-  itkLegacyMacro(void MultipleMethodExecute());
+  itkLegacyMacro(void MultipleMethodExecute();)
 
   /** Set the SingleMethod to f() and the UserData field of the
    * WorkUnitInfo that is passed to it will be data.
@@ -124,17 +128,17 @@ public:
 
   /** Set the MultipleMethod at the given index to f() and the UserData
    * field of the WorkUnitInfo that is passed to it will be data. */
-  itkLegacyMacro(void SetMultipleMethod(ThreadIdType index, ThreadFunctionType, void * data));
+  itkLegacyMacro(void SetMultipleMethod(ThreadIdType index, ThreadFunctionType, void * data);)
 
   /** Create a new thread for the given function. Return a thread id
    * which is a number between 0 and ITK_MAX_THREADS - 1. This
    * id should be used to kill the thread at a later time.
    * Deprecated. Use C++11 thread support instead. */
-  itkLegacyMacro(ThreadIdType SpawnThread(ThreadFunctionType, void * data));
+  itkLegacyMacro(ThreadIdType SpawnThread(ThreadFunctionType, void * data);)
 
   /** Terminate the thread that was created with a SpawnThreadExecute()
    * Deprecated. Use C++11 thread support instead. */
-  itkLegacyMacro(void TerminateThread(ThreadIdType thread_id));
+  itkLegacyMacro(void TerminateThread(ThreadIdType thread_id);)
 
   void
   SetMaximumNumberOfThreads(ThreadIdType numberOfThreads) override;
@@ -177,6 +181,7 @@ private:
   /** spawn a new thread for the SingleMethod */
   ThreadProcessIdType
   SpawnDispatchSingleMethodThread(WorkUnitInfo *);
+
   /** wait for a thread in the threadpool to finish work */
   void SpawnWaitForSingleMethodThread(ThreadProcessIdType);
 

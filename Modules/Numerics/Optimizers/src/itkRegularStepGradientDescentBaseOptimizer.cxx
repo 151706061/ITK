@@ -24,21 +24,18 @@ namespace itk
  * Constructor
  */
 RegularStepGradientDescentBaseOptimizer::RegularStepGradientDescentBaseOptimizer()
+  : m_GradientMagnitudeTolerance(1e-4)
+  , m_MaximumStepLength(1.0)
+  , m_MinimumStepLength(1e-3)
+  , m_RelaxationFactor(0.5)
+  , m_StopCondition(StopConditionEnum::Unknown)
+  , m_NumberOfIterations(100)
+
 
 {
-  m_MaximumStepLength = 1.0;
-  m_MinimumStepLength = 1e-3;
-  m_GradientMagnitudeTolerance = 1e-4;
-  m_NumberOfIterations = 100;
-  m_CurrentIteration = 0;
-  m_Value = 0;
-  m_Maximize = false;
   m_CostFunction = nullptr;
-  m_CurrentStepLength = 0;
-  m_StopCondition = StopConditionEnum::Unknown;
   m_Gradient.Fill(0.0f);
   m_PreviousGradient.Fill(0.0f);
-  m_RelaxationFactor = 0.5;
   m_StopConditionDescription.str("");
 }
 
@@ -218,14 +215,10 @@ RegularStepGradientDescentBaseOptimizer::AdvanceOneStep()
     return;
   }
 
-  double direction;
+  double direction = -1.0;
   if (this->m_Maximize)
   {
     direction = 1.0;
-  }
-  else
-  {
-    direction = -1.0;
   }
 
   const double factor = direction * m_CurrentStepLength / gradientMagnitude;
@@ -237,7 +230,7 @@ RegularStepGradientDescentBaseOptimizer::AdvanceOneStep()
   this->InvokeEvent(IterationEvent());
 }
 
-const std::string
+std::string
 RegularStepGradientDescentBaseOptimizer::GetStopConditionDescription() const
 {
   return m_StopConditionDescription.str();
@@ -255,15 +248,6 @@ RegularStepGradientDescentBaseOptimizer::PrintSelf(std::ostream & os, Indent ind
   os << indent << "CurrentIteration: " << m_CurrentIteration << std::endl;
   os << indent << "Value: " << m_Value << std::endl;
   os << indent << "Maximize: " << m_Maximize << std::endl;
-  if (m_CostFunction)
-  {
-    os << indent << "CostFunction: " << &m_CostFunction << std::endl;
-  }
-  else
-  {
-    os << indent << "CostFunction: "
-       << "(None)" << std::endl;
-  }
   os << indent << "CurrentStepLength: " << m_CurrentStepLength << std::endl;
   os << indent << "StopCondition: " << m_StopCondition << std::endl;
   os << indent << "Gradient: " << m_Gradient << std::endl;

@@ -39,7 +39,8 @@
     {                                                                                                          \
       v->VisitFromCell(cellid, this);                                                                          \
     }                                                                                                          \
-  }
+  }                                                                                                            \
+  ITK_MACROEND_NOOP_STATEMENT
 
 // Define a macro for the common type alias required by the
 // classes deriving form CellInterface (included).
@@ -61,7 +62,7 @@
   using typename Superclass::CellRawPointer;                           \
   using typename Superclass::CellConstRawPointer;                      \
   using typename Superclass::CellTraits;                               \
-  using typename Superclass::CoordRepType;                             \
+  using typename Superclass::CoordinateType;                           \
   using typename Superclass::InterpolationWeightType;                  \
   using typename Superclass::PointIdentifier;                          \
   using typename Superclass::PointIdIterator;                          \
@@ -108,7 +109,11 @@ public:
   using CellTraits = TCellTraits;
 
   /** Save type information for this cell. */
-  using CoordRepType = typename CellTraits::CoordRepType;
+  using CoordinateType = typename CellTraits::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = typename CellTraits::InterpolationWeightType;
   using PointIdentifier = typename CellTraits::PointIdentifier;
   using PointIdIterator = typename CellTraits::PointIdIterator;
@@ -139,7 +144,7 @@ public:
   using CellFeatureCount = CellFeatureIdentifier;
 
   /** Types needed to contour the cells */
-  using ParametricCoordArrayType = Array<CoordRepType>;
+  using ParametricCoordArrayType = Array<CoordinateType>;
   using ShapeFunctionsArrayType = Array<InterpolationWeightType>;
 
   //  static int GetNextUserCellId(); // never return > MAX_INTERFACE
@@ -202,7 +207,7 @@ public:
     void
     AddVisitor(VisitorType * v)
     {
-      CellGeometryEnum id = v->GetCellTopologyId();
+      const CellGeometryEnum id = v->GetCellTopologyId();
 
       if (id < CellGeometryEnum::LAST_ITK_CELL)
       {
@@ -230,7 +235,7 @@ public:
 
   /**  Return the type of the cell (one of the CellGeometryEnum enums
    *   listed above). */
-  virtual itk::CommonEnums::CellGeometry
+  [[nodiscard]] virtual itk::CommonEnums::CellGeometry
   GetType() const = 0;
 
   /** Create a new copy of this cell.  This is provided so that a copy can
@@ -239,19 +244,19 @@ public:
   MakeCopy(CellAutoPointer &) const = 0;
 
   /** Get the topological dimension of this cell. */
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetDimension() const = 0;
 
   /** Get the interpolation order of the cell.  Usually linear. */
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetInterpolationOrder() const;
 
   /** Get the number of points required to define the cell. */
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetNumberOfPoints() const = 0;
 
   /** Get the number of boundary features of a given dimension on this cell. */
-  virtual CellFeatureCount
+  [[nodiscard]] virtual CellFeatureCount
   GetNumberOfBoundaryFeatures(int dimension) const = 0;
 
   /** Get the boundary feature corresponding to the given dimension and Id. */
@@ -261,7 +266,7 @@ public:
   /** Get the point id list used by the cell in a form suitable to pass to
    * SetPointIds(first) on another cell.  This is equivalent to
    * PointIdsBegin() const. */
-  virtual PointIdConstIterator
+  [[nodiscard]] virtual PointIdConstIterator
   GetPointIds() const;
 
   /** Set the point id list used by the cell.  It is assumed that the given
@@ -288,7 +293,7 @@ public:
 
   /** Get a const begin iterator to the list of point identifiers used
    * by the cell. */
-  virtual PointIdConstIterator
+  [[nodiscard]] virtual PointIdConstIterator
   PointIdsBegin() const = 0;
 
   /** Get an end iterator to the list of point identifiers used by the cell. */
@@ -297,22 +302,23 @@ public:
 
   /** Get a const end iterator to the list of point identifiers used
    * by the cell. */
-  virtual PointIdConstIterator
+  [[nodiscard]] virtual PointIdConstIterator
   PointIdsEnd() const = 0;
 
   /** Get/Set the point id list used by the cell */
+  /** @ITKStartGrouping */
   using PointIdentifierContainerType = itk::Array<PointIdentifier>;
-  PointIdentifierContainerType
+  [[nodiscard]] PointIdentifierContainerType
   GetPointIdsContainer() const;
   void
   SetPointIdsContainer(const PointIdentifierContainerType &);
-
+  /** @ITKEndGrouping */
   /** Given the parametric coordinates of a point in the cell
    * (pCoords[CellDimension]), get the closest cell boundary feature of
    * topological dimension CellDimension-1.  If the "inside" pointer is not
    * nullptr, the flag is set to indicate whether the point is inside the cell. */
   virtual bool
-  GetClosestBoundary(CoordRepType[], bool *, CellAutoPointer &)
+  GetClosestBoundary(CoordinateType[], bool *, CellAutoPointer &)
   {
     return false;
   }
@@ -334,10 +340,10 @@ public:
    *  - Get the interpolation weights for the cell
    *     (Returns through pointer to array: weights[NumberOfPoints]). */
   virtual bool
-  EvaluatePosition(CoordRepType *,
+  EvaluatePosition(CoordinateType *,
                    PointsContainer *,
-                   CoordRepType *,
-                   CoordRepType[],
+                   CoordinateType *,
+                   CoordinateType[],
                    double *,
                    InterpolationWeightType *)
   {
@@ -367,12 +373,12 @@ public:
    *
    * Returns whether an intersection exists within the given tolerance. */
   virtual bool
-  IntersectWithLine(CoordRepType[PointDimension],
-                    CoordRepType[PointDimension],
-                    CoordRepType,
-                    CoordRepType[PointDimension],
-                    CoordRepType *,
-                    CoordRepType[])
+  IntersectWithLine(CoordinateType[PointDimension],
+                    CoordinateType[PointDimension],
+                    CoordinateType,
+                    CoordinateType[PointDimension],
+                    CoordinateType *,
+                    CoordinateType[])
   {
     return bool();
   }
@@ -381,13 +387,17 @@ public:
    * Array is ordered (xmin, xmax,  ymin, ymax, ....).  A pointer to the
    * array is returned for convenience.  This allows code like:
    * "CoordRep* bounds = cell->GetBoundingBox(new CoordRep[6]);". */
-  CoordRepType * GetBoundingBox(CoordRepType[PointDimension * 2]) { return nullptr; }
+  CoordinateType *
+  GetBoundingBox(CoordinateType[PointDimension * 2])
+  {
+    return nullptr;
+  }
 
   /** Compute the square of the diagonal length of the bounding box. */
-  CoordRepType
+  CoordinateType
   GetBoundingBoxDiagonalLength2()
   {
-    return CoordRepType{};
+    return CoordinateType{};
   }
 
   /** Intersect the given bounding box (bounds[PointDimension*2]) with a line
@@ -402,11 +412,12 @@ public:
    *     (returned through "t" pointer).
    *
    * Returns whether an intersection exists. */
-  virtual bool IntersectBoundingBoxWithLine(CoordRepType[PointDimension * 2],
-                                            CoordRepType[PointDimension],
-                                            CoordRepType[PointDimension],
-                                            CoordRepType[PointDimension],
-                                            CoordRepType *)
+  virtual bool
+  IntersectBoundingBoxWithLine(CoordinateType[PointDimension * 2],
+                               CoordinateType[PointDimension],
+                               CoordinateType[PointDimension],
+                               CoordinateType[PointDimension],
+                               CoordinateType *)
   {
     return bool();
   }
@@ -461,7 +472,7 @@ public:
 
 #endif
 
-  /** Standard part of every itk Object. */
+  /** \see LightObject::GetNameOfClass() */
   itkVirtualGetNameOfClassMacro(CellInterface);
 
 public:
@@ -512,7 +523,7 @@ protected:
  * \ingroup ITKCommon
  */
 template <int VPointDimension,
-          typename TCoordRep,
+          typename TCoordinate,
           typename TInterpolationWeight,
           typename TPointIdentifier,
           typename TCellIdentifier,
@@ -524,7 +535,11 @@ class ITK_TEMPLATE_EXPORT CellTraitsInfo
 {
 public:
   static constexpr unsigned int PointDimension = VPointDimension;
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = TInterpolationWeight;
   using PointIdentifier = TPointIdentifier;
   using CellIdentifier = TCellIdentifier;
@@ -539,7 +554,7 @@ public:
 
 #define itkMakeCellTraitsMacro            \
   CellTraitsInfo<Self::PointDimension,    \
-                 CoordRepType,            \
+                 CoordinateType,          \
                  InterpolationWeightType, \
                  PointIdentifier,         \
                  CellIdentifier,          \

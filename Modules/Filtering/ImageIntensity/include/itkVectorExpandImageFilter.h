@@ -90,7 +90,7 @@ public:
   using OutputImagePointer = typename TOutputImage::Pointer;
   using OutputImageRegionType = typename TOutputImage::RegionType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorExpandImageFilter);
 
   /** ImageDimension enumeration */
@@ -117,22 +117,28 @@ public:
   using ExpandFactorsArrayType = FixedArray<ExpandFactorsType, ImageDimension>;
 
   /** Typedef support for the interpolation function */
-  using CoordRepType = double;
-  using InterpolatorType = VectorInterpolateImageFunction<InputImageType, CoordRepType>;
+  using CoordinateType = double;
+#  ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#  endif
+  using InterpolatorType = VectorInterpolateImageFunction<InputImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
-  using DefaultInterpolatorType = VectorLinearInterpolateImageFunction<InputImageType, CoordRepType>;
+  using DefaultInterpolatorType = VectorLinearInterpolateImageFunction<InputImageType, CoordinateType>;
 
   /** Get/Set the interpolator function. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Interpolator, InterpolatorType);
   itkGetModifiableObjectMacro(Interpolator, InterpolatorType);
-
+  /** @ITKEndGrouping */
   /** Set the expand factors. Values are clamped to
    * a minimum value of 1. Default is 1 for all dimensions. */
+  /** @ITKStartGrouping */
   itkSetMacro(ExpandFactors, ExpandFactorsArrayType);
   virtual void
   SetExpandFactors(const float factor);
   itkSetVectorMacro(ExpandFactors, const unsigned int, ImageDimension);
-
+  /** @ITKEndGrouping */
   /** Get the expand factors. */
   itkGetConstReferenceMacro(ExpandFactors, ExpandFactorsArrayType);
 
@@ -153,12 +159,8 @@ public:
   void
   GenerateInputRequestedRegion() override;
 
-#  ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputValueType>));
-  // End concept checking
-#  endif
 
 protected:
   VectorExpandImageFilter();

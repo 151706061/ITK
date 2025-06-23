@@ -47,7 +47,7 @@ public:
   itkNewMacro(Self);
 
   // Pure virtual functions that all Metrics must provide
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfParameters() const override
   {
     return 5;
@@ -66,7 +66,7 @@ public:
     derivative.Fill(0.0);
   }
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfLocalParameters() const override
   {
     return 0;
@@ -124,12 +124,11 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
   using MovingImageType = itk::Image<PixelType, ImageDimension>;
   using VirtualImageType = itk::Image<PixelType, ImageDimension>;
 
-  auto                      fixedImage = FixedImageType::New();
-  auto                      movingImage = MovingImageType::New();
-  VirtualImageType::Pointer virtualImage = fixedImage;
+  auto                            fixedImage = FixedImageType::New();
+  auto                            movingImage = MovingImageType::New();
+  const VirtualImageType::Pointer virtualImage = fixedImage;
 
-  MovingImageType::SizeType size;
-  size.Fill(100);
+  auto size = MovingImageType::SizeType::Filled(100);
 
   movingImage->SetRegions(size);
   fixedImage->SetRegions(size);
@@ -159,7 +158,7 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
   //
   using RegistrationParameterScalesFromPhysicalShiftType =
     itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromPhysicalShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromPhysicalShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromPhysicalShiftType::New();
 
   shiftScaleEstimator->SetMetric(metric);
@@ -228,9 +227,9 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
   //
   MovingTransformType::ParametersType movingStep(movingTransform->GetNumberOfParameters());
   movingStep = movingTransform->GetParameters(); // the step is an identity transform
-  FloatType stepScale = shiftScaleEstimator->EstimateStepScale(movingStep);
+  const FloatType stepScale = shiftScaleEstimator->EstimateStepScale(movingStep);
   std::cout << "The step scale of shift for the affine transform = " << stepScale << std::endl;
-  FloatType learningRate = 1.0 / stepScale;
+  const FloatType learningRate = 1.0 / stepScale;
   std::cout << "The learning rate of shift for the affine transform = " << learningRate << std::endl;
 
   // compute truth
@@ -308,8 +307,7 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
   using FieldType = DisplacementTransformType::DisplacementFieldType;
   using VectorType = itk::Vector<double, ImageDimension>;
 
-  VectorType zero;
-  zero.Fill(0.0);
+  constexpr VectorType zero{};
 
   auto field = FieldType::New();
   field->SetRegions(virtualImage->GetLargestPossibleRegion());
@@ -356,13 +354,13 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
   //
   DisplacementTransformType::ParametersType displacementStep(displacementTransform->GetNumberOfParameters());
   displacementStep.Fill(1.0);
-  FloatType localStepScale = shiftScaleEstimator->EstimateStepScale(displacementStep);
+  const FloatType localStepScale = shiftScaleEstimator->EstimateStepScale(displacementStep);
   std::cout << "The step scale of shift for the displacement field transform = " << localStepScale << std::endl;
-  FloatType localLearningRate = 1.0 / localStepScale;
+  const FloatType localLearningRate = 1.0 / localStepScale;
   std::cout << "The learning rate of shift for the displacement field transform = " << localLearningRate << std::endl;
 
-  bool      localStepScalePass = false;
-  FloatType theoreticalLocalStepScale = std::sqrt(2.0);
+  bool            localStepScalePass = false;
+  const FloatType theoreticalLocalStepScale = std::sqrt(2.0);
   if (itk::Math::abs((localStepScale - theoreticalLocalStepScale) / theoreticalLocalStepScale) < 0.01)
   {
     localStepScalePass = true;
@@ -386,9 +384,7 @@ itkRegistrationParameterScalesFromPhysicalShiftTest(int, char *[])
     std::cout << "Test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed" << std::endl;
+  return EXIT_FAILURE;
 }

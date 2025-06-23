@@ -23,9 +23,7 @@
 #include "itkMeasurementVectorTraits.h"
 #include <vector> // for the size_type declaration
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class Sample
@@ -70,7 +68,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Sample);
 
   /** MeasurementVector type alias support */
@@ -125,25 +123,23 @@ public:
       {
         return;
       }
+
+      // If the new size is different from the current size, then
+      // only change the measurement vector size if the container is empty.
+      if (this->Size())
+      {
+        itkExceptionMacro("Attempting to change the measurement vector size of a non-empty Sample");
+      }
       else
       {
-        // If the new size is different from the current size, then
-        // only change the measurement vector size if the container is empty.
-        if (this->Size())
-        {
-          itkExceptionMacro("Attempting to change the measurement vector size of a non-empty Sample");
-        }
-        else
-        {
-          this->m_MeasurementVectorSize = s;
-          this->Modified();
-        }
+        this->m_MeasurementVectorSize = s;
+        this->Modified();
       }
     }
     else
     {
       // If this is a non-resizable vector type
-      MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
+      const MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
       // and the new length is different from the default one, then throw an
       // exception
       if (defaultLength != s)
@@ -170,7 +166,9 @@ public:
   }
 
 protected:
-  Sample() { m_MeasurementVectorSize = NumericTraits<MeasurementVectorType>::GetLength(MeasurementVectorType()); }
+  Sample()
+    : m_MeasurementVectorSize(NumericTraits<MeasurementVectorType>::GetLength(MeasurementVectorType()))
+  {}
 
   ~Sample() override = default;
 
@@ -184,7 +182,6 @@ protected:
 private:
   MeasurementVectorSizeType m_MeasurementVectorSize{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

@@ -28,12 +28,12 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
   : m_TimeStep(NumericTraits<LevelSetOutputType>::OneValue())
   , m_RMSChangeAccumulator(LevelSetOutputType{})
   , m_CurrentLevelSetId(IdentifierType{})
+  , m_OutputLevelSet(LevelSetType::New())
+  , m_TempLevelSet(LevelSetType::New())
   , m_MinStatus(LevelSetType::MinusThreeLayer())
   , m_MaxStatus(LevelSetType::PlusThreeLayer())
 {
   this->m_Offset.Fill(0);
-  this->m_TempLevelSet = LevelSetType::New();
-  this->m_OutputLevelSet = LevelSetType::New();
 }
 
 template <unsigned int VDimension, typename TLevelSetValueType, typename TEquationContainer>
@@ -104,8 +104,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
   /** todo: put neighborhood creation in protected method */
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
@@ -138,7 +137,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
   it = layerPlus2.begin();
   while (it != layerPlus2.end())
   {
-    LevelSetInputType currentIndex = it->first;
+    const LevelSetInputType currentIndex = it->first;
     this->m_TempPhi[currentIndex] = LevelSetType::PlusTwoLayer();
     neighIt.SetLocation(currentIndex);
 
@@ -146,7 +145,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
     {
       if (nIt.Get() == LevelSetType::PlusThreeLayer())
       {
-        LevelSetInputType neighborIndex = neighIt.GetIndex(nIt.GetNeighborhoodOffset());
+        const LevelSetInputType neighborIndex = neighIt.GetIndex(nIt.GetNeighborhoodOffset());
         this->m_TempPhi[neighborIndex] = LevelSetType::PlusThreeLayer();
       }
     }
@@ -179,7 +178,7 @@ template <unsigned int VDimension, typename TLevelSetValueType, typename TEquati
 void
 UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>::UpdateLayerZero()
 {
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & outputLayer0 = this->m_OutputLevelSet->GetLayer(LevelSetType::ZeroLayer());
 
@@ -195,8 +194,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
@@ -208,11 +206,11 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
   {
     itkAssertInDebugAndIgnoreInReleaseMacro(nodeIt->first == upIt->first);
 
-    LevelSetInputType currentIndex = nodeIt->first;
+    const LevelSetInputType currentIndex = nodeIt->first;
     inputIndex = currentIndex + this->m_Offset;
 
-    LevelSetOutputType currentValue = nodeIt->second;
-    LevelSetOutputType tempUpdate = this->m_TimeStep * static_cast<LevelSetOutputType>(upIt->second);
+    const LevelSetOutputType currentValue = nodeIt->second;
+    LevelSetOutputType       tempUpdate = this->m_TimeStep * static_cast<LevelSetOutputType>(upIt->second);
 
     if (tempUpdate > 0.5)
     {
@@ -225,7 +223,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
       tempUpdate = -0.499;
     }
 
-    LevelSetOutputType tempValue = currentValue + tempUpdate;
+    const LevelSetOutputType tempValue = currentValue + tempUpdate;
     this->m_RMSChangeAccumulator += tempUpdate * tempUpdate;
 
     if (tempValue > 0.5)
@@ -239,7 +237,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
       {
         if (it.Get() == LevelSetType::ZeroLayer())
         {
-          LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
+          const LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
           auto tit = this->m_TempPhi.find(tempIndex);
 
@@ -293,7 +291,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
       {
         if (it.Get() == LevelSetType::ZeroLayer())
         {
-          LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
+          const LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
           auto tit = this->m_TempPhi.find(tempIndex);
           if (tit != this->m_TempPhi.end())
@@ -353,12 +351,11 @@ template <unsigned int VDimension, typename TLevelSetValueType, typename TEquati
 void
 UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>::UpdateLayerMinus1()
 {
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
@@ -377,7 +374,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
   while (nodeIt != nodeEnd)
   {
-    LevelSetInputType currentIndex = nodeIt->first;
+    const LevelSetInputType currentIndex = nodeIt->first;
     inputIndex = currentIndex + this->m_Offset;
 
     neighIt.SetLocation(currentIndex);
@@ -389,9 +386,9 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
     // compute M and check if point with label 0 exists in the neighborhood
     for (typename NeighborhoodIteratorType::Iterator it = neighIt.Begin(); !it.IsAtEnd(); ++it)
     {
-      LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
+      const LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
-      LevelSetLayerIdType label = it.Get();
+      const LevelSetLayerIdType label = it.Get();
 
       if (label >= LevelSetType::ZeroLayer())
       {
@@ -447,8 +444,8 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
     }
     else // !thereIsAPointWithLabelEqualTo0
     {    // change layers only
-      auto               tempIt = nodeIt;
-      LevelSetOutputType t = tempIt->second;
+      auto                     tempIt = nodeIt;
+      const LevelSetOutputType t = tempIt->second;
       ++nodeIt;
       outputlayerMinus1.erase(tempIt);
 
@@ -463,15 +460,14 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 {
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
   neighIt.OverrideBoundaryCondition(&spNBC);
   neighIt.ActivateOffsets(GenerateConnectedImageNeighborhoodShapeOffsets<ImageDimension, 1, false>());
 
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & layerPlus2 = this->m_TempLevelSet->GetLayer(LevelSetType::PlusTwoLayer());
   LevelSetLayerType & layerZero = this->m_TempLevelSet->GetLayer(LevelSetType::ZeroLayer());
@@ -494,7 +490,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
     for (typename NeighborhoodIteratorType::Iterator it = neighIt.Begin(); !it.IsAtEnd(); ++it)
     {
-      LevelSetLayerIdType label = it.Get();
+      const LevelSetLayerIdType label = it.Get();
 
       if (label <= LevelSetType::ZeroLayer())
       {
@@ -554,8 +550,8 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
     }
     else
     { // change layers only
-      auto               tempIt = nodeIt;
-      LevelSetOutputType t = tempIt->second;
+      auto                     tempIt = nodeIt;
+      const LevelSetOutputType t = tempIt->second;
       ++nodeIt;
       outputLayerPlus1.erase(tempIt);
       layerPlus2.insert(NodePairType(currentIndex, t));
@@ -569,21 +565,20 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 {
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
   neighIt.OverrideBoundaryCondition(&spNBC);
   neighIt.ActivateOffsets(GenerateConnectedImageNeighborhoodShapeOffsets<ImageDimension, 1, false>());
 
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & outputLayerMinus2 = this->m_OutputLevelSet->GetLayer(LevelSetType::MinusTwoLayer());
   LevelSetLayerType & layerMinus1 = this->m_TempLevelSet->GetLayer(LevelSetType::MinusOneLayer());
 
-  auto                        nodeIt = outputLayerMinus2.begin();
-  const LevelSetLayerIterator nodeEnd = outputLayerMinus2.end();
+  auto       nodeIt = outputLayerMinus2.begin();
+  const auto nodeEnd = outputLayerMinus2.end();
 
   while (nodeIt != nodeEnd)
   {
@@ -608,7 +603,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
         }
         const LevelSetInputType neighborIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
-        const LevelSetLayerIterator phiIt = this->m_TempPhi.find(neighborIndex);
+        const auto phiIt = this->m_TempPhi.find(neighborIndex);
         itkAssertInDebugAndIgnoreInReleaseMacro(phiIt != this->m_TempPhi.end());
 
         max = std::max(max, phiIt->second);
@@ -617,7 +612,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
     if (thereIsAPointWithLabelEqualToMinus1)
     {
-      const LevelSetLayerIterator phiIt = this->m_TempPhi.find(currentIndex);
+      const auto phiIt = this->m_TempPhi.find(currentIndex);
 
       max = max - 1.;
 
@@ -674,21 +669,20 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 {
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
   neighIt.OverrideBoundaryCondition(&spNBC);
   neighIt.ActivateOffsets(GenerateConnectedImageNeighborhoodShapeOffsets<ImageDimension, 1, false>());
 
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & outputLayerPlus2 = this->m_OutputLevelSet->GetLayer(LevelSetType::PlusTwoLayer());
   LevelSetLayerType & layerPlusOne = this->m_TempLevelSet->GetLayer(LevelSetType::PlusOneLayer());
 
-  auto                        nodeIt = outputLayerPlus2.begin();
-  const LevelSetLayerIterator nodeEnd = outputLayerPlus2.end();
+  auto       nodeIt = outputLayerPlus2.begin();
+  const auto nodeEnd = outputLayerPlus2.end();
 
   while (nodeIt != nodeEnd)
   {
@@ -702,7 +696,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
     for (typename NeighborhoodIteratorType::Iterator it = neighIt.Begin(); !it.IsAtEnd(); ++it)
     {
-      LevelSetLayerIdType label = it.Get();
+      const LevelSetLayerIdType label = it.Get();
       if (label <= LevelSetType::PlusOneLayer())
       {
         if (label == LevelSetType::PlusOneLayer())
@@ -802,15 +796,14 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 {
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
   neighIt.OverrideBoundaryCondition(&spNBC);
   neighIt.ActivateOffsets(GenerateConnectedImageNeighborhoodShapeOffsets<ImageDimension, 1, false>());
 
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & layerMinus1 = this->m_TempLevelSet->GetLayer(LevelSetType::MinusOneLayer());
   LevelSetLayerType & layerMinus2 = this->m_TempLevelSet->GetLayer(LevelSetType::MinusTwoLayer());
@@ -822,8 +815,8 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
   while (nodeIt != nodeEnd)
   {
-    LevelSetInputType  currentIndex = nodeIt->first;
-    LevelSetOutputType currentValue = nodeIt->second;
+    const LevelSetInputType  currentIndex = nodeIt->first;
+    const LevelSetOutputType currentValue = nodeIt->second;
 
     outputlayerMinus1.insert(NodePairType(currentIndex, currentValue));
 
@@ -837,7 +830,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
     for (typename NeighborhoodIteratorType::Iterator it = neighIt.Begin(); !it.IsAtEnd(); ++it)
     {
-      LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
+      const LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
       auto phiIt = this->m_TempPhi.find(tempIndex);
       if (phiIt != this->m_TempPhi.end())
@@ -860,15 +853,14 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 {
   ZeroFluxNeumannBoundaryCondition<LabelImageType> spNBC;
 
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
 
   NeighborhoodIteratorType neighIt(radius, this->m_InternalImage, this->m_InternalImage->GetLargestPossibleRegion());
 
   neighIt.OverrideBoundaryCondition(&spNBC);
   neighIt.ActivateOffsets(GenerateConnectedImageNeighborhoodShapeOffsets<ImageDimension, 1, false>());
 
-  TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
+  const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(this->m_CurrentLevelSetId);
 
   LevelSetLayerType & layerPlus1 = this->m_TempLevelSet->GetLayer(LevelSetType::PlusOneLayer());
   LevelSetLayerType & layerPlus2 = this->m_TempLevelSet->GetLayer(LevelSetType::PlusTwoLayer());
@@ -880,8 +872,8 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
   while (nodeIt != nodeEnd)
   {
-    LevelSetInputType  currentIndex = nodeIt->first;
-    LevelSetOutputType currentValue = nodeIt->second;
+    const LevelSetInputType  currentIndex = nodeIt->first;
+    const LevelSetOutputType currentValue = nodeIt->second;
 
     outputLayerPlus1.insert(NodePairType(currentIndex, currentValue));
     this->m_InternalImage->SetPixel(currentIndex, LevelSetType::PlusOneLayer());
@@ -894,7 +886,7 @@ UpdateWhitakerSparseLevelSet<VDimension, TLevelSetValueType, TEquationContainer>
 
     for (typename NeighborhoodIteratorType::Iterator it = neighIt.Begin(); !it.IsAtEnd(); ++it)
     {
-      LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
+      const LevelSetInputType tempIndex = neighIt.GetIndex(it.GetNeighborhoodOffset());
 
       auto phiIt = this->m_TempPhi.find(tempIndex);
       if (phiIt != this->m_TempPhi.end())

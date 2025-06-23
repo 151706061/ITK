@@ -28,11 +28,6 @@ namespace itk
 /** \class QuadraticEdgeCell
  *  \brief Represents a second order line segment for a Mesh.
  *
- * \tparam TPixelType The type associated with a point, cell, or boundary
- * for use in storing its data.
- *
- * \tparam TCellTraits Type information of mesh containing cell.
- *
  * \ingroup MeshObjects
  * \ingroup ITKCommon
  */
@@ -43,10 +38,11 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(QuadraticEdgeCell);
 
   /** Standard class type aliases. */
+  /** @ITKStartGrouping */
   itkCellCommonTypedefs(QuadraticEdgeCell);
   itkCellInheritedTypedefs(TCellInterface);
-
-  /** Standard part of every itk Object. */
+  /** @ITKEndGrouping */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(QuadraticEdgeCell);
 
   /** The type of boundary for this lines's vertices. */
@@ -59,18 +55,19 @@ public:
   static constexpr unsigned int CellDimension = 1;
 
   /** Implement the standard CellInterface. */
-  CellGeometryEnum
+  /** @ITKStartGrouping */
+  [[nodiscard]] CellGeometryEnum
   GetType() const override
   {
     return CellGeometryEnum::QUADRATIC_EDGE_CELL;
   }
   void
   MakeCopy(CellAutoPointer &) const override;
-
-  unsigned int
+  /** @ITKEndGrouping */
+  [[nodiscard]] unsigned int
   GetDimension() const override;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoints() const override;
 
   CellFeatureCount

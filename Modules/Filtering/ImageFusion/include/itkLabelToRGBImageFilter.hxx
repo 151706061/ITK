@@ -24,7 +24,7 @@
  * This code was contributed in the Insight Journal paper:
  * "The watershed transform in ITK - discussion and new developments"
  * by Beare R., Lehmann G.
- * https://www.insight-journal.org/browse/publication/92
+ * https://doi.org/10.54294/lf8u75
  *
  */
 
@@ -35,8 +35,8 @@ namespace itk
  */
 template <typename TLabelImage, typename TOutputImage>
 LabelToRGBImageFilter<TLabelImage, TOutputImage>::LabelToRGBImageFilter()
+  : m_BackgroundValue(LabelPixelType{})
 {
-  m_BackgroundValue = LabelPixelType{};
   NumericTraits<OutputPixelType>::SetLength(m_BackgroundColor, 3);
   m_BackgroundColor.Fill(OutputPixelValueType{});
 }

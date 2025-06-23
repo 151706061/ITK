@@ -40,9 +40,7 @@ namespace itk
  * image onto a single array.  More properties and visualizations can be
  * found in various places on the web.
  *
- * The implementation is based on
- * Chris Hamilton, "Compact Hilbert Indices", Technical Report CS-2006-07,
- * July 24, 2006.
+ * The implementation is based on \cite hamilton2006
  * and a direct porting of the Aldo Cortesi's python code found at
  * https://github.com/cortesi/scurve
  *
@@ -62,7 +60,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HilbertPath);
 
   /** New() method for dynamic construction */
@@ -147,8 +145,10 @@ public:
   /**
    * Set/get Hilbert order.  The multi-dimensional space is of size 2^(HilbertOrder).
    */
+  /** @ITKStartGrouping */
   itkSetClampMacro(HilbertOrder, HilbertOrderType, 1, NumericTraits<HilbertOrderType>::max());
   itkGetConstMacro(HilbertOrder, HilbertOrderType);
+  /** @ITKEndGrouping */
 
   /** Convert the path index to the multidimensional index location */
   IndexType

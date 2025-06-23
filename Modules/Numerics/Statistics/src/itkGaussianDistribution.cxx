@@ -19,9 +19,7 @@
 #include "vnl/vnl_erf.h"
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 GaussianDistribution::GaussianDistribution()
 {
@@ -159,7 +157,7 @@ GaussianDistribution::PDF(double x)
 double
 GaussianDistribution::PDF(double x, double mean, double variance)
 {
-  double xminusmean = x - mean;
+  const double xminusmean = x - mean;
 
   return (itk::Math::one_over_sqrt2pi / std::sqrt(variance)) * std::exp(-0.5 * xminusmean * xminusmean / variance);
 }
@@ -172,11 +170,9 @@ GaussianDistribution::PDF(double x, const ParametersType & p)
   {
     return PDF(x, p[0], p[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << p.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << p.size() << " parameters.");
 }
 
 double
@@ -189,7 +185,7 @@ double
 GaussianDistribution::CDF(double x, double mean, double variance)
 {
   // convert to zero mean unit variance
-  double u = (x - mean) / std::sqrt(variance);
+  const double u = (x - mean) / std::sqrt(variance);
 
   return 0.5 * (vnl_erf(itk::Math::sqrt1_2 * u) + 1.0);
 }
@@ -208,10 +204,7 @@ GaussianDistribution::CDF(double x, const ParametersType & p)
 double
 GaussianDistribution::InverseCDF(double p)
 {
-  double dp, dx, dt, ddq, dq;
-  int    newt;
-
-  dp = (p <= 0.5) ? (p) : (1.0 - p); /* make between 0 and 0.5 */
+  const double dp = (p <= 0.5) ? (p) : (1.0 - p); /* make between 0 and 0.5 */
 
   // if original value is invalid, return +infinity or -infinity
   // changed from original code to reflect the fact that the
@@ -225,23 +218,23 @@ GaussianDistribution::InverseCDF(double p)
   {
     return itk::NumericTraits<double>::NonpositiveMin();
   }
-  else if (p >= 1.0)
+  if (p >= 1.0)
   {
     return itk::NumericTraits<double>::max();
   }
 
   /**  Step 1:  use 26.2.23 from Abramowitz and Stegun */
 
-  dt = std::sqrt(-2.0 * std::log(dp));
-  dx = dt - ((.010328e+0 * dt + .802853e+0) * dt + 2.515517e+0) /
-              (((.001308e+0 * dt + .189269e+0) * dt + 1.432788e+0) * dt + 1.e+0);
+  const double dt = std::sqrt(-2.0 * std::log(dp));
+  double       dx = dt - ((.010328e+0 * dt + .802853e+0) * dt + 2.515517e+0) /
+                     (((.001308e+0 * dt + .189269e+0) * dt + 1.432788e+0) * dt + 1.e+0);
 
   /**  Step 2:  do 3 Newton steps to improve this */
 
-  for (newt = 0; newt < 3; ++newt)
+  for (int newt = 0; newt < 3; ++newt)
   {
-    dq = 0.5e+0 * vnl_erfc(dx * itk::Math::sqrt1_2) - dp;
-    ddq = std::exp(-0.5e+0 * dx * dx) / 2.506628274631000e+0;
+    const double dq = 0.5e+0 * vnl_erfc(dx * itk::Math::sqrt1_2) - dp;
+    const double ddq = std::exp(-0.5e+0 * dx * dx) / 2.506628274631000e+0;
     dx = dx + dq / ddq;
   }
 
@@ -265,7 +258,7 @@ GaussianDistribution::InverseCDF(double p, double mean, double variance)
   {
     return x;
   }
-  else if (Math::ExactlyEquals(x, itk::NumericTraits<double>::max()))
+  if (Math::ExactlyEquals(x, itk::NumericTraits<double>::max()))
   {
     return x;
   }
@@ -301,11 +294,9 @@ GaussianDistribution::EvaluatePDF(double x) const
 
     return GaussianDistribution::PDF(x, m_Parameters[0], m_Parameters[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << m_Parameters.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << m_Parameters.size() << " parameters.");
 }
 
 double
@@ -320,11 +311,9 @@ GaussianDistribution::EvaluatePDF(double x, const ParametersType & p) const
 
     return GaussianDistribution::PDF(x, p[0], p[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << p.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << p.size() << " parameters.");
 }
 
 double
@@ -350,11 +339,9 @@ GaussianDistribution::EvaluateCDF(double x) const
 
     return GaussianDistribution::CDF(x, m_Parameters[0], m_Parameters[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << m_Parameters.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << m_Parameters.size() << " parameters.");
 }
 
 double
@@ -369,11 +356,9 @@ GaussianDistribution::EvaluateCDF(double x, const ParametersType & p) const
 
     return GaussianDistribution::CDF(x, p[0], p[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << p.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << p.size() << " parameters.");
 }
 
 double
@@ -399,11 +384,9 @@ GaussianDistribution::EvaluateInverseCDF(double p) const
 
     return GaussianDistribution::InverseCDF(p, m_Parameters[0], m_Parameters[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << m_Parameters.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << m_Parameters.size() << " parameters.");
 }
 
 double
@@ -418,11 +401,9 @@ GaussianDistribution::EvaluateInverseCDF(double p, const ParametersType & params
 
     return GaussianDistribution::InverseCDF(p, params[0], params[1]);
   }
-  else
-  {
-    itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
-                             << params.size() << " parameters.");
-  }
+
+  itkGenericExceptionMacro("Invalid number of parameters to describe distribution. Expected 2 parameters, but got "
+                           << params.size() << " parameters.");
 }
 
 double
@@ -459,5 +440,4 @@ GaussianDistribution::PrintSelf(std::ostream & os, Indent indent) const
     os << indent << "Variance: (unknown)" << std::endl;
   }
 }
-} // end of namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics

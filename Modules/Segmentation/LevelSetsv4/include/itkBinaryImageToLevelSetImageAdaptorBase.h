@@ -39,7 +39,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = Object;
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryImageToLevelSetImageAdaptorBase);
 
   using InputImageType = TInputImage;
@@ -64,12 +64,15 @@ public:
   itkGetModifiableObjectMacro(LevelSet, LevelSetType);
 
   /** Set/Get the input image*/
+  /** @ITKStartGrouping */
   itkSetObjectMacro(InputImage, InputImageType);
   itkGetModifiableObjectMacro(InputImage, InputImageType);
-
+  /** @ITKEndGrouping */
 protected:
   /** Constructor */
-  BinaryImageToLevelSetImageAdaptorBase() { this->m_LevelSet = LevelSetType::New(); }
+  BinaryImageToLevelSetImageAdaptorBase()
+    : m_LevelSet(LevelSetType::New())
+  {}
 
   /** Destructor */
   ~BinaryImageToLevelSetImageAdaptorBase() override = default;

@@ -50,21 +50,19 @@ itkResampleImageTest6(int argc, char * argv[])
   using ImageRegionType = ImageType::RegionType;
   using ImageSizeType = ImageType::SizeType;
 
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
   using WriterType = itk::ImageFileWriter<ImageType>;
 
-  float scaling = std::stod(argv[1]);
+  const float scaling = std::stod(argv[1]);
 
   // Create and configure an image
-  ImagePointerType image = ImageType::New();
-  ImageIndexType   index = { { 0, 0 } };
-  ImageSizeType    size = { { 64, 64 } };
-  ImageRegionType  region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImagePointerType image = ImageType::New();
+  ImageIndexType         index = { { 0, 0 } };
+  ImageSizeType          size = { { 64, 64 } };
+  const ImageRegionType  region{ index, size };
   image->SetLargestPossibleRegion(region);
   image->SetBufferedRegion(region);
   image->SetVectorLength(3);
@@ -102,7 +100,7 @@ itkResampleImageTest6(int argc, char * argv[])
   interp->SetInputImage(image);
 
   // Create and configure a resampling filter
-  itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
+  const itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
     itk::ResampleImageFilter<ImageType, ImageType>::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(resample, ResampleImageFilter, ImageToImageFilter);
@@ -123,8 +121,7 @@ itkResampleImageTest6(int argc, char * argv[])
   resample->SetOutputStartIndex(index);
   ITK_TEST_SET_GET_VALUE(index, resample->GetOutputStartIndex());
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
+  constexpr ImageType::PointType origin{};
   resample->SetOutputOrigin(origin);
   ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
 

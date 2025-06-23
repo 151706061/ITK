@@ -27,7 +27,6 @@ namespace itk
 template <typename TInputImage, typename TOutputImage>
 HConvexImageFilter<TInputImage, TOutputImage>::HConvexImageFilter()
   : m_Height(2)
-
 {}
 
 template <typename TInputImage, typename TOutputImage>
@@ -38,7 +37,7 @@ HConvexImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -67,16 +66,14 @@ HConvexImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Delegate to a H-Maxima filter.
   //
   //
-  typename HMaximaImageFilter<TInputImage, TInputImage>::Pointer hmax =
-    HMaximaImageFilter<TInputImage, TInputImage>::New();
+  auto hmax = HMaximaImageFilter<TInputImage, TInputImage>::New();
 
   hmax->SetInput(this->GetInput());
   hmax->SetHeight(m_Height);
   hmax->SetFullyConnected(m_FullyConnected);
 
   // Need to subtract the H-Maxima image from the input
-  typename SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::Pointer subtract =
-    SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
+  auto subtract = SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
 
   subtract->SetInput1(this->GetInput());
   subtract->SetInput2(hmax->GetOutput());
@@ -106,7 +103,7 @@ HConvexImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inde
   os << indent << "Height of local maxima (contrast): "
      << static_cast<typename NumericTraits<InputImagePixelType>::PrintType>(m_Height) << std::endl;
   os << indent << "Number of iterations used to produce current output: " << m_NumberOfIterationsUsed << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

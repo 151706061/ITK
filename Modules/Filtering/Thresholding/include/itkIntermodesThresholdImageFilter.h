@@ -40,7 +40,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/811
+ * https://doi.org/10.54294/efycla
  *
  * \sa HistogramThresholdImageFilter
  *
@@ -64,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(IntermodesThresholdImageFilter);
 
   using InputImageType = TInputImage;
@@ -99,10 +99,11 @@ public:
 
   /** Select whether midpoint (intermode=true) or minimum between
      peaks is used. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseInterMode, bool);
   itkGetConstReferenceMacro(UseInterMode, bool);
   itkBooleanMacro(UseInterMode);
-
+  /** @ITKEndGrouping */
   /** Image related type alias. */
   static constexpr unsigned int InputImageDimension = InputImageType::ImageDimension;
   static constexpr unsigned int OutputImageDimension = OutputImageType::ImageDimension;
@@ -118,7 +119,7 @@ protected:
   ~IntermodesThresholdImageFilter() override = default;
 
   void
-  VerifyPreconditions() ITKv5_CONST override
+  VerifyPreconditions() const override
   {
     Superclass::VerifyPreconditions();
     if (dynamic_cast<const CalculatorType *>(Superclass::GetCalculator()) == nullptr)

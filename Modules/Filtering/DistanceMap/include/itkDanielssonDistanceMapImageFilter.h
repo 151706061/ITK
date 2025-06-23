@@ -47,10 +47,7 @@ namespace itk
  *
  * This filter is N-dimensional and known to be efficient
  * in computational time. The algorithm is the N-dimensional version
- * of the 4SED algorithm given for two dimensions in:
- *
- * Danielsson, Per-Erik.  Euclidean Distance Mapping.  Computer
- * Graphics and Image Processing 14, 227-248 (1980).
+ * of the 4SED algorithm given for two dimensions in \cite danielsson1980.
  *
  * \ingroup ImageFeatureExtraction
  * \ingroup ITKDistanceMap
@@ -72,7 +69,7 @@ public:
   /** Method for creation through the object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DanielssonDistanceMapImageFilter);
 
   /** Type for input image. */
@@ -127,24 +124,27 @@ public:
   using VectorImagePointer = typename VectorImageType::Pointer;
 
   /** Set/Get if the distance should be squared. */
+  /** @ITKStartGrouping */
   itkSetMacro(SquaredDistance, bool);
   itkGetConstReferenceMacro(SquaredDistance, bool);
   itkBooleanMacro(SquaredDistance);
-
+  /** @ITKEndGrouping */
   /** Set/Get if the input is binary. If this variable is set, each
    * nonzero pixel in the input image will be given a unique numeric
    * code to be used by the Voronoi partition.  If the image is binary
    * but you are not interested in the Voronoi regions of the
    * different nonzero pixels, then you need not set this.  */
+  /** @ITKStartGrouping */
   itkSetMacro(InputIsBinary, bool);
   itkGetConstReferenceMacro(InputIsBinary, bool);
   itkBooleanMacro(InputIsBinary);
-
+  /** @ITKEndGrouping */
   /** Set/Get if image spacing should be used in computing distances. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstReferenceMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
-
+  /** @ITKEndGrouping */
   /** Get Voronoi Map
    * This map shows for each pixel what object is closest to it.
    * Each object should be labeled by a number (larger than 0),
@@ -174,17 +174,13 @@ public:
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
   static constexpr unsigned int VoronoiImageDimension = TVoronoiImage::ImageDimension;
 
-  // Begin concept checking
   itkConceptMacro(InputOutputSameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
   itkConceptMacro(InputVoronoiSameDimensionCheck, (Concept::SameDimension<InputImageDimension, VoronoiImageDimension>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, OutputPixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputPixelType, OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   DanielssonDistanceMapImageFilter();
@@ -211,7 +207,7 @@ protected:
 private:
   bool m_SquaredDistance{};
   bool m_InputIsBinary{};
-  bool m_UseImageSpacing{};
+  bool m_UseImageSpacing{ true };
 
   SpacingType m_InputSpacingCache{};
 };

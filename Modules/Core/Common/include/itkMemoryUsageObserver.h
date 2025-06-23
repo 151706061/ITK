@@ -87,6 +87,7 @@ class ITKCommon_EXPORT LinuxMemoryUsageObserver : public MemoryUsageObserverBase
 public:
   /** destructor */
   ~LinuxMemoryUsageObserver() override;
+
   MemoryLoadType
   GetMemoryUsage() override;
 };
@@ -98,6 +99,7 @@ class ITKCommon_EXPORT MacOSXMemoryUsageObserver : public MemoryUsageObserverBas
 public:
   /** destructor */
   ~MacOSXMemoryUsageObserver() override;
+
   MemoryLoadType
   GetMemoryUsage() override;
 };
@@ -109,6 +111,7 @@ class ITKCommon_EXPORT SunSolarisMemoryUsageObserver : public MemoryUsageObserve
 public:
   /** destructor */
   virtual ~SunSolarisMemoryUsageObserver();
+
   virtual MemoryLoadType
   GetMemoryUsage();
 };
@@ -120,6 +123,7 @@ class ITKCommon_EXPORT SysResourceMemoryUsageObserver : public MemoryUsageObserv
 public:
   /** destructor */
   ~SysResourceMemoryUsageObserver() override;
+
   MemoryLoadType
   GetMemoryUsage() override;
 };
@@ -134,9 +138,11 @@ class ITKCommon_EXPORT MallinfoMemoryUsageObserver : public MemoryUsageObserverB
 public:
   /** destructor */
   ~MallinfoMemoryUsageObserver() override;
+
   MemoryLoadType
   GetMemoryUsage() override;
 };
+
 #  endif // Mallinfo
 #endif   // !defined(WIN32) && !defined(_WIN32)
 

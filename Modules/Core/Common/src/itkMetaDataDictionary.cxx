@@ -44,20 +44,22 @@ void
 MetaDataDictionary::Print(std::ostream & os) const
 {
   os << "Dictionary use_count: " << m_Dictionary.use_count() << std::endl;
-  for (MetaDataDictionaryMapType::const_iterator it = m_Dictionary->begin(); it != m_Dictionary->end(); ++it)
+  for (auto & it : *m_Dictionary)
   {
-    os << it->first << "  ";
-    it->second->Print(os);
+    os << it.first << "  ";
+    it.second->Print(os);
   }
 }
 
-MetaDataObjectBase::Pointer & MetaDataDictionary::operator[](const std::string & key)
+MetaDataObjectBase::Pointer &
+MetaDataDictionary::operator[](const std::string & key)
 {
   MakeUnique();
   return (*m_Dictionary)[key];
 }
 
-const MetaDataObjectBase * MetaDataDictionary::operator[](const std::string & key) const
+const MetaDataObjectBase *
+MetaDataDictionary::operator[](const std::string & key) const
 {
   auto iter = m_Dictionary->find(key);
   if (iter == m_Dictionary->end())
@@ -76,8 +78,8 @@ MetaDataDictionary::Get(const std::string & key) const
   {
     itkGenericExceptionMacro("Key '" << key << "' does not exist ");
   }
-  MetaDataObjectBase::Pointer entry = (*m_Dictionary)[key];
-  const MetaDataObjectBase *  constentry = entry.GetPointer();
+  const MetaDataObjectBase::Pointer entry = (*m_Dictionary)[key];
+  const MetaDataObjectBase *        constentry = entry.GetPointer();
   return constentry;
 }
 
@@ -100,9 +102,9 @@ MetaDataDictionary::GetKeys() const
   using VectorType = std::vector<std::string>;
   VectorType ans;
 
-  for (MetaDataDictionaryMapType::const_iterator it = m_Dictionary->begin(); it != m_Dictionary->end(); ++it)
+  for (auto & it : *m_Dictionary)
   {
-    ans.push_back(it->first);
+    ans.push_back(it.first);
   }
 
   return ans;
@@ -177,8 +179,8 @@ MetaDataDictionary::MakeUnique()
 bool
 MetaDataDictionary::Erase(const std::string & key)
 {
-  auto                                      it = m_Dictionary->find(key);
-  const MetaDataDictionaryMapType::iterator end = m_Dictionary->end();
+  auto       it = m_Dictionary->find(key);
+  const auto end = m_Dictionary->end();
 
   if (it != end)
   {

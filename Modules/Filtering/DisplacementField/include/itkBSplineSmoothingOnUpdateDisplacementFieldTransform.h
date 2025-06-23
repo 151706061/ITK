@@ -36,15 +36,10 @@ namespace itk
  *
  * This class takes as input a displacement field, smooths it on demand using
  * the specified B-spline parameters.  This represents an alternative approach
- * to B-spline (FFD) registration and is explained more in detail in the
- * reference given below.
+ * to B-spline (FFD) registration and is explained more in detail in
+ * \cite tustison2009.
  *
  * \author Nicholas J. Tustison
- *
- * \par REFERENCE
- * NJ Tustison, BB Avants, JC Gee, "Directly Manipulated Free-Form Deformation
- * Image Registration", IEEE Transactions on Image Processing, 18(3):624-635,
- * 2009.
  *
  * \ingroup ITKDisplacementField
  */
@@ -61,7 +56,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineSmoothingOnUpdateDisplacementFieldTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -173,10 +168,11 @@ public:
   /**
    * Enforce stationary boundaries.  Important for diffeomorphic transforms.
    */
+  /** @ITKStartGrouping */
   itkBooleanMacro(EnforceStationaryBoundary);
   itkSetMacro(EnforceStationaryBoundary, bool);
   itkGetConstMacro(EnforceStationaryBoundary, bool);
-
+  /** @ITKEndGrouping */
 protected:
   BSplineSmoothingOnUpdateDisplacementFieldTransform();
   ~BSplineSmoothingOnUpdateDisplacementFieldTransform() override = default;
@@ -185,7 +181,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   /** Clone the current transform */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
   /** Smooth the displacement field using B-splines.

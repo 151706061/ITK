@@ -18,23 +18,16 @@
 #ifndef itkSampleClassifierFilter_hxx
 #define itkSampleClassifierFilter_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 SampleClassifierFilter<TSample>::SampleClassifierFilter()
+  : m_DecisionRule(nullptr) /** Initialize decision rule */
 {
-  this->m_NumberOfClasses = 0;
-
   this->SetNumberOfRequiredInputs(3);
   this->SetNumberOfRequiredOutputs(1);
 
   this->ProcessObject::SetNthOutput(0, this->MakeOutput(0));
-
-  /** Initialize decision rule */
-  m_DecisionRule = nullptr;
 }
 
 template <typename TSample>
@@ -87,8 +80,8 @@ SampleClassifierFilter<TSample>::SetMembershipFunctionsWeightsArray(
 }
 
 template <typename TSample>
-typename SampleClassifierFilter<TSample>::DataObjectPointer SampleClassifierFilter<TSample>::MakeOutput(
-  DataObjectPointerArraySizeType)
+typename SampleClassifierFilter<TSample>::DataObjectPointer
+SampleClassifierFilter<TSample>::MakeOutput(DataObjectPointerArraySizeType)
 {
   return MembershipSampleType::New().GetPointer();
 }
@@ -155,13 +148,12 @@ SampleClassifierFilter<TSample>::GenerateData()
   output->SetSample(this->GetInput());
   output->SetNumberOfClasses(this->m_NumberOfClasses);
 
-  typename TSample::ConstIterator iter = sample->Begin();
-  typename TSample::ConstIterator end = sample->End();
+  typename TSample::ConstIterator       iter = sample->Begin();
+  const typename TSample::ConstIterator end = sample->End();
 
   while (iter != end)
   {
-    typename TSample::MeasurementVectorType measurements;
-    measurements = iter.GetMeasurementVector();
+    const typename TSample::MeasurementVectorType measurements = iter.GetMeasurementVector();
     for (unsigned int i = 0; i < this->m_NumberOfClasses; ++i)
     {
       discriminantScores[i] = membershipFunctionsWeightsArray[i] * membershipFunctions[i]->Evaluate(measurements);
@@ -180,7 +172,6 @@ SampleClassifierFilter<TSample>::GetOutput() const -> const MembershipSampleType
 {
   return static_cast<const MembershipSampleType *>(this->ProcessObject::GetOutput(0));
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

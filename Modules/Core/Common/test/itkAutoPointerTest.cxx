@@ -28,7 +28,7 @@ public:
   using ConstAutoPointer = itk::AutoPointer<const Self>;
   TestObject() { std::cout << "TestObject Constructed" << std::endl; }
   virtual ~TestObject() { std::cout << "TestObject Destructed" << std::endl; }
-  const char *
+  [[nodiscard]] const char *
   GetClassName() const
   {
     return "my Class name is TestObject";
@@ -83,7 +83,7 @@ itkAutoPointerTest(int, char *[])
   cptr1.TakeOwnership(new TestObject);
 
 
-  TestObject::ConstAutoPointer cptr2(cptr1);
+  const TestObject::ConstAutoPointer cptr2(cptr1);
 
 
   return EXIT_SUCCESS;

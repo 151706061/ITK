@@ -31,19 +31,15 @@
 #include <algorithm>
 #include "itkMath.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 template <unsigned int VDimension>
 Solver<VDimension>::Solver()
+  : m_FEMObject(nullptr)
 {
   this->SetLinearSystemWrapper(&m_LinearSystemVNL);
 
-  this->m_NGFN = 0;
-  this->m_NMFC = 0;
-  this->m_FEMObject = nullptr;
   this->m_Origin.Fill(0.0);
   this->m_Spacing.Fill(1.0);
 
@@ -106,11 +102,6 @@ Solver<VDimension>::GetTimeStep() const -> Float
 {
   return Float{};
 }
-
-template <unsigned int VDimension>
-void
-Solver<VDimension>::SetTimeStep(Float itkNotUsed(dt))
-{}
 
 template <unsigned int VDimension>
 auto
@@ -408,9 +399,7 @@ Solver<VDimension>::AssembleF(int dim)
       {
         // If the array of element pointers is not empty,
         // we apply the load to all elements in that array.
-        for (LoadElement::ElementPointersVectorType::const_iterator i = l1->GetElementArray().begin();
-             i != l1->GetElementArray().end();
-             i++)
+        for (auto i = l1->GetElementArray().begin(); i != l1->GetElementArray().end(); i++)
         {
           const Element * el0 = (*i);
           // Call the Fe() function of the element that we are applying the load
@@ -516,11 +505,6 @@ Solver<VDimension>::AssembleF(int dim)
     m_LinearSystem->SetVectorValue(q.first, q.second);
   }
 }
-
-template <unsigned int VDimension>
-void
-Solver<VDimension>::DecomposeK()
-{}
 
 template <unsigned int VDimension>
 void
@@ -724,15 +708,13 @@ Solver<VDimension>::InitializeInterpolationGrid(const InterpolationGridSizeType 
   // Set the interpolation grid (image) size, origin and spacing
   // from the given vectors, so that physical point of v1 is (0,0,0) and
   // physical point v2 is (size[0],size[1],size[2]).
-  InterpolationGridSizeType image_size;
-  image_size.Fill(1);
+  constexpr auto image_size = InterpolationGridSizeType::Filled(1);
   for (unsigned int i = 0; i < FEMDimension; ++i)
   {
     image_size[i] = size[i];
   }
 
-  InterpolationGridPointType image_origin;
-  image_origin.Fill(0.0);
+  InterpolationGridPointType image_origin{};
   for (unsigned int i = 0; i < FEMDimension; ++i)
   {
     image_origin[i] = bb1[i];
@@ -871,7 +853,7 @@ Solver<VDimension>::FillInterpolationGrid()
         iter.Set(e);
       }
     } // next point in region
-  }   // next element
+  } // next element
 }
 
 template <unsigned int VDimension>
@@ -935,7 +917,6 @@ Solver<VDimension>::GetElementAtPoint(const VectorType & pt) const
   }
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif

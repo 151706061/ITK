@@ -94,7 +94,8 @@ public:
   /**\name Policies
    * The following Policies will be used by \c itk::VariableLengthVector::SetSize
    */
-  //@{
+  /** @ITKStartGrouping */
+
   /** \c VariableLengthVector empty base-class for allocation policies.
    * All Allocation Policies are expected to inherit from this empty base
    * class.
@@ -113,7 +114,7 @@ public:
    * This policy, when used from \c VariableLengthVector::SetSize(), always
    * implies that the previous internal buffer will be reallocated. Even if
    * enough memory was available.
-   * \return true (always)
+   * Returns true (always)
    *
    * \sa \c itk::VariableLengthVector::SetSize
    * \sa \c NeverReallocate
@@ -138,8 +139,7 @@ public:
    *
    * The typical use case of this policy is to make sure a \c
    * VariableLengthVector is not a proxy object.
-   * \return false (always)
-   *
+   * Returns false (always)
    * \pre <tt>oldSize == newSize</tt>, checked by assertion
    *
    * \sa \c itk::VariableLengthVector::SetSize
@@ -152,10 +152,8 @@ public:
   struct NeverReallocate : AllocateRootPolicy
   {
     bool
-    operator()(unsigned int newSize, unsigned int oldSize) const
+    operator()([[maybe_unused]] unsigned int newSize, [[maybe_unused]] unsigned int oldSize) const
     {
-      (void)newSize;
-      (void)oldSize;
       itkAssertInDebugAndIgnoreInReleaseMacro(newSize == oldSize &&
                                               "SetSize is expected to never change the VariableLengthVector size...");
       return true;
@@ -304,7 +302,7 @@ public:
                TValue2 *    itkNotUsed(newBuffer)) const
     {}
   };
-  //@}
+  /** @ITKEndGrouping */
 
 
   /** The element type stored at each location in the Array. */
@@ -391,9 +389,8 @@ public:
    */
   template <typename T>
   VariableLengthVector(const VariableLengthVector<T> & v)
+    : m_NumElements(v.Size())
   {
-    m_NumElements = v.Size();
-    m_LetArrayManageMemory = true;
     if (m_NumElements != 0)
     {
       m_Data = this->AllocateElements(m_NumElements);
@@ -473,7 +470,8 @@ public:
    * \post \c m_LetArrayManageMemory is true
    */
   template <typename TExpr1, typename TExpr2, typename TBinaryOp>
-  VariableLengthVector(VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & rhs);
+  VariableLengthVector(const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & rhs);
+
   /** Assignment from an Expression Template vector.
    * \tparam TExpr1 Type of the left sub-expression
    * \tparam TExpr2 Type of the right sub-expression
@@ -495,13 +493,13 @@ public:
    */
   template <typename TExpr1, typename TExpr2, typename TBinaryOp>
   Self &
-  operator=(VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & rhs);
+  operator=(const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & rhs);
 
   /** Set all the elements of the array to the specified value.
    * \pre This function may be called on empty vectors, it's a no-op.
    */
   void
-  Fill(TValue const & v);
+  Fill(const TValue & v);
 
   /** Converting assignment operator.
    * \note Ensures a <em>String Exception Guarantee</em>: resists to
@@ -526,7 +524,7 @@ public:
     //    VLV<const TValue> vcref(v.GetDataPointer(), v.GetSize());
     //    ...;
     //    v = vcref;
-    ElementIdentifier const N = v.Size();
+    const ElementIdentifier N = v.Size();
     this->SetSize(N, DontShrinkToFit(), DumpOldValues());
     for (ElementIdentifier i = 0; i < N; ++i)
     {
@@ -572,32 +570,42 @@ public:
    * precision
    */
   Self &
-  operator=(TValue const & v);
+  operator=(const TValue & v);
 
   /** Return the number of elements in the Array  */
-  unsigned int
+  /** @ITKStartGrouping */
+  [[nodiscard]] unsigned int
   Size() const
   {
     return m_NumElements;
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetSize() const
   {
     return m_NumElements;
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfElements() const
   {
     return m_NumElements;
   }
+  /** @ITKEndGrouping */
+  /** Return reference to the element at specified index. No range checking. */
+  TValue &
+  operator[](unsigned int i)
+  {
+    return this->m_Data[i];
+  }
 
   /** Return reference to the element at specified index. No range checking. */
-  TValue & operator[](unsigned int i) { return this->m_Data[i]; }
-  /** Return reference to the element at specified index. No range checking. */
-  TValue const & operator[](unsigned int i) const { return this->m_Data[i]; }
+  const TValue &
+  operator[](unsigned int i) const
+  {
+    return this->m_Data[i];
+  }
 
   /** Get one element */
-  const TValue &
+  [[nodiscard]] const TValue &
   GetElement(unsigned int i) const
   {
     return m_Data[i];
@@ -743,10 +751,10 @@ public:
    * \return a non-null pointer to an array of \c size elements (0 is a valid
    * parameter).
    */
-  TValue *
+  [[nodiscard]] TValue *
   AllocateElements(ElementIdentifier size) const;
 
-  const TValue *
+  [[nodiscard]] const TValue *
   GetDataPointer() const
   {
     return m_Data;
@@ -869,7 +877,7 @@ public:
    */
   template <typename TExpr1, typename TExpr2, typename TBinaryOp>
   Self &
-  operator+=(VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & rhs)
+  operator+=(const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & rhs)
   {
     itkAssertInDebugAndIgnoreInReleaseMacro(rhs.Size() == Size());
     for (ElementIdentifier i = 0; i < m_NumElements; ++i)
@@ -890,7 +898,7 @@ public:
    */
   template <typename TExpr1, typename TExpr2, typename TBinaryOp>
   Self &
-  operator-=(VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & rhs)
+  operator-=(const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & rhs)
   {
     itkAssertInDebugAndIgnoreInReleaseMacro(rhs.Size() == Size());
     for (ElementIdentifier i = 0; i < m_NumElements; ++i)
@@ -961,15 +969,15 @@ public:
   ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(Self);
 
   /** Returns vector's Euclidean norm. */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetNorm() const;
 
   /** Returns vector's squared Euclidean norm. */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetSquaredNorm() const;
 
   /** letArrayManageMemory getter. */
-  bool
+  [[nodiscard]] bool
   IsAProxy() const
   {
     return !m_LetArrayManageMemory;
@@ -1029,13 +1037,13 @@ template <typename TExpr>
 struct GetType
 {
   using Type = TExpr;
+
   /** Fetches the i-th element from an array (expression).
    * \note the default unspecialized behaviour returns the input number \c v.
    */
   static Type
-  Load(Type const & v, unsigned int idx)
+  Load(const Type & v, unsigned int itkNotUsed(idx))
   {
-    (void)idx;
     return v;
   }
 };
@@ -1052,9 +1060,8 @@ struct GetType
  */
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<mpl::And<mpl::IsArray<TExpr1>, mpl::IsArray<TExpr2>>::Value, unsigned int>
-GetSize(TExpr1 const & lhs, TExpr2 const & rhs)
+GetSize(const TExpr1 & lhs, [[maybe_unused]] const TExpr2 & rhs)
 {
-  (void)rhs;
   itkAssertInDebugAndIgnoreInReleaseMacro(lhs.Size() == rhs.Size());
   return lhs.Size();
 }
@@ -1071,7 +1078,7 @@ GetSize(TExpr1 const & lhs, TExpr2 const & rhs)
  */
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<mpl::And<mpl::IsArray<TExpr1>, mpl::Not<mpl::IsArray<TExpr2>>>::Value, unsigned int>
-GetSize(TExpr1 const & lhs, TExpr2 const & itkNotUsed(rhs))
+GetSize(const TExpr1 & lhs, const TExpr2 & itkNotUsed(rhs))
 {
   return lhs.Size();
 }
@@ -1087,7 +1094,7 @@ GetSize(TExpr1 const & lhs, TExpr2 const & itkNotUsed(rhs))
  */
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<mpl::And<mpl::IsArray<TExpr2>, mpl::Not<mpl::IsArray<TExpr1>>>::Value, unsigned int>
-GetSize(TExpr1 const & itkNotUsed(lhs), TExpr2 const & rhs)
+GetSize(const TExpr1 & itkNotUsed(lhs), const TExpr2 & rhs)
 {
   return rhs.Size();
 }
@@ -1097,7 +1104,7 @@ struct GetType<VariableLengthVector<T>>
 {
   using Type = T;
   static Type
-  Load(VariableLengthVector<T> const & v, unsigned int idx)
+  Load(const VariableLengthVector<T> & v, unsigned int idx)
   {
     return v[idx];
   }
@@ -1107,7 +1114,7 @@ struct GetType<VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp>>
 {
   using Type = typename VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp>::ResType;
   static Type
-  Load(VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & v, unsigned int idx)
+  Load(const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & v, unsigned int idx)
   {
     return v[idx];
   }
@@ -1198,7 +1205,7 @@ struct CanBeDivided : mpl::And<mpl::IsArray<TExpr1>, mpl::IsNumber<TExpr2>>
 template <typename TExpr1, typename TExpr2, typename TBinaryOp>
 struct VariableLengthVectorExpression
 {
-  VariableLengthVectorExpression(TExpr1 const & lhs, TExpr2 const & rhs)
+  VariableLengthVectorExpression(const TExpr1 & lhs, const TExpr2 & rhs)
     : m_lhs(lhs)
     , m_rhs(rhs)
   {
@@ -1209,7 +1216,7 @@ struct VariableLengthVectorExpression
   }
 
   /// Returns the size of the vector expression.
-  unsigned int
+  [[nodiscard]] unsigned int
   Size() const
   {
     return Details::GetSize(m_lhs, m_rhs);
@@ -1231,23 +1238,24 @@ struct VariableLengthVectorExpression
    *
    * \c Load() is in charge of fetching the i-th element of the sub-expressions
    */
-  ResType operator[](unsigned int idx) const
+  ResType
+  operator[](unsigned int idx) const
   {
     itkAssertInDebugAndIgnoreInReleaseMacro(idx < Size());
     return TBinaryOp::Apply(Details::GetType<TExpr1>::Load(m_lhs, idx), Details::GetType<TExpr2>::Load(m_rhs, idx));
   }
 
   /** Returns vector's Euclidean Norm  */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetNorm() const;
 
   /** Returns vector's squared Euclidean Norm  */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetSquaredNorm() const;
 
 private:
-  TExpr1 const & m_lhs;
-  TExpr2 const & m_rhs;
+  const TExpr1 & m_lhs;
+  const TExpr2 & m_rhs;
 };
 
 /** Addition involving a \c VariableLengthVector.
@@ -1262,7 +1270,7 @@ private:
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<Details::op::CanBeAddedOrSubtracted<TExpr1, TExpr2>::Value,
                         VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Plus>>
-operator+(TExpr1 const & lhs, TExpr2 const & rhs)
+operator+(const TExpr1 & lhs, const TExpr2 & rhs)
 {
   return VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Plus>(lhs, rhs);
 }
@@ -1279,7 +1287,7 @@ operator+(TExpr1 const & lhs, TExpr2 const & rhs)
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<Details::op::CanBeAddedOrSubtracted<TExpr1, TExpr2>::Value,
                         VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Sub>>
-operator-(TExpr1 const & lhs, TExpr2 const & rhs)
+operator-(const TExpr1 & lhs, const TExpr2 & rhs)
 {
   return VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Sub>(lhs, rhs);
 }
@@ -1295,7 +1303,7 @@ operator-(TExpr1 const & lhs, TExpr2 const & rhs)
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<Details::op::CanBeMultiplied<TExpr1, TExpr2>::Value,
                         VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Mult>>
-operator*(TExpr1 const & lhs, TExpr2 const & rhs)
+operator*(const TExpr1 & lhs, const TExpr2 & rhs)
 {
   return VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Mult>(lhs, rhs);
 }
@@ -1310,7 +1318,7 @@ operator*(TExpr1 const & lhs, TExpr2 const & rhs)
 template <typename TExpr1, typename TExpr2>
 inline std::enable_if_t<Details::op::CanBeDivided<TExpr1, TExpr2>::Value,
                         VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Div>>
-operator/(TExpr1 const & lhs, TExpr2 const & rhs)
+operator/(const TExpr1 & lhs, const TExpr2 & rhs)
 {
   return VariableLengthVectorExpression<TExpr1, TExpr2, Details::op::Div>(lhs, rhs);
 }
@@ -1320,7 +1328,7 @@ operator/(TExpr1 const & lhs, TExpr2 const & rhs)
  */
 template <typename TExpr1, typename TExpr2, typename TBinaryOp>
 std::ostream &
-operator<<(std::ostream & os, VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> const & v)
+operator<<(std::ostream & os, const VariableLengthVectorExpression<TExpr1, TExpr2, TBinaryOp> & v)
 {
   os << '[';
   if (v.Size() != 0)
@@ -1341,7 +1349,7 @@ operator<<(std::ostream & os, VariableLengthVectorExpression<TExpr1, TExpr2, TBi
  */
 template <typename TExpr>
 inline std::enable_if_t<mpl::IsArray<TExpr>::Value, typename TExpr::RealValueType>
-GetNorm(TExpr const & v)
+GetNorm(const TExpr & v)
 {
   return static_cast<typename TExpr::RealValueType>(std::sqrt(static_cast<double>(GetSquaredNorm(v))));
 }
@@ -1353,7 +1361,7 @@ GetNorm(TExpr const & v)
  */
 template <typename TExpr>
 inline std::enable_if_t<mpl::IsArray<TExpr>::Value, typename TExpr::RealValueType>
-GetSquaredNorm(TExpr const & v)
+GetSquaredNorm(const TExpr & v)
 {
   using RealValueType = typename TExpr::RealValueType;
   RealValueType sum = 0.0;
@@ -1366,7 +1374,7 @@ GetSquaredNorm(TExpr const & v)
 }
 
 /**\name Serialization */
-//@{
+
 /** Serialization of \c VariableLengthVector
  * \relates itk::VariableLengthVector
  */
@@ -1389,10 +1397,9 @@ operator<<(std::ostream & os, const VariableLengthVector<TValue> & arr)
   os << ']';
   return os;
 }
-//@}
 
 /**\name Standard compliance functions */
-//@{
+
 /** \c swap() overload for \c VariableLengthVector
  * \throw None
  * \relates itk::VariableLengthVector
@@ -1416,7 +1423,6 @@ swap(VariableLengthVector<T> & l_, VariableLengthVector<T> & r_) noexcept
 {
   l_.Swap(r_);
 }
-//@}
 
 } // namespace itk
 

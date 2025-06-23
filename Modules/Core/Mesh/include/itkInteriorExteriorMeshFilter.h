@@ -62,7 +62,11 @@ public:
   using OutputMeshPointer = typename OutputMeshType::Pointer;
 
   /** Type for representing coordinates. */
-  using CoordRepType = typename TInputMesh::CoordRepType;
+  using CoordinateType = typename TInputMesh::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
 
   /** Type of the  transform. */
   using SpatialFunctionType = TSpatialFunction;
@@ -70,13 +74,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InteriorExteriorMeshFilter);
 
   /** Get/Set the spatial function. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(SpatialFunction, SpatialFunctionType);
   itkGetModifiableObjectMacro(SpatialFunction, SpatialFunctionType);
-
+  /** @ITKEndGrouping */
   using SpatialFunctionDataObjectType = DataObjectDecorator<SpatialFunctionType>;
   using SpatialFunctionDataObjectPointer = typename SpatialFunctionDataObjectType::Pointer;
 

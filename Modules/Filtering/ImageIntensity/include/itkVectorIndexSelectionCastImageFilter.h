@@ -28,10 +28,10 @@ template <typename TInput, typename TOutput>
 class VectorIndexSelectionCast
 {
 public:
-  VectorIndexSelectionCast() { m_Index = 0; }
+  VectorIndexSelectionCast() = default;
   ~VectorIndexSelectionCast() = default;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetIndex() const
   {
     return m_Index;
@@ -57,7 +57,7 @@ public:
   }
 
 private:
-  unsigned int m_Index;
+  unsigned int m_Index{ 0 };
 };
 } // namespace Functor
 
@@ -106,10 +106,11 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorIndexSelectionCastImageFilter);
 
   /** Get/Set methods for the index */
+  /** @ITKStartGrouping */
   void
   SetIndex(unsigned int i)
   {
@@ -120,17 +121,14 @@ public:
     }
   }
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetIndex() const
   {
     return this->GetFunctor().GetIndex();
   }
+  /** @ITKEndGrouping */
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   VectorIndexSelectionCastImageFilter() = default;

@@ -26,17 +26,27 @@
 
 namespace
 {
+// Tells whether GetImageDimension() returns ImageDimension, for all of the specified values of VImageDimension.
+template <unsigned int... VImageDimension>
+constexpr bool GetImageDimension_returns_ImageDimension{ (
+  (itk::ImageRegion<VImageDimension>::GetImageDimension() == VImageDimension) && ...) };
+
+static_assert(GetImageDimension_returns_ImageDimension<2, 3, 4>, "GetImageDimension() should return ImageDimension.");
+
+
 template <unsigned int VDimension>
 constexpr bool
 CheckTrivialCopyabilityOfImageRegion()
 {
   constexpr bool isImageRegionTriviallyCopyable{ std::is_trivially_copyable_v<itk::ImageRegion<VDimension>> };
 
-#ifdef ITK_FUTURE_LEGACY_REMOVE
-  static_assert(isImageRegionTriviallyCopyable, "In the future, ImageRegion<VDimension> should be trivially copyable.");
+#ifdef ITK_LEGACY_REMOVE
+  static_assert(isImageRegionTriviallyCopyable,
+                "When legacy support is removed, ImageRegion<VDimension> should be trivially copyable.");
   return isImageRegionTriviallyCopyable;
 #else
-  static_assert(!isImageRegionTriviallyCopyable, "ImageRegion<VDimension> should *not* be trivially copyable.");
+  static_assert(!isImageRegionTriviallyCopyable,
+                "When legacy support is enabled, ImageRegion<VDimension> should *not* be trivially copyable.");
   return !isImageRegionTriviallyCopyable;
 #endif
 }
@@ -222,19 +232,23 @@ TEST(ImageRegion, SupportsStructuredBinding)
   using IndexType = RegionType::IndexType;
   using SizeType = RegionType::SizeType;
 
-  RegionType region{};
-  auto && [index, size] = region;
+  {
+    // Testing non-cost behavior
+    RegionType nonConstRegion{}; // NOLINT(misc-const-correctness)
+    auto && [index, size] = nonConstRegion;
 
-  static_assert(std::is_same_v<decltype(index), IndexType>);
-  static_assert(std::is_same_v<decltype(size), SizeType>);
-  EXPECT_EQ(&index, &(region.GetIndex()));
-  EXPECT_EQ(&size, &(region.GetSize()));
+    static_assert(std::is_same_v<decltype(index), IndexType>);
+    static_assert(std::is_same_v<decltype(size), SizeType>);
+    EXPECT_EQ(&index, &(nonConstRegion.GetIndex()));
+    EXPECT_EQ(&size, &(nonConstRegion.GetSize()));
+  }
+  {
+    const RegionType constRegion{};
+    auto && [constIndex, constSize] = constRegion;
 
-  const RegionType constRegion{};
-  auto && [constIndex, constSize] = constRegion;
-
-  static_assert(std::is_same_v<decltype(constIndex), const IndexType>);
-  static_assert(std::is_same_v<decltype(constSize), const SizeType>);
-  EXPECT_EQ(&constIndex, &(constRegion.GetIndex()));
-  EXPECT_EQ(&constSize, &(constRegion.GetSize()));
+    static_assert(std::is_same_v<decltype(constIndex), const IndexType>);
+    static_assert(std::is_same_v<decltype(constSize), const SizeType>);
+    EXPECT_EQ(&constIndex, &(constRegion.GetIndex()));
+    EXPECT_EQ(&constSize, &(constRegion.GetSize()));
+  }
 }

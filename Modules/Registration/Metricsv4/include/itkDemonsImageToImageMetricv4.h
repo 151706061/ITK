@@ -73,7 +73,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DemonsImageToImageMetricv4);
 
   /** Superclass types */
@@ -111,9 +111,10 @@ public:
 
   /** Accessors for the image intensity difference threshold use
    *  in derivative calculation */
+  /** @ITKStartGrouping */
   itkGetConstMacro(IntensityDifferenceThreshold, TInternalComputationValueType);
   itkSetMacro(IntensityDifferenceThreshold, TInternalComputationValueType);
-
+  /** @ITKEndGrouping */
   /** Get the denominator threshold used in derivative calculation. */
   itkGetConstMacro(DenominatorThreshold, TInternalComputationValueType);
 

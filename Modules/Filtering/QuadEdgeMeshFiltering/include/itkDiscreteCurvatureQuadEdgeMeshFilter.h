@@ -51,7 +51,7 @@ public:
   using OutputPointsContainerPointer = typename OutputMeshType::PointsContainerPointer;
   using OutputPointsContainerIterator = typename OutputMeshType::PointsContainerIterator;
   using OutputPointType = typename OutputMeshType::PointType;
-  using OutputCoordType = typename OutputPointType::CoordRepType;
+  using OutputCoordType = typename OutputPointType::CoordinateType;
   using OutputPointIdentifier = typename OutputMeshType::PointIdentifier;
   using OutputCellIdentifier = typename OutputMeshType::CellIdentifier;
   using OutputQEType = typename OutputMeshType::QEType;
@@ -60,14 +60,10 @@ public:
 
   using TriangleType = TriangleHelper<OutputPointType>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DiscreteCurvatureQuadEdgeMeshFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputCurvatureType>));
-  // End concept checking
-#endif
 
 protected:
   DiscreteCurvatureQuadEdgeMeshFilter()
@@ -103,10 +99,10 @@ protected:
   {
     this->CopyInputMeshToOutputMesh();
 
-    OutputMeshPointer output = this->GetOutput();
+    const OutputMeshPointer output = this->GetOutput();
 
-    OutputPointsContainerPointer  points = output->GetPoints();
-    OutputPointsContainerIterator p_it = points->Begin();
+    const OutputPointsContainerPointer points = output->GetPoints();
+    OutputPointsContainerIterator      p_it = points->Begin();
 
     OutputCurvatureType curvature;
 

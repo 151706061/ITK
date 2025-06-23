@@ -20,7 +20,7 @@
 namespace itk
 {
 bool ITKCommon_EXPORT
-     ci_equal(char a, char b)
+ci_equal(char a, char b)
 {
   return tolower(static_cast<int>(a)) == tolower(static_cast<int>(b));
 }
@@ -54,25 +54,30 @@ ITKCommon_EXPORT std::istream &
 
     // Get name
     std::istringstream stream(headerline);
-    std::string        address, perms, offset, device;
-    int                inode = -1;
+
+    int inode = -1;
     // the header is defined with the following expression: "address permissions
     // offset device inode [name]"
+    std::string address;
+
     stream >> address;
     if (!stream.good())
     {
       itkGenericExceptionMacro("bad address: " << address);
     }
+    std::string perms;
     stream >> perms;
     if (!stream.good())
     {
       itkGenericExceptionMacro("bad perms: " << perms);
     }
+    std::string offset;
     stream >> offset;
     if (!stream.good())
     {
       itkGenericExceptionMacro("bad offset: " << offset);
     }
+    std::string device;
     stream >> device;
     if (!stream.good())
     {
@@ -138,12 +143,12 @@ ITKCommon_EXPORT std::istream &
 
     std::string bracket;
 
-    while ((in >> bracket).good() && bracket.find("[", 0) == std::string::npos)
+    while ((in >> bracket).good() && bracket.find('[', 0) == std::string::npos)
     {
       record.m_RecordName += std::string(" ") + bracket;
     }
 
-    if (!in.good() || bracket.find("[", 0) == std::string::npos)
+    if (!in.good() || bracket.find('[', 0) == std::string::npos)
     {
       itkGenericExceptionMacro("For record: " << record.m_RecordName << ", bad left bracket: " << bracket);
     }
@@ -237,7 +242,7 @@ ITKCommon_EXPORT std::istream &
         // If address is "[" then recordName was the address and there is name
         // for
         // the record, skip it.
-        if (address.find("[", 0) != std::string::npos)
+        if (address.find('[', 0) != std::string::npos)
         {
           in.getline(line, 256);
           recordHasNoName = true;
@@ -252,7 +257,7 @@ ITKCommon_EXPORT std::istream &
 
     std::string bracket;
 
-    while ((in >> bracket).good() && bracket.find("[", 0) == std::string::npos)
+    while ((in >> bracket).good() && bracket.find('[', 0) == std::string::npos)
     {
       // the string is not a bracket yet, but probably the address. So the
       // previous
@@ -260,7 +265,7 @@ ITKCommon_EXPORT std::istream &
       record.m_RecordName += std::string(" ") + address;
       address = bracket;
     }
-    if (!in.good() || bracket.find("[", 0) == std::string::npos)
+    if (!in.good() || bracket.find('[', 0) == std::string::npos)
     {
       itkGenericExceptionMacro("For record: " << record.m_RecordName << ", bad left bracket: " << bracket);
     }
@@ -343,10 +348,7 @@ struct MapRecordConditionalPlusor
 /**              ---             MapData               ---              **/
 
 /** MadData destructor */
-MapData::~MapData()
-{
-  this->Reset();
-}
+MapData::~MapData() { this->Reset(); }
 
 MapData::MemoryLoadType
 MapData::GetTotalMemoryUsage()

@@ -106,7 +106,7 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  BlobPointer blob = BlobType::New();
+  const BlobPointer blob = BlobType::New();
   blob->GetProperty().SetName("My Blob");
   blob->SetId(1);
   blob->SetPoints(list);
@@ -121,7 +121,7 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  BlobType::BlobPointListType pointList = blob->GetPoints();
+  const BlobType::BlobPointListType pointList = blob->GetPoints();
   std::cout << "The blob contains " << pointList.size();
   std::cout << " points" << std::endl;
   // Software Guide : EndCodeSnippet
@@ -143,13 +143,11 @@ main(int, char *[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  BlobType::BlobPointListType::const_iterator it = blob->GetPoints().begin();
-  while (it != blob->GetPoints().end())
+  for (auto & currentPoint : blob->GetPoints())
   {
-    std::cout << "Position = " << (*it).GetPositionInWorldSpace()
+    std::cout << "Position = " << currentPoint.GetPositionInWorldSpace()
               << std::endl;
-    std::cout << "Color = " << (*it).GetColor() << std::endl;
-    ++it;
+    std::cout << "Color = " << currentPoint.GetColor() << std::endl;
   }
   // Software Guide : EndCodeSnippet
 

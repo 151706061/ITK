@@ -46,10 +46,7 @@ namespace itk
  * on it. Values at these non-grid position of the Fixed image are
  * interpolated using a user-selected Interpolator.
  *
- * Implementation of this class is based on:
- * Hipwell, J. H., et. al. (2003), "Intensity-Based 2-D-3D Registration of
- * Cerebral Angiograms,", IEEE Transactions on Medical Imaging,
- * 22(11):1417-1426.
+ * Implementation of this class is based on \cite hipwell2003.
  *
  * \ingroup RegistrationMetrics
  * \ingroup ITKRegistrationCommon
@@ -70,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GradientDifferenceImageToImageMetric);
 
   /** Types transferred from the base class */
@@ -136,9 +133,10 @@ public:
 
   /** Set/Get the value of Delta used for computing derivatives by finite
    * differences in the GetDerivative() method */
+  /** @ITKStartGrouping */
   itkSetMacro(DerivativeDelta, double);
   itkGetConstReferenceMacro(DerivativeDelta, double);
-
+  /** @ITKEndGrouping */
 protected:
   GradientDifferenceImageToImageMetric();
   ~GradientDifferenceImageToImageMetric() override = default;
@@ -168,6 +166,7 @@ private:
   /** The range of the moving image gradients. */
   mutable MovedGradientPixelType m_MinMovedGradient[MovedImageDimension]{};
   mutable MovedGradientPixelType m_MaxMovedGradient[MovedImageDimension]{};
+
   /** The range of the fixed image gradients. */
   mutable FixedGradientPixelType m_MinFixedGradient[FixedImageDimension]{};
   mutable FixedGradientPixelType m_MaxFixedGradient[FixedImageDimension]{};

@@ -59,7 +59,6 @@
 
 /* what threading system are we using */
 #cmakedefine ITK_USE_PTHREADS
-#cmakedefine ITK_HP_PTHREADS
 #cmakedefine ITK_USE_WIN32_THREADS
 
 #cmakedefine ITK_WINDOWS_EXPORT_ALL_SYMBOLS
@@ -71,11 +70,9 @@
 #endif
 #cmakedefine ITK_DYNAMIC_LOADING
 
-#cmakedefine ITKV4_COMPATIBILITY
 #cmakedefine ITK_LEGACY_REMOVE
 #cmakedefine ITK_LEGACY_SILENT
 #cmakedefine ITK_FUTURE_LEGACY_REMOVE
-#cmakedefine ITK_USE_CONCEPT_CHECKING
 #cmakedefine ITK_USE_FFTWF
 #cmakedefine ITK_USE_FFTWD
 #cmakedefine ITK_USE_CUFFTW
@@ -190,5 +187,7 @@
 #    define ITK_COMPILER_SUPPORTS_SSE2_32
 #  endif
 #endif
+
+#cmakedefine ITK_HAS_SCHED_GETAFFINITY
 
 #endif //itkConfigure_h

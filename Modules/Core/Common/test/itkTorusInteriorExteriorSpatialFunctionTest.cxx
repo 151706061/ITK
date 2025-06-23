@@ -28,33 +28,32 @@ itkTorusInteriorExteriorSpatialFunctionTest(int, char *[])
   constexpr unsigned int PointDimension = 3;
 
   // Define the point coordinate representation type
-  using PointCoordRepType = float;
+  using PointCoordinateType = float;
 
   // Define the point type
-  using PointType = itk::Point<PointCoordRepType, PointDimension>;
+  using PointType = itk::Point<PointCoordinateType, PointDimension>;
 
   // Define the type for the torus spatial function
   using TorusInteriorExteriorSpatialFunctionType = itk::TorusInteriorExteriorSpatialFunction<PointDimension, PointType>;
 
   // Create the torus spatial function
-  TorusInteriorExteriorSpatialFunctionType::Pointer torusInteriorExteriorSpatialFunction =
+  const TorusInteriorExteriorSpatialFunctionType::Pointer torusInteriorExteriorSpatialFunction =
     TorusInteriorExteriorSpatialFunctionType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(
     torusInteriorExteriorSpatialFunction, TorusInteriorExteriorSpatialFunction, InteriorExteriorSpatialFunction);
 
   // Set the torus properties
-  TorusInteriorExteriorSpatialFunctionType::InputType origin;
-  origin.Fill(1.0);
+  auto origin = itk::MakeFilled<TorusInteriorExteriorSpatialFunctionType::InputType>(1.0);
 
   torusInteriorExteriorSpatialFunction->SetOrigin(origin);
   ITK_TEST_SET_GET_VALUE(origin, torusInteriorExteriorSpatialFunction->GetOrigin());
 
-  double majorRadius = 10.0;
+  constexpr double majorRadius = 10.0;
   torusInteriorExteriorSpatialFunction->SetMajorRadius(majorRadius);
   ITK_TEST_SET_GET_VALUE(majorRadius, torusInteriorExteriorSpatialFunction->GetMajorRadius());
 
-  double minorRadius = 4.0;
+  constexpr double minorRadius = 4.0;
   torusInteriorExteriorSpatialFunction->SetMinorRadius(minorRadius);
   ITK_TEST_SET_GET_VALUE(minorRadius, torusInteriorExteriorSpatialFunction->GetMinorRadius());
 
@@ -69,10 +68,10 @@ itkTorusInteriorExteriorSpatialFunctionTest(int, char *[])
   outsidePoint[1] = 2.0;
   outsidePoint[2] = 1.0;
 
-  TorusInteriorExteriorSpatialFunctionType::OutputType insidePointOutputValue =
+  const TorusInteriorExteriorSpatialFunctionType::OutputType insidePointOutputValue =
     torusInteriorExteriorSpatialFunction->Evaluate(insidePoint);
 
-  TorusInteriorExteriorSpatialFunctionType::OutputType outsidePointOutputValue =
+  const TorusInteriorExteriorSpatialFunctionType::OutputType outsidePointOutputValue =
     torusInteriorExteriorSpatialFunction->Evaluate(outsidePoint);
 
   int testStatus = EXIT_SUCCESS;

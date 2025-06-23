@@ -21,6 +21,8 @@
 #include "itkImageToImageFilter.h"
 #include "itkCovariantVector.h"
 #include "itkImageRegionIterator.h"
+#include "itkZeroFluxNeumannBoundaryCondition.h"
+#include <memory> // For unique_ptr.
 
 namespace itk
 {
@@ -87,7 +89,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GradientImageFilter);
 
   /** Image type alias support */
@@ -112,10 +114,11 @@ public:
    * into account and to compute the derivatives in physical space; use Off to
    * ignore the image spacing and to compute the derivatives in isotropic
    * voxel space. Default is On. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_FUTURE_LEGACY_REMOVE)
   /** Use the image spacing information in calculations. Use this option if you
       want derivatives in physical space. Default is UseImageSpacingOn.
@@ -140,12 +143,8 @@ public:
   void
   OverrideBoundaryCondition(ImageBoundaryCondition<TInputImage> * boundaryCondition);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputPixelType, OutputValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputValueType>));
-  // End concept checking
-#endif
 
   /** The UseImageDirection flag determines whether image derivatives are
    * computed with respect to the image grid or with respect to the physical
@@ -157,13 +156,14 @@ public:
    * flag is OFF.
    * The default value of this flag is On.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageDirection, bool);
   itkGetConstMacro(UseImageDirection, bool);
   itkBooleanMacro(UseImageDirection);
-
+  /** @ITKEndGrouping */
 protected:
   GradientImageFilter();
-  ~GradientImageFilter() override;
+  ~GradientImageFilter() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
@@ -219,14 +219,16 @@ private:
   }
 
 
-  bool m_UseImageSpacing{};
+  bool m_UseImageSpacing{ true };
 
   // flag to take or not the image direction into account
   // when computing the derivatives.
-  bool m_UseImageDirection{};
+  bool m_UseImageDirection{ true };
 
   // allow setting the the m_BoundaryCondition
-  ImageBoundaryCondition<TInputImage, TInputImage> * m_BoundaryCondition{};
+  std::unique_ptr<ImageBoundaryCondition<TInputImage, TInputImage>> m_BoundaryCondition{
+    std::make_unique<ZeroFluxNeumannBoundaryCondition<TInputImage>>()
+  };
 };
 } // end namespace itk
 

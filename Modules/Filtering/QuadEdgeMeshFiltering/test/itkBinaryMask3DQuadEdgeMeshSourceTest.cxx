@@ -55,12 +55,9 @@ itkBinaryMask3DQuadEdgeMeshSourceTest(int, char *[])
   size[1] = 128;
   size[2] = 128;
 
-  IndexType start;
-  start.Fill(0);
+  constexpr IndexType start{};
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const RegionType region{ start, size };
 
   auto image = ImageType::New();
 
@@ -72,15 +69,12 @@ itkBinaryMask3DQuadEdgeMeshSourceTest(int, char *[])
   IteratorType it(image, region);
   it.GoToBegin();
 
-  PointType             point;
-  PointType             center;
-  PointType::VectorType radial;
-
   IndexType centralIndex = start;
   centralIndex[0] += size[0] / 2;
   centralIndex[1] += size[1] / 2;
   centralIndex[2] += size[2] / 2;
 
+  PointType center;
   image->TransformIndexToPhysicalPoint(centralIndex, center);
 
   //
@@ -88,8 +82,9 @@ itkBinaryMask3DQuadEdgeMeshSourceTest(int, char *[])
   //
   while (!it.IsAtEnd())
   {
+    PointType point;
     image->TransformIndexToPhysicalPoint(it.GetIndex(), point);
-    radial = point - center;
+    const PointType::VectorType radial = point - center;
     if (radial.GetNorm() < 60.0)
     {
       it.Set(internalValue);

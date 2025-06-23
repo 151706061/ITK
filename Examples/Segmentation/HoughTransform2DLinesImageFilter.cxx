@@ -82,13 +82,10 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  using ReaderType = itk::ImageFileReader<ImageType>;
-  auto reader = ReaderType::New();
-
-  reader->SetFileName(argv[1]);
+  ImageType::Pointer localImage;
   try
   {
-    reader->Update();
+    localImage = itk::ReadImage<ImageType>(argv[1]);
   }
   catch (const itk::ExceptionObject & excep)
   {
@@ -96,7 +93,6 @@ main(int argc, char * argv[])
     std::cerr << excep << std::endl;
     return EXIT_FAILURE;
   }
-  ImageType::Pointer localImage = reader->GetOutput();
   // Software Guide : EndCodeSnippet
 
 
@@ -141,8 +137,8 @@ main(int argc, char * argv[])
 
   threshFilter->SetInput(gradFilter->GetOutput());
   threshFilter->SetOutsideValue(0);
-  unsigned char threshBelow = 0;
-  unsigned char threshAbove = 255;
+  constexpr unsigned char threshBelow = 0;
+  constexpr unsigned char threshAbove = 255;
   threshFilter->ThresholdOutside(threshBelow, threshAbove);
   threshFilter->Update();
   // Software Guide : EndCodeSnippet
@@ -189,7 +185,8 @@ main(int argc, char * argv[])
     houghFilter->SetDiscRadius(std::stod(argv[5]));
   }
   houghFilter->Update();
-  AccumulatorImageType::Pointer localAccumulator = houghFilter->GetOutput();
+  const AccumulatorImageType::Pointer localAccumulator =
+    houghFilter->GetOutput();
   // Software Guide : EndCodeSnippet
 
   //  Software Guide : BeginLatex
@@ -218,7 +215,8 @@ main(int argc, char * argv[])
 
   auto localOutputImage = OutputImageType::New();
 
-  OutputImageType::RegionType region(localImage->GetLargestPossibleRegion());
+  const OutputImageType::RegionType region(
+    localImage->GetLargestPossibleRegion());
   localOutputImage->SetRegions(region);
   localOutputImage->CopyInformation(localImage);
   localOutputImage->Allocate(true); // initialize buffer to zero
@@ -232,10 +230,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  using LineIterator =
-    HoughTransformFilterType::LinesListType::const_iterator;
-  LineIterator itLines = lines.begin();
-  while (itLines != lines.end())
+  for (auto & line : lines)
   {
     // Software Guide : EndCodeSnippet
 
@@ -251,18 +246,18 @@ main(int argc, char * argv[])
     using LinePointListType =
       HoughTransformFilterType::LineType::LinePointListType;
 
-    LinePointListType                 pointsList = (*itLines)->GetPoints();
-    LinePointListType::const_iterator itPoints = pointsList.begin();
+    LinePointListType pointsList = line->GetPoints();
+    auto              itPoints = pointsList.begin();
 
     double u[2];
     u[0] = (*itPoints).GetPositionInObjectSpace()[0];
     u[1] = (*itPoints).GetPositionInObjectSpace()[1];
-    itPoints++;
+    ++itPoints;
     double v[2];
     v[0] = u[0] - (*itPoints).GetPositionInObjectSpace()[0];
     v[1] = u[1] - (*itPoints).GetPositionInObjectSpace()[1];
 
-    double norm = std::sqrt(v[0] * v[0] + v[1] * v[1]);
+    const double norm = std::sqrt(v[0] * v[0] + v[1] * v[1]);
     v[0] /= norm;
     v[1] /= norm;
     // Software Guide : EndCodeSnippet
@@ -277,7 +272,7 @@ main(int argc, char * argv[])
     ImageType::IndexType localIndex;
     itk::Size<2>         size =
       localOutputImage->GetLargestPossibleRegion().GetSize();
-    float diag =
+    const float diag =
       std::sqrt(static_cast<float>(size[0] * size[0] + size[1] * size[1]));
 
     for (auto i = static_cast<int>(-diag); i < static_cast<int>(diag); ++i)
@@ -285,7 +280,7 @@ main(int argc, char * argv[])
       localIndex[0] = static_cast<long>(u[0] + i * v[0]);
       localIndex[1] = static_cast<long>(u[1] + i * v[1]);
 
-      OutputImageType::RegionType outputRegion =
+      const OutputImageType::RegionType outputRegion =
         localOutputImage->GetLargestPossibleRegion();
 
       if (outputRegion.IsInside(localIndex))
@@ -293,7 +288,6 @@ main(int argc, char * argv[])
         localOutputImage->SetPixel(localIndex, 255);
       }
     }
-    itLines++;
   }
   // Software Guide : EndCodeSnippet
 
@@ -304,14 +298,10 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-  auto writer = WriterType::New();
-  writer->SetFileName(argv[2]);
-  writer->SetInput(localOutputImage);
 
   try
   {
-    writer->Update();
+    itk::WriteImage(localOutputImage, argv[2]);
   }
   catch (const itk::ExceptionObject & excep)
   {

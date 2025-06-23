@@ -40,7 +40,7 @@ itkImageFileReaderPositiveSpacingTest(int argc, char * argv[])
   auto reader = ReaderType::New();
   reader->SetFileName(argv[1]);
   reader->Update();
-  ImageNDType::Pointer image = reader->GetOutput();
+  const ImageNDType::Pointer image = reader->GetOutput();
   image->DisconnectPipeline();
   ImageNDType::SpacingType spacing = image->GetSpacing();
   for (unsigned int ii = 0; ii < image->GetImageDimension(); ++ii)
@@ -52,7 +52,7 @@ itkImageFileReaderPositiveSpacingTest(int argc, char * argv[])
     }
   }
   std::cout << "Spacing: " << spacing << std::endl;
-  ImageNDType::DirectionType direction = image->GetDirection();
+  const ImageNDType::DirectionType direction = image->GetDirection();
   std::cout << "Direction: " << '\n' << direction << std::endl;
 
   MetaImage metaImage;
@@ -88,21 +88,19 @@ itkImageFileReaderPositiveSpacingTest(int argc, char * argv[])
   // We manually go through all pixels in the input image and compare their value without
   // their value in the image loaded without ensuring positive spacing.
   ImageNDType::DirectionType scale;
-  ImageNDType::DirectionType indexToPhysicalPoint;
-  ImageNDType::DirectionType physicalPointToIndex;
   for (unsigned int ii = 0; ii < ImageNDType::ImageDimension; ++ii)
   {
     scale[ii][ii] = ioSpacing[ii];
   }
-  indexToPhysicalPoint = ioDirection * scale;
-  physicalPointToIndex = indexToPhysicalPoint.GetInverse();
+  const ImageNDType::DirectionType indexToPhysicalPoint = ioDirection * scale;
+  ImageNDType::DirectionType       physicalPointToIndex = indexToPhysicalPoint.GetInverse();
 
   using IteratorType = itk::ImageRegionIteratorWithIndex<ImageNDType>;
   IteratorType it(image, image->GetLargestPossibleRegion());
   for (it.GoToBegin(); !it.IsAtEnd(); ++it)
   {
-    ImageNDType::IndexType index = it.GetIndex();
-    ImageNDType::PointType point;
+    const ImageNDType::IndexType index = it.GetIndex();
+    ImageNDType::PointType       point;
     image->TransformIndexToPhysicalPoint(index, point);
     // Compute index from physical point in baseline
     ImageNDType::IndexType baselineIndex;

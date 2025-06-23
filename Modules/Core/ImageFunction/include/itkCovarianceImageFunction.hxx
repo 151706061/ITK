@@ -24,14 +24,14 @@
 namespace itk
 {
 
-template <typename TInputImage, typename TCoordRep>
-CovarianceImageFunction<TInputImage, TCoordRep>::CovarianceImageFunction()
+template <typename TInputImage, typename TCoordinate>
+CovarianceImageFunction<TInputImage, TCoordinate>::CovarianceImageFunction()
 
   = default;
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 auto
-CovarianceImageFunction<TInputImage, TCoordRep>::EvaluateAtIndex(const IndexType & index) const -> RealType
+CovarianceImageFunction<TInputImage, TCoordinate>::EvaluateAtIndex(const IndexType & index) const -> RealType
 {
   using PixelType = typename TInputImage::PixelType;
   using PixelComponentType = typename PixelType::ValueType;
@@ -61,8 +61,7 @@ CovarianceImageFunction<TInputImage, TCoordRep>::EvaluateAtIndex(const IndexType
   mean.fill(PixelComponentRealType{});
 
   // Create an N-d neighborhood kernel, using a zeroflux boundary condition
-  typename InputImageType::SizeType kernelSize;
-  kernelSize.Fill(m_NeighborhoodRadius);
+  auto kernelSize = InputImageType::SizeType::Filled(m_NeighborhoodRadius);
 
   ConstNeighborhoodIterator<InputImageType> it(
     kernelSize, this->GetInputImage(), this->GetInputImage()->GetBufferedRegion());
@@ -103,9 +102,9 @@ CovarianceImageFunction<TInputImage, TCoordRep>::EvaluateAtIndex(const IndexType
   return (covariance);
 }
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 void
-CovarianceImageFunction<TInputImage, TCoordRep>::PrintSelf(std::ostream & os, Indent indent) const
+CovarianceImageFunction<TInputImage, TCoordinate>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 

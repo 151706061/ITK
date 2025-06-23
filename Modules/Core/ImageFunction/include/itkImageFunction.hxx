@@ -22,10 +22,10 @@
 namespace itk
 {
 
-template <typename TInputImage, typename TOutput, typename TCoordRep>
-ImageFunction<TInputImage, TOutput, TCoordRep>::ImageFunction()
+template <typename TInputImage, typename TOutput, typename TCoordinate>
+ImageFunction<TInputImage, TOutput, TCoordinate>::ImageFunction()
+  : m_Image(nullptr)
 {
-  m_Image = nullptr;
   m_StartIndex.Fill(0);
   m_EndIndex.Fill(0);
   m_StartContinuousIndex.Fill(0.0f);
@@ -33,9 +33,9 @@ ImageFunction<TInputImage, TOutput, TCoordRep>::ImageFunction()
 }
 
 
-template <typename TInputImage, typename TOutput, typename TCoordRep>
+template <typename TInputImage, typename TOutput, typename TCoordinate>
 void
-ImageFunction<TInputImage, TOutput, TCoordRep>::PrintSelf(std::ostream & os, Indent indent) const
+ImageFunction<TInputImage, TOutput, TCoordinate>::PrintSelf(std::ostream & os, Indent indent) const
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "InputImage: " << m_Image.GetPointer() << std::endl;
@@ -45,9 +45,9 @@ ImageFunction<TInputImage, TOutput, TCoordRep>::PrintSelf(std::ostream & os, Ind
   os << indent << "EndContinuousIndex: " << m_EndContinuousIndex << std::endl;
 }
 
-template <typename TInputImage, typename TOutput, typename TCoordRep>
+template <typename TInputImage, typename TOutput, typename TCoordinate>
 void
-ImageFunction<TInputImage, TOutput, TCoordRep>::SetInputImage(const InputImageType * ptr)
+ImageFunction<TInputImage, TOutput, TCoordinate>::SetInputImage(const InputImageType * ptr)
 {
   // set the input image
   m_Image = ptr;
@@ -60,8 +60,8 @@ ImageFunction<TInputImage, TOutput, TCoordRep>::SetInputImage(const InputImageTy
     for (unsigned int j = 0; j < ImageDimension; ++j)
     {
       m_EndIndex[j] = m_StartIndex[j] + static_cast<IndexValueType>(size[j]) - 1;
-      m_StartContinuousIndex[j] = static_cast<CoordRepType>(m_StartIndex[j] - 0.5);
-      m_EndContinuousIndex[j] = static_cast<CoordRepType>(m_EndIndex[j] + 0.5);
+      m_StartContinuousIndex[j] = static_cast<CoordinateType>(m_StartIndex[j] - 0.5);
+      m_EndContinuousIndex[j] = static_cast<CoordinateType>(m_EndIndex[j] + 0.5);
     }
   }
 }

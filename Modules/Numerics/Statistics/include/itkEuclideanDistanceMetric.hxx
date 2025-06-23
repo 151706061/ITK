@@ -18,16 +18,13 @@
 #ifndef itkEuclideanDistanceMetric_hxx
 #define itkEuclideanDistanceMetric_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TVector>
 inline double
 EuclideanDistanceMetric<TVector>::Evaluate(const MeasurementVectorType & x) const
 {
-  MeasurementVectorSizeType measurementVectorSize = this->GetMeasurementVectorSize();
+  const MeasurementVectorSizeType measurementVectorSize = this->GetMeasurementVectorSize();
 
   if (measurementVectorSize == 0)
   {
@@ -54,7 +51,7 @@ template <typename TVector>
 inline double
 EuclideanDistanceMetric<TVector>::Evaluate(const MeasurementVectorType & x1, const MeasurementVectorType & x2) const
 {
-  MeasurementVectorSizeType measurementVectorSize = NumericTraits<MeasurementVectorType>::GetLength(x1);
+  const MeasurementVectorSizeType measurementVectorSize = NumericTraits<MeasurementVectorType>::GetLength(x1);
 
   if (measurementVectorSize != NumericTraits<MeasurementVectorType>::GetLength(x2))
   {
@@ -84,7 +81,6 @@ EuclideanDistanceMetric<TVector>::Evaluate(const ValueType & a, const ValueType 
 
   return itk::Math::abs(temp);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

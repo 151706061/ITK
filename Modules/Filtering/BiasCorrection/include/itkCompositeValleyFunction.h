@@ -60,15 +60,8 @@ namespace itk
  * by Martin Styner, Univ. of North Carolina at Chapel Hill, and his
  * colleagues.
  *
- * For more details. refer to the following articles.
- * "Parametric estimate of intensity inhomogeneities applied to MRI"
- * Martin Styner, G. Gerig, Christian Brechbuehler, Gabor Szekely,
- * IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165, 2000,
- * (https://www.cs.unc.edu/~styner/docs/tmi00.pdf)
+ * For more details refer to \cite styner2000 and \cite styner1997.
  *
- * "Evaluation of 2D/3D bias correction with 1+1ES-optimization"
- * Martin Styner, Prof. Dr. G. Gerig (IKT, BIWI, ETH Zuerich), TR-197
- * (https://www.cs.unc.edu/~styner/docs/StynerTR97.pdf)
  * \ingroup ITKBiasCorrection
  */
 class TargetClass
@@ -76,35 +69,36 @@ class TargetClass
 public:
   /** Constructor. */
   TargetClass(double mean, double sigma)
-  {
-    m_Mean = mean;
-    m_Sigma = sigma;
-  }
+    : m_Mean(mean)
+    , m_Sigma(sigma)
+  {}
 
   /** Set/Get the mean of the function. */
+  /** @ITKStartGrouping */
   void
   SetMean(double mean)
   {
     m_Mean = mean;
   }
-  double
+  [[nodiscard]] double
   GetMean() const
   {
     return m_Mean;
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the standard deviation of the function. */
+  /** @ITKStartGrouping */
   void
   SetSigma(double sigma)
   {
     m_Sigma = sigma;
   }
-  double
+  [[nodiscard]] double
   GetSigma() const
   {
     return m_Sigma;
   }
-
+  /** @ITKEndGrouping */
 private:
   double m_Mean;
   double m_Sigma;
@@ -127,14 +121,14 @@ public:
   ~CompositeValleyFunction() override;
 
   /** Get energy table's higher bound. */
-  double
+  [[nodiscard]] double
   GetUpperBound() const
   {
     return m_UpperBound;
   }
 
   /** Get energy table's lower bound. */
-  double
+  [[nodiscard]] double
   GetLowerBound() const
   {
     return m_LowerBound;
@@ -154,10 +148,8 @@ public:
     {
       return this->Evaluate(x);
     }
-    else
-    {
-      return GetCachedValue(x);
-    }
+
+    return GetCachedValue(x);
   }
 
   /** Evaluate the function at point x.  */
@@ -175,7 +167,7 @@ protected:
   void
   AddNewClass(double mean, double sigma)
   {
-    TargetClass aClass(mean, sigma);
+    const TargetClass aClass(mean, sigma);
 
     m_Targets.push_back(aClass);
   }

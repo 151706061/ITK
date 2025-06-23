@@ -38,20 +38,10 @@ namespace itk
  * Output: The output is the updated transform which has been added to the
  * composite transform.
  *
- * This implementation is based on the source code in Advanced Normalization Tools (ANTs)
+ * This implementation is based on the source code in Advanced
+ * Normalization Tools (ANTs) \cite avants2011.
  *
- *   Avants, B. B.; Tustison, N. J.; Song, G.; Cook, P. A.; Klein, A. & Gee, J. C.
- *   A reproducible evaluation of ANTs similarity metric performance in brain image registration.
- *   Neuroimage, Penn Image Computing and Science Laboratory, University of Pennsylvania,
- *   2011, 54, 2033-2044
- *
- * The original paper discussing the method is here:
- *
- *  Avants, B. B.; Epstein, C. L.; Grossman, M. & Gee, J. C.
- *  Symmetric diffeomorphic image registration with cross-correlation:
- *  evaluating automated labeling of elderly and neurodegenerative brain.
- *  Med Image Anal, Department of Radiology, University of Pennsylvania,
- *  2008, 12, 26-41
+ * The original paper discussing the method is \cite avants2008.
  *
  * The method evolved since that time with crucial contributions from Gang Song and
  * Nick Tustison. Though similar in spirit, this implementation is not identical.
@@ -86,7 +76,7 @@ public:
   /** ImageDimension constants */
   static constexpr unsigned int ImageDimension = TFixedImage::ImageDimension;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SyNImageRegistrationMethod);
 
   /** Input type alias for the images. */
@@ -145,54 +135,64 @@ public:
   using NumberOfIterationsArrayType = Array<SizeValueType>;
 
   /** Set/Get the learning rate. */
+  /** @ITKStartGrouping */
   itkSetMacro(LearningRate, RealType);
   itkGetConstMacro(LearningRate, RealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of iterations per level. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfIterationsPerLevel, NumberOfIterationsArrayType);
   itkGetConstMacro(NumberOfIterationsPerLevel, NumberOfIterationsArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the convergence threshold */
+  /** @ITKStartGrouping */
   itkSetMacro(ConvergenceThreshold, RealType);
   itkGetConstMacro(ConvergenceThreshold, RealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the convergence window size */
+  /** @ITKStartGrouping */
   itkSetMacro(ConvergenceWindowSize, unsigned int);
   itkGetConstMacro(ConvergenceWindowSize, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Let the user control whether we compute metric derivatives in the downsampled or full-res space.
    *  The default is 'true' --- classic SyN --- but there may be advantages to the other approach.
    *  Classic SyN did not have this possibility. This implementation will let us explore the question.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(DownsampleImagesForMetricDerivatives, bool);
   itkGetConstMacro(DownsampleImagesForMetricDerivatives, bool);
-
+  /** @ITKEndGrouping */
   /** Allow the user to average the gradients in the mid-point domain. Default false.
    *  One might choose to do this to further reduce bias.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(AverageMidPointGradients, bool);
   itkGetConstMacro(AverageMidPointGradients, bool);
-
+  /** @ITKEndGrouping */
   /**
    * Get/Set the Gaussian smoothing variance for the update field.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheUpdateField, RealType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheUpdateField, RealType);
-
+  /** @ITKEndGrouping */
   /**
    * Get/Set the Gaussian smoothing variance for the total field.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheTotalField, RealType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheTotalField, RealType);
-
+  /** @ITKEndGrouping */
   /** Get modifiable FixedToMiddle and MovingToMiddle transforms to save the current state of the registration. */
+  /** @ITKStartGrouping */
   itkGetModifiableObjectMacro(FixedToMiddleTransform, OutputTransformType);
   itkGetModifiableObjectMacro(MovingToMiddleTransform, OutputTransformType);
-
+  /** @ITKEndGrouping */
   /** Set FixedToMiddle and MovingToMiddle transforms to restore the registration from a saved state. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(FixedToMiddleTransform, OutputTransformType);
   itkSetObjectMacro(MovingToMiddleTransform, OutputTransformType);
-
+  /** @ITKEndGrouping */
 protected:
   SyNImageRegistrationMethod();
   ~SyNImageRegistrationMethod() override = default;

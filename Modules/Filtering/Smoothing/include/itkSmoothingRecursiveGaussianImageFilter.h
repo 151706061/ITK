@@ -65,7 +65,7 @@ public:
   using RealType = typename NumericTraits<PixelType>::RealType;
   using ScalarRealType = typename NumericTraits<PixelType>::ScalarRealType;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SmoothingRecursiveGaussianImageFilter);
 
   /** Image dimension. */
@@ -108,11 +108,12 @@ public:
    * Sigma is measured in the units of image spacing. You may use the method
    * SetSigma to set the same value across each axis or use the method
    * SetSigmaArray if you need different values along each axis. */
+  /** @ITKStartGrouping */
   void
   SetSigmaArray(const SigmaArrayType & sigma);
   void
   SetSigma(ScalarRealType sigma);
-
+  /** @ITKEndGrouping */
   /** Get the Sigma value. */
   SigmaArrayType
   GetSigmaArray() const;
@@ -126,25 +127,22 @@ public:
    * This method does not effect the output of this filter.
    *
    * \sa RecursiveGaussianImageFilter::SetNormalizeAcrossScale */
+  /** @ITKStartGrouping */
   void
   SetNormalizeAcrossScale(bool normalize);
   itkGetConstMacro(NormalizeAcrossScale, bool);
   itkBooleanMacro(NormalizeAcrossScale);
-
+  /** @ITKEndGrouping */
   /** Set the number of work units to create. */
   void
   SetNumberOfWorkUnits(ThreadIdType nb) override;
 
-  bool
+  [[nodiscard]] bool
   CanRunInPlace() const override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   // This concept does not work with variable length vector images
   // itkConceptMacro( InputHasNumericTraitsCheck,
   //( Concept::HasNumericTraits< PixelType > ) );
-  // End concept checking
-#endif
 
 protected:
   SmoothingRecursiveGaussianImageFilter();

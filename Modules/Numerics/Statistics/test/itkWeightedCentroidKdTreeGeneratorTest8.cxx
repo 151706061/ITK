@@ -37,8 +37,8 @@ itkWeightedCentroidKdTreeGeneratorTest8(int argc, char * argv[])
   // Random number generator
   using NumberGeneratorType = itk::Statistics::MersenneTwisterRandomVariateGenerator;
 
-  NumberGeneratorType::Pointer randomNumberGenerator = NumberGeneratorType::GetInstance();
-  randomNumberGenerator->Initialize();
+  const NumberGeneratorType::Pointer randomNumberGenerator = NumberGeneratorType::GetInstance();
+  randomNumberGenerator->SetSeed();
 
   constexpr unsigned int measurementVectorSize = 2;
 
@@ -73,17 +73,16 @@ itkWeightedCentroidKdTreeGeneratorTest8(int argc, char * argv[])
 
   using TreeType = TreeGeneratorType::KdTreeType;
 
-  TreeType::Pointer tree = treeGenerator->GetOutput();
+  const TreeType::Pointer tree = treeGenerator->GetOutput();
 
   MeasurementVectorType queryPoint;
 
-  unsigned int                           numberOfNeighbors = 1;
+  constexpr unsigned int                 numberOfNeighbors = 1;
   TreeType::InstanceIdentifierVectorType neighbors;
 
   MeasurementVectorType result;
   MeasurementVectorType test_point;
-  MeasurementVectorType min_point;
-  min_point.Fill(0.0);
+  MeasurementVectorType min_point{};
 
   unsigned int numberOfFailedPoints = 0;
 
@@ -155,8 +154,8 @@ itkWeightedCentroidKdTreeGeneratorTest8(int argc, char * argv[])
     //
     // Compute the distance to the "presumed" nearest neighbor
     //
-    double result_dist = std::sqrt((result[0] - queryPoint[0]) * (result[0] - queryPoint[0]) +
-                                   (result[1] - queryPoint[1]) * (result[1] - queryPoint[1]));
+    const double result_dist = std::sqrt((result[0] - queryPoint[0]) * (result[0] - queryPoint[0]) +
+                                         (result[1] - queryPoint[1]) * (result[1] - queryPoint[1]));
 
     //
     // Compute the distance to all other points, to verify

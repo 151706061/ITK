@@ -31,7 +31,7 @@ namespace itk
  *
  * \note For itk::Image, one element is one pixel. So the number of elements is directly
  * linked to the physical size of the object, i.e.
- * \f$ PhysicalSize = TargetNumberOfElements \cdot \prod_{i=1}{dim} Spacing_{i} \f$
+ * \f$ PhysicalSize = TargetNumberOfElements \cdot \prod_{i=1}^{dim} Spacing_{i} \f$
  *
  * \note For itk::QuadEdgeMesh, one element is one vertex.
  *
@@ -52,23 +52,24 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingNumberOfElementsStoppingCriterion);
 
   using typename Superclass::OutputPixelType;
   using typename Superclass::NodeType;
 
   /** Get/set the threshold used by the stopping criteria. */
+  /** @ITKStartGrouping */
   itkSetMacro(TargetNumberOfElements, IdentifierType);
   itkGetMacro(TargetNumberOfElements, IdentifierType);
-
-  bool
+  /** @ITKEndGrouping */
+  [[nodiscard]] bool
   IsSatisfied() const override
   {
     return (this->m_CurrentNumberOfElements >= this->m_TargetNumberOfElements);
   }
 
-  std::string
+  [[nodiscard]] std::string
   GetDescription() const override
   {
     return "Current Number of Elements >= Target Number of Elements";

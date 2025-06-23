@@ -61,7 +61,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Finding regional extrema - methods and performance"
  * by Beare R., Lehmann G.
- * https://www.insight-journal.org/browse/publication/65
+ * https://doi.org/10.54294/hva3gz
  *
  * \author Richard Beare. Department of Medicine, Monash University,
  * Melbourne, Australia.
@@ -105,7 +105,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ValuedRegionalExtremaImageFilter);
 
   /**
@@ -114,27 +114,25 @@ public:
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the value used to mark all pixels which are not extrema.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(MarkerValue, typename TInputImage::PixelType);
   itkGetConstReferenceMacro(MarkerValue, typename TInputImage::PixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Get whether the image is flat or not.
    */
   itkGetConstMacro(Flat, bool);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasPixelTraitsCheck, (Concept::HasPixelTraits<InputImagePixelType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   ValuedRegionalExtremaImageFilter();

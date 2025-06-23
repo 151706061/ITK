@@ -76,7 +76,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AutoPointerDataObjectDecorator);
 
   /** Set the contained object */
@@ -84,6 +84,7 @@ public:
   Set(T * val);
 
   /** Get the contained object */
+  /** @ITKStartGrouping */
   virtual T *
   Get()
   {
@@ -94,7 +95,7 @@ public:
   {
     return m_Component.get();
   }
-
+  /** @ITKEndGrouping */
 protected:
   AutoPointerDataObjectDecorator() = default;
   ~AutoPointerDataObjectDecorator() override = default;

@@ -152,7 +152,7 @@ LBFGSOptimizerBasev4<TInternalVnlOptimizerType>::GetOptimizer() -> InternalOptim
 }
 
 template <typename TInternalVnlOptimizerType>
-const std::string
+std::string
 LBFGSOptimizerBasev4<TInternalVnlOptimizerType>::GetStopConditionDescription() const
 {
   m_StopConditionDescription.str("");
@@ -212,10 +212,8 @@ LBFGSOptimizerBasev4<TInternalVnlOptimizerType>::GetStopConditionDescription() c
     }
     return m_StopConditionDescription.str();
   }
-  else
-  {
-    return std::string("");
-  }
+
+  return {};
 }
 
 template class ITKOptimizersv4_EXPORT LBFGSOptimizerBasev4<vnl_lbfgs>;

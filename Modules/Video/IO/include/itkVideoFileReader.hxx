@@ -28,13 +28,10 @@ namespace itk
 
 template <typename TOutputVideoStream>
 VideoFileReader<TOutputVideoStream>::VideoFileReader()
+  : m_FileName("")
+  , m_VideoIO(nullptr)
+  , m_IFrameSafe(true)
 {
-  // Initialize members
-  m_FileName = "";
-  m_VideoIO = nullptr;
-  m_PixelConversionNeeded = false;
-  m_IFrameSafe = true;
-
   // TemporalProcessObject inherited members
   this->SetUnitOutputNumberOfFrames(1);
   this->SetFrameSkipPerOutput(1);
@@ -100,7 +97,7 @@ VideoFileReader<TOutputVideoStream>::UpdateOutputInformation()
   }
   const RegionType region(size);
 
-  VideoStreamPointer output = this->GetOutput();
+  const VideoStreamPointer output = this->GetOutput();
 
   output->SetAllLargestPossibleSpatialRegions(region);
   output->SetAllBufferedSpatialRegions(region);
@@ -188,15 +185,15 @@ VideoFileReader<TOutputVideoStream>::InitializeVideoIO()
   }
 
   // See if a buffer conversion is needed
-  IOComponentEnum ioType = ImageIOBase::MapPixelType<typename ConvertPixelTraits::ComponentType>::CType;
+  const IOComponentEnum ioType = ImageIOBase::MapPixelType<typename ConvertPixelTraits::ComponentType>::CType;
   if (m_VideoIO->GetComponentType() != ioType ||
       m_VideoIO->GetNumberOfComponents() != ConvertPixelTraits::GetNumberOfComponents())
   {
     // the pixel types don't match so a type conversion needs to be
     // performed
     itkDebugMacro("Buffer conversion required from: "
-                  << m_VideoIO->GetComponentTypeAsString(m_VideoIO->GetComponentType())
-                  << " to: " << m_VideoIO->GetComponentTypeAsString(ioType) << " ConvertPixelTraits::NumComponents "
+                  << ImageIOBase::GetComponentTypeAsString(m_VideoIO->GetComponentType())
+                  << " to: " << ImageIOBase::GetComponentTypeAsString(ioType) << " ConvertPixelTraits::NumComponents "
                   << ConvertPixelTraits::GetNumberOfComponents() << " m_VideoIO->NumComponents "
                   << m_VideoIO->GetNumberOfComponents());
     m_PixelConversionNeeded = true;
@@ -219,10 +216,10 @@ VideoFileReader<TOutputVideoStream>::TemporalStreamingGenerateData()
   typename VideoStreamType::TemporalRegionType requestedTemporalRegion;
   output = this->GetOutput();
   requestedTemporalRegion = output->GetRequestedTemporalRegion();
-  FrameOffsetType frameNum = requestedTemporalRegion.GetFrameStart();
+  const FrameOffsetType frameNum = requestedTemporalRegion.GetFrameStart();
 
   // Figure out if we need to skip frames
-  FrameOffsetType currentIOFrame = m_VideoIO->GetCurrentFrame();
+  const FrameOffsetType currentIOFrame = m_VideoIO->GetCurrentFrame();
   if (frameNum != currentIOFrame)
   {
     m_VideoIO->SetNextFrameToRead(frameNum);
@@ -232,8 +229,8 @@ VideoFileReader<TOutputVideoStream>::TemporalStreamingGenerateData()
   if (this->m_PixelConversionNeeded)
   {
     // Set up temporary buffer for reading
-    size_t     bufferSize = m_VideoIO->GetImageSizeInBytes();
-    const auto loadBuffer = make_unique_for_overwrite<char[]>(bufferSize);
+    const size_t bufferSize = m_VideoIO->GetImageSizeInBytes();
+    const auto   loadBuffer = make_unique_for_overwrite<char[]>(bufferSize);
 
     // Read into a temporary buffer
     this->m_VideoIO->Read(static_cast<void *>(loadBuffer.get()));
@@ -255,9 +252,9 @@ template <typename TOutputVideoStream>
 void
 VideoFileReader<TOutputVideoStream>::DoConvertBuffer(const void * inputData, FrameOffsetType frameNumber)
 {
-  PixelType *  outputData = this->GetOutput()->GetFrame(frameNumber)->GetPixelContainer()->GetBufferPointer();
-  unsigned int numberOfPixels = this->GetOutput()->GetFrame(frameNumber)->GetPixelContainer()->Size();
-  bool         isVectorImage(strcmp(this->GetOutput()->GetFrame(frameNumber)->GetNameOfClass(), "VectorImage") == 0);
+  PixelType *        outputData = this->GetOutput()->GetFrame(frameNumber)->GetPixelContainer()->GetBufferPointer();
+  const unsigned int numberOfPixels = this->GetOutput()->GetFrame(frameNumber)->GetPixelContainer()->Size();
+  const bool isVectorImage(strcmp(this->GetOutput()->GetFrame(frameNumber)->GetNameOfClass(), "VectorImage") == 0);
 #define ITK_CONVERT_BUFFER_IF_BLOCK(_CType, type)                                                              \
   else if (m_VideoIO->GetComponentType() == _CType)                                                            \
   {                                                                                                            \
@@ -290,12 +287,12 @@ VideoFileReader<TOutputVideoStream>::DoConvertBuffer(const void * inputData, Fra
   ITK_CONVERT_BUFFER_IF_BLOCK(IOComponentEnum::DOUBLE, double)
   else
   {
-#define TYPENAME_VideoFileReader(x) m_VideoIO->GetComponentTypeAsString(ImageIOBase::MapPixelType<x>::CType)
+#define TYPENAME_VideoFileReader(x) ImageIOBase::GetComponentTypeAsString(ImageIOBase::MapPixelType<x>::CType)
 
     ExceptionObject    e(__FILE__, __LINE__);
     std::ostringstream msg;
     msg << "Couldn't convert component type: " << std::endl
-        << "    " << m_VideoIO->GetComponentTypeAsString(m_VideoIO->GetComponentType()) << std::endl
+        << "    " << ImageIOBase::GetComponentTypeAsString(m_VideoIO->GetComponentType()) << std::endl
         << "to one of: " << std::endl
         << "    " << TYPENAME_VideoFileReader(unsigned char) << std::endl
         << "    " << TYPENAME_VideoFileReader(char) << std::endl

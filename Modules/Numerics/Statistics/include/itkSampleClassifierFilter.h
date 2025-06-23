@@ -26,9 +26,7 @@
 #include "itkProcessObject.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class SampleClassifierFilter
@@ -53,10 +51,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(SampleClassifierFilter);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Type of the input Sample */
   using SampleType = TSample;
 
@@ -105,13 +104,15 @@ public:
   /** Number of classes. This must match the number of labels and membership
    * functions provided by the user, otherwise an exception will be thrown at
    */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfClasses, unsigned int);
   itkGetConstMacro(NumberOfClasses, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get the decision rule. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(DecisionRule, DecisionRuleType);
   itkGetConstObjectMacro(DecisionRule, DecisionRuleType);
-
+  /** @ITKEndGrouping */
   /** Sets input vector of class labels. The length of this vector must match
    * the number of classes, otherwise an exception will be thrown at run time.
    * */
@@ -144,19 +145,19 @@ protected:
    * called.
    * \sa ProcessObject
    */
+  /** @ITKStartGrouping */
   using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
   using Superclass::MakeOutput;
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
-
+  /** @ITKEndGrouping */
 private:
   unsigned int m_NumberOfClasses{};
 
   /** Decision Rule */
   DecisionRulePointer m_DecisionRule{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkSampleClassifierFilter.hxx"

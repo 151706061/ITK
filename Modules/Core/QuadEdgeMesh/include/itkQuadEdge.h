@@ -52,6 +52,7 @@
  * @param dt Dual edge type.
  * \todo Should this macro be added to doxygen macros?
  */
+/** @ITKStartGrouping */
 #define itkQEAccessorsMacro(st, pt, dt)                                                          \
   pt * GetOnext() { return (dynamic_cast<pt *>(this->st::GetOnext())); }                         \
                                                                                                  \
@@ -110,19 +111,21 @@
                                                                                                  \
   const pt * GetInvRnext() const { return (dynamic_cast<const pt *>(this->st::GetInvRnext())); } \
                                                                                                  \
-  const pt * GetInvDnext() const { return (dynamic_cast<const pt *>(this->st::GetInvDnext())); }
-
+  const pt * GetInvDnext() const { return (dynamic_cast<const pt *>(this->st::GetInvDnext())); } \
+                                                                                                 \
+  ITK_MACROEND_NOOP_STATEMENT
+/** @ITKEndGrouping */
 namespace itk
 {
 /**
  * \class QuadEdge
  * \brief Base class for the implementation of a quad-edge data structure as
- * proposed in "Guibas and Stolfi 1985"
+ * proposed in \cite guibas1985.
  *
  * \author Alexandre Gouaillard, Leonardo Florez-Valencia, Eric Boix
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/122
+ * https://doi.org/10.54294/4mx7kk
  *
  * \sa "Accessing adjacent edges."
  *
@@ -141,6 +144,7 @@ public:
   using ConstIterator = QuadEdgeMeshConstIterator<Self>;
 
   /** Basic iterators methods. */
+  /** @ITKStartGrouping */
   inline itkQEDefineIteratorMethodsMacro(Onext);
   // itkQEDefineIteratorMethodsMacro( Sym );
   // itkQEDefineIteratorMethodsMacro( Lnext );
@@ -154,8 +158,10 @@ public:
   // itkQEDefineIteratorMethodsMacro( InvLnext );
   // itkQEDefineIteratorMethodsMacro( InvRnext );
   // itkQEDefineIteratorMethodsMacro( InvDnext );
+  /** @ITKEndGrouping */
 
   /** Object creation methods. */
+  /** @ITKStartGrouping */
   QuadEdge();
   QuadEdge(const QuadEdge &) = default;
   QuadEdge(QuadEdge &&) = default;
@@ -164,8 +170,10 @@ public:
   QuadEdge &
   operator=(QuadEdge &&) = default;
   virtual ~QuadEdge();
+  /** @ITKEndGrouping */
 
   /** Sub-algebra Set methods. */
+  /** @ITKStartGrouping */
   inline void
   SetOnext(Self * onext)
   {
@@ -176,10 +184,12 @@ public:
   {
     this->m_Rot = rot;
   }
+  /** @ITKEndGrouping */
 
   /** Sub-algebra Get methods.
    *  Returns edge with same Origin (see
    *  "Accessing adjacent edges"). */
+  /** @ITKStartGrouping */
   inline Self *
   GetOnext()
   {
@@ -190,16 +200,17 @@ public:
   {
     return this->m_Rot;
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetOnext() const
   {
     return this->m_Onext;
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetRot() const
   {
     return this->m_Rot;
   }
+  /** @ITKEndGrouping */
 
   /**
    * \brief Basic quad-edge topological method.
@@ -239,6 +250,7 @@ public:
 
   /** Returns the symmetric edge
    * (see "Accessing adjacent edges"). */
+  /** @ITKStartGrouping */
   inline Self *
   GetSym()
   {
@@ -246,25 +258,26 @@ public:
     {
       return (this->m_Rot->m_Rot);
     }
-    return (this->m_Rot);
+    return nullptr;
   }
 
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetSym() const
   {
     if (this->m_Rot)
     {
       return (this->m_Rot->m_Rot);
     }
-    return (this->m_Rot);
+    return nullptr;
   }
+  /** @ITKEndGrouping */
 
   /** Returns next edge with same Left face
    * (see "Accessing adjacent edges"). */
   Self *
   GetLnext();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetLnext() const;
 
   /** Returns next edge with same Right face. The first edge
@@ -273,7 +286,7 @@ public:
   Self *
   GetRnext();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetRnext() const;
 
   /** Returns next edge with same right face and same Destination. The
@@ -282,7 +295,7 @@ public:
   Self *
   GetDnext();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetDnext() const;
 
   /** Returns previous edge with same Origin
@@ -290,7 +303,7 @@ public:
   Self *
   GetOprev();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetOprev() const;
 
   /** Returns previous edge with same Left face. The first edge
@@ -299,7 +312,7 @@ public:
   Self *
   GetLprev();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetLprev() const;
 
   /** Returns the previous edge with same Right face. The first edge
@@ -308,7 +321,7 @@ public:
   Self *
   GetRprev();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetRprev() const;
 
   /** Returns the previous edge with same Right face and same Destination.
@@ -317,10 +330,11 @@ public:
   Self *
   GetDprev();
 
-  const Self *
+  [[nodiscard]] [[nodiscard]] const Self *
   GetDprev() const;
 
   /** Inverse operators */
+  /** @ITKStartGrouping */
   inline Self *
   GetInvRot()
   {
@@ -366,7 +380,7 @@ public:
   {
     return this->GetDprev();
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetInvRot() const
   {
 #ifdef NDEBUG
@@ -391,45 +405,47 @@ public:
 #endif
   }
 
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetInvOnext() const
   {
     return this->GetOprev();
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetInvLnext() const
   {
     return this->GetLprev();
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetInvRnext() const
   {
     return this->GetRprev();
   }
-  inline const Self *
+  [[nodiscard]] [[nodiscard]] inline const Self *
   GetInvDnext() const
   {
     return this->GetDprev();
   }
+  /** @ITKEndGrouping */
 
   /** Queries. */
-  inline bool
+  /** @ITKStartGrouping */
+  [[nodiscard]] [[nodiscard]] inline bool
   IsHalfEdge() const
   {
     return ((m_Onext == this) || (m_Rot == nullptr));
   }
-  inline bool
+  [[nodiscard]] [[nodiscard]] inline bool
   IsIsolated() const
   {
     return (this == this->GetOnext());
   }
   bool
   IsEdgeInOnextRing(Self * testEdge) const;
-
-  bool
+  [[nodiscard]] [[nodiscard]] bool
   IsLnextGivenSizeCyclic(const int size) const;
+  /** @ITKEndGrouping */
 
-  unsigned int
+  [[nodiscard]] [[nodiscard]] unsigned int
   GetOrder() const;
 
 private:

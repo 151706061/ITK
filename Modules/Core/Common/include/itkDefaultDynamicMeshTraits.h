@@ -46,7 +46,7 @@ namespace itk
  * \tparam VMaxTopologicalDimension Max topological dimension of a cell
  * that can be inserted into this mesh.
  *
- * \tparam TCoordRep Numerical type to store each coordinate value.
+ * \tparam TCoordinate Numerical type to store each coordinate value.
  *
  * \tparam TInterpolationWeight Numerical type to store interpolation
  * weights.
@@ -57,7 +57,7 @@ namespace itk
 template <typename TPixelType,
           unsigned int VPointDimension = 3,
           unsigned int VMaxTopologicalDimension = VPointDimension,
-          typename TCoordRep = float,
+          typename TCoordinate = float,
           typename TInterpolationWeight = float,
           typename TCellPixelType = TPixelType>
 class DefaultDynamicMeshTraits
@@ -69,7 +69,11 @@ public:
   /** Just save all the template parameters. */
   using PixelType = TPixelType;
   using CellPixelType = TCellPixelType;
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = TInterpolationWeight;
 
   /** Just save all the template parameters. */
@@ -90,11 +94,11 @@ public:
   using CellFeatureIdentifier = IdentifierType;
 
   /** The type of point used by the mesh. */
-  using PointType = Point<CoordRepType, VPointDimension>;
+  using PointType = Point<CoordinateType, VPointDimension>;
 
   /** The type of point used for hashing.  This should never change from
    * this setting, regardless of the mesh type. */
-  using PointHashType = Point<CoordRepType, VPointDimension>;
+  using PointHashType = Point<CoordinateType, VPointDimension>;
 
   /** The container type for use in storing points.  It must conform to
    * the IndexedContainerInterface. */

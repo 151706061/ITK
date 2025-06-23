@@ -22,9 +22,7 @@
 #include "itkObjectFactory.h"
 #include "itkTotalProgressReporter.h"
 
-namespace itk
-{
-namespace Testing
+namespace itk::Testing
 {
 
 template <typename TInputImage, typename TOutputImage>
@@ -53,7 +51,7 @@ ExtractSliceImageFilter<TInputImage, TOutputImage>::CallCopyOutputRegionToInputR
   InputImageRegionType &        destRegion,
   const OutputImageRegionType & srcRegion)
 {
-  ExtractSliceImageFilterRegionCopierType extractImageRegionCopier;
+  const ExtractSliceImageFilterRegionCopierType extractImageRegionCopier;
 
   extractImageRegionCopier(destRegion, srcRegion, m_ExtractionRegion);
 }
@@ -67,12 +65,10 @@ ExtractSliceImageFilter<TInputImage, TOutputImage>::SetExtractionRegion(InputIma
                 "InputImageDimension must be greater than OutputImageDimension");
   m_ExtractionRegion = extractRegion;
 
-  unsigned int        nonzeroSizeCount = 0;
-  InputImageSizeType  inputSize = extractRegion.GetSize();
-  OutputImageSizeType outputSize;
-  outputSize.Fill(0);
-  OutputImageIndexType outputIndex;
-  outputIndex.Fill(0);
+  unsigned int         nonzeroSizeCount = 0;
+  InputImageSizeType   inputSize = extractRegion.GetSize();
+  OutputImageSizeType  outputSize{};
+  OutputImageIndexType outputIndex{};
 
   /**
    * check to see if the number of non-zero entries in the extraction region
@@ -124,9 +120,7 @@ ExtractSliceImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
   outputPtr->SetLargestPossibleRegion(m_OutputImageRegion);
 
   // Set the output spacing and origin
-  const ImageBase<InputImageDimension> * phyData;
-
-  phyData = dynamic_cast<const ImageBase<InputImageDimension> *>(this->GetInput());
+  const auto * phyData = dynamic_cast<const ImageBase<InputImageDimension> *>(this->GetInput());
 
   if (phyData == nullptr)
   {
@@ -144,10 +138,9 @@ ExtractSliceImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
 
   typename OutputImageType::SpacingType   outputSpacing;
   typename OutputImageType::DirectionType outputDirection;
-  typename OutputImageType::PointType     outputOrigin;
-  outputOrigin.Fill(0.0);
+  typename OutputImageType::PointType     outputOrigin{};
 
-  if (static_cast<unsigned int>(OutputImageDimension) > static_cast<unsigned int>(InputImageDimension))
+  if constexpr (OutputImageDimension > InputImageDimension)
   {
     // copy the input to the output and fill the rest of the
     // output with zeros.
@@ -292,7 +285,6 @@ ExtractSliceImageFilter<TInputImage, TOutputImage>::GetInput() const
   return itkDynamicCastInDebugMode<const TInputImage *>(this->GetPrimaryInput());
 }
 
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #endif

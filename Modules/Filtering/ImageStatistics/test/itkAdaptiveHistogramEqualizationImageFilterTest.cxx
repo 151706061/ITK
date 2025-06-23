@@ -46,23 +46,22 @@ itkAdaptiveHistogramEqualizationImageFilterTest(int argc, char * argv[])
   auto reader = ReaderType::New();
   reader->SetFileName(argv[1]);
 
-  FilterType::ImageSizeType radius;
-  radius.Fill(std::stoi(argv[3]));
+  auto radius = FilterType::ImageSizeType::Filled(std::stoi(argv[3]));
 
   auto filter = FilterType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, AdaptiveHistogramEqualizationImageFilter, MovingHistogramImageFilter);
 
-  itk::SimpleFilterWatcher watcher(filter);
+  const itk::SimpleFilterWatcher watcher(filter);
 
   filter->SetInput(reader->GetOutput());
   filter->SetRadius(radius);
 
-  float alpha = std::stod(argv[4]);
+  const float alpha = std::stod(argv[4]);
   filter->SetAlpha(alpha);
   ITK_TEST_SET_GET_VALUE(alpha, filter->GetAlpha());
 
-  float beta = std::stod(argv[5]);
+  const float beta = std::stod(argv[5]);
   filter->SetBeta(beta);
   ITK_TEST_SET_GET_VALUE(beta, filter->GetBeta());
 

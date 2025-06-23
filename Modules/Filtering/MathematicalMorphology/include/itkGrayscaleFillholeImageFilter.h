@@ -44,8 +44,7 @@ namespace itk
  * pixel value in the input image.
  *
  * Geodesic morphology and the Fillhole algorithm is described in
- * Chapter 6 of Pierre Soille's book "Morphological Image Analysis:
- * Principles and Applications", Second Edition, Springer, 2003.
+ * \cite soille2004.
  *
  * \sa ReconstructionByErosionImageFilter
  * \sa MorphologyImageFilter, GrayscaleErodeImageFilter, GrayscaleFunctionErodeImageFilter, BinaryErodeImageFilter
@@ -83,7 +82,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GrayscaleFillholeImageFilter);
 
   /**
@@ -92,15 +91,12 @@ public:
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   GrayscaleFillholeImageFilter();

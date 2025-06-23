@@ -42,7 +42,7 @@ ObjectStore<TObjectType>::Reserve(SizeValueType n)
 
   // Need to grow.  Allocate a new block of memory and copy that block's
   // pointers into the m_FreeList.  Updates m_Size appropriately.
-  MemoryBlock new_block(n - m_Size);
+  const MemoryBlock new_block(n - m_Size);
   m_Store.push_back(new_block);
 
   m_FreeList.reserve(n);
@@ -57,13 +57,11 @@ template <typename TObjectType>
 auto
 ObjectStore<TObjectType>::Borrow() -> ObjectType *
 {
-  ObjectType * p;
-
   if (m_FreeList.empty()) // must allocate more memory
   {
     this->Reserve(m_Size + this->GetGrowthSize());
   }
-  p = m_FreeList.back();
+  ObjectType * p = m_FreeList.back();
   m_FreeList.pop_back();
   return p;
 

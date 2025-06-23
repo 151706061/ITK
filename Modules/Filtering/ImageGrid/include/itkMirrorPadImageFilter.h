@@ -70,7 +70,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MirrorPadImageFilter);
 
   using InputImageType = TInputImage;
@@ -94,14 +94,11 @@ public:
   static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
 
   /** Get/Set the base for exponential decay in mirrored region. */
+  /** @ITKStartGrouping */
   itkGetMacro(DecayBase, double);
   itkSetClampMacro(DecayBase, double, NumericTraits<double>::min(), 1.0);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   MirrorPadImageFilter() = default;

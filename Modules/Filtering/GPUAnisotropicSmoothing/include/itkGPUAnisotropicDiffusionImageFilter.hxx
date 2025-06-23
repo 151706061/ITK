@@ -41,12 +41,14 @@ GPUAnisotropicDiffusionImageFilter<TInputImage, TOutputImage, TParentImageFilter
   double minSpacing;
   if (this->GetUseImageSpacing())
   {
-    minSpacing = this->GetInput()->GetSpacing()[0];
+    const auto & spacing = this->GetInput()->GetSpacing();
+
+    minSpacing = spacing[0];
     for (unsigned int i = 1; i < ImageDimension; ++i)
     {
-      if (this->GetInput()->GetSpacing()[i] < minSpacing)
+      if (spacing[i] < minSpacing)
       {
-        minSpacing = this->GetInput()->GetSpacing()[i];
+        minSpacing = spacing[i];
       }
     }
   }
@@ -54,14 +56,13 @@ GPUAnisotropicDiffusionImageFilter<TInputImage, TOutputImage, TParentImageFilter
   {
     minSpacing = 1.0;
   }
-  if (this->GetTimeStep() > (minSpacing / std::pow(2.0, static_cast<double>(ImageDimension) + 1)))
+  if (this->GetTimeStep() > (minSpacing / double{ 1ULL << (ImageDimension + 1) }))
   {
-    //    f->SetTimeStep(1.0 / std::pow(2.0,
-    // static_cast<double>(ImageDimension)));
+    //    f->SetTimeStep(1.0 / double{ 1ULL << ImageDimension });
     itkWarningMacro("Anisotropic diffusion unstable time step: "
                     << this->GetTimeStep() << std::endl
                     << "Stable time step for this image must be smaller than "
-                    << minSpacing / std::pow(2.0, static_cast<double>(ImageDimension + 1)));
+                    << minSpacing / double{ 1ULL << (ImageDimension + 1) });
   }
 
   if (this->m_GradientMagnitudeIsFixed == false)

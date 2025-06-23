@@ -16,6 +16,8 @@
  *
  *=========================================================================*/
 
+#include <algorithm>
+
 #include "itkImageSource.h"
 #include "itkTestingMacros.h"
 
@@ -41,7 +43,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DummyImageSource);
 
   /** Index for which exception is thrown. */
@@ -56,7 +58,7 @@ protected:
     TOutputImage * output = nullptr;
     output = this->GetOutput(0);
     typename TOutputImage::RegionType largestPossibleRegion;
-    largestPossibleRegion.SetSize({ { 4 } });
+    largestPossibleRegion.SetSize({ { std::min(4, ITK_DEFAULT_MAX_THREADS) } });
     output->SetLargestPossibleRegion(largestPossibleRegion);
   }
 
@@ -83,17 +85,20 @@ itkMultiThreaderExceptionsTest(int, char *[])
 
   using OutputImageType = itk::Image<OutputPixelType, Dimension>;
 
-  std::set<ThreaderEnum> threadersToTest = { ThreaderEnum::Platform, ThreaderEnum::Pool };
+  const std::set<ThreaderEnum> threadersToTest = {
+    ThreaderEnum::Platform,
+    ThreaderEnum::Pool,
 #ifdef ITK_USE_TBB
-  threadersToTest.insert(ThreaderEnum::TBB);
+    ThreaderEnum::TBB,
 #endif // ITK_USE_TBB
+  };
   for (auto thType : threadersToTest)
   {
     itk::MultiThreaderBase::SetGlobalDefaultThreader(thType);
-    typename itk::DummyImageSource<OutputImageType>::Pointer dummySrc;
-    dummySrc = itk::DummyImageSource<OutputImageType>::New();
+    const typename itk::DummyImageSource<OutputImageType>::Pointer dummySrc =
+      itk::DummyImageSource<OutputImageType>::New();
     dummySrc->SetNumberOfWorkUnits(4);
-    for (itk::IndexValueType i = 0; i < 4; ++i)
+    for (itk::IndexValueType i = 0; i < dummySrc->GetNumberOfWorkUnits(); ++i)
     {
       dummySrc->SetExceptionIndex(i);
       ITK_TRY_EXPECT_EXCEPTION(dummySrc->Update());

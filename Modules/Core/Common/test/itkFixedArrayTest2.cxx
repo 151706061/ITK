@@ -25,31 +25,26 @@ int
 itkFixedArrayTest2(int, char *[])
 {
   // Define the number of elements in the array
-  const unsigned int nelements = 10000000L;
+  constexpr unsigned int nelements = 10000000L;
 
   // Define the number of runs used for timing
   constexpr unsigned int nrun = 10;
 
   // Declare a simple timer
-  clock_t t;
 
   using ArrayType = itk::FixedArray<double, 2>;
 
   // Declare an array of nelements FixedArray
   // and add a small margin to play with pointers
   // but not map outside the allocated memory
-  auto * vec = new ArrayType[nelements + 8];
-
-  // Fill it up with zeros
-  memset(vec, 0, (nelements + 8) * sizeof(ArrayType));
-
+  auto * vec = new ArrayType[nelements + 8]();
 
   // Display the alignment of the array
   std::cout << "Initial alignment: " << (((size_t)vec) & 7) << '\n';
 
   // Start a simple experiment
-  t = clock();
-  double acc1 = 0.0;
+  clock_t t = clock();
+  double  acc1 = 0.0;
 
   for (unsigned int i = 0; i < nrun; ++i)
   {

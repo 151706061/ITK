@@ -22,32 +22,17 @@
 #include "itkConstNeighborhoodIterator.h"
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodAlgorithm.h"
-#include "itkProgressReporter.h"
+#include "itkTotalProgressReporter.h"
 
-namespace itk
-{
-namespace Testing
+#include <cmath> // For abs.
+
+namespace itk::Testing
 {
 //----------------------------------------------------------------------------
 template <typename TInputImage, typename TOutputImage>
 ComparisonImageFilter<TInputImage, TOutputImage>::ComparisonImageFilter()
 {
-  // Set the default DifferenceThreshold.
-  m_DifferenceThreshold = OutputPixelType{};
-
-  // Set the default ToleranceRadius.
-  m_ToleranceRadius = 0;
-
-  // Initialize statistics about difference image.
-  m_MinimumDifference = NumericTraits<OutputPixelType>::max();
-  m_MaximumDifference = NumericTraits<OutputPixelType>::NonpositiveMin();
-  m_MeanDifference = RealType{};
-  m_TotalDifference = AccumulateType{};
-  m_NumberOfPixelsWithDifferences = 0;
-  m_IgnoreBoundaryPixels = false;
-  m_VerifyInputInformation = true;
-
-  this->DynamicMultiThreadingOff();
+  this->DynamicMultiThreadingOn();
 
   // #0 "Valid" required
   Self::SetPrimaryInputName("ValidInput");
@@ -77,34 +62,20 @@ template <typename TInputImage, typename TOutputImage>
 void
 ComparisonImageFilter<TInputImage, TOutputImage>::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
-
   // Initialize statistics about difference image.
   m_MinimumDifference = NumericTraits<OutputPixelType>::max();
   m_MaximumDifference = NumericTraits<OutputPixelType>::NonpositiveMin();
   m_MeanDifference = RealType{};
   m_TotalDifference = AccumulateType{};
   m_NumberOfPixelsWithDifferences = 0;
-
-  // Resize the thread temporaries
-  m_ThreadDifferenceSum.SetSize(numberOfWorkUnits);
-  m_ThreadMinimumDifference.SetSize(numberOfWorkUnits);
-  m_ThreadMaximumDifference.SetSize(numberOfWorkUnits);
-  m_ThreadNumberOfPixels.SetSize(numberOfWorkUnits);
-
-  // Initialize the temporaries
-  m_ThreadMinimumDifference.Fill(NumericTraits<OutputPixelType>::max());
-  m_ThreadMaximumDifference.Fill(NumericTraits<OutputPixelType>::NonpositiveMin());
-  m_ThreadDifferenceSum.Fill(AccumulateType{});
-  m_ThreadNumberOfPixels.Fill(0);
 }
 
 
 //----------------------------------------------------------------------------
 template <typename TInputImage, typename TOutputImage>
 void
-ComparisonImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const OutputImageRegionType & threadRegion,
-                                                                       ThreadIdType                  threadId)
+ComparisonImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
+  const OutputImageRegionType & threadRegion)
 {
   using SmartIterator = ConstNeighborhoodIterator<InputImageType>;
   using InputIterator = ImageRegionConstIterator<InputImageType>;
@@ -142,12 +113,19 @@ ComparisonImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const Out
     }
   }
 
+
+  // Initialize the thread local variables
+  OutputPixelType threadMinimumDifference{ NumericTraits<OutputPixelType>::max() };
+  OutputPixelType threadMaximumDifference{ NumericTraits<OutputPixelType>::NonpositiveMin() };
+  AccumulateType  threadDifferenceSum{};
+  SizeValueType   threadNumberOfPixels{ 0 };
+
   // Find the data-set boundary faces.
   FacesCalculator boundaryCalculator;
   FaceListType    faceList = boundaryCalculator(testImage, threadRegion, radius);
 
   // Support progress methods/callbacks.
-  ProgressReporter progress(this, threadId, threadRegion.GetNumberOfPixels());
+  TotalProgressReporter progress(this, threadRegion.GetNumberOfPixels());
 
   // Process the internal face and each of the boundary faces.
   for (auto face = faceList.begin(); face != faceList.end(); ++face)
@@ -162,32 +140,24 @@ ComparisonImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const Out
       for (valid.GoToBegin(), test.GoToBegin(), out.GoToBegin(); !valid.IsAtEnd(); ++valid, ++test, ++out)
       {
         // Get the current valid pixel.
-        InputPixelType t = valid.Get();
+        const InputPixelType t = valid.Get();
 
         //  Assume a good match - so test center pixel first, for speed
-        RealType difference = static_cast<RealType>(t) - test.GetCenterPixel();
-        if (NumericTraits<RealType>::IsNegative(difference))
-        {
-          difference = -difference;
-        }
-        auto minimumDifference = static_cast<OutputPixelType>(difference);
+        const RealType difference = std::abs(static_cast<RealType>(t) - test.GetCenterPixel());
+        auto           minimumDifference = static_cast<OutputPixelType>(difference);
 
         // If center pixel isn't good enough, then test the neighborhood
         if (minimumDifference > m_DifferenceThreshold)
         {
-          unsigned int neighborhoodSize = test.Size();
+          const unsigned int neighborhoodSize = test.Size();
           // Find the closest-valued pixel in the neighborhood of the test
           // image.
           for (unsigned int i = 0; i < neighborhoodSize; ++i)
           {
             // Use the RealType for the difference to make sure we get the
             // sign.
-            RealType differenceReal = static_cast<RealType>(t) - test.GetPixel(i);
-            if (NumericTraits<RealType>::IsNegative(differenceReal))
-            {
-              differenceReal = -differenceReal;
-            }
-            auto d = static_cast<OutputPixelType>(differenceReal);
+            const RealType differenceReal = std::abs(static_cast<RealType>(t) - test.GetPixel(i));
+            auto           d = static_cast<OutputPixelType>(differenceReal);
             if (d < minimumDifference)
             {
               minimumDifference = d;
@@ -206,11 +176,11 @@ ComparisonImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const Out
           out.Set(minimumDifference);
 
           // Update difference image statistics.
-          m_ThreadDifferenceSum[threadId] += minimumDifference;
-          m_ThreadNumberOfPixels[threadId]++;
+          threadDifferenceSum += minimumDifference;
+          ++threadNumberOfPixels;
 
-          m_ThreadMinimumDifference[threadId] = std::min(m_ThreadMinimumDifference[threadId], minimumDifference);
-          m_ThreadMaximumDifference[threadId] = std::max(m_ThreadMaximumDifference[threadId], minimumDifference);
+          threadMinimumDifference = std::min(threadMinimumDifference, minimumDifference);
+          threadMaximumDifference = std::max(threadMaximumDifference, minimumDifference);
         }
         else
         {
@@ -231,6 +201,13 @@ ComparisonImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const Out
       }
     }
   }
+
+  const std::lock_guard<std::mutex> lock(m_Mutex);
+  m_TotalDifference += threadDifferenceSum;
+  m_NumberOfPixelsWithDifferences += threadNumberOfPixels;
+
+  m_MinimumDifference = std::min(threadMinimumDifference, m_MinimumDifference);
+  m_MaximumDifference = std::max(threadMaximumDifference, m_MaximumDifference);
 }
 
 //----------------------------------------------------------------------------
@@ -238,23 +215,6 @@ template <typename TInputImage, typename TOutputImage>
 void
 ComparisonImageFilter<TInputImage, TOutputImage>::AfterThreadedGenerateData()
 {
-  // Set statistics about difference image.
-  ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
-
-  for (ThreadIdType i = 0; i < numberOfWorkUnits; ++i)
-  {
-    m_TotalDifference += m_ThreadDifferenceSum[i];
-    m_NumberOfPixelsWithDifferences += m_ThreadNumberOfPixels[i];
-
-    m_MinimumDifference = std::min(m_ThreadMinimumDifference[i], m_MinimumDifference);
-    m_MaximumDifference = std::max(m_ThreadMaximumDifference[i], m_MaximumDifference);
-  }
-
-  // The TotalDifference is an accumulation of values of pixels which
-  // don't meet the difference threshold with the radius
-  // option. Therefore this value is averaged over the number of pixel
-  // actually accumulated.
-
   // Calculate the mean difference.
   m_MeanDifference = 0.0;
   if (m_NumberOfPixelsWithDifferences > 0)
@@ -265,7 +225,7 @@ ComparisonImageFilter<TInputImage, TOutputImage>::AfterThreadedGenerateData()
 
 template <typename TInputImage, typename TOutputImage>
 void
-ComparisonImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() ITKv5_CONST
+ComparisonImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() const
 {
   if (m_VerifyInputInformation)
   {
@@ -274,7 +234,6 @@ ComparisonImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() ITKv5
 }
 
 
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #endif

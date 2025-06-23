@@ -36,7 +36,7 @@ ReadImage(const std::string & fileName)
   auto reader = ReaderType::New();
   reader->SetFileName(fileName.c_str());
 
-  itk::MetaImageIO::Pointer io = itk::MetaImageIO::New();
+  const itk::MetaImageIO::Pointer io = itk::MetaImageIO::New();
   reader->SetImageIO(io);
 
   try
@@ -68,7 +68,7 @@ WriteImage(typename ImageType::Pointer & image, const std::string & fileName)
 
   writer->SetFileName(fileName.c_str());
 
-  itk::MetaImageIO::Pointer io = itk::MetaImageIO::New();
+  const itk::MetaImageIO::Pointer io = itk::MetaImageIO::New();
   writer->SetImageIO(io);
 
   writer->SetInput(image);
@@ -156,7 +156,7 @@ itkMetaImageIOMetaDataTest(int argc, char * argv[])
   }
   // write out an image -- using a random image source, but
   // the image data is irrelevant
-  const int Dim(2);
+  constexpr int Dim(2);
 
   using PixelType = unsigned char;
   using ImageType = itk::Image<PixelType, Dim>;
@@ -176,12 +176,12 @@ itkMetaImageIOMetaDataTest(int argc, char * argv[])
   //
   {
     // Add string key
-    std::string key("hello");
-    std::string value("world");
+    const std::string key("hello");
+    const std::string value("world");
     itk::EncapsulateMetaData<std::string>(dict, key, value);
   }
 
-  const auto maxSupportedStringSize = (MET_MAX_NUMBER_OF_FIELD_VALUES * sizeof(double)) - 1;
+  constexpr auto maxSupportedStringSize = (MET_MAX_NUMBER_OF_FIELD_VALUES * sizeof(double)) - 1;
   static_assert(maxSupportedStringSize == std::numeric_limits<int16_t>::max(), "Assert that this max value is 32767");
 
   {
@@ -192,73 +192,73 @@ itkMetaImageIOMetaDataTest(int argc, char * argv[])
   }
   {
     // Add double
-    std::string key("double");
-    double      value(7.891011);
+    const std::string key("double");
+    constexpr double  value(7.891011);
     itk::EncapsulateMetaData<double>(dict, key, value);
   }
   {
     // Add float
-    std::string key("float");
-    float       value(1.23456);
+    const std::string key("float");
+    constexpr float   value(1.23456);
     itk::EncapsulateMetaData<float>(dict, key, value);
   }
   {
     // Add long
-    std::string key("long");
-    long        value(-31415926);
+    const std::string key("long");
+    constexpr long    value(-31415926);
     itk::EncapsulateMetaData<int>(dict, key, value);
   }
   {
     // Add unsigned long
-    std::string   key("unsigned_long");
-    unsigned long value(27182818);
+    const std::string       key("unsigned_long");
+    constexpr unsigned long value(27182818);
     itk::EncapsulateMetaData<unsigned long>(dict, key, value);
   }
   {
     // Add long long
-    std::string key("long_long");
-    long long   value(-8589934592ll);
+    const std::string   key("long_long");
+    constexpr long long value(-8589934592ll);
     itk::EncapsulateMetaData<long long>(dict, key, value);
   }
   {
     // Add unsigned long long
-    std::string        key("unsigned_long_long");
-    unsigned long long value(8589934592ull);
+    const std::string            key("unsigned_long_long");
+    constexpr unsigned long long value(8589934592ull);
     itk::EncapsulateMetaData<unsigned long long>(dict, key, value);
   }
   {
     // Add int
-    std::string key("int");
-    int         value(-3141592);
+    const std::string key("int");
+    constexpr int     value(-3141592);
     itk::EncapsulateMetaData<int>(dict, key, value);
   }
   {
     // Add unsigned int
-    std::string  key("unsigned_int");
-    unsigned int value(2718281);
+    const std::string      key("unsigned_int");
+    constexpr unsigned int value(2718281);
     itk::EncapsulateMetaData<unsigned int>(dict, key, value);
   }
   {
     // Add short
-    std::string key("short");
-    short       value(-16384);
+    const std::string key("short");
+    constexpr short   value(-16384);
     itk::EncapsulateMetaData<short>(dict, key, value);
   }
   {
     // Add short
-    std::string  key("unsigned_short");
-    unsigned int value(8192);
+    const std::string      key("unsigned_short");
+    constexpr unsigned int value(8192);
     itk::EncapsulateMetaData<unsigned short>(dict, key, value);
   }
   {
     // Add char
-    std::string key("char");
-    char        value('c');
+    const std::string key("char");
+    constexpr char    value('c');
     itk::EncapsulateMetaData<char>(dict, key, value);
   }
   {
-    std::string key("bool");
-    bool        value(true);
+    const std::string key("bool");
+    constexpr bool    value(true);
     itk::EncapsulateMetaData<bool>(dict, key, value);
   }
 
@@ -267,11 +267,11 @@ itkMetaImageIOMetaDataTest(int argc, char * argv[])
   //
   // Read the image just written and check if the key we added
   // persisted with the file.
-  ImageType::Pointer randImage2 = ReadImage<ImageType>(argv[1]);
+  const ImageType::Pointer randImage2 = ReadImage<ImageType>(argv[1]);
 
   dict = randImage2->GetMetaDataDictionary();
 
-  std::string value("world");
+  const std::string value("world");
   if (!TestMatch<std::string>(dict, "hello", value))
   {
     return 1; // error

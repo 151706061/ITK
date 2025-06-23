@@ -68,13 +68,14 @@ itkFastMarchingImageFilterRealTest2(int itkNotUsed(argc), char * itkNotUsed(argv
 
   marcher->SetStoppingCriterion(criterion);
 
-  ShowProgressObject                                    progressWatch(marcher);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(marcher);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   marcher->AddObserver(itk::ProgressEvent(), command);
 
   // Specify the size of the output image
-  FloatImageType::SizeType size = { { 64, 64 } };
+  constexpr FloatImageType::SizeType size = { { 64, 64 } };
   marcher->SetOutputSize(size);
 
   // Set up a speed image of ones
@@ -92,10 +93,9 @@ itkFastMarchingImageFilterRealTest2(int itkNotUsed(argc), char * itkNotUsed(argv
   aliveImage->Allocate();
   aliveImage->FillBuffer(0.0);
 
-  FloatImageType::OffsetType offset0 = { { 28, 35 } };
+  constexpr FloatImageType::OffsetType offset0 = { { 28, 35 } };
 
-  itk::Index<Dimension> index;
-  index.Fill(0);
+  itk::Index<Dimension> index{};
   index += offset0;
 
   aliveImage->SetPixel(index, 1.0);
@@ -157,20 +157,20 @@ itkFastMarchingImageFilterRealTest2(int itkNotUsed(argc), char * itkNotUsed(argv
   ITK_EXERCISE_BASIC_OBJECT_METHODS(adaptor, FastMarchingImageToNodePairContainerAdaptor, Object);
 
 
-  bool isForbiddenImageBinaryMask = true;
+  constexpr bool isForbiddenImageBinaryMask = true;
   ITK_TEST_SET_GET_BOOLEAN(adaptor, IsForbiddenImageBinaryMask, isForbiddenImageBinaryMask);
 
   adaptor->SetAliveImage(aliveImage.GetPointer());
   ITK_TEST_SET_GET_VALUE(aliveImage.GetPointer(), adaptor->GetAliveImage());
 
-  typename AdaptorType::OutputPixelType aliveValue = 0.0;
+  constexpr typename AdaptorType::OutputPixelType aliveValue = 0.0;
   adaptor->SetAliveValue(aliveValue);
   ITK_TEST_SET_GET_VALUE(aliveValue, adaptor->GetAliveValue());
 
   adaptor->SetTrialImage(trialImage.GetPointer());
   ITK_TEST_SET_GET_VALUE(trialImage.GetPointer(), adaptor->GetTrialImage());
 
-  typename AdaptorType::OutputPixelType trialValue = 1.0;
+  constexpr typename AdaptorType::OutputPixelType trialValue = 1.0;
   adaptor->SetTrialValue(trialValue);
   ITK_TEST_SET_GET_VALUE(trialValue, adaptor->GetTrialValue());
 
@@ -194,13 +194,13 @@ itkFastMarchingImageFilterRealTest2(int itkNotUsed(argc), char * itkNotUsed(argv
 
 
   // Check the results
-  FloatImageType::Pointer output = marcher->GetOutput();
+  const FloatImageType::Pointer output = marcher->GetOutput();
 
   itk::ImageRegionIterator<FloatImageType> iterator(output, output->GetBufferedRegion());
 
   bool passed = true;
 
-  double threshold = 1.42;
+  constexpr double threshold = 1.42;
   while (!iterator.IsAtEnd())
   {
     FloatImageType::IndexType tempIndex = iterator.GetIndex();
@@ -247,9 +247,7 @@ itkFastMarchingImageFilterRealTest2(int itkNotUsed(argc), char * itkNotUsed(argv
     std::cout << "Test passed!" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed!" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed!" << std::endl;
+  return EXIT_FAILURE;
 }

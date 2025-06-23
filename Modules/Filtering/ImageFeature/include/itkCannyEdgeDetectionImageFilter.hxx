@@ -33,17 +33,15 @@ template <typename TInputImage, typename TOutputImage>
 CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::CannyEdgeDetectionImageFilter()
   : m_UpperThreshold(OutputImagePixelType{})
   , m_LowerThreshold(OutputImagePixelType{})
+  , m_UpdateBuffer1(OutputImageType::New())
+  , m_GaussianFilter(GaussianImageFilterType::New())
+  , m_MultiplyImageFilter(MultiplyImageFilterType::New())
 {
   m_Variance.Fill(0.0);
   m_MaximumError.Fill(0.01);
 
-  m_GaussianFilter = GaussianImageFilterType::New();
-  m_MultiplyImageFilter = MultiplyImageFilterType::New();
-  m_UpdateBuffer1 = OutputImageType::New();
-
   // Set up neighborhood slices for all the dimensions.
-  typename Neighborhood<OutputImagePixelType, ImageDimension>::RadiusType r;
-  r.Fill(1);
+  constexpr auto r = MakeFilled<typename Neighborhood<OutputImagePixelType, ImageDimension>::RadiusType>(1);
 
   // Dummy neighborhood used to set up the slices
   Neighborhood<OutputImagePixelType, ImageDimension> it;
@@ -83,7 +81,7 @@ void
 CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::AllocateUpdateBuffer()
 {
   // The update buffer looks just like the input
-  typename TInputImage::ConstPointer input = this->GetInput();
+  const typename TInputImage::ConstPointer input = this->GetInput();
 
   m_UpdateBuffer1->CopyInformation(input);
   m_UpdateBuffer1->SetRequestedRegion(input->GetRequestedRegion());
@@ -104,15 +102,14 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::ThreadedCompute2ndDeri
 
   // Here input is the result from the gaussian filter output is the update
   // buffer
-  typename OutputImageType::Pointer input = m_GaussianFilter->GetOutput();
+  const typename OutputImageType::Pointer input = m_GaussianFilter->GetOutput();
 
   // Set iterator radius
-  Size<ImageDimension> radius;
-  radius.Fill(1);
+  constexpr auto radius = Size<ImageDimension>::Filled(1);
 
   // Find the data-set boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>                        bC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>                              bC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>::FaceListType faceList =
     bC(input, outputRegionForThread, radius);
 
   // Process the non-boundary region and then each of the boundary faces.
@@ -141,7 +138,7 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::ComputeCannyEdge(const
   -> OutputImagePixelType
 {
 
-  NeighborhoodInnerProduct<OutputImageType> innerProduct;
+  const NeighborhoodInnerProduct<OutputImageType> innerProduct;
 
   OutputImagePixelType dx[ImageDimension];
   OutputImagePixelType dxx[ImageDimension];
@@ -204,8 +201,7 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::GenerateData()
   output->Graft(this->GetOutput());
   this->m_OutputImage = output;
 
-  typename ZeroCrossingImageFilter<TOutputImage, TOutputImage>::Pointer zeroCrossFilter =
-    ZeroCrossingImageFilter<TOutputImage, TOutputImage>::New();
+  auto zeroCrossFilter = ZeroCrossingImageFilter<TOutputImage, TOutputImage>::New();
 
   this->AllocateUpdateBuffer();
 
@@ -275,10 +271,10 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::HysteresisThresholding
   // This is the Zero crossings of the Second derivative multiplied with the
   // gradients of the image. HysteresisThresholding of this image should give
   // the Canny output.
-  typename OutputImageType::Pointer input = m_MultiplyImageFilter->GetOutput();
-  float                             value;
+  const typename OutputImageType::Pointer input = m_MultiplyImageFilter->GetOutput();
+  float                                   value = NAN;
 
-  ListNodeType * node;
+  ListNodeType * node = nullptr;
 
   // fix me
   ImageRegionIterator<TOutputImage> oit(input, input->GetRequestedRegion());
@@ -315,15 +311,10 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::FollowEdge(IndexType  
   // This is the Zero crossings of the Second derivative multiplied with the
   // gradients of the image. HysteresisThresholding of this image should give
   // the Canny output.
-  InputImageRegionType inputRegion = multiplyImageFilterOutput->GetRequestedRegion();
-
-  IndexType      nIndex;
-  IndexType      cIndex;
-  ListNodeType * node;
+  const InputImageRegionType inputRegion = multiplyImageFilterOutput->GetRequestedRegion();
 
   // Assign iterator radius
-  Size<ImageDimension> radius;
-  radius.Fill(1);
+  constexpr auto radius = Size<ImageDimension>::Filled(1);
 
   ConstNeighborhoodIterator<TOutputImage> oit(
     radius, multiplyImageFilterOutput, multiplyImageFilterOutput->GetRequestedRegion());
@@ -335,20 +326,20 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::FollowEdge(IndexType  
     // Remove the node if we are not going to follow it!
     //
     // Pop the front node from the list and read its index value.
-    node = m_NodeList->Front(); // get a pointer to the first node
-    m_NodeList->PopFront();     // unlink the front node
-    m_NodeStore->Return(node);  // return the memory for reuse
+    auto node = m_NodeList->Front(); // get a pointer to the first node
+    m_NodeList->PopFront();          // unlink the front node
+    m_NodeStore->Return(node);       // return the memory for reuse
     return;
   }
 
-  int nSize = m_Center * 2 + 1;
+  const int nSize = m_Center * 2 + 1;
   while (!m_NodeList->Empty())
   {
     // Pop the front node from the list and read its index value.
-    node = m_NodeList->Front(); // Get a pointer to the first node
-    cIndex = node->m_Value;     // Read the value of the first node
-    m_NodeList->PopFront();     // Unlink the front node
-    m_NodeStore->Return(node);  // Return the memory for reuse
+    auto       node = m_NodeList->Front(); // Get a pointer to the first node
+    const auto cIndex = node->m_Value;     // Read the value of the first node
+    m_NodeList->PopFront();                // Unlink the front node
+    m_NodeStore->Return(node);             // Return the memory for reuse
 
     // Move iterators to the correct index position.
     oit.SetLocation(cIndex);
@@ -358,7 +349,7 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::FollowEdge(IndexType  
     // Search the neighbors for new indices to add to the list.
     for (int i = 0; i < nSize; ++i)
     {
-      nIndex = oit.GetIndex(i);
+      const auto nIndex = oit.GetIndex(i);
       uit.SetIndex(nIndex);
       if (inputRegion.IsInside(nIndex))
       {
@@ -392,21 +383,20 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::ThreadedCompute2ndDeri
   // Here input is the result from the gaussian filter
   //      input1 is the 2nd derivative result
   //      output is the gradient of 2nd derivative
-  typename OutputImageType::Pointer input1 = this->m_OutputImage;
-  typename OutputImageType::Pointer input = m_GaussianFilter->GetOutput();
+  const typename OutputImageType::Pointer input1 = this->m_OutputImage;
+  const typename OutputImageType::Pointer input = m_GaussianFilter->GetOutput();
 
-  typename InputImageType::Pointer output = m_UpdateBuffer1;
+  const typename InputImageType::Pointer output = m_UpdateBuffer1;
 
   // Set iterator radius
-  Size<ImageDimension> radius;
-  radius.Fill(1);
+  constexpr auto radius = Size<ImageDimension>::Filled(1);
 
   // Find the data-set boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>                        bC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>                              bC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>::FaceListType faceList =
     bC(input, outputRegionForThread, radius);
 
-  InputImagePixelType zero{};
+  constexpr InputImagePixelType zero{};
 
   OutputImagePixelType dx[ImageDimension];
   OutputImagePixelType dx1[ImageDimension];
@@ -419,7 +409,7 @@ CannyEdgeDetectionImageFilter<TInputImage, TOutputImage>::ThreadedCompute2ndDeri
   // Process the non-boundary region and then each of the boundary faces.
   // These are N-d regions which border the edge of the buffer.
 
-  NeighborhoodInnerProduct<OutputImageType> IP;
+  const NeighborhoodInnerProduct<OutputImageType> IP;
 
   for (const auto & face : faceList)
   {

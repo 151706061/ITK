@@ -35,11 +35,9 @@ int
 itkSplineKernelTransformTest(int, char *[])
 {
 
-  const double epsilon = 1e-12;
+  constexpr double epsilon = 1e-12;
 
   // 2-D case
-  int i, j;
-
   constexpr unsigned int Dimension = 2;
   using ParametersValueType = double;
 
@@ -76,9 +74,9 @@ itkSplineKernelTransformTest(int, char *[])
 
   Points2DIteratorType source2Dend = sourceLandmarks2D->GetPoints()->End();
 
-  for (i = 0; i < 2; ++i)
+  for (unsigned int i = 0; i < 2; ++i)
   {
-    for (j = 0; j < 2; ++j)
+    for (unsigned int j = 0; j < 2; ++j)
     {
       sourcePoint2D[0] = j;
       sourcePoint2D[1] = i;
@@ -105,8 +103,8 @@ itkSplineKernelTransformTest(int, char *[])
   ebs2D->ComputeWMatrix();
 
   { // Testing the number of parameters
-    EBSTransform2DType::ParametersType parameters1 = ebs2D->GetParameters();
-    const unsigned int                 numberOfParameters = parameters1.Size();
+    const EBSTransform2DType::ParametersType parameters1 = ebs2D->GetParameters();
+    const unsigned int                       numberOfParameters = parameters1.Size();
     if (numberOfParameters != 4 * 2)
     {
       std::cerr << "Number of parameters was not updated after" << std::endl;
@@ -193,7 +191,7 @@ itkSplineKernelTransformTest(int, char *[])
     source2Dit++;
     target2Dit++;
   }
-  if (tps2D->IsLinear() == true) // NOTE TPS is never linear!
+  if (tps2D->IsLinear()) // NOTE TPS is never linear!
   {
     std::cout << "ERROR:  2D TPS reports as being a linear transform." << std::endl;
     return EXIT_FAILURE;
@@ -212,7 +210,7 @@ itkSplineKernelTransformTest(int, char *[])
     }
   }
   { // Just for code coverage
-    TPSTransform2DType::VectorSetType::ConstPointer tempDisplacements = tps2D->GetDisplacements();
+    const TPSTransform2DType::VectorSetType::ConstPointer tempDisplacements = tps2D->GetDisplacements();
 
     {
       TPSTransform2DType::InputVectorType testVector;
@@ -346,7 +344,6 @@ itkSplineKernelTransformTest(int, char *[])
 
 
   // 3-D case
-  int k;
   using EBSTransform3DType = itk::ElasticBodySplineKernelTransform<double, 3>;
   using TPSTransform3DType = itk::ThinPlateSplineKernelTransform<double, 3>;
 
@@ -376,11 +373,11 @@ itkSplineKernelTransformTest(int, char *[])
   Points3DIteratorType ebs3DsEnd = ebs3D->GetModifiableSourceLandmarks()->GetPoints()->End();
   Points3DIteratorType tps3DsEnd = tps3D->GetModifiableSourceLandmarks()->GetPoints()->End();
 
-  for (i = 0; i < 2; ++i)
+  for (unsigned int i = 0; i < 2; ++i)
   {
-    for (j = 0; j < 2; ++j)
+    for (unsigned int j = 0; j < 2; ++j)
     {
-      for (k = 0; k < 2; ++k)
+      for (int k = 0; k < 2; ++k)
       {
         sourcePoint3D[0] = k;
         sourcePoint3D[1] = j;
@@ -459,7 +456,7 @@ itkSplineKernelTransformTest(int, char *[])
   tps3D->SetParameters(parameters1);
   TPSTransform3DType::ParametersType parameters2 = tps3D->GetParameters();
   const unsigned int                 numberOfParameters = parameters1.Size();
-  const double                       tolerance = 1e-7;
+  constexpr double                   tolerance = 1e-7;
   for (unsigned int pr = 0; pr < numberOfParameters; ++pr)
   {
     if (itk::Math::abs(parameters1[pr] - parameters2[pr]) > tolerance)
@@ -472,7 +469,6 @@ itkSplineKernelTransformTest(int, char *[])
 
 
   // 4-D case
-  int l;
   using EBSTransform4DType = itk::ElasticBodySplineKernelTransform<double, 4>;
   using TPSTransform4DType = itk::ThinPlateSplineKernelTransform<double, 4>;
 
@@ -502,13 +498,13 @@ itkSplineKernelTransformTest(int, char *[])
   Points4DIteratorType ebs4DsEnd = ebs4D->GetModifiableSourceLandmarks()->GetPoints()->End();
   Points4DIteratorType tps4DsEnd = tps4D->GetModifiableSourceLandmarks()->GetPoints()->End();
 
-  for (i = 0; i < 2; ++i)
+  for (unsigned int i = 0; i < 2; ++i)
   {
-    for (j = 0; j < 2; ++j)
+    for (unsigned int j = 0; j < 2; ++j)
     {
-      for (k = 0; k < 2; ++k)
+      for (int k = 0; k < 2; ++k)
       {
-        for (l = 0; l < 2; ++l)
+        for (int l = 0; l < 2; ++l)
         {
           sourcePoint4D[0] = l;
           sourcePoint4D[1] = k;

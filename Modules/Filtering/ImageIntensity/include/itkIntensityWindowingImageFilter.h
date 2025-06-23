@@ -165,23 +165,25 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(IntensityWindowingImageFilter);
 
   /** Set/Get the values of the maximum and minimum
    *  intensities of the output image. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputMinimum, OutputPixelType);
   itkSetMacro(OutputMaximum, OutputPixelType);
   itkGetConstReferenceMacro(OutputMinimum, OutputPixelType);
   itkGetConstReferenceMacro(OutputMaximum, OutputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the values of the maximum and minimum
    *  intensities of the input intensity window. */
+  /** @ITKStartGrouping */
   itkSetMacro(WindowMinimum, InputPixelType);
   itkSetMacro(WindowMaximum, InputPixelType);
   itkGetConstReferenceMacro(WindowMinimum, InputPixelType);
   itkGetConstReferenceMacro(WindowMaximum, InputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the window width and level. This is an alternative API
    * to using the SetWindowMinimum()/SetWindowMaximum(). The window
    * minimum and maximum are set as [level-window/2,
@@ -198,9 +200,10 @@ public:
   /** Get the Scale and Shift used for the linear transformation
       of gray level values.
    \warning These Values are only valid after the filter has been updated. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(Scale, RealType);
   itkGetConstReferenceMacro(Shift, RealType);
-
+  /** @ITKEndGrouping */
   /** Process to execute before entering the multithreaded section. */
   void
   BeforeThreadedGenerateData() override;
@@ -208,11 +211,7 @@ public:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   IntensityWindowingImageFilter();

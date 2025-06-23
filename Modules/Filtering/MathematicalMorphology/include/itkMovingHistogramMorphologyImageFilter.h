@@ -56,7 +56,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MovingHistogramMorphologyImageFilter);
 
   /** Image related type alias. */
@@ -88,9 +88,10 @@ public:
 
   /** Set/Get the boundary value.
    *  Subclasses should set their own values. */
+  /** @ITKStartGrouping */
   itkSetMacro(Boundary, PixelType);
   itkGetConstMacro(Boundary, PixelType);
-
+  /** @ITKEndGrouping */
   /** Return true if the vector based algorithm is used, and
    * false if the map based algorithm is used */
   static bool

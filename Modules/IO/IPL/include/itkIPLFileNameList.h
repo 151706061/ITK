@@ -37,21 +37,27 @@
 #include <string>
 #include <list>
 /** Set built-in type.  Creates member Set"name"() (e.g., SetVisibility()); */
-#define IPLSetMacroDeclaration(name, type) virtual void Set##name(const type _arg);
+#define IPLSetMacroDeclaration(name, type) virtual void Set##name(const type _arg)
 
-#define IPLSetMacroDefinition(class, name, type)                                                        \
-  void class ::Set##name(const type _arg)                                                               \
-  {                                                                                                     \
-    CLANG_PRAGMA_PUSH                                                                                   \
-    CLANG_SUPPRESS_Wfloat_equal if (this->m_##name != _arg) CLANG_PRAGMA_POP { this->m_##name = _arg; } \
-  }
+#define IPLSetMacroDefinition(class, name, type) \
+  void class ::Set##name(const type _arg)        \
+  {                                              \
+    ITK_GCC_PRAGMA_PUSH                          \
+    ITK_GCC_SUPPRESS_Wfloat_equal                \
+    if (this->m_##name != _arg)                  \
+    {                                            \
+      this->m_##name = _arg;                     \
+    }                                            \
+    ITK_GCC_PRAGMA_POP                           \
+  }                                              \
+  ITK_MACROEND_NOOP_STATEMENT
 
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility()); */
-#define IPLGetMacroDeclaration(name, type) virtual type Get##name();
+#define IPLGetMacroDeclaration(name, type) virtual type Get##name()
 
-#define IPLGetMacroDefinition(class, name, type) \
-  type class ::Get##name() { return this->m_##name; }
-
+#define IPLGetMacroDefinition(class, name, type)      \
+  type class ::Get##name() { return this->m_##name; } \
+  ITK_MACROEND_NOOP_STATEMENT
 namespace itk
 {
 /**
@@ -62,14 +68,7 @@ namespace itk
 class IPLFileSortInfo
 {
 public:
-  IPLFileSortInfo()
-  {
-    m_SliceLocation = 0;
-    m_SliceOffset = 0;
-    m_EchoNumber = 0;
-    m_ImageNumber = 0;
-    m_Data = nullptr;
-  }
+  IPLFileSortInfo() = default;
 
   IPLFileSortInfo(const char * const filename,
                   float              sliceLocation,
@@ -77,14 +76,13 @@ public:
                   int                echoNumber,
                   int                imageNumber,
                   void *             data = nullptr)
-  {
-    m_ImageFileName = filename;
-    m_SliceLocation = sliceLocation;
-    m_SliceOffset = sliceOffset;
-    m_EchoNumber = echoNumber;
-    m_ImageNumber = imageNumber;
-    m_Data = data;
-  }
+    : m_ImageFileName(filename)
+    , m_SliceLocation(sliceLocation)
+    , m_SliceOffset(sliceOffset)
+    , m_EchoNumber(echoNumber)
+    , m_ImageNumber(imageNumber)
+    , m_Data(data)
+  {}
 
   virtual ~IPLFileSortInfo();
 
@@ -131,16 +129,12 @@ public:
   };
 
   IPLFileNameList()
+    : m_SortOrder(SortGlobalAscend)
   {
-    m_XDim = 0;
-    m_YDim = 0;
-    m_XRes = 0.0;
-    m_YRes = 0.0;
-    m_Key1 = 0; /** Key that must be matched for image to be used,
+    /** Key1 that must be matched for image to be used,
                   i.e. seriesNumber, extensionkey */
-    m_Key2 = 0; /** Key that must be matched for image to be used, i.e.
+    /** Key2 that must be matched for image to be used, i.e.
                   echoNumber*/
-    m_SortOrder = SortGlobalAscend;
   }
 
   virtual ~IPLFileNameList();
@@ -157,7 +151,8 @@ public:
     return m_List.end();
   }
 
-  IPLFileSortInfo * operator[](unsigned int __n)
+  IPLFileSortInfo *
+  operator[](unsigned int __n)
   {
     auto it = begin();
     auto itend = end();
@@ -172,14 +167,14 @@ public:
     return *it;
   }
 
-  ListSizeType
+  [[nodiscard]] ListSizeType
   NumFiles() const
   {
     return m_List.size();
   }
 
   bool
-  AddElementToList(char const * const filename,
+  AddElementToList(const char * const filename,
                    const float        sliceLocation,
                    const int          offset,
                    const int          XDim,
@@ -234,9 +229,8 @@ public:
   {
     auto it = m_List.begin();
     auto itend = m_List.end();
-    int  i = 0;
 
-    for (i = 0; it != itend; i++, it++)
+    for (int i = 0; it != itend; i++, it++)
     {
       if (i != ElementToRemove)
       {
@@ -259,7 +253,7 @@ public:
   void
   sortImageListDescend();
 
-  ListSizeType
+  [[nodiscard]] ListSizeType
   GetnumImageInfoStructs() const
   {
     return m_List.size();

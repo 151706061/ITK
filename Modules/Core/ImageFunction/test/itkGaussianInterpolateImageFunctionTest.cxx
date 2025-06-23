@@ -32,26 +32,21 @@ itkGaussianInterpolateImageFunctionTest(int, char *[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(interpolator, GaussianInterpolateImageFunction, InterpolateImageFunction);
 
-  InterpolatorType::ArrayType sigma;
-  sigma.Fill(1.0);
+  auto sigma = itk::MakeFilled<InterpolatorType::ArrayType>(1.0);
   interpolator->SetSigma(sigma);
   ITK_TEST_SET_GET_VALUE(sigma, interpolator->GetSigma());
 
-  InterpolatorType::RealType alpha = 1.0;
+  constexpr InterpolatorType::RealType alpha = 1.0;
   interpolator->SetAlpha(alpha);
   ITK_TEST_SET_GET_VALUE(alpha, interpolator->GetAlpha());
 
   auto image = ImageType::New();
 
-  ImageType::IndexType start;
-  start.Fill(0);
+  constexpr ImageType::IndexType start{};
 
-  ImageType::SizeType size;
-  size.Fill(3);
+  auto size = ImageType::SizeType::Filled(3);
 
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const ImageType::RegionType region{ start, size };
 
   image->SetRegions(region);
   image->Allocate();
@@ -72,8 +67,7 @@ itkGaussianInterpolateImageFunctionTest(int, char *[])
 
   interpolator->SetInputImage(image);
 
-  typename ImageType::SizeType radius;
-  radius.Fill(1);
+  auto radius = ImageType::SizeType::Filled(1);
   for (unsigned int d = 0; d < ImageType::ImageDimension; ++d)
   {
     ITK_TEST_SET_GET_VALUE(radius[d], interpolator->GetRadius()[d]);
@@ -92,16 +86,16 @@ itkGaussianInterpolateImageFunctionTest(int, char *[])
   {
     point[1] = 0.0;
 
-    for (unsigned int j = 0; j < 5; ++j)
+    for (const double it : expectedValue)
     {
-      InterpolatorType::OutputType computedValue = interpolator->Evaluate(point);
+      const InterpolatorType::OutputType computedValue = interpolator->Evaluate(point);
 
-      if (!itk::Math::FloatAlmostEqual(computedValue, expectedValue[j], 7, 5e-6))
+      if (!itk::Math::FloatAlmostEqual(computedValue, it, 7, 5e-6))
       {
         std::cerr << "Error: computed and expected values are different" << std::endl;
         std::cerr << "Point: " << point << std::endl;
         std::cerr << "Computed: " << computedValue << std::endl;
-        std::cerr << "Expected: " << expectedValue[j] << std::endl;
+        std::cerr << "Expected: " << it << std::endl;
         return EXIT_FAILURE;
       }
 

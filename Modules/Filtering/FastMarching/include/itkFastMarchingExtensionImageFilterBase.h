@@ -40,9 +40,7 @@ namespace itk
  * the value of the variables at the know points and on containing the
  * value of the variables at the trail points.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * For an alternative implementation, see itk::FastMarchingExtensionImageFilter.
  *
@@ -70,7 +68,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingExtensionImageFilterBase);
 
   /** The dimension of the level set. */
@@ -82,7 +80,7 @@ public:
   /** AuxVarType type alias support */
   using AuxValueType = TAuxValue;
   using AuxValueVectorType = Vector<AuxValueType, AuxDimension>;
-  using AuxValueContainerType = VectorContainer<IdentifierType, AuxValueVectorType>;
+  using AuxValueContainerType = VectorContainer<AuxValueVectorType>;
 
   using AuxValueContainerPointer = typename AuxValueContainerType::Pointer;
   using AuxValueContainerConstIterator = typename AuxValueContainerType::ConstIterator;
@@ -112,18 +110,16 @@ public:
   GetAuxiliaryImage(const unsigned int idx);
 
   /** Set the container auxiliary values at the initial alive points. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(AuxiliaryAliveValues, AuxValueContainerType);
   itkGetModifiableObjectMacro(AuxiliaryAliveValues, AuxValueContainerType);
-
+  /** @ITKEndGrouping */
   /** Set the container of auxiliary values at the initial trial points. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(AuxiliaryTrialValues, AuxValueContainerType);
   itkGetModifiableObjectMacro(AuxiliaryTrialValues, AuxValueContainerType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(AuxValueHasNumericTraitsCheck, (Concept::HasNumericTraits<TAuxValue>));
-  // End concept checking
-#endif
 
 protected:
   FastMarchingExtensionImageFilterBase();

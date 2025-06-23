@@ -32,9 +32,7 @@ namespace itk
  * interest.
  *
  * Geodesic morphology and the connected closing algorithm are
- * described in Chapter 6 of Pierre Soille's book "Morphological Image
- * Analysis: Principles and Applications", Second Edition, Springer,
- * 2003.
+ * described in \cite soille2004.
  *
  * \sa GrayscaleGeodesicDilateImageFilter
  * \sa MorphologyImageFilter, GrayscaleDilateImageFilter, GrayscaleFunctionDilateImageFilter, BinaryDilateImageFilter
@@ -73,30 +71,28 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GrayscaleConnectedClosingImageFilter);
 
   /** Set/Get the seed pixel for the segmentation */
+  /** @ITKStartGrouping */
   itkSetMacro(Seed, InputImageIndexType);
   itkGetConstMacro(Seed, InputImageIndexType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the connected components are defined strictly by
    * face connectivity or by face+edge+vertex connectivity.  Default is
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputImagePixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   GrayscaleConnectedClosingImageFilter();

@@ -31,12 +31,12 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 VotingBinaryImageFilter<TInputImage, TOutputImage>::VotingBinaryImageFilter()
+  : m_ForegroundValue(NumericTraits<InputPixelType>::max())
+  , m_BackgroundValue(InputPixelType{})
+  , m_BirthThreshold(1)
+  , m_SurvivalThreshold(1)
 {
   m_Radius.Fill(1);
-  m_ForegroundValue = NumericTraits<InputPixelType>::max();
-  m_BackgroundValue = InputPixelType{};
-  m_BirthThreshold = 1;
-  m_SurvivalThreshold = 1;
   this->ThreaderUpdateProgressOff();
 }
 
@@ -48,8 +48,8 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
-  typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
+  const typename Superclass::InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -58,8 +58,7 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(m_Radius);
@@ -70,21 +69,19 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
     inputPtr->SetRequestedRegion(inputRequestedRegion);
     return;
   }
-  else
-  {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
 
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion(inputRequestedRegion);
+  // Couldn't crop the region (requested region is outside the largest
+  // possible region).  Throw an exception.
 
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    e.SetLocation(ITK_LOCATION);
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-  }
+  // store what we tried to request (prior to trying to crop)
+  inputPtr->SetRequestedRegion(inputRequestedRegion);
+
+  // build an exception
+  InvalidRequestedRegionError e(__FILE__, __LINE__);
+  e.SetLocation(ITK_LOCATION);
+  e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
+  e.SetDataObject(inputPtr);
+  throw e;
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -97,12 +94,12 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   ConstNeighborhoodIterator<InputImageType> bit;
   ImageRegionIterator<OutputImageType>      it;
 
-  typename OutputImageType::Pointer     output = this->GetOutput();
-  typename InputImageType::ConstPointer input = this->GetInput();
+  const typename OutputImageType::Pointer     output = this->GetOutput();
+  const typename InputImageType::ConstPointer input = this->GetInput();
 
   // Find the data-set boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                        bC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>                              bC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
     bC(input, outputRegionForThread, m_Radius);
 
   TotalProgressReporter progress(this, output->GetRequestedRegion().GetNumberOfPixels());
@@ -115,7 +112,7 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
     bit.OverrideBoundaryCondition(&nbc);
     bit.GoToBegin();
 
-    unsigned int neighborhoodSize = bit.Size();
+    const unsigned int neighborhoodSize = bit.Size();
 
     while (!bit.IsAtEnd())
     {
@@ -125,7 +122,7 @@ VotingBinaryImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
       unsigned int count = 0;
       for (unsigned int i = 0; i < neighborhoodSize; ++i)
       {
-        InputPixelType value = bit.GetPixel(i);
+        const InputPixelType value = bit.GetPixel(i);
         if (value == m_ForegroundValue)
         {
           ++count;

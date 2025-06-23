@@ -34,27 +34,27 @@
 namespace
 {
 
-template <typename TCoordRepType, unsigned int VDimension>
-class NonlinearAffineTransform : public itk::AffineTransform<TCoordRepType, VDimension>
+template <typename TCoordinateType, unsigned int VDimension>
+class NonlinearAffineTransform : public itk::AffineTransform<TCoordinateType, VDimension>
 {
 public:
   /** Standard class type aliases.   */
   using Self = NonlinearAffineTransform;
-  using Superclass = itk::AffineTransform<TCoordRepType, VDimension>;
+  using Superclass = itk::AffineTransform<TCoordinateType, VDimension>;
   using Pointer = itk::SmartPointer<Self>;
   using ConstPointer = itk::SmartPointer<const Self>;
 
   /** New macro for creation of through a smart pointer. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NonlinearAffineTransform);
 
   /** Override this so not linear. See test below. */
-  typename itk::TransformBaseTemplate<TCoordRepType>::TransformCategoryEnum
+  typename itk::TransformBaseTemplate<TCoordinateType>::TransformCategoryEnum
   GetTransformCategory() const override
   {
-    return itk::TransformBaseTemplate<TCoordRepType>::TransformCategoryEnum::UnknownTransformCategory;
+    return itk::TransformBaseTemplate<TCoordinateType>::TransformCategoryEnum::UnknownTransformCategory;
   }
 };
 } // namespace
@@ -76,12 +76,12 @@ itkResampleImageTest2Streaming(int argc, char * argv[])
 
   using PixelType = unsigned char;
   using ImageType = itk::Image<PixelType, VDimension>;
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
-  using NonlinearAffineTransformType = NonlinearAffineTransform<CoordRepType, VDimension>;
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
-  using ExtrapolatorType = itk::NearestNeighborExtrapolateImageFunction<ImageType, CoordRepType>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
+  using NonlinearAffineTransformType = NonlinearAffineTransform<CoordinateType, VDimension>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
+  using ExtrapolatorType = itk::NearestNeighborExtrapolateImageFunction<ImageType, CoordinateType>;
 
   using ReaderType = itk::ImageFileReader<ImageType>;
   using WriterType = itk::ImageFileWriter<ImageType>;

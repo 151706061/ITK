@@ -98,7 +98,7 @@ CompareImages(itk::ImageRegionIterator<ImageType> & refIter, itk::ImageRegionIte
   outIter.GoToBegin();
   while (!outIter.IsAtEnd())
   {
-    typename ImageType::PixelType diff = refIter.Get() - outIter.Get();
+    const typename ImageType::PixelType diff = refIter.Get() - outIter.Get();
     if (itk::Math::abs(diff) > 1)
     {
       passed = false;
@@ -215,7 +215,7 @@ itkHistogramMatchingImageFilterTest()
     ITK_EXERCISE_BASIC_OBJECT_METHODS(filterWithReferenceImage, HistogramMatchingImageFilter, ImageToImageFilter);
 
 
-    bool generateReferenceHistogramFromImage = true;
+    constexpr bool generateReferenceHistogramFromImage = true;
     ITK_TEST_SET_GET_BOOLEAN(
       filterWithReferenceImage, GenerateReferenceHistogramFromImage, generateReferenceHistogramFromImage);
 
@@ -225,23 +225,23 @@ itkHistogramMatchingImageFilterTest()
     filterWithReferenceImage->SetSourceImage(source);
     ITK_TEST_SET_GET_VALUE(source, filterWithReferenceImage->GetSourceImage());
 
-    itk::SizeValueType numberOfHistogramLevels = 50;
+    constexpr itk::SizeValueType numberOfHistogramLevels = 50;
     filterWithReferenceImage->SetNumberOfHistogramLevels(numberOfHistogramLevels);
     ITK_TEST_SET_GET_VALUE(numberOfHistogramLevels, filterWithReferenceImage->GetNumberOfHistogramLevels());
 
-    itk::SizeValueType numberOfMatchPoints = 8;
+    constexpr itk::SizeValueType numberOfMatchPoints = 8;
     filterWithReferenceImage->SetNumberOfMatchPoints(numberOfMatchPoints);
     ITK_TEST_SET_GET_VALUE(numberOfMatchPoints, filterWithReferenceImage->GetNumberOfMatchPoints());
 
-    ShowProgressObject                                    progressWatch(filterWithReferenceImage);
-    itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-    command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+    ShowProgressObject                                          progressWatch(filterWithReferenceImage);
+    const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+      itk::SimpleMemberCommand<ShowProgressObject>::New();
     command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
     filterWithReferenceImage->AddObserver(itk::ProgressEvent(), command);
 
     {
       // Exercise and test with ThresholdAtMeanIntensityOff
-      bool thresholdAtMeanIntensity = false;
+      constexpr bool thresholdAtMeanIntensity = false;
       ITK_TEST_SET_GET_BOOLEAN(filterWithReferenceImage, ThresholdAtMeanIntensity, thresholdAtMeanIntensity);
 
       filterWithReferenceImage->Update();
@@ -255,7 +255,7 @@ itkHistogramMatchingImageFilterTest()
     }
     {
       // Exercise and test with ThresholdAtMeanIntensityOn
-      bool thresholdAtMeanIntensity = true;
+      constexpr bool thresholdAtMeanIntensity = true;
       ITK_TEST_SET_GET_BOOLEAN(filterWithReferenceImage, ThresholdAtMeanIntensity, thresholdAtMeanIntensity);
 
       filterWithReferenceImage->Update();
@@ -286,9 +286,9 @@ itkHistogramMatchingImageFilterTest()
     filterWithSameSizeHistogram->SetNumberOfMatchPoints(8);
     filterWithSameSizeHistogram->ThresholdAtMeanIntensityOn();
 
-    ShowProgressObject                                    progressWatchHistogramReference(filterWithSameSizeHistogram);
-    itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference;
-    commandHistogramReference = itk::SimpleMemberCommand<ShowProgressObject>::New();
+    ShowProgressObject progressWatchHistogramReference(filterWithSameSizeHistogram);
+    const itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference =
+      itk::SimpleMemberCommand<ShowProgressObject>::New();
     commandHistogramReference->SetCallbackFunction(&progressWatchHistogramReference, &ShowProgressObject::ShowProgress);
     filterWithSameSizeHistogram->AddObserver(itk::ProgressEvent(), commandHistogramReference);
 
@@ -312,9 +312,9 @@ itkHistogramMatchingImageFilterTest()
     filterWithSmallerHistogram->SetNumberOfMatchPoints(8);
     filterWithSmallerHistogram->ThresholdAtMeanIntensityOn();
 
-    ShowProgressObject                                    progressWatchHistogramReference(filterWithSmallerHistogram);
-    itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference;
-    commandHistogramReference = itk::SimpleMemberCommand<ShowProgressObject>::New();
+    ShowProgressObject progressWatchHistogramReference(filterWithSmallerHistogram);
+    const itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference =
+      itk::SimpleMemberCommand<ShowProgressObject>::New();
     commandHistogramReference->SetCallbackFunction(&progressWatchHistogramReference, &ShowProgressObject::ShowProgress);
     filterWithSmallerHistogram->AddObserver(itk::ProgressEvent(), commandHistogramReference);
 
@@ -339,9 +339,9 @@ itkHistogramMatchingImageFilterTest()
     filterWithLargerHistogram->SetNumberOfMatchPoints(8);
     filterWithLargerHistogram->ThresholdAtMeanIntensityOn();
 
-    ShowProgressObject                                    progressWatchHistogramReference(filterWithLargerHistogram);
-    itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference;
-    commandHistogramReference = itk::SimpleMemberCommand<ShowProgressObject>::New();
+    ShowProgressObject progressWatchHistogramReference(filterWithLargerHistogram);
+    const itk::SimpleMemberCommand<ShowProgressObject>::Pointer commandHistogramReference =
+      itk::SimpleMemberCommand<ShowProgressObject>::New();
     commandHistogramReference->SetCallbackFunction(&progressWatchHistogramReference, &ShowProgressObject::ShowProgress);
     filterWithLargerHistogram->AddObserver(itk::ProgressEvent(), commandHistogramReference);
 

@@ -69,7 +69,7 @@ namespace itk
  * and added to the meta-data in case users wish to extract data from them.
  *
  * The original implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/237
+ * https://doi.org/10.54294/o8w4c0
  *
  * \ingroup ITKIOBruker
  *
@@ -90,7 +90,7 @@ public:
   /** New macro for creation of through a SmartPointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Bruker2dseqImageIO);
 
   /** Determine if the necessary files exist to read the specified 2dseq file.

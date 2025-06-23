@@ -33,7 +33,8 @@
  */
 template <typename T>
 [[deprecated("Preferably use the C++ `[[maybe_unused]]` attribute instead!")]] inline void
-Unused(const T &){};
+Unused(const T &)
+{}
 #endif
 
 namespace itk
@@ -77,12 +78,12 @@ public:
 
 #ifndef ITK_FUTURE_LEGACY_REMOVE
   template <typename T>
-  [[deprecated("Prefer calling the SetGlobalInstance(globalName, global, deleteFunc) overload (without the unused func "
-               "parameter)!")]] bool
-  SetGlobalInstance(const char *                globalName,
-                    T *                         global,
-                    std::function<void(void *)> itkNotUsed(func),
-                    std::function<void()>       deleteFunc)
+  ITK_FUTURE_DEPRECATED("Prefer calling the SetGlobalInstance(globalName, global, deleteFunc) overload (without the "
+                        "unused func parameter)!")
+  bool SetGlobalInstance(const char *                globalName,
+                         T *                         global,
+                         std::function<void(void *)> itkNotUsed(func),
+                         std::function<void()>       deleteFunc)
   {
     this->SetGlobalInstance(globalName, global, std::move(deleteFunc));
     // Just returns true for backward compatibility (legacy only).
@@ -92,12 +93,13 @@ public:
 
   /** Set/Get the pointer to GlobalSingleton.
    * Note that SetGlobalSingleton is not concurrent thread safe. */
+  /** @ITKStartGrouping */
   static Self *
   GetInstance();
   static void
   SetInstance(Self * instance);
   ~SingletonIndex();
-
+  /** @ITKEndGrouping */
 private:
   // Internal struct to store the instance pointer and the delete function object of a global object.
   struct GlobalObject
@@ -147,8 +149,9 @@ Singleton(const char * globalName, std::function<void()> deleteFunc)
 
 #ifndef ITK_FUTURE_LEGACY_REMOVE
 template <typename T>
-[[deprecated("Prefer calling the Singleton(globalName, deleteFunc) overload (without the unused func parameter)!")]] T *
-Singleton(const char * globalName, std::function<void(void *)> itkNotUsed(func), std::function<void()> deleteFunc)
+ITK_FUTURE_DEPRECATED(
+  "Prefer calling the Singleton(globalName, deleteFunc) overload (without the unused func parameter)!")
+T * Singleton(const char * globalName, std::function<void(void *)> itkNotUsed(func), std::function<void()> deleteFunc)
 {
   return Singleton<T>(globalName, std::move(deleteFunc));
 }

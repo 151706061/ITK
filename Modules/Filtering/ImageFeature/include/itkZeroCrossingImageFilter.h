@@ -88,7 +88,7 @@ public:
   /** Typedef to describe the output image region type. */
   using OutputImageRegionType = typename TOutputImage::RegionType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ZeroCrossingImageFilter);
 
   /** ImageDimension enumeration   */
@@ -107,21 +107,19 @@ public:
   GenerateInputRequestedRegion() override;
 
   /** Set/Get the label value for zero-crossing pixels. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, OutputImagePixelType);
   itkGetConstMacro(ForegroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the label value for non-zero-crossing pixels. */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(InputComparableCheck, (Concept::Comparable<InputImagePixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   ZeroCrossingImageFilter();

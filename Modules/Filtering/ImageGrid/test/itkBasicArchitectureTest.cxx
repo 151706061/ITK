@@ -21,6 +21,7 @@
 #include "itkShrinkImageFilter.h"
 #include "itkCommand.h"
 #include "itkTextOutput.h"
+#include "itkTestingMacros.h"
 
 // The following three classes are used to support callbacks
 // on the shrink filter in the pipeline that follows later
@@ -122,8 +123,7 @@ itkBasicArchitectureTest(int, char *[])
   // Create a source object (in this case a random image generator).
   // The source object is templated on the output type.
   //
-  itk::RandomImageSource<FloatImage2DType>::Pointer random;
-  random = itk::RandomImageSource<FloatImage2DType>::New();
+  const itk::RandomImageSource<FloatImage2DType>::Pointer random = itk::RandomImageSource<FloatImage2DType>::New();
   random->SetMin(0.0);
   random->SetMax(1.0);
 
@@ -131,41 +131,48 @@ itkBasicArchitectureTest(int, char *[])
   // add some callbacks to the start, progress, and end filter execution
   // methods. The filter is templated on the input and output data types.
   //
-  itk::ShrinkImageFilter<FloatImage2DType, FloatImage2DType>::Pointer shrink;
-  shrink = itk::ShrinkImageFilter<FloatImage2DType, FloatImage2DType>::New();
+  const itk::ShrinkImageFilter<FloatImage2DType, FloatImage2DType>::Pointer shrink =
+    itk::ShrinkImageFilter<FloatImage2DType, FloatImage2DType>::New();
   shrink->SetInput(random->GetOutput());
   shrink->SetShrinkFactors(2);
 
   // Create a command to call ShowProgress when progress event is triggered
-  ShowProgressObject                                    progressWatch(shrink);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(shrink);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   shrink->AddObserver(itk::ProgressEvent(), command);
+  ITK_TEST_EXPECT_TRUE(shrink->HasObserver(itk::ProgressEvent()));
 
   // Create a command to call StartEndEvent when start event is triggered
-  StartEndEvent                                    startEndWatch;
-  itk::SimpleMemberCommand<StartEndEvent>::Pointer start;
-  start = itk::SimpleMemberCommand<StartEndEvent>::New();
+  StartEndEvent                                          startEndWatch;
+  const itk::SimpleMemberCommand<StartEndEvent>::Pointer start = itk::SimpleMemberCommand<StartEndEvent>::New();
   start->SetCallbackFunction(&startEndWatch, &StartEndEvent::Start);
-  unsigned long tag = shrink->AddObserver(itk::StartEvent(), start);
+  shrink->AddObserver(itk::StartEvent(), start);
+  ITK_TEST_EXPECT_TRUE(shrink->HasObserver(itk::StartEvent()));
 
   // Create a command to call StartEndEvent when end event is triggered
-  itk::SimpleMemberCommand<StartEndEvent>::Pointer end;
-  end = itk::SimpleMemberCommand<StartEndEvent>::New();
+  const itk::SimpleMemberCommand<StartEndEvent>::Pointer end = itk::SimpleMemberCommand<StartEndEvent>::New();
   end->SetCallbackFunction(&startEndWatch, &StartEndEvent::End);
-  shrink->AddObserver(itk::EndEvent(), end);
+  const unsigned long endEventObserverTag = shrink->AddObserver(itk::EndEvent(), end);
+  ITK_TEST_EXPECT_TRUE(shrink->HasObserver(itk::EndEvent()));
 
   // Create a command that to call AnyEvent when event is fired
-  AllEvents                              allWatch;
-  itk::MemberCommand<AllEvents>::Pointer allEvents;
-  allEvents = itk::MemberCommand<AllEvents>::New();
+  AllEvents                                    allWatch;
+  const itk::MemberCommand<AllEvents>::Pointer allEvents = itk::MemberCommand<AllEvents>::New();
   allEvents->SetCallbackFunction(&allWatch, &AllEvents::WatchEvents);
-  shrink->AddObserver(itk::AnyEvent(), allEvents);
+  const unsigned long anyEventObserverTag = shrink->AddObserver(itk::AnyEvent(), allEvents);
+  ITK_TEST_EXPECT_TRUE(shrink->HasObserver(itk::AnyEvent()));
   shrink->Update();
 
-  // test RemoveObserver code
-  shrink->RemoveObserver(tag);
+  // Test RemoveObserver code
+  shrink->RemoveObserver(anyEventObserverTag);
+  ITK_TEST_EXPECT_TRUE(!shrink->HasObserver(itk::AnyEvent()));
+
+  // Test RemoveObserver const code
+  const auto & constShrink = *shrink;
+  constShrink.RemoveObserver(endEventObserverTag);
+  ITK_TEST_EXPECT_TRUE(!constShrink.HasObserver(itk::EndEvent()));
 
   return EXIT_SUCCESS;
 }

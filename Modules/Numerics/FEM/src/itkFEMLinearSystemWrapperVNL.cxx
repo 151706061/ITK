@@ -20,9 +20,7 @@
 #include <vnl/vnl_sparse_matrix_linear_system.h>
 #include <vnl/algo/vnl_lsqr.h>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 void
 LinearSystemWrapperVNL::InitializeMatrix(unsigned int matrixIndex)
@@ -224,8 +222,7 @@ LinearSystemWrapperVNL::Solve()
 void
 LinearSystemWrapperVNL::SwapMatrices(unsigned int MatrixIndex1, unsigned int MatrixIndex2)
 {
-  vnl_sparse_matrix<Float> * tmp;
-  tmp = (*m_Matrices)[MatrixIndex1];
+  vnl_sparse_matrix<Float> * tmp = (*m_Matrices)[MatrixIndex1];
   (*m_Matrices)[MatrixIndex1] = (*m_Matrices)[MatrixIndex2];
   (*m_Matrices)[MatrixIndex2] = tmp;
 }
@@ -233,8 +230,7 @@ LinearSystemWrapperVNL::SwapMatrices(unsigned int MatrixIndex1, unsigned int Mat
 void
 LinearSystemWrapperVNL::SwapVectors(unsigned int VectorIndex1, unsigned int VectorIndex2)
 {
-  vnl_vector<Float> * tmp;
-  tmp = (*m_Vectors)[VectorIndex1];
+  vnl_vector<Float> * tmp = (*m_Vectors)[VectorIndex1];
   (*m_Vectors)[VectorIndex1] = (*m_Vectors)[VectorIndex2];
   (*m_Vectors)[VectorIndex2] = tmp;
 }
@@ -242,8 +238,7 @@ LinearSystemWrapperVNL::SwapVectors(unsigned int VectorIndex1, unsigned int Vect
 void
 LinearSystemWrapperVNL::SwapSolutions(unsigned int SolutionIndex1, unsigned int SolutionIndex2)
 {
-  vnl_vector<Float> * tmp;
-  tmp = (*m_Solutions)[SolutionIndex1];
+  vnl_vector<Float> * tmp = (*m_Solutions)[SolutionIndex1];
   (*m_Solutions)[SolutionIndex1] = (*m_Solutions)[SolutionIndex2];
   (*m_Solutions)[SolutionIndex2] = tmp;
 }
@@ -297,16 +292,15 @@ LinearSystemWrapperVNL::ScaleMatrix(Float scale, unsigned int matrixIndex)
 
 LinearSystemWrapperVNL::~LinearSystemWrapperVNL()
 {
-  unsigned int i;
-  for (i = 0; i < m_NumberOfMatrices; ++i)
+  for (unsigned int i = 0; i < m_NumberOfMatrices; ++i)
   {
     this->DestroyMatrix(i);
   }
-  for (i = 0; i < m_NumberOfVectors; ++i)
+  for (unsigned int i = 0; i < m_NumberOfVectors; ++i)
   {
     this->DestroyVector(i);
   }
-  for (i = 0; i < m_NumberOfSolutions; ++i)
+  for (unsigned int i = 0; i < m_NumberOfSolutions; ++i)
   {
     this->DestroySolution(i);
   }
@@ -316,5 +310,4 @@ LinearSystemWrapperVNL::~LinearSystemWrapperVNL()
   delete m_Solutions;
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem

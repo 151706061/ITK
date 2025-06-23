@@ -43,11 +43,10 @@ itkTriangleMeshToBinaryImageFilterTest2(int argc, char * argv[])
 
   using TriangleFilterType = itk::SimplexMeshToTriangleMeshFilter<SimplexMeshType, TriangleMeshType>;
   using TriangleMeshPointer = TriangleMeshType::Pointer;
-  auto      mySphereMeshSource = SphereMeshSourceType::New();
-  PointType center;
-  center.Fill(-5);
+  auto                 mySphereMeshSource = SphereMeshSourceType::New();
+  auto                 center = itk::MakeFilled<PointType>(-5);
   PointType::ValueType scaleInit[3] = { 10, 10, 10 };
-  VectorType           scale = scaleInit;
+  const VectorType     scale = scaleInit;
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetResolution(3);
@@ -60,8 +59,8 @@ itkTriangleMeshToBinaryImageFilterTest2(int argc, char * argv[])
   backFilter->SetInput(simplexFilter->GetOutput());
   backFilter->Update();
 
-  SimplexMeshType::Pointer simplexMesh = simplexFilter->GetOutput();
-  TriangleMeshPointer      originalTriangleMesh = mySphereMeshSource->GetOutput();
+  const SimplexMeshType::Pointer simplexMesh = simplexFilter->GetOutput();
+  const TriangleMeshPointer      originalTriangleMesh = mySphereMeshSource->GetOutput();
 
   std::cout << " Number of Points and Cells in Original Triangle Mesh" << std::endl;
   std::cout << originalTriangleMesh->GetNumberOfPoints() << std::endl;
@@ -71,7 +70,7 @@ itkTriangleMeshToBinaryImageFilterTest2(int argc, char * argv[])
 
 
   std::cout << "Simplex Mesh: " << simplexMesh << std::endl;
-  TriangleMeshType::Pointer triangleMesh = backFilter->GetOutput();
+  const TriangleMeshType::Pointer triangleMesh = backFilter->GetOutput();
 
   std::cout << " Number of Points and Cells in Back Filtered Triangle Mesh" << std::endl;
   std::cout << triangleMesh->GetNumberOfPoints() << std::endl;

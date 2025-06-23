@@ -68,14 +68,14 @@ public:
   GetValue(const ParametersType & position) const override
   {
 
-    double x = position[0];
-    double y = position[1];
+    const double x = position[0];
+    const double y = position[1];
 
     std::cout << "GetValue ( ";
     std::cout << x << " , " << y;
     std::cout << ") = ";
 
-    double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     std::cout << val << std::endl;
 
@@ -86,8 +86,8 @@ public:
   GetDerivative(const ParametersType & position, DerivativeType & derivative) const override
   {
 
-    double x = position[0];
-    double y = position[1];
+    const double x = position[0];
+    const double y = position[1];
 
     std::cout << "GetDerivative ( ";
     std::cout << x << " , " << y;
@@ -119,7 +119,7 @@ public:
   itkNewMacro(Self);
 
 protected:
-  CommandIterationUpdateConjugateGradient() { m_IterationNumber = 0; }
+  CommandIterationUpdateConjugateGradient() {}
 
 public:
   using OptimizerType = itk::ConjugateGradientOptimizer;
@@ -148,7 +148,7 @@ public:
   }
 
 private:
-  unsigned long m_IterationNumber;
+  unsigned long m_IterationNumber{ 0 };
 
   itk::FunctionEvaluationIterationEvent m_FunctionEvent;
   itk::GradientEvaluationIterationEvent m_GradientEvent;
@@ -176,11 +176,11 @@ itkConjugateGradientOptimizerTest(int, char *[])
 
   vnlOptimizerType * vnlOptimizer = itkOptimizer->GetOptimizer();
 
-  const double  F_Tolerance = 1e-3;       // Function value tolerance
-  const double  G_Tolerance = 1e-4;       // Gradient magnitude tolerance
-  const double  X_Tolerance = 1e-8;       // Search space tolerance
-  const double  Epsilon_Function = 1e-10; // Step
-  constexpr int Max_Iterations = 100;     // Maximum number of iterations
+  constexpr double F_Tolerance = 1e-3;       // Function value tolerance
+  constexpr double G_Tolerance = 1e-4;       // Gradient magnitude tolerance
+  constexpr double X_Tolerance = 1e-8;       // Search space tolerance
+  constexpr double Epsilon_Function = 1e-10; // Step
+  constexpr int    Max_Iterations = 100;     // Maximum number of iterations
 
   vnlOptimizer->set_f_tolerance(F_Tolerance);
   vnlOptimizer->set_g_tolerance(G_Tolerance);
@@ -234,15 +234,14 @@ itkConjugateGradientOptimizerTest(int, char *[])
   // check results to see if it is within range
   //
 
-  OptimizerType::ParametersType finalPosition;
-  finalPosition = itkOptimizer->GetCurrentPosition();
+  OptimizerType::ParametersType finalPosition = itkOptimizer->GetCurrentPosition();
 
   std::cout << "Solution        = (";
   std::cout << finalPosition[0] << ',';
   std::cout << finalPosition[1] << ')' << std::endl;
 
-  bool   pass = true;
-  double trueParameters[2] = { 2, -2 };
+  bool             pass = true;
+  constexpr double trueParameters[2] = { 2, -2 };
   for (unsigned int j = 0; j < 2; ++j)
   {
     if (itk::Math::abs(finalPosition[j] - trueParameters[j]) > 0.01)
@@ -259,16 +258,15 @@ itkConjugateGradientOptimizerTest(int, char *[])
 
   // Get the final value of the optimizer
   std::cout << "Testing GetValue() : ";
-  OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
+  const OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
   if (itk::Math::abs(finalValue + 10.0) > 0.01)
   {
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   std::cout << "Test passed." << std::endl;
   return EXIT_SUCCESS;

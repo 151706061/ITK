@@ -72,7 +72,7 @@ public:
   using Self = ConstantBoundaryCondition;
   using Superclass = ImageBoundaryCondition<TInputImage, TOutputImage>;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConstantBoundaryCondition);
 
   /** Extract information from the image type */
@@ -121,7 +121,7 @@ public:
   SetConstant(const OutputPixelType & c);
 
   /** Get the value of the constant. */
-  const OutputPixelType &
+  [[nodiscard]] const OutputPixelType &
   GetConstant() const;
 
   /** Tell if the boundary condition can index to any location within

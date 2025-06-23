@@ -81,7 +81,7 @@ public:
     {
       while (!it.IsAtEndOfLine())
       {
-        PixelType readValue = it.Get();
+        const PixelType readValue = it.Get();
         std::cout << readValue << ' ';
         if (readValue != value)
         {
@@ -121,8 +121,8 @@ itkRawImageIOTest4(int argc, char * argv[])
   using ComponentType = itk::PixelTraits<PixelType>::ValueType;
   using ByteSwapperType = itk::ByteSwapper<ComponentType>;
 
-  PixelType    value{};
-  unsigned int numberOfPixels = dims[0] * dims[1];
+  PixelType          value{};
+  const unsigned int numberOfPixels = dims[0] * dims[1];
 
 
   // Create the BigEndian binary file
@@ -193,20 +193,17 @@ itkRawImageIOTest4(int argc, char * argv[])
   RawImageIOReadFileTester<ImageType> readTester;
 
 
-  int status;
-
   std::cout << "Testing read of Big Endian File" << std::endl;
   bool fileIsBigEndian = true;
-  status = readTester.Read(argv[1], fileIsBigEndian, dims);
+  int  status = readTester.Read(argv[1], fileIsBigEndian, dims);
   if (status == EXIT_FAILURE)
   {
     std::cerr << "Reading Raw BigEndian FAILED !!" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "Reading Raw BigEndian PASSED !!" << std::endl << std::endl;
-  }
+
+  std::cout << "Reading Raw BigEndian PASSED !!" << std::endl << std::endl;
+
 
   std::cout << "Testing read of Little Endian File" << std::endl;
   fileIsBigEndian = false;
@@ -216,10 +213,9 @@ itkRawImageIOTest4(int argc, char * argv[])
     std::cerr << "Reading Raw LittleEndian FAILED !!" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "Reading Raw LittleEndian PASSED !!" << std::endl << std::endl;
-  }
+
+  std::cout << "Reading Raw LittleEndian PASSED !!" << std::endl << std::endl;
+
 
   std::cout << "Test PASSED !!" << std::endl << std::endl;
 

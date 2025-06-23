@@ -25,11 +25,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 NormalizeImageFilter<TInputImage, TOutputImage>::NormalizeImageFilter()
-{
-  m_StatisticsFilter = nullptr;
-  m_StatisticsFilter = StatisticsImageFilter<TInputImage>::New();
-  m_ShiftScaleFilter = ShiftScaleImageFilter<TInputImage, TOutputImage>::New();
-}
+  : m_StatisticsFilter(StatisticsImageFilter<TInputImage>::New())
+  , m_ShiftScaleFilter(ShiftScaleImageFilter<TInputImage, TOutputImage>::New())
+{}
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -38,7 +36,7 @@ NormalizeImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
   if (this->GetInput())
   {
-    InputImagePointer image = const_cast<typename Superclass::InputImageType *>(this->GetInput());
+    const InputImagePointer image = const_cast<typename Superclass::InputImageType *>(this->GetInput());
     image->SetRequestedRegionToLargestPossibleRegion();
   }
 }

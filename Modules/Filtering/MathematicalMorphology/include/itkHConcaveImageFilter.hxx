@@ -27,7 +27,6 @@ namespace itk
 template <typename TInputImage, typename TOutputImage>
 HConcaveImageFilter<TInputImage, TOutputImage>::HConcaveImageFilter()
   : m_Height(2)
-
 {}
 
 template <typename TInputImage, typename TOutputImage>
@@ -38,7 +37,7 @@ HConcaveImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -66,16 +65,14 @@ HConcaveImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Delegate to a H-Minima filter.
   //
   //
-  typename HMinimaImageFilter<TInputImage, TInputImage>::Pointer hmin =
-    HMinimaImageFilter<TInputImage, TInputImage>::New();
+  auto hmin = HMinimaImageFilter<TInputImage, TInputImage>::New();
 
   hmin->SetInput(this->GetInput());
   hmin->SetHeight(m_Height);
   hmin->SetFullyConnected(m_FullyConnected);
 
   // Need to subtract the input from the H-Minima image
-  typename SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::Pointer subtract =
-    SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
+  auto subtract = SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
 
   subtract->SetInput1(hmin->GetOutput());
   subtract->SetInput2(this->GetInput());
@@ -105,7 +102,7 @@ HConcaveImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Ind
   os << indent << "Depth of local minima (contrast): "
      << static_cast<typename NumericTraits<InputImagePixelType>::PrintType>(m_Height) << std::endl;
   os << indent << "Number of iterations used to produce current output: " << m_NumberOfIterationsUsed << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

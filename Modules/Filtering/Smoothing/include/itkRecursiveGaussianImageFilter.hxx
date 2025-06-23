@@ -26,11 +26,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 RecursiveGaussianImageFilter<TInputImage, TOutputImage>::RecursiveGaussianImageFilter()
-{
-  m_Sigma = 1.0;
-  m_NormalizeAcrossScale = false;
-  m_Order = GaussianOrderEnum::ZeroOrder;
-}
+  : m_Sigma(1.0)
+  , m_Order(GaussianOrderEnum::ZeroOrder)
+{}
 
 /**
  *   Explicitly set a zeroth order derivative.
@@ -69,7 +67,7 @@ template <typename TInputImage, typename TOutputImage>
 void
 RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType spacing)
 {
-  const ScalarRealType spacingTolerance = 1e-8;
+  constexpr ScalarRealType spacingTolerance = 1e-8;
 
   /**  Parameters of exponential series. */
   ScalarRealType A1[3];
@@ -86,7 +84,7 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType sp
   if (spacing < 0.0)
   {
     direction = -1.0;
-    spacing = -spacing;
+    spacing *= -1;
   }
 
   if (spacing < spacingTolerance)
@@ -117,9 +115,13 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType sp
   A2[2] = static_cast<ScalarRealType>(0.3446);
   B2[2] = static_cast<ScalarRealType>(-2.2355);
 
-  ScalarRealType SD, DD, ED;
+  ScalarRealType SD; /*one-line-declaration*/
+  ScalarRealType DD; /*one-line-declaration*/
+  ScalarRealType ED; /*one-line-declaration*/
   this->ComputeDCoefficients(sigmad, W1, L1, W2, L2, SD, DD, ED);
-  ScalarRealType SN, DN, EN;
+  ScalarRealType SN; /*one-line-declaration*/
+  ScalarRealType DN; /*one-line-declaration*/
+  ScalarRealType EN; /*one-line-declaration*/
 
   switch (m_Order)
   {
@@ -129,7 +131,7 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType sp
       ComputeNCoefficients(
         sigmad, A1[0], B1[0], W1, L1, A2[0], B2[0], W2, L2, this->m_N0, this->m_N1, this->m_N2, this->m_N3, SN, DN, EN);
 
-      ScalarRealType alpha0 = 2 * SN / SD - this->m_N0;
+      const ScalarRealType alpha0 = 2 * SN / SD - this->m_N0;
       this->m_N0 *= across_scale_normalization / alpha0;
       this->m_N1 *= across_scale_normalization / alpha0;
       this->m_N2 *= across_scale_normalization / alpha0;
@@ -169,14 +171,24 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType sp
       }
       // Approximation of convolution with the second derivative of a
       // Gaussian.
-      ScalarRealType N0_0, N1_0, N2_0, N3_0;
-      ScalarRealType N0_2, N1_2, N2_2, N3_2;
-      ScalarRealType SN0, DN0, EN0;
-      ScalarRealType SN2, DN2, EN2;
+      ScalarRealType N0_0; /*one-line-declaration*/
+      ScalarRealType N1_0; /*one-line-declaration*/
+      ScalarRealType N2_0; /*one-line-declaration*/
+      ScalarRealType N3_0; /*one-line-declaration*/
+      ScalarRealType N0_2; /*one-line-declaration*/
+      ScalarRealType N1_2; /*one-line-declaration*/
+      ScalarRealType N2_2; /*one-line-declaration*/
+      ScalarRealType N3_2; /*one-line-declaration*/
+      ScalarRealType SN0;  /*one-line-declaration*/
+      ScalarRealType DN0;  /*one-line-declaration*/
+      ScalarRealType EN0;  /*one-line-declaration*/
+      ScalarRealType SN2;  /*one-line-declaration*/
+      ScalarRealType DN2;  /*one-line-declaration*/
+      ScalarRealType EN2;  /*one-line-declaration*/
       ComputeNCoefficients(sigmad, A1[0], B1[0], W1, L1, A2[0], B2[0], W2, L2, N0_0, N1_0, N2_0, N3_0, SN0, DN0, EN0);
       ComputeNCoefficients(sigmad, A1[2], B1[2], W1, L1, A2[2], B2[2], W2, L2, N0_2, N1_2, N2_2, N3_2, SN2, DN2, EN2);
 
-      ScalarRealType beta = -(2 * SN2 - SD * N0_2) / (2 * SN0 - SD * N0_0);
+      const ScalarRealType beta = -(2 * SN2 - SD * N0_2) / (2 * SN0 - SD * N0_0);
       this->m_N0 = N0_2 + beta * N0_0;
       this->m_N1 = N1_2 + beta * N1_0;
       this->m_N2 = N2_2 + beta * N2_0;
@@ -185,8 +197,7 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::SetUp(ScalarRealType sp
       DN = DN2 + beta * DN0;
       EN = EN2 + beta * EN0;
 
-      ScalarRealType alpha2;
-      alpha2 = EN * SD * SD - ED * SN * SD - 2 * DN * DD * SD + 2 * DD * DD * SN;
+      ScalarRealType alpha2 = EN * SD * SD - ED * SN * SD - 2 * DN * DD * SD + 2 * DD * DD * SN;
       alpha2 /= SD * SD * SD;
 
       this->m_N0 *= across_scale_normalization / alpha2;
@@ -227,12 +238,12 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::ComputeNCoefficients(Sc
                                                                               ScalarRealType & DN,
                                                                               ScalarRealType & EN)
 {
-  ScalarRealType Sin1 = std::sin(W1 / sigmad);
-  ScalarRealType Sin2 = std::sin(W2 / sigmad);
-  ScalarRealType Cos1 = std::cos(W1 / sigmad);
-  ScalarRealType Cos2 = std::cos(W2 / sigmad);
-  ScalarRealType Exp1 = std::exp(L1 / sigmad);
-  ScalarRealType Exp2 = std::exp(L2 / sigmad);
+  const ScalarRealType Sin1 = std::sin(W1 / sigmad);
+  const ScalarRealType Sin2 = std::sin(W2 / sigmad);
+  const ScalarRealType Cos1 = std::cos(W1 / sigmad);
+  const ScalarRealType Cos2 = std::cos(W2 / sigmad);
+  const ScalarRealType Exp1 = std::exp(L1 / sigmad);
+  const ScalarRealType Exp2 = std::exp(L2 / sigmad);
 
   N0 = A1 + A2;
   N1 = Exp2 * (B2 * Sin2 - (A2 + 2 * A1) * Cos2);
@@ -323,7 +334,7 @@ RecursiveGaussianImageFilter<TInputImage, TOutputImage>::ComputeRemainingCoeffic
 
 template <typename TInputImage, typename TOutputImage>
 void
-RecursiveGaussianImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() ITKv5_CONST
+RecursiveGaussianImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() const
 {
   this->Superclass::VerifyPreconditions();
 

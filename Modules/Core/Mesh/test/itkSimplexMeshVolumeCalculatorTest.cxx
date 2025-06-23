@@ -42,11 +42,10 @@ itkSimplexMeshVolumeCalculatorTest(int, char *[])
   // Declare the type of the gradient image
   using SimplexFilterType = itk::TriangleMeshToSimplexMeshFilter<TriangleMeshType, SimplexMeshType>;
 
-  auto      mySphereMeshSource = SphereMeshSourceType::New();
-  PointType center;
-  center.Fill(0);
+  auto                 mySphereMeshSource = SphereMeshSourceType::New();
+  constexpr PointType  center{};
   PointType::ValueType scaleInit[3] = { 10, 10, 10 };
-  VectorType           scale = scaleInit;
+  const VectorType     scale = scaleInit;
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetScale(scale);
@@ -75,7 +74,7 @@ itkSimplexMeshVolumeCalculatorTest(int, char *[])
 
   calculator->Print(std::cout);
 
-  double volume = calculator->GetVolume();
+  const double volume = calculator->GetVolume();
 
   const double pi = std::atan(1.0) * 4.0;
   const double knownVolume = 4.0 / 3.0 * pi * (1000.0); // scale was 10 = radius

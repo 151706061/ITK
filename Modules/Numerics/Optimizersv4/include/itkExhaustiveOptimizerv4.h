@@ -96,7 +96,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExhaustiveOptimizerv4);
 
   /** Steps type */
@@ -138,7 +138,7 @@ public:
   itkGetConstReferenceMacro(CurrentIndex, ParametersType);
 
   /** Get the reason for termination */
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
   /**  Set the position to initialize the optimization. */

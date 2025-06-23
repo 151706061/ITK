@@ -84,7 +84,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LBFGSOptimizerBasev4);
 
   using MetricType = Superclass::MetricType;
@@ -138,7 +138,7 @@ public:
   itkGetConstMacro(GradientConvergenceTolerance, double);
 
   /** Get the reason for termination */
-  const StopConditionReturnStringType
+  StopConditionReturnStringType
   GetStopConditionDescription() const override;
 
 protected:

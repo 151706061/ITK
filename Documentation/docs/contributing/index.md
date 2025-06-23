@@ -1,9 +1,9 @@
-Contributing to ITK
-===================
+Contribute to ITK
+=================
 
 Welcome to the Insight Toolkit (ITK) ! We are excited that you are here! Join us as a contributing member of the community.
 
-![Contributor graph](https://contributor-graph-api.apiseven.com/contributors-svg?chart=contributorOverTime&repo=InsightSoftwareConsortium/ITK)
+[![Alt](https://repobeats.axiom.co/api/embed/e2194d411e086b1a9a9db4336692fdb302612295.svg "Repobeats analytics image")](https://github.com/InsightSoftwareConsortium/ITK/pulse/monthly)
 
 This article documents how to contribute improvements to ITK.
 
@@ -17,7 +17,7 @@ Setup
 Before you begin, perform initial setup:
 
   1. [Register for a GitHub](https://github.com/join) account.
-  2. Optionally download our [one page PDF desk reference](https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/master/Documentation/GitCheatSheet.pdf).
+  2. Optionally download our [one page PDF desk reference](https://raw.githubusercontent.com/InsightSoftwareConsortium/ITK/main/Documentation/docs/contributing/GitCheatSheet.pdf).
   3. Follow the [download instructions] to create a local ITK clone:
 
 ```bash
@@ -41,9 +41,16 @@ the [`setup-git-aliases`] script for general Git tasks in ITK.
 Visit the *Pro Git: Setup* resource in [Git Help] for further
 information on setting up your local Git environment.
 
+(build)=
+Local Build and Testing
+-----------------------
+
+See our guide on how to [build and test ITK] to make and test your change
+locally.
+
 (workflow)=
-Workflow
---------
+Git Workflow
+------------
 
 ITK development uses a branchy workflow based on topic branches.
 This corresponds to the *Fork & Pull Model* mentioned in the
@@ -65,10 +72,10 @@ three main steps:
 Update
 ------
 
-Update your local `master` branch:
+Update your local `main` branch:
 
 ```bash
-git checkout master
+git checkout main
 git pullall
 ```
 
@@ -86,10 +93,10 @@ To start a new topic branch:
 git fetch upstream
 ```
 
-For new development, start the topic from `upstream/master`:
+For new development, start the topic from `upstream/main`:
 
 ```bash
-git checkout -b my-topic upstream/master
+git checkout -b my-topic upstream/main
 ```
 
 For release branch fixes, start the topic from `upstream/release`:
@@ -306,30 +313,47 @@ After a feature topic has been reviewed and approved in GitHub, ITK
 maintainers will merge it into the upstream repository via the GitHub user
 interface.
 
-(*If the merge conflicts follow the printed instructions to resolve them.*)
+If the merge conflicts follow the printed instructions to resolve them.
+
+If a new contributor has not learned how to amend and force-push updates to
+their branch into logical commits (preferred), maintainers should use the
+*Squash and merge* button on the pull request to consolidate patches into
+logical commits.
 
 For bug fixes that are ready to be included in the next patch release, make a
 comment on the pull request which states the topic should be merged to the
-`release` branch.
+`release` and `release-X.X` maintenance branch, where `X.X` are the current
+maintenance version, e.g. `5.4`.
 
-Here are the recommended steps to merge a topic to both `release` and `master`
+Here are the recommended steps to merge a topic to both `release` and `main`
 branches, assuming the topic branch is forked off the `release` branch:
 
 ```bash
-git checkout release
+git checkout release-X.X
+git pull --ff-only upstream release-X.X
 git merge --no-ff my-topic
+git push upstream release-X.X
+```
+
+then:
+
+```bash
+git checkout release
+git pull --ff-only upstream release
+git merge --no-ff release-X.X
 git push upstream release
 ```
 
-and do:
+then:
 
 ```bash
-git checkout master
+git checkout main
+git pull --ff-only upstream main
 git merge --no-ff release
-git push upstream master
+git push upstream main
 ```
 
-to merge the `release` branch back to `master`.
+to merge the `release` branch back to `main`.
 
 (delete-a-topic)=
 Delete a Topic
@@ -337,10 +361,10 @@ Delete a Topic
 
 After a topic has been merged upstream, delete your local branch for the topic.
 
-Checkout and update the `master` branch:
+Checkout and update the `main` branch:
 
 ```bash
-git checkout master
+git checkout main
 git pullall
 ```
 
@@ -368,15 +392,12 @@ Branches
 At the time of this writing the `ITK` repository has the following
 branches:
 
-  * `master`: Development (default)
+  * `main`: Development (default)
   * `release`: Maintenance of latest release
   * `release-3.20`: Maintenance of the ITKv3 series
   * `release-4.13`: Maintenance of the ITKv4 series
-  * `5.4`: Maintenance of the ITKv5 series.
-    - The naming convention changed to support ReadTheDocs rendering of
-      versions on docs.itk.org
-    - Future releases, `6.0`, `6.1`, etc. should use this convention.
-  * `nightly-master`: Follows master, updated at 01:00 UTC for nightly dashboard build consistency.
+  * `release-5.4`: Maintenance of the ITKv5 series.
+  * `nightly-main`: Follows main, updated at 01:00 UTC for nightly dashboard build consistency.
   * `hooks`: Local commit hooks (place in `.git/hooks`)
   * `dashboard`: Dashboard script (setup a CDash client)
 
@@ -387,17 +408,18 @@ Actual releases have tags named by the release version number.
 :maxdepth: 3
 :caption: 📖 More Information
 
+build_test_itk.md
+document_itk.md
+upload_binary_data.md
+data.md
+module_workflows.md
 ITK Software Guide, Book 1, Part III: Development Guidelines <https://itk.org/ItkSoftwareGuide.pdf>
 git_help.md
 GitHub flow guide <https://guides.github.com/introduction/flow/index.html>
-ITK Git Cheatsheet <https://github.com/InsightSoftwareConsortium/ITK/blob/master/Documentation/docs/contributing/GitCheatSheet.pdf>
+ITK Git Cheatsheet <https://github.com/InsightSoftwareConsortium/ITK/blob/main/Documentation/docs/contributing/GitCheatSheet.pdf>
 CDash Dashboard <https://open.cdash.org/index.php?project=Insight>
 dashboard.md
 updating_third_party.md
-data.md
-documenting_itk.md
-upload_binary_data.md
-module_workflows.md
 python_packaging.md
 ../README.md
 ```
@@ -405,9 +427,10 @@ python_packaging.md
 [ITK Git Cheatsheet]: ./GitCheatSheet.pdf
 [download instructions]: ../download.md
 [Updating Third Party]: ./updating_third_party.md
+[build and test ITK]: ./build_test_itk.md
 
-[`SetupForDevelopment.sh`]: https://github.com/InsightSoftwareConsortium/ITK/blob/master/Utilities/SetupForDevelopment.sh
-[`setup-git-aliases`]: https://github.com/InsightSoftwareConsortium/ITK/blob/master/Utilities/GitSetup/setup-git-aliases
+[`SetupForDevelopment.sh`]: https://github.com/InsightSoftwareConsortium/ITK/blob/main/Utilities/SetupForDevelopment.sh
+[`setup-git-aliases`]: https://github.com/InsightSoftwareConsortium/ITK/blob/main/Utilities/GitSetup/setup-git-aliases
 
 [ITK's Discourse]: https://discourse.itk.org/
 

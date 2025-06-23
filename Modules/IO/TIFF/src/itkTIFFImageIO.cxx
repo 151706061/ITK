@@ -31,7 +31,7 @@ bool
 TIFFImageIO::CanReadFile(const char * file)
 {
   // First check the filename
-  std::string filename = file;
+  const std::string filename = file;
 
   if (filename.empty())
   {
@@ -40,15 +40,12 @@ TIFFImageIO::CanReadFile(const char * file)
   }
 
   // Now check if this is a valid TIFF image
-  TIFFErrorHandler save = TIFFSetErrorHandler(nullptr);
-  int              res = m_InternalImage->Open(file);
+  const int res = m_InternalImage->Open(file, true);
   if (res)
   {
-    TIFFSetErrorHandler(save);
     return true;
   }
   m_InternalImage->Clean();
-  TIFFSetErrorHandler(save);
   return false;
 }
 
@@ -122,7 +119,9 @@ TIFFImageIO::GetFormat()
         {
           for (uint64_t cc = 0; cc < m_TotalColors; ++cc)
           {
-            uint16_t red, green, blue;
+            uint16_t red = 0;
+            uint16_t green = 0;
+            uint16_t blue = 0;
             this->GetColor(cc, &red, &green, &blue);
             if (red != green || red != blue)
             {
@@ -133,11 +132,10 @@ TIFFImageIO::GetFormat()
           m_ImageFormat = TIFFImageIO::PALETTE_GRAYSCALE;
           return m_ImageFormat;
         }
-        else
-        { // if not expanding read grayscale palette as palette
-          m_ImageFormat = TIFFImageIO::PALETTE_RGB;
-          return m_ImageFormat;
-        }
+
+        // if not expanding read grayscale palette as palette
+        m_ImageFormat = TIFFImageIO::PALETTE_RGB;
+        return m_ImageFormat;
       }
   }
   m_ImageFormat = TIFFImageIO::OTHER;
@@ -182,12 +180,13 @@ TIFFImageIO::Read(void * buffer)
 {
 
   // re-open the file if it was closed
-  if (!m_InternalImage->m_IsOpen)
+  if (!m_InternalImage->m_IsOpen || m_FileName != TIFFFileName(m_InternalImage->m_Image))
   {
     if (!this->CanReadFile(m_FileName.c_str()))
     {
       itkExceptionMacro("Cannot open file " << this->m_FileName << '!');
     }
+    m_InternalImage->Open(m_FileName.c_str());
   }
 
   // The IO region should be of dimensions 3 otherwise we read only the first
@@ -205,7 +204,9 @@ TIFFImageIO::Read(void * buffer)
 }
 
 TIFFImageIO::TIFFImageIO()
-  : m_ColorPalette(0)
+  : m_InternalImage(new TIFFReaderInternal)
+  , m_ColorPalette(0)
+
 
 {
   this->SetNumberOfDimensions(2);
@@ -214,12 +215,6 @@ TIFFImageIO::TIFFImageIO()
 
   m_ComponentType = IOComponentEnum::UCHAR;
   m_PixelType = IOPixelEnum::SCALAR;
-
-  m_ColorRed = nullptr;
-  m_ColorGreen = nullptr;
-  m_ColorBlue = nullptr;
-
-  m_InternalImage = new TIFFReaderInternal;
 
   m_Spacing[0] = 1.0;
   m_Spacing[1] = 1.0;
@@ -280,6 +275,10 @@ TIFFImageIO::InternalSetCompressor(const std::string & _compressor)
   {
     this->SetCompression(Deflate);
   }
+  else if (_compressor == "ADOBEDEFLATE")
+  {
+    this->SetCompression(AdobeDeflate);
+  }
   else if (_compressor == "LZW")
   {
     this->SetCompression(LZW);
@@ -304,7 +303,9 @@ TIFFImageIO::InitializeColors()
     return;
   }
 
-  unsigned short *red_orig, *green_orig, *blue_orig;
+  unsigned short * red_orig = nullptr;
+  unsigned short * green_orig = nullptr;
+  unsigned short * blue_orig = nullptr;
   if (!TIFFGetField(m_InternalImage->m_Image, TIFFTAG_COLORMAP, &red_orig, &green_orig, &blue_orig))
   {
     return;
@@ -333,14 +334,16 @@ TIFFImageIO::InitializeColors()
 void
 TIFFImageIO::ReadImageInformation()
 {
-  // If the internal image was not open we open it.
+
+  // If the internal image was not open or the filenames are the same we open it.
   // This is usually done when the user sets the ImageIO manually
-  if (!m_InternalImage->m_IsOpen)
+  if (!m_InternalImage->m_IsOpen || m_FileName != TIFFFileName(m_InternalImage->m_Image))
   {
     if (!this->CanReadFile(m_FileName.c_str()))
     {
       itkExceptionMacro("Cannot open file " << this->m_FileName << '!');
     }
+    m_InternalImage->Open(m_FileName.c_str());
   }
 
   ReadTIFFTags();
@@ -460,7 +463,7 @@ TIFFImageIO::ReadImageInformation()
       this->SetPixelType(IOPixelEnum::RGBA);
   }
 
-  bool isPalette =
+  const bool isPalette =
     (this->GetFormat() == TIFFImageIO::PALETTE_GRAYSCALE || this->GetFormat() == TIFFImageIO::PALETTE_RGB) &&
     m_TotalColors > 0;
   bool isPaletteShortType = false;
@@ -469,7 +472,9 @@ TIFFImageIO::ReadImageInformation()
     // detect if palette appears to be 8-bit or 16-bit
     for (uint64_t cc = 0; cc < m_TotalColors; ++cc)
     {
-      uint16_t red, green, blue;
+      uint16_t red = 0;
+      uint16_t green = 0;
+      uint16_t blue = 0;
       this->GetColor(cc, &red, &green, &blue);
       if (red > 255 || green > 255 || blue > 255)
       {
@@ -537,7 +542,7 @@ TIFFImageIO::ReadImageInformation()
 bool
 TIFFImageIO::CanWriteFile(const char * name)
 {
-  std::string filename = name;
+  const std::string filename = name;
 
   if (filename.empty())
   {
@@ -569,7 +574,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
 {
   const auto * outPtr = static_cast<const char *>(buffer);
 
-  uint16_t page, pages = 1;
+  uint16_t pages = 1;
 
   const SizeValueType width = m_Dimensions[0];
   const SizeValueType height = m_Dimensions[1];
@@ -578,13 +583,13 @@ TIFFImageIO::InternalWrite(const void * buffer)
     pages = static_cast<uint16_t>(m_Dimensions[2]);
   }
 
-  auto   scomponents = static_cast<uint16_t>(this->GetNumberOfComponents());
-  double resolution_x{ m_Spacing[0] != 0.0 ? 25.4 / m_Spacing[0] : 0.0 };
-  double resolution_y{ m_Spacing[1] != 0.0 ? 25.4 / m_Spacing[1] : 0.0 };
+  auto         scomponents = static_cast<uint16_t>(this->GetNumberOfComponents());
+  const double resolution_x{ m_Spacing[0] != 0.0 ? 25.4 / m_Spacing[0] : 0.0 };
+  const double resolution_y{ m_Spacing[1] != 0.0 ? 25.4 / m_Spacing[1] : 0.0 };
   // rowsperstrip is set to a default value but modified based on the tif scanlinesize before
   // passing it into the TIFFSetField (see below).
-  auto     rowsperstrip = uint32_t{ 0 };
-  uint16_t bps;
+  uint32_t rowsperstrip{ 0 };
+  uint16_t bps = 0;
 
   switch (this->GetComponentType())
   {
@@ -607,15 +612,15 @@ TIFFImageIO::InternalWrite(const void * buffer)
       itkExceptionMacro("TIFF supports unsigned/signed char, unsigned/signed short, and float");
   }
 
-  uint16_t predictor;
+  uint16_t predictor = 0;
 
   const char * mode = "w";
 
   // If the size of the image is greater than 2 GiB then use big tiff
   constexpr SizeType oneKibiByte = 1024;
-  const SizeType     oneMebiByte = 1024 * oneKibiByte;
-  const SizeType     oneGibiByte = 1024 * oneMebiByte;
-  const SizeType     twoGibiBytes = 2 * oneGibiByte;
+  constexpr SizeType oneMebiByte = 1024 * oneKibiByte;
+  constexpr SizeType oneGibiByte = 1024 * oneMebiByte;
+  constexpr SizeType twoGibiBytes = 2 * oneGibiByte;
 
   if (this->GetImageSizeInBytes() > twoGibiBytes)
   {
@@ -651,7 +656,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
   {
     TIFFCreateDirectory(tif);
   }
-  for (page = 0; page < pages; ++page)
+  for (uint16_t page = 0; page < pages; ++page)
   {
     TIFFSetDirectory(tif, page);
     TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, w);
@@ -674,8 +679,8 @@ TIFFImageIO::InternalWrite(const void * buffer)
     {
       // if number of scalar components is greater than 3, that means we assume
       // there is alpha.
-      uint16_t   extra_samples = scomponents - 3;
-      const auto sample_info = make_unique_for_overwrite<uint16_t[]>(scomponents - 3);
+      const uint16_t extra_samples = scomponents - 3;
+      const auto     sample_info = make_unique_for_overwrite<uint16_t[]>(scomponents - 3);
       sample_info[0] = EXTRASAMPLE_ASSOCALPHA;
       for (uint16_t cc = 1; cc < scomponents - 3; ++cc)
       {
@@ -684,7 +689,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
       TIFFSetField(tif, TIFFTAG_EXTRASAMPLES, extra_samples, sample_info.get());
     }
 
-    uint16_t compression;
+    uint16_t compression = 0;
 
     if (m_UseCompression)
     {
@@ -701,6 +706,9 @@ TIFFImageIO::InternalWrite(const void * buffer)
           break;
         case TIFFImageIO::Deflate:
           compression = COMPRESSION_DEFLATE;
+          break;
+        case TIFFImageIO::AdobeDeflate:
+          compression = COMPRESSION_ADOBE_DEFLATE;
           break;
         default:
           compression = COMPRESSION_NONE;
@@ -741,7 +749,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
       TIFFSetField(tif, TIFFTAG_JPEGQUALITY, this->GetJPEGQuality());
       TIFFSetField(tif, TIFFTAG_JPEGCOLORMODE, JPEGCOLORMODE_RGB);
     }
-    else if (compression == COMPRESSION_DEFLATE)
+    else if (compression == COMPRESSION_DEFLATE || compression == COMPRESSION_ADOBE_DEFLATE)
     {
       predictor = PREDICTOR_NONE;
       TIFFSetField(tif, TIFFTAG_PREDICTOR, predictor);
@@ -765,7 +773,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
     // Rather than change that value in the third party libtiff library, we instead compute the
     // rowsperstrip here to lead to this same value.
 #ifdef TIFF_INT64_T // detect if libtiff4
-    uint64_t scanlinesize = TIFFScanlineSize64(tif);
+    uint64_t const scanlinesize = TIFFScanlineSize64(tif);
 #else
     tsize_t scanlinesize = TIFFScanlineSize(tif);
 #endif
@@ -795,7 +803,7 @@ TIFFImageIO::InternalWrite(const void * buffer)
       // Set the page number
       TIFFSetField(tif, TIFFTAG_PAGENUMBER, page, pages);
     }
-    SizeValueType rowLength; // in bytes
+    SizeValueType rowLength = 0; // in bytes
 
     switch (this->GetComponentType())
     {
@@ -847,54 +855,11 @@ TIFFImageIO::InternalWrite(const void * buffer)
 }
 
 
+// TIFF >= 4.0.3 is required for the following code.
 // With the TIFF 4.0 (aka bigtiff ) interface the tiff field structure
 // was renamed and became an opaque type requiring function to
-// access. The follow are some macros for portable access.
-#ifdef ITK_TIFF_HAS_TIFFFieldReadCount
-#  define itkTIFFFieldName(TIFFField) TIFFFieldName(TIFFField)
-#  define itkTIFFFieldReadCount(TIFFField) TIFFFieldReadCount(TIFFField)
-#  define itkTIFFFieldPassCount(TIFFField) TIFFFieldPassCount(TIFFField)
-#  define itkTIFFFieldDataType(TIFFField) TIFFFieldDataType(TIFFField)
-#  define itkTIFFField TIFFField
-#elif defined(ITK_TIFF_HAS_TIFFField)
-} // end namespace itk
-/// Tiff 4.0.0-4.0.2 had _TIFFField as a private structure, but missing the
-/// required access mehods added in 4.0.3, This is a copy of the
-/// structure from tiff_dir.h.
-typedef enum
-{
-  ITK_TIFF_MOC_1 = 0,
-  ITK_TIFF_MOC_2 = 51
-} ITK_TIFF_MOC_TIFFSetGetFieldType;
-struct _TIFFField
-{
-  uint32_t field_tag;                              /* field's tag */
-  short field_readcount;                           /* read count/TIFF_VARIABLE/TIFF_SPP */
-  short field_writecount;                          /* write count/TIFF_VARIABLE */
-  TIFFDataType field_type;                         /* type of associated data */
-  uint32_t reserved;                               /* reserved for future extension */
-  ITK_TIFF_MOC_TIFFSetGetFieldType set_field_type; /* type to be passed to TIFFSetField */
-  ITK_TIFF_MOC_TIFFSetGetFieldType get_field_type; /* type to be passed to TIFFGetField */
-  unsigned short field_bit;                        /* bit in fieldsset bit vector */
-  unsigned char field_oktochange;                  /* if true, can change while writing */
-  unsigned char field_passcount;                   /* if true, pass dir count on set */
-  char * field_name;                               /* ASCII name */
-  TIFFFieldArray * field_subfields;                /* if field points to child ifds, child ifd field definition array */
-};
-namespace itk
-{
-#  define itkTIFFFieldName(TIFFField) ((TIFFField)->field_name)
-#  define itkTIFFFieldReadCount(TIFFField) ((TIFFField)->field_readcount)
-#  define itkTIFFFieldPassCount(TIFFField) ((TIFFField)->field_passcount)
-#  define itkTIFFFieldDataType(TIFFField) ((TIFFField)->field_type)
-#  define itkTIFFField TIFFField
-#else // libtiff version 3
-#  define itkTIFFFieldName(TIFFField) ((TIFFField)->field_name)
-#  define itkTIFFFieldReadCount(TIFFFieldInfo) ((TIFFFieldInfo)->field_readcount)
-#  define itkTIFFFieldPassCount(TIFFFieldInfo) ((TIFFFieldInfo)->field_passcount)
-#  define itkTIFFFieldDataType(TIFFFieldInfo) ((TIFFFieldInfo)->field_type)
-#  define itkTIFFField TIFFFieldInfo
-#endif
+// access.
+
 
 namespace
 {
@@ -941,9 +906,9 @@ TIFFImageIO::CanFindTIFFTag(unsigned int t)
     itkExceptionMacro("Need to call CanReadFile before");
   }
 
-  ttag_t tag = t; // 32bits integer
+  const ttag_t tag = t; // 32bits integer
 
-  const itkTIFFField * fld = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
+  const TIFFField * fld = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
 
   if (fld == nullptr)
   {
@@ -960,31 +925,31 @@ TIFFImageIO::ReadRawByteFromTag(unsigned int t, unsigned int & value_count)
   {
     itkExceptionMacro("Need to call CanReadFile before");
   }
-  ttag_t tag = t;
-  void * raw_data = nullptr;
+  const ttag_t tag = t;
+  void *       raw_data = nullptr;
 
-  const itkTIFFField * fld = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
+  const TIFFField * fld = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
 
   if (fld == nullptr)
   {
     itkExceptionMacro("fld is nullptr");
   }
 
-  if (!itkTIFFFieldPassCount(fld))
+  if (!TIFFFieldPassCount(fld))
   {
     return nullptr;
   }
 
   int ret = 0;
-  if (itkTIFFFieldReadCount(fld) == TIFF_VARIABLE2)
+  if (TIFFFieldReadCount(fld) == TIFF_VARIABLE2)
   {
-    uint32_t cnt;
+    uint32_t cnt = 0;
     ret = TIFFGetField(m_InternalImage->m_Image, tag, &cnt, &raw_data);
     value_count = cnt;
   }
-  else if (itkTIFFFieldReadCount(fld) == TIFF_VARIABLE)
+  else if (TIFFFieldReadCount(fld) == TIFF_VARIABLE)
   {
-    uint16_t cnt;
+    uint16_t cnt = 0;
     ret = TIFFGetField(m_InternalImage->m_Image, tag, &cnt, &raw_data);
     value_count = cnt;
   }
@@ -995,7 +960,7 @@ TIFFImageIO::ReadRawByteFromTag(unsigned int t, unsigned int & value_count)
   }
   else
   {
-    if (itkTIFFFieldDataType(fld) != TIFF_BYTE)
+    if (TIFFFieldDataType(fld) != TIFF_BYTE)
     {
       itkExceptionMacro("Tag is not of type TIFF_BYTE");
     }
@@ -1013,7 +978,9 @@ TIFFImageIO::PopulateColorPalette()
     m_ColorPalette.resize(m_TotalColors);
     for (uint64_t cc = 0; cc < m_TotalColors; ++cc)
     {
-      uint16_t red, green, blue;
+      uint16_t red = 0;
+      uint16_t green = 0;
+      uint16_t blue = 0;
       this->GetColor(cc, &red, &green, &blue);
 
       RGBPixelType p;
@@ -1038,7 +1005,7 @@ TIFFImageIO::AllocateTiffPalette(uint16_t bps)
   m_ColorBlue = nullptr;
 
   // bpp is 16 at maximum for palette image
-  tmsize_t array_size = tmsize_t{ 1 } << bps * sizeof(uint16_t);
+  const tmsize_t array_size = tmsize_t{ 1 } << bps * sizeof(uint16_t);
   m_ColorRed = static_cast<uint16_t *>(_TIFFmalloc(array_size));
   if (!m_ColorRed)
   {
@@ -1061,7 +1028,7 @@ TIFFImageIO::AllocateTiffPalette(uint16_t bps)
     itkExceptionMacro("Can't allocate space for Blue channel of component tables.");
   }
   // TIFF palette length is fixed for a given bpp
-  uint64_t TIFFPaletteLength = uint64_t{ 1 } << bps;
+  const uint64_t TIFFPaletteLength = uint64_t{ 1 } << bps;
   for (size_t i = 0; i < TIFFPaletteLength; ++i)
   {
     if (i < m_ColorPalette.size())
@@ -1110,9 +1077,9 @@ TIFFImageIO::ReadTIFFTags()
     }
     raw_data = nullptr;
 
-    uint32_t tag = TIFFGetTagListEntry(m_InternalImage->m_Image, i);
+    const uint32_t tag = TIFFGetTagListEntry(m_InternalImage->m_Image, i);
 
-    const itkTIFFField * field = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
+    const TIFFField * field = TIFFFieldWithTag(m_InternalImage->m_Image, tag);
 
     if (field == nullptr)
     {
@@ -1120,18 +1087,18 @@ TIFFImageIO::ReadTIFFTags()
     }
 
 
-    const char * field_name = itkTIFFFieldName(field);
+    const char * field_name = TIFFFieldName(field);
     int          value_count = 0;
 
 
-    const int read_count = itkTIFFFieldReadCount(field);
+    const int read_count = TIFFFieldReadCount(field);
 
     // check if tag required count argument with GetField
-    if (itkTIFFFieldPassCount(field))
+    if (TIFFFieldPassCount(field))
     {
       if (read_count == TIFF_VARIABLE2)
       {
-        uint32_t cnt;
+        uint32_t cnt = 0;
         if (TIFFGetField(m_InternalImage->m_Image, tag, &cnt, &raw_data) != 1)
         {
           continue;
@@ -1140,7 +1107,7 @@ TIFFImageIO::ReadTIFFTags()
       }
       else if (read_count == TIFF_VARIABLE)
       {
-        uint16_t cnt;
+        uint16_t cnt = 0;
         if (TIFFGetField(m_InternalImage->m_Image, tag, &cnt, &raw_data) != 1)
         {
           continue;
@@ -1163,7 +1130,7 @@ TIFFImageIO::ReadTIFFTags()
         value_count = read_count;
       }
 
-      if (itkTIFFFieldDataType(field) == TIFF_ASCII || read_count == TIFF_VARIABLE || read_count == TIFF_VARIABLE2 ||
+      if (TIFFFieldDataType(field) == TIFF_ASCII || read_count == TIFF_VARIABLE || read_count == TIFF_VARIABLE2 ||
           read_count == TIFF_SPP || value_count > 1)
       {
         if (TIFFGetField(m_InternalImage->m_Image, tag, &raw_data) != 1)
@@ -1173,7 +1140,7 @@ TIFFImageIO::ReadTIFFTags()
       }
       else
       {
-        const size_t dataSize = itkTIFFDataSize(itkTIFFFieldDataType(field));
+        const size_t dataSize = itkTIFFDataSize(TIFFFieldDataType(field));
         raw_data = _TIFFmalloc(static_cast<tmsize_t>(dataSize * static_cast<size_t>(value_count)));
         mem_alloc = true;
         if (TIFFGetField(m_InternalImage->m_Image, tag, raw_data) != 1)
@@ -1188,8 +1155,8 @@ TIFFImageIO::ReadTIFFTags()
       continue;
     }
 
-    itkDebugMacro("TiffInfo tag " << field_name << '(' << tag << "): " << itkTIFFFieldDataType(field) << ' '
-                                  << value_count << ' ' << raw_data);
+    itkDebugMacro("TiffInfo tag " << field_name << '(' << tag << "): " << TIFFFieldDataType(field) << ' ' << value_count
+                                  << ' ' << raw_data);
 
 
 #define itkEncapsulate(T1, T2)                                                         \
@@ -1211,7 +1178,7 @@ TIFFImageIO::ReadTIFFTags()
 
     try
     {
-      switch (itkTIFFFieldDataType(field))
+      switch (TIFFFieldDataType(field))
       {
         case TIFF_ASCII:
           if (value_count > 1)
@@ -1252,14 +1219,18 @@ TIFFImageIO::ReadTIFFTags()
         case TIFF_IFD:
 #ifdef TIFF_INT64_T // detect if libtiff4
         case TIFF_LONG8:
+          itkEncapsulate(uint64_t, uint64_t);
+          break;
         case TIFF_SLONG8:
         case TIFF_IFD8:
+          itkEncapsulate(int64_t, int64_t);
+          break;
 #endif
         case TIFF_RATIONAL:
         case TIFF_SRATIONAL:
         case TIFF_UNDEFINED:
         default:
-          itkWarningMacro(<< field_name << " has unsupported data type (" << itkTIFFFieldDataType(field)
+          itkWarningMacro(<< field_name << " has unsupported data type (" << TIFFFieldDataType(field)
                           << ") for meta-data dictionary.");
           break;
       }
@@ -1306,7 +1277,7 @@ TIFFImageIO::ReadCurrentPage(void * buffer, size_t pixelOffset)
       itkExceptionMacro("Cannot read TIFF image as a TIFF RGBA image");
     }
 
-    unsigned char * out = static_cast<unsigned char *>(buffer) + pixelOffset;
+    auto * out = static_cast<unsigned char *>(buffer) + pixelOffset;
     RGBAImageToBuffer<unsigned char>(out, tempImage);
   }
   else
@@ -1360,12 +1331,11 @@ TIFFImageIO::ReadGenericImage(void * _out, unsigned int width, unsigned int heig
   tsize_t isize = TIFFScanlineSize(m_InternalImage->m_Image);
 #endif
 
-  size_t  inc;
+  size_t  inc = 0;
   tdata_t buf = _TIFFmalloc(static_cast<tmsize_t>(isize));
   isize /= sizeof(ComponentType);
 
-  auto *          out = static_cast<ComponentType *>(_out);
-  ComponentType * image;
+  auto * out = static_cast<ComponentType *>(_out);
 
   if (m_InternalImage->m_PlanarConfig != PLANARCONFIG_CONTIG && m_InternalImage->m_SamplesPerPixel != 1)
   {
@@ -1410,7 +1380,7 @@ TIFFImageIO::ReadGenericImage(void * _out, unsigned int width, unsigned int heig
     {
       itkExceptionMacro("Problem reading the row: " << row);
     }
-
+    ComponentType * image = nullptr;
     if (m_InternalImage->m_Orientation == ORIENTATION_TOPLEFT)
     {
       image = out + inc * row * width;

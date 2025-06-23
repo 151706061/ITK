@@ -75,7 +75,7 @@ Convert(std::string optionString)
 
 template <typename TValue>
 std::vector<TValue>
-ConvertVector(std::string optionString)
+ConvertVector(const std::string & optionString)
 {
   std::vector<TValue>    values;
   std::string::size_type crosspos = optionString.find('x', 0);
@@ -93,7 +93,7 @@ ConvertVector(std::string optionString)
     values.push_back(value);
     while (crosspos != std::string::npos)
     {
-      std::string::size_type crossposfrom = crosspos;
+      const std::string::size_type crossposfrom = crosspos;
       crosspos = optionString.find('x', crossposfrom + 1);
       if (crosspos == std::string::npos)
       {
@@ -169,34 +169,34 @@ N4(int argc, char * argv[])
   using CorrecterType = itk::N4BiasFieldCorrectionImageFilter<ImageType, MaskImageType, ImageType>;
   auto correcter = CorrecterType::New();
 
-  unsigned int splineOrder = 3;
+  constexpr unsigned int splineOrder = 3;
   correcter->SetSplineOrder(splineOrder);
   ITK_TEST_SET_GET_VALUE(splineOrder, correcter->GetSplineOrder());
 
   correcter->SetWienerFilterNoise(0.01);
 
-  typename CorrecterType::RealType biasFieldFullWidthAtHalfMaximum = 0.15;
+  const typename CorrecterType::RealType biasFieldFullWidthAtHalfMaximum = 0.15;
   correcter->SetBiasFieldFullWidthAtHalfMaximum(biasFieldFullWidthAtHalfMaximum);
   ITK_TEST_SET_GET_VALUE(biasFieldFullWidthAtHalfMaximum, correcter->GetBiasFieldFullWidthAtHalfMaximum());
 
-  typename CorrecterType::RealType convergenceThreshold = 0.0000001;
+  const typename CorrecterType::RealType convergenceThreshold = 0.0000001;
   correcter->SetConvergenceThreshold(convergenceThreshold);
   ITK_TEST_SET_GET_VALUE(convergenceThreshold, correcter->GetConvergenceThreshold());
 
-  unsigned int numberOfHistogramBins = 200;
+  constexpr unsigned int numberOfHistogramBins = 200;
   correcter->SetNumberOfHistogramBins(numberOfHistogramBins);
   ITK_TEST_SET_GET_VALUE(numberOfHistogramBins, correcter->GetNumberOfHistogramBins());
 
-  typename CorrecterType::RealType wienerFilterNoise = 0.01;
+  const typename CorrecterType::RealType wienerFilterNoise = 0.01;
   correcter->SetWienerFilterNoise(wienerFilterNoise);
   ITK_TEST_SET_GET_VALUE(wienerFilterNoise, correcter->GetWienerFilterNoise());
 
-  typename CorrecterType::MaskPixelType maskLabel =
+  const typename CorrecterType::MaskPixelType maskLabel =
     itk::NumericTraits<typename CorrecterType::MaskPixelType>::OneValue();
   correcter->SetMaskLabel(maskLabel);
   ITK_TEST_SET_GET_VALUE(maskLabel, correcter->GetMaskLabel());
 
-  bool useMaskLabel = false;
+  constexpr bool useMaskLabel = false;
   ITK_TEST_SET_GET_BOOLEAN(correcter, UseMaskLabel, useMaskLabel);
 
   // Handle the number of iterations
@@ -214,8 +214,7 @@ N4(int argc, char * argv[])
   correcter->SetMaximumNumberOfIterations(maximumNumberOfIterations);
   ITK_TEST_SET_GET_VALUE(maximumNumberOfIterations, correcter->GetMaximumNumberOfIterations());
 
-  typename CorrecterType::ArrayType numberOfFittingLevels;
-  numberOfFittingLevels.Fill(
+  auto numberOfFittingLevels = itk::MakeFilled<typename CorrecterType::ArrayType>(
     static_cast<typename CorrecterType::VariableSizeArrayType::SizeValueType>(numIters.size()));
   correcter->SetNumberOfFittingLevels(numberOfFittingLevels);
   ITK_TEST_SET_GET_VALUE(numberOfFittingLevels, correcter->GetNumberOfFittingLevels());
@@ -239,7 +238,7 @@ N4(int argc, char * argv[])
 
   for (unsigned int d = 0; d < ImageDimension; ++d)
   {
-    float domain =
+    const float domain =
       static_cast<RealType>(inputImage->GetLargestPossibleRegion().GetSize()[d] - 1) * inputImage->GetSpacing()[d];
     auto numberOfSpans = static_cast<unsigned int>(std::ceil(domain / splineDistance));
     auto extraPadding =
@@ -311,11 +310,11 @@ N4(int argc, char * argv[])
 
 
   // Test the reconstruction of the log bias field
-  ImagePointer originalInputImage = reader->GetOutput();
+  const ImagePointer originalInputImage = reader->GetOutput();
   reader->UpdateOutputInformation();
   correcter->SetMaskImage(nullptr);
   correcter->SetInput(originalInputImage);
-  typename CorrecterType::RealImagePointer biasField =
+  const typename CorrecterType::RealImagePointer biasField =
     correcter->ReconstructBiasField(correcter->GetLogBiasFieldControlPointLattice());
   WriteImage(biasField.GetPointer(), (std::string(argv[3]) + "-LogBiasField.nrrd").c_str());
 

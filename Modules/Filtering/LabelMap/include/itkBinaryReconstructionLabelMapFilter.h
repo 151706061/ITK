@@ -36,7 +36,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  * \ingroup ITKLabelMap
@@ -77,24 +77,21 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryReconstructionLabelMapFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   /*  itkConceptMacro(InputEqualityComparableCheck,
       (Concept::EqualityComparable<PixelType>));
     itkConceptMacro(IntConvertibleToInputCheck,
       (Concept::Convertible<int, PixelType>));
     itkConceptMacro(InputOStreamWritableCheck,
       (Concept::OStreamWritable<PixelType>));*/
-  // End concept checking
-#endif
 
   /** Set/Get the marker image */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MarkerImage, MarkerImageType);
   itkGetInputMacro(MarkerImage, MarkerImageType);
-
+  /** @ITKEndGrouping */
   /** Set the input image */
   void
   SetInput1(TImage * input)
@@ -113,9 +110,10 @@ public:
    * Set/Get the value used as "foreground" in the output image.
    * Defaults to NumericTraits<MaskPixelType>::max().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, MarkerImagePixelType);
   itkGetConstMacro(ForegroundValue, MarkerImagePixelType);
-
+  /** @ITKEndGrouping */
 protected:
   BinaryReconstructionLabelMapFilter();
   ~BinaryReconstructionLabelMapFilter() override = default;

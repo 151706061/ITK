@@ -20,9 +20,7 @@
 
 #include "itkDistanceMetric.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class EuclideanDistanceMetric
@@ -47,7 +45,7 @@ public:
 
   using typename Superclass::OriginType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EuclideanDistanceMetric);
 
   /** Method for creation through the object factory. */
@@ -72,8 +70,7 @@ protected:
   EuclideanDistanceMetric() = default;
   ~EuclideanDistanceMetric() override = default;
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkEuclideanDistanceMetric.hxx"

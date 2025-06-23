@@ -17,16 +17,14 @@
  *=========================================================================*/
 #include "itkSparseFrequencyContainer2.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 SparseFrequencyContainer2::SparseFrequencyContainer2()
-{
-  m_TotalFrequency = TotalAbsoluteFrequencyType{};
-}
+  : m_TotalFrequency(TotalAbsoluteFrequencyType{})
+{}
 
-void SparseFrequencyContainer2::Initialize(SizeValueType)
+void
+SparseFrequencyContainer2::Initialize(SizeValueType)
 {
   this->SetToZero();
 }
@@ -49,7 +47,7 @@ SparseFrequencyContainer2::SetFrequency(const InstanceIdentifier id, const Absol
 {
   // No need to test for bounds because in a map container the
   // element is allocated if the key doesn't exist yet
-  AbsoluteFrequencyType frequency = this->GetFrequency(id);
+  const AbsoluteFrequencyType frequency = this->GetFrequency(id);
 
   m_FrequencyContainer[id] = value;
   m_TotalFrequency += (value - frequency);
@@ -65,10 +63,8 @@ SparseFrequencyContainer2::GetFrequency(const InstanceIdentifier id) const
   {
     return iter->second;
   }
-  else
-  {
-    return 0;
-  }
+
+  return 0;
 }
 
 bool
@@ -76,7 +72,7 @@ SparseFrequencyContainer2::IncreaseFrequency(const InstanceIdentifier id, const 
 {
   // No need to test for bounds because in a map container the
   // element is allocated if the key doesn't exist yet
-  AbsoluteFrequencyType frequency = this->GetFrequency(id);
+  const AbsoluteFrequencyType frequency = this->GetFrequency(id);
 
   m_FrequencyContainer[id] = frequency + value;
   m_TotalFrequency += value;
@@ -88,5 +84,4 @@ SparseFrequencyContainer2::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics

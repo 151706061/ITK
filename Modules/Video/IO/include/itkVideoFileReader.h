@@ -72,20 +72,22 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VideoFileReader);
 
 
   /** Specify the file to read. This is forwarded to the IO instance. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
-
+  /** @ITKEndGrouping */
   /** Get/Set IFrameSafe. If true, the last IFrame will be reported as the last
    * frame for the largest possible temporal region */
+  /** @ITKStartGrouping */
   itkSetMacro(IFrameSafe, bool);
   itkGetMacro(IFrameSafe, bool);
   itkBooleanMacro(IFrameSafe);
-
+  /** @ITKEndGrouping */
   /** Set up the output information */
   void
   UpdateOutputInformation() override;

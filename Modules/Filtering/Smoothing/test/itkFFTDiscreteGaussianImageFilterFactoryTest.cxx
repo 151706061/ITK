@@ -27,7 +27,7 @@
 int
 itkFFTDiscreteGaussianImageFilterFactoryTest(int, char *[])
 {
-  const unsigned int ImageDimension = 3;
+  constexpr unsigned int ImageDimension = 3;
   using PixelType = float;
   using ImageType = itk::Image<PixelType, ImageDimension>;
   using BaseFilterType = itk::DiscreteGaussianImageFilter<ImageType>;
@@ -45,7 +45,7 @@ itkFFTDiscreteGaussianImageFilterFactoryTest(int, char *[])
 
   // Register factory and verify instantiation override
   using FactoryType = itk::FFTDiscreteGaussianImageFilterFactory;
-  FactoryType::Pointer overrideFactory = FactoryType::New();
+  const FactoryType::Pointer overrideFactory = FactoryType::New();
   itk::ObjectFactoryBase::RegisterFactory(overrideFactory);
 
   ITK_TRY_EXPECT_NO_EXCEPTION(baseFilter = BaseFilterType::New());

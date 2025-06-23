@@ -24,9 +24,7 @@
 #include "itkMacro.h"
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 template <typename TImageType, typename THistogramFrequencyContainer>
@@ -60,7 +58,7 @@ template <typename TImageType, typename THistogramFrequencyContainer>
 void
 ScalarImageToRunLengthMatrixFilter<TImageType, THistogramFrequencyContainer>::SetOffset(const OffsetType offset)
 {
-  OffsetVectorPointer offsetVector = OffsetVector::New();
+  const OffsetVectorPointer offsetVector = OffsetVector::New();
   offsetVector->push_back(offset);
   this->SetOffsets(offsetVector);
 }
@@ -146,8 +144,7 @@ ScalarImageToRunLengthMatrixFilter<TImageType, THistogramFrequencyContainer>::Ge
   // distance/intensity pair to the histogram
 
   using NeighborhoodIteratorType = ConstNeighborhoodIterator<ImageType>;
-  typename NeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  auto                     radius = MakeFilled<typename NeighborhoodIteratorType::RadiusType>(1);
   NeighborhoodIteratorType neighborIt(radius, inputImage, inputImage->GetRequestedRegion());
 
 
@@ -175,7 +172,7 @@ ScalarImageToRunLengthMatrixFilter<TImageType, THistogramFrequencyContainer>::Ge
     for (neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt)
     {
       const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
-      IndexType       centerIndex = neighborIt.GetIndex();
+      const IndexType centerIndex = neighborIt.GetIndex();
       if (centerPixelIntensity < this->m_Min || centerPixelIntensity > this->m_Max ||
           alreadyVisitedImage->GetPixel(centerIndex) ||
           (this->GetMaskImage() && this->GetMaskImage()->GetPixel(centerIndex) != this->m_InsidePixelValue))
@@ -186,14 +183,12 @@ ScalarImageToRunLengthMatrixFilter<TImageType, THistogramFrequencyContainer>::Ge
 
       itkDebugMacro("===> offset = " << offset << std::endl);
 
-      MeasurementType centerBinMin = this->GetOutput()->GetBinMinFromValue(0, centerPixelIntensity);
-      MeasurementType centerBinMax = this->GetOutput()->GetBinMaxFromValue(0, centerPixelIntensity);
-      MeasurementType lastBinMax = this->GetOutput()->GetDimensionMaxs(0)[this->GetOutput()->GetSize(0) - 1];
+      const MeasurementType centerBinMin = this->GetOutput()->GetBinMinFromValue(0, centerPixelIntensity);
+      const MeasurementType centerBinMax = this->GetOutput()->GetBinMaxFromValue(0, centerPixelIntensity);
+      const MeasurementType lastBinMax = this->GetOutput()->GetDimensionMaxs(0)[this->GetOutput()->GetSize(0) - 1];
 
-      PixelType pixelIntensity(PixelType{});
-      IndexType index;
-
-      index = centerIndex + offset;
+      auto      pixelIntensity(PixelType{});
+      IndexType index = centerIndex + offset;
       IndexType lastGoodIndex = centerIndex;
       bool      runLengthSegmentAlreadyVisited = false;
 
@@ -345,8 +340,7 @@ ScalarImageToRunLengthMatrixFilter<TImageType, THistogramFrequencyContainer>::No
   itkDebugMacro("new  offset = " << offset << std::endl);
 }
 
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 
 #endif

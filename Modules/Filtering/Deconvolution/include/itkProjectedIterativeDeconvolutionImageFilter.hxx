@@ -24,9 +24,8 @@ namespace itk
 
 template <typename TSuperclass>
 ProjectedIterativeDeconvolutionImageFilter<TSuperclass>::ProjectedIterativeDeconvolutionImageFilter()
-{
-  m_ProjectionFilter = nullptr;
-}
+  : m_ProjectionFilter(nullptr)
+{}
 
 template <typename TSuperclass>
 ProjectedIterativeDeconvolutionImageFilter<TSuperclass>::~ProjectedIterativeDeconvolutionImageFilter()
@@ -43,7 +42,7 @@ ProjectedIterativeDeconvolutionImageFilter<TSuperclass>::Initialize(ProgressAccu
   this->Superclass::Initialize(progress, progressWeight, iterationProgressWeight);
 
   m_ProjectionFilter = ProjectionFilterType::New();
-  typename InternalImageType::PixelType zero{};
+  const typename InternalImageType::PixelType zero{};
   m_ProjectionFilter->ThresholdBelow(zero);
 }
 

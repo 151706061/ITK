@@ -46,10 +46,8 @@ namespace itk
  * from the negative gradient of the edge potential image. This term behaves like
  * a doublet attracting the contour to the edges.
  *
- * \par This implementation is based on:
- *  L. Lorigo, O. Faugeras, W.E.L. Grimson, R. Keriven, R. Kikinis, A. Nabavi,
- *  and C.-F. Westin, Curves: Curve evolution for vessel segmentation.
- *  Medical Image Analysis, 5:195-206, 2001.
+ * \par Reference:
+ * This implementation is based on \cite lorigo2001.
  *
  * \sa LevelSetFunction
  * \sa SegmentationLevelSetImageFunction
@@ -75,7 +73,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CurvesLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -111,6 +109,7 @@ public:
 
   /** Set/Get the sigma for the Gaussian kernel used to compute the gradient
    * of the feature image needed for the advection term of the equation. */
+  /** @ITKStartGrouping */
   void
   SetDerivativeSigma(const double v)
   {
@@ -121,7 +120,7 @@ public:
   {
     return m_DerivativeSigma;
   }
-
+  /** @ITKEndGrouping */
   void
   Initialize(const RadiusType & r) override;
 

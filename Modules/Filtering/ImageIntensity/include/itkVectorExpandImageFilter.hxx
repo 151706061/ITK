@@ -51,13 +51,15 @@ VectorExpandImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os,
 {
   Superclass::PrintSelf(os, indent);
 
-  unsigned int j;
-  os << indent << "ExpandFactors: [";
-  for (j = 0; j < ImageDimension - 1; ++j)
   {
-    os << m_ExpandFactors[j] << ", ";
+    os << indent << "ExpandFactors: [";
+    unsigned int j = 0;
+    for (; j < ImageDimension - 1; ++j)
+    {
+      os << m_ExpandFactors[j] << ", ";
+    }
+    os << m_ExpandFactors[j] << ']' << std::endl;
   }
-  os << m_ExpandFactors[j] << ']' << std::endl;
 
   os << indent << "Interpolator: ";
   os << m_Interpolator.GetPointer() << std::endl;
@@ -68,26 +70,16 @@ template <typename TInputImage, typename TOutputImage>
 void
 VectorExpandImageFilter<TInputImage, TOutputImage>::SetExpandFactors(const float factor)
 {
-  unsigned int j;
-
-  for (j = 0; j < ImageDimension; ++j)
+  if (ContainerFillWithCheck(m_ExpandFactors, factor, Self::ImageDimension))
   {
-    if (Math::NotExactlyEquals(factor, m_ExpandFactors[j]))
+    for (unsigned int j = 0; j < ImageDimension; ++j)
     {
-      break;
-    }
-  }
-  if (j < ImageDimension)
-  {
-    this->Modified();
-    for (j = 0; j < ImageDimension; ++j)
-    {
-      m_ExpandFactors[j] = factor;
       if (m_ExpandFactors[j] < 1)
       {
         m_ExpandFactors[j] = 1;
       }
     }
+    this->Modified();
   }
 }
 
@@ -111,7 +103,7 @@ void
 VectorExpandImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
   using OutputIterator = ImageRegionIteratorWithIndex<TOutputImage>;
 
   TotalProgressReporter progress(this, outputPtr->GetRequestedRegion().GetNumberOfPixels());
@@ -167,8 +159,8 @@ VectorExpandImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
 {
   Superclass::GenerateInputRequestedRegion();
 
-  InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
-  OutputImagePointer outputPtr = this->GetOutput();
+  const InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -176,7 +168,6 @@ VectorExpandImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
   }
 
   // We need to compute the input requested region (size and start index)
-  unsigned int                             i;
   const typename TOutputImage::SizeType &  outputRequestedRegionSize = outputPtr->GetRequestedRegion().GetSize();
   const typename TOutputImage::IndexType & outputRequestedRegionStartIndex = outputPtr->GetRequestedRegion().GetIndex();
 
@@ -185,7 +176,7 @@ VectorExpandImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
 
   // inputRequestedSize = (outputRequestedSize / ExpandFactor) + 1)
   // The extra 1 above is to take care of edge effects when streaming.
-  for (i = 0; i < TInputImage::ImageDimension; ++i)
+  for (unsigned int i = 0; i < TInputImage::ImageDimension; ++i)
   {
     inputRequestedRegionSize[i] = (SizeValueType)std::ceil(static_cast<double>(outputRequestedRegionSize[i]) /
                                                            static_cast<double>(m_ExpandFactors[i])) +
@@ -230,8 +221,8 @@ VectorExpandImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
 
-  InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
-  OutputImagePointer outputPtr = this->GetOutput();
+  const InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {

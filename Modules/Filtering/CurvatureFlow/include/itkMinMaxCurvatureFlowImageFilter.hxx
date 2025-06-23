@@ -26,11 +26,9 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 MinMaxCurvatureFlowImageFilter<TInputImage, TOutputImage>::MinMaxCurvatureFlowImageFilter()
+  : m_StencilRadius(2)
 {
-  m_StencilRadius = 2;
-
-  typename MinMaxCurvatureFlowFunctionType::Pointer cffp;
-  cffp = MinMaxCurvatureFlowFunctionType::New();
+  auto cffp = MinMaxCurvatureFlowFunctionType::New();
 
   this->SetDifferenceFunction(static_cast<FiniteDifferenceFunctionType *>(cffp.GetPointer()));
 }

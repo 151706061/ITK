@@ -75,7 +75,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DemonsRegistrationFilter);
 
   /** Inherit types from superclass. */
@@ -102,18 +102,19 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images.
+   * computed over the overlapping region between the two images.
    * This is value is only available for the previous iteration and
    * NOT the current iteration. */
-  virtual double
+  [[nodiscard]] virtual double
   GetMetric() const;
 
   /** Switch between using the fixed image and moving image gradient
    * for computing the displacement field updates. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseMovingImageGradient, bool);
   itkGetConstMacro(UseMovingImageGradient, bool);
   itkBooleanMacro(UseMovingImageGradient);
-
+  /** @ITKEndGrouping */
   /** Set/Get the threshold below which the absolute difference of
    * intensity yields a match. When the intensities match between a
    * moving and fixed image pixel, the update vector (for that
@@ -121,7 +122,7 @@ public:
   virtual void
   SetIntensityDifferenceThreshold(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetIntensityDifferenceThreshold() const;
 
 protected:
@@ -144,7 +145,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override
+  VerifyInputInformation() const override
   {}
 
 private:

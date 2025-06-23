@@ -39,8 +39,8 @@ TestUnknowMetaDataBug(const std::string & fname)
     using PixelType = unsigned short;
     using ImageType = itk::Image<PixelType, 2>;
 
-    ImageType::RegionType region;
-    ImageType::SizeType   size = { { 32, 32 } };
+    ImageType::RegionType         region;
+    constexpr ImageType::SizeType size = { { 32, 32 } };
     region.SetSize(size);
 
     auto image = ImageType::New();
@@ -60,25 +60,23 @@ TestUnknowMetaDataBug(const std::string & fname)
     hasher->InPlaceOff();
     hasher->Update();
 
-    std::string originalHash = hasher->GetHash();
+    const std::string originalHash = hasher->GetHash();
     std::cout << "\tOriginal image hash: " << originalHash << std::endl;
 
 
     // Write image out
-    itk::ImageFileWriter<ImageType>::Pointer writer;
-    writer = itk::ImageFileWriter<ImageType>::New();
+    const itk::ImageFileWriter<ImageType>::Pointer writer = itk::ImageFileWriter<ImageType>::New();
     writer->SetInput(image);
     writer->SetFileName(fname);
     writer->Update();
 
-    itk::ImageFileReader<ImageType>::Pointer reader;
-    reader = itk::ImageFileReader<ImageType>::New();
+    const itk::ImageFileReader<ImageType>::Pointer reader = itk::ImageFileReader<ImageType>::New();
     reader->SetFileName(fname);
 
     hasher->SetInput(reader->GetOutput());
     hasher->Update();
 
-    std::string readHash = hasher->GetHash();
+    const std::string readHash = hasher->GetHash();
     std::cout << "\tRead hash: " << readHash << std::endl;
 
     ITK_TEST_EXPECT_EQUAL(originalHash, readHash);

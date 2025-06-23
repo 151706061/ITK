@@ -51,7 +51,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ColorTable);
 
   /** Generate a lookup table of 8 discrete colors. The colors are Red,
@@ -95,11 +95,12 @@ public:
    * the color. If a name is not provided, the name "UserDefined" is
    * used.
    */
+  /** @ITKStartGrouping */
   bool
   SetColor(unsigned int c, TComponent r, TComponent g, TComponent b, const char * name = "UserDefined");
   bool
   SetColor(unsigned int c, RGBPixel<TComponent> pixel, const char * name = "UserDefined");
-
+  /** @ITKEndGrouping */
   /** Given the position in the table and the color
    * returns the value.
    */

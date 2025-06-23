@@ -18,18 +18,13 @@
 #ifndef itkMahalanobisDistanceMetric_hxx
 #define itkMahalanobisDistanceMetric_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TVector>
 MahalanobisDistanceMetric<TVector>::MahalanobisDistanceMetric()
 
 {
-  MeasurementVectorSizeType size;
-
-  size = this->GetMeasurementVectorSize();
+  const MeasurementVectorSizeType size = this->GetMeasurementVectorSize();
 
   this->m_Covariance.set_size(size, size);
   this->m_InverseCovariance.set_size(size, size);
@@ -73,8 +68,7 @@ MahalanobisDistanceMetric<TVector>::SetCovariance(const CovarianceMatrixType & c
   {
     if (cov.rows() != this->GetMeasurementVectorSize() || cov.cols() != this->GetMeasurementVectorSize())
     {
-      itkExceptionMacro("Size of the covariance matrix must be same as the length of"
-                        << " the measurement vector.");
+      itkExceptionMacro("Size of the covariance matrix must be same as the length of the measurement vector.");
     }
   }
 
@@ -90,8 +84,7 @@ MahalanobisDistanceMetric<TVector>::SetInverseCovariance(const CovarianceMatrixT
   {
     if (invcov.rows() != this->GetMeasurementVectorSize() || invcov.cols() != this->GetMeasurementVectorSize())
     {
-      itkExceptionMacro("Size of the covariance matrix xcmust be same as the length of"
-                        << " each measurement vector.");
+      itkExceptionMacro("Size of the covariance matrix xcmust be same as the length of each measurement vector.");
     }
   }
 
@@ -160,8 +153,7 @@ MahalanobisDistanceMetric<TVector>::Evaluate(const MeasurementVectorType & measu
   tempMat = tempVec * m_InverseCovariance;
 
   // Compute |y - mean | * inverse(cov) * |y - mean|^T
-  double temp;
-  temp = std::sqrt(dot_product(tempMat.as_ref(), tempVec.as_ref()));
+  const double temp = std::sqrt(dot_product(tempMat.as_ref(), tempVec.as_ref()));
 
   return temp;
 }
@@ -193,8 +185,7 @@ MahalanobisDistanceMetric<TVector>::Evaluate(const MeasurementVectorType & x1, c
   tempMat = tempVec * m_InverseCovariance;
 
   // Compute |x1 - x2 | * inverse(cov) * |x1 - x2|^T
-  double temp;
-  temp = std::sqrt(dot_product(tempMat.as_ref(), tempVec.as_ref()));
+  const double temp = std::sqrt(dot_product(tempMat.as_ref(), tempVec.as_ref()));
 
   return temp;
 }
@@ -216,7 +207,6 @@ MahalanobisDistanceMetric<TVector>::PrintSelf(std::ostream & os, Indent indent) 
   os << indent << "Double max:        " << std::endl;
   os << this->GetDoubleMax() << std::endl;
 }
-} // end namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

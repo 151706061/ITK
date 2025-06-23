@@ -35,7 +35,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateInputR
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
 
   if (!inputPtr)
   {
@@ -51,7 +51,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateInputR
     // Determine the size of the operator in this dimension.  Note that the
     // Gaussian is built as a 1D operator in each of the specified directions.
     oper.SetDirection(i);
-    if (m_UseImageSpacing == true)
+    if (m_UseImageSpacing)
     {
       oper.SetSpacing(this->GetInput()->GetSpacing()[i]);
     }
@@ -68,8 +68,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateInputR
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(radius);
@@ -80,28 +79,26 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateInputR
     inputPtr->SetRequestedRegion(inputRequestedRegion);
     return;
   }
-  else
-  {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
 
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion(inputRequestedRegion);
+  // Couldn't crop the region (requested region is outside the largest
+  // possible region).  Throw an exception.
 
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    e.SetLocation(ITK_LOCATION);
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-  }
+  // store what we tried to request (prior to trying to crop)
+  inputPtr->SetRequestedRegion(inputRequestedRegion);
+
+  // build an exception
+  InvalidRequestedRegionError e(__FILE__, __LINE__);
+  e.SetLocation(ITK_LOCATION);
+  e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
+  e.SetDataObject(inputPtr);
+  throw e;
 }
 
 template <typename TInputImage, typename TOutputImage>
 void
 DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
 {
-  typename TOutputImage::Pointer output = this->GetOutput();
+  const typename TOutputImage::Pointer output = this->GetOutput();
 
   output->SetBufferedRegion(output->GetRequestedRegion());
   output->Allocate();
@@ -157,7 +154,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
     // Set up the operator for this dimension
     oper[reverse_i].SetDirection(i);
     oper[reverse_i].SetOrder(m_Order[i]);
-    if (m_UseImageSpacing == true)
+    if (m_UseImageSpacing)
     {
       // convert the variance from physical units to pixels
       double s = localInput->GetSpacing()[i];
@@ -176,10 +173,10 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
   }
 
   // Create a chain of filters
-  if (ImageDimension == 1)
+  if constexpr (ImageDimension == 1)
   {
     // Use just a single filter
-    SingleFilterPointer singleFilter = SingleFilterType::New();
+    const SingleFilterPointer singleFilter = SingleFilterType::New();
     singleFilter->SetOperator(oper[0]);
     singleFilter->SetInput(localInput);
     progress->RegisterInternalFilter(singleFilter, 1.0f / ImageDimension);
@@ -201,23 +198,28 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
   {
     // Setup a full mini-pipeline and stream the data through the
     // pipeline.
-    unsigned int numberOfStages = ImageDimension * this->GetInternalNumberOfStreamDivisions() + 1;
+    const unsigned int numberOfStages = ImageDimension * this->GetInternalNumberOfStreamDivisions() + 1;
 
     // First filter convolves and changes type from input type to real type
-    FirstFilterPointer firstFilter = FirstFilterType::New();
+    const FirstFilterPointer firstFilter = FirstFilterType::New();
     firstFilter->SetOperator(oper[0]);
     firstFilter->ReleaseDataFlagOn();
     firstFilter->SetInput(localInput);
     progress->RegisterInternalFilter(firstFilter, 1.0f / numberOfStages);
 
     // Middle filters convolves from real to real
-    std::vector<IntermediateFilterPointer> intermediateFilters;
-    if (ImageDimension > 2)
+    // Last filter convolves and changes type from real type to output type
+    const LastFilterPointer lastFilter = LastFilterType::New();
+    lastFilter->SetOperator(oper[ImageDimension - 1]);
+    lastFilter->ReleaseDataFlagOn();
+    if constexpr (ImageDimension > 2)
     {
-      const unsigned int max_dim = ImageDimension - 1;
+      const unsigned int                     max_dim = ImageDimension - 1;
+      std::vector<IntermediateFilterPointer> intermediateFilters;
+      intermediateFilters.reserve(max_dim);
       for (unsigned int i = 1; i != max_dim; ++i)
       {
-        IntermediateFilterPointer f = IntermediateFilterType::New();
+        const IntermediateFilterPointer f = IntermediateFilterType::New();
         f->SetOperator(oper[i]);
         f->ReleaseDataFlagOn();
         progress->RegisterInternalFilter(f, 1.0f / numberOfStages);
@@ -233,14 +235,6 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
         }
         intermediateFilters.push_back(f);
       }
-    }
-
-    // Last filter convolves and changes type from real type to output type
-    LastFilterPointer lastFilter = LastFilterType::New();
-    lastFilter->SetOperator(oper[ImageDimension - 1]);
-    lastFilter->ReleaseDataFlagOn();
-    if (ImageDimension > 2)
-    {
       const unsigned int temp_dim = ImageDimension - 3;
       lastFilter->SetInput(intermediateFilters[temp_dim]->GetOutput());
     }
@@ -252,7 +246,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::GenerateData()
 
     // Put in a StreamingImageFilter so the mini-pipeline is processed
     // in chunks to minimize memory usage
-    StreamingFilterPointer streamingFilter = StreamingFilterType::New();
+    const StreamingFilterPointer streamingFilter = StreamingFilterType::New();
     streamingFilter->SetInput(lastFilter->GetOutput());
     streamingFilter->SetNumberOfStreamDivisions(this->GetInternalNumberOfStreamDivisions());
     progress->RegisterInternalFilter(streamingFilter, 1.0f / numberOfStages);
@@ -282,7 +276,7 @@ DiscreteGaussianDerivativeImageFilter<TInputImage, TOutputImage>::PrintSelf(std:
   os << indent << "Variance: " << m_Variance << std::endl;
   os << indent << "MaximumError: " << m_MaximumError << std::endl;
   os << indent << "MaximumKernelWidth: " << m_MaximumKernelWidth << std::endl;
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
   os << indent << "InternalNumberOfStreamDivisions: " << m_InternalNumberOfStreamDivisions << std::endl;
   os << indent << "NormalizeAcrossScale: " << m_NormalizeAcrossScale << std::endl;
 }

@@ -41,9 +41,7 @@ namespace itk
  * by dilation using a marker image that is the original image for all
  * unaffected pixels.
  *
- * Opening by reconstruction is described in Chapter 6.3.9 of Pierre
- * Soille's book "Morphological Image Analysis: Principles and
- * Applications", Second Edition, Springer, 2003.
+ * Opening by reconstruction is described in \cite soille2004.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -85,7 +83,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(OpeningByReconstructionImageFilter);
 
   /** Set kernel (structuring element). */
@@ -100,23 +98,21 @@ public:
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the original intensities of the image retained for
    * those pixels unaffected by the opening by reconstruction. If Off,
    * the output pixel contrast will be reduced. */
+  /** @ITKStartGrouping */
   itkSetMacro(PreserveIntensities, bool);
   itkGetConstReferenceMacro(PreserveIntensities, bool);
   itkBooleanMacro(PreserveIntensities);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   OpeningByReconstructionImageFilter();

@@ -69,7 +69,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NormalizedCorrelationImageFilter);
 
   /** Extract some information from the image types.  Dimensionality
@@ -125,15 +125,11 @@ public:
     this->SetOperator(t);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, MaskImageDimension>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelType>));
   itkConceptMacro(OperatorHasNumericTraitsCheck, (Concept::HasNumericTraits<OperatorValueType>));
   // This filter can only operate on data types that are signed.
   itkConceptMacro(SignedOutputPixelType, (Concept::Signed<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   NormalizedCorrelationImageFilter() = default;

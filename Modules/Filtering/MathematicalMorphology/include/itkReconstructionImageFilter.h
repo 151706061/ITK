@@ -24,7 +24,7 @@
 #include "itkProgressReporter.h"
 #include <queue>
 
-//#define BASIC
+// #define BASIC
 #define COPY
 
 #ifdef COPY
@@ -39,9 +39,7 @@ namespace itk
  *
  * This filter uses Luc Vincent's algorithm, which employs raster and
  * antiraster propagation steps followed by a FIFO based propagation
- * step. "Morphological grayscale reconstruction in image analysis -
- * applications and efficient algorithms" -- IEEE Transactions on
- * Image processing, Vol 2, No 2, pp 176-201, April 1993
+ * step \cite vincent1993.
  *
  * \author Richard Beare. Department of Medicine, Monash University,
  * Melbourne, Australia.
@@ -87,6 +85,7 @@ public:
   using OutputImageIndexType = typename OutputImageType::IndexType;
 
   /** ImageDimension constants */
+
   /** ImageDimension constants */
   static constexpr unsigned int MarkerImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int MaskImageDimension = TInputImage::ImageDimension;
@@ -95,7 +94,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ReconstructionImageFilter);
 
   /** Set/Get the marker image. Traditionally, the marker image must
@@ -103,34 +102,38 @@ public:
    * however this filter implicitly applies a mask to force the
    * constraint to hold. The marker image the
    * image that is dilated by this filter. */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MarkerImage, MarkerImageType);
   itkGetInputMacro(MarkerImage, MarkerImageType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the mask image. The mask image is used to "mask" the
    * dilated marker image. The mask operation is a pixelwise
    * minimum. */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MaskImage, MaskImageType);
   itkGetInputMacro(MaskImage, MaskImageType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the connected components are defined strictly by
    * face connectivity or by face+edge+vertex connectivity.  Default is
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
+  /** @ITKEndGrouping */
   /**
    * Perform a padding of the image internally to increase the performance
    * of the filter. UseInternalCopy can be set to false to reduce the memory
    * usage.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(UseInternalCopy, bool);
   itkGetConstReferenceMacro(UseInternalCopy, bool);
   itkBooleanMacro(UseInternalCopy);
-
+  /** @ITKEndGrouping */
 protected:
   ReconstructionImageFilter();
   ~ReconstructionImageFilter() override = default;

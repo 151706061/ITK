@@ -115,28 +115,24 @@ public:
   /** Const Iterator */
   struct ConstIterator
   {
-    ConstIterator() { m_NeighborhoodIterator = nullptr; }
+    ConstIterator()
+      : m_NeighborhoodIterator(nullptr)
+    {}
     ConstIterator(Self * s)
+      : m_NeighborhoodIterator(s)
     {
-      m_NeighborhoodIterator = s;
       this->GoToBegin();
     }
 
-    ITK_ITERATOR_VIRTUAL ~ConstIterator() = default;
+    ~ConstIterator() = default;
 
     ConstIterator &
-    operator=(const ConstIterator & o)
-    {
-      m_NeighborhoodIterator = o.m_NeighborhoodIterator;
-      m_ListIterator = o.m_ListIterator;
-      return *this;
-    }
+    operator=(const ConstIterator & o) = default;
 
     ConstIterator(const ConstIterator & o)
-    {
-      m_NeighborhoodIterator = o.m_NeighborhoodIterator;
-      m_ListIterator = o.m_ListIterator;
-    }
+      : m_NeighborhoodIterator(o.m_NeighborhoodIterator)
+      , m_ListIterator(o.m_ListIterator)
+    {}
 
     void
     operator++(int)
@@ -172,17 +168,15 @@ public:
 
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       if (m_ListIterator == m_NeighborhoodIterator->GetActiveIndexList().end())
       {
         return true;
       }
-      else
-      {
-        return false;
-      }
+
+      return false;
     }
 
     void
@@ -197,19 +191,19 @@ public:
       m_ListIterator = m_NeighborhoodIterator->GetActiveIndexList().end();
     }
 
-    PixelType
+    [[nodiscard]] PixelType
     Get() const
     {
       return m_NeighborhoodIterator->GetPixel(*m_ListIterator);
     }
 
-    OffsetType
+    [[nodiscard]] OffsetType
     GetNeighborhoodOffset() const
     {
       return m_NeighborhoodIterator->GetOffset(*m_ListIterator);
     }
 
-    typename IndexListType::value_type
+    [[nodiscard]] typename IndexListType::value_type
     GetNeighborhoodIndex() const
     {
       return *m_ListIterator;
@@ -326,17 +320,18 @@ public:
   /** Add/Remove a neighborhood offset (from the center of the neighborhood)
    *  to/from the active list.  Active list offsets are the only locations
    *  updated and accessible through the iterator.  */
-  ITK_ITERATOR_VIRTUAL void
-  ActivateOffset(const OffsetType & off) ITK_ITERATOR_FINAL
+  /** @ITKStartGrouping */
+  void
+  ActivateOffset(const OffsetType & off)
   {
     this->ActivateIndex(Superclass::GetNeighborhoodIndex(off));
   }
-  ITK_ITERATOR_VIRTUAL void
-  DeactivateOffset(const OffsetType & off) ITK_ITERATOR_FINAL
+  void
+  DeactivateOffset(const OffsetType & off)
   {
     this->DeactivateIndex(Superclass::GetNeighborhoodIndex(off));
   }
-
+  /** @ITKEndGrouping */
   /** Activates a whole range of offsets, for example, an std::vector<OffsetType>,
    * which could be from GenerateImageNeighborhoodOffsets(shape). */
   template <typename TOffsets>
@@ -350,8 +345,8 @@ public:
   }
 
   /** Removes all active pixels from this neighborhood. */
-  ITK_ITERATOR_VIRTUAL void
-  ClearActiveList() ITK_ITERATOR_FINAL
+  void
+  ClearActiveList()
   {
     m_ActiveIndexList.clear();
     m_CenterIsActive = false;
@@ -374,9 +369,17 @@ public:
   /** Add non-zero neighborhood offsets to the active list. The
    * radius of the neighborhood must match the radius of the shaped
    * iterator */
+  /** @ITKStartGrouping */
+  template <typename TNeighborPixel>
   void
-  CreateActiveListFromNeighborhood(const NeighborhoodType &);
-
+  CreateActiveListFromNeighborhood(const Neighborhood<TNeighborPixel, Self::Dimension> &);
+  void
+  CreateActiveListFromNeighborhood(const NeighborhoodType & neighborhood)
+  {
+    // just delegate to the templated version
+    this->CreateActiveListFromNeighborhood<PixelType>(neighborhood);
+  }
+  /** @ITKEndGrouping */
   /** Reimplements the operator++ method so that only active pixel locations
    * are updated. */
   Self &
@@ -415,9 +418,9 @@ protected:
       argument is an index location calculated as an offset into a linear
       array which represents the image region defined by the radius of this
       iterator, with the smallest dimension as the fastest increasing index. */
-  ITK_ITERATOR_VIRTUAL void ActivateIndex(NeighborIndexType) ITK_ITERATOR_FINAL;
+  void ActivateIndex(NeighborIndexType);
 
-  ITK_ITERATOR_VIRTUAL void DeactivateIndex(NeighborIndexType) ITK_ITERATOR_FINAL;
+  void DeactivateIndex(NeighborIndexType);
 
 
   bool          m_CenterIsActive{ false };

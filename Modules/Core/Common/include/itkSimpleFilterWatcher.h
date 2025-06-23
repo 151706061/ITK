@@ -96,6 +96,7 @@ public:
 
   /** Methods to control the verbosity of the messages. Quiet
    * reporting limits the information emitted at a ProgressEvent. */
+  /** @ITKStartGrouping */
   void
   QuietOn()
   {
@@ -106,10 +107,12 @@ public:
   {
     m_Quiet = false;
   }
+  /** @ITKEndGrouping */
 
   /** Methods to use to test the AbortEvent of the a filter. If
    * TestAbort is on, the filter being watched will be aborted when
    * the progress reaches 30%. */
+  /** @ITKStartGrouping */
   void
   TestAbortOn()
   {
@@ -120,8 +123,10 @@ public:
   {
     m_TestAbort = false;
   }
+  /** @ITKEndGrouping */
 
   /** Methods to access member data */
+
   /** Get a pointer to the process object being watched. */
   ProcessObject *
   GetProcess()
@@ -130,41 +135,47 @@ public:
   }
 
   /** Set/Get the steps completed. */
+  /** @ITKStartGrouping */
   void
   SetSteps(int val)
   {
     m_Steps = val;
   }
-  int
+  [[nodiscard]] int
   GetSteps() const
   {
     return m_Steps;
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the number of iterations completed. */
+  /** @ITKStartGrouping */
   void
   SetIterations(int val)
   {
     m_Iterations = val;
   }
-  int
+  [[nodiscard]] int
   GetIterations() const
   {
     return m_Iterations;
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the quiet mode boolean. If true, verbose progress is
    * reported. */
+  /** @ITKStartGrouping */
   void
   SetQuiet(bool val)
   {
     m_Quiet = val;
   }
-  bool
+  [[nodiscard]] bool
   GetQuiet() const
   {
     return m_Quiet;
   }
+  /** @ITKEndGrouping */
 
   /** Get the comment for the watcher. */
   std::string
@@ -288,8 +299,8 @@ private:
   TimeProbe                   m_TimeProbe{};
   int                         m_Steps{ 0 };
   int                         m_Iterations{ 0 };
-  bool                        m_Quiet{ false };
   bool                        m_TestAbort{ false };
+  bool                        m_Quiet{ false };
   std::string                 m_Comment{};
   itk::ProcessObject::Pointer m_Process{};
   std::mutex                  m_ProgressOutput{};

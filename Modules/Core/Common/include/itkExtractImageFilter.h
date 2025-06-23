@@ -35,7 +35,7 @@ namespace itk
 class ExtractImageFilterEnums
 {
 public:
-  /** \class DirectionCollapseStrategy
+  /**
    * \ingroup ITKCommon
    * Strategy to be used to collapse physical space dimensions
    */
@@ -47,6 +47,7 @@ public:
     DIRECTIONCOLLAPSETOGUESS = 3
   };
 };
+
 /** Define how to print enumerations */
 extern ITKCommon_EXPORT std::ostream &
                         operator<<(std::ostream & out, const ExtractImageFilterEnums::DirectionCollapseStrategy value);
@@ -129,7 +130,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExtractImageFilter);
 
   /** Image type information. */
@@ -216,7 +217,7 @@ public:
   /**
    * Get the currently set strategy for collapsing directions of physical space.
    */
-  DirectionCollapseStrategyEnum
+  [[nodiscard]] DirectionCollapseStrategyEnum
   GetDirectionCollapseToStrategy() const
   {
     return this->m_DirectionCollapseStrategy;
@@ -256,15 +257,12 @@ public:
    *  we have to collapse dimension dim.  This means the output image will have
    *  'c' dimensions less than the input image, where c = number of
    *  ExtractionRegion.Size = 0. */
+  /** @ITKStartGrouping */
   void
   SetExtractionRegion(InputImageRegionType extractRegion);
   itkGetConstMacro(ExtractionRegion, InputImageRegionType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputCovertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
-  // End concept checking
-#endif
+  /** @ITKEndGrouping */
 
 protected:
   ExtractImageFilter();

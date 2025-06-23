@@ -70,7 +70,7 @@ itkQuadEdgeMeshAddFaceTest1(int argc, char * argv[])
   constexpr int   NumPoints = 7;
   PointIdentifier pid[NumPoints];
 
-  PointType::CoordRepType a = std::sqrt(3.0) / 2.0;
+  PointType::CoordinateType a = std::sqrt(3.0) / 2.0;
 
   using ValueArrayType = PointType::ValueArrayType;
 
@@ -89,7 +89,7 @@ itkQuadEdgeMeshAddFaceTest1(int argc, char * argv[])
     pid[i] = mesh->AddPoint(points[i]);
   }
 
-  int testType = std::stoi(argv[1]);
+  const int testType = std::stoi(argv[1]);
   if (testType == 0)
   {
 

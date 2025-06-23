@@ -4,6 +4,11 @@
 :maxdepth: 1
 :caption: 📝 ITK Release Notes
 
+5.4.4.md
+5.4.3.md
+5.4.2.md
+5.4.0.md
+5.4rc04.md
 5.4rc02.md
 5.4rc01.md
 
@@ -55,3 +60,5 @@
 1.8.md
 1.0.md
 ```
+
+The release asset archive is [available here](https://drive.google.com/drive/folders/1NFEZGTs_axoJUXox3JsRKCqw2QQCY_Ri).

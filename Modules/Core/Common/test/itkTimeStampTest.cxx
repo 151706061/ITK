@@ -64,7 +64,7 @@ itkTimeStampTest(int, char *[])
     TimeStampTestHelper helper;
 
     // Set up the multithreader
-    itk::MultiThreaderBase::Pointer multithreader = itk::MultiThreaderBase::New();
+    const itk::MultiThreaderBase::Pointer multithreader = itk::MultiThreaderBase::New();
     multithreader->SetNumberOfWorkUnits(itk::ITK_MAX_THREADS + 10); // this will be clamped
     multithreader->SetSingleMethod(modified_function, &helper);
 
@@ -134,7 +134,7 @@ itkTimeStampTest(int, char *[])
           // been used
           const itk::ModifiedTimeType index = helper.timestamps[k].GetMTime() - min_mtime;
 
-          if (istimestamped[index] == true)
+          if (istimestamped[index])
           {
             iter_success = false;
             std::cerr << helper.timestamps[k].GetMTime() << " was used twice as a timestamp!" << std::endl;

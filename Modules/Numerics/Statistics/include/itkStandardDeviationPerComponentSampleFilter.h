@@ -24,9 +24,7 @@
 #include "itkSimpleDataObjectDecorator.h"
 #include "itkNumericTraitsFixedArrayPixel.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class StandardDeviationPerComponentSampleFilter
@@ -59,10 +57,11 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using SampleType = TSample;
 
-  /** Standard Macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(StandardDeviationPerComponentSampleFilter);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Length of a measurement vector */
   using MeasurementVectorSizeType = typename TSample::MeasurementVectorSizeType;
 
@@ -98,12 +97,6 @@ public:
   const MeasurementVectorRealDecoratedType *
   GetMeanPerComponentOutput() const;
 
-protected:
-  StandardDeviationPerComponentSampleFilter();
-  ~StandardDeviationPerComponentSampleFilter() override = default;
-  void
-  PrintSelf(std::ostream & os, Indent indent) const override;
-
   /** DataObject pointer */
   using DataObjectPointer = DataObject::Pointer;
 
@@ -111,6 +104,12 @@ protected:
   using Superclass::MakeOutput;
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType index) override;
+
+protected:
+  StandardDeviationPerComponentSampleFilter();
+  ~StandardDeviationPerComponentSampleFilter() override = default;
+  void
+  PrintSelf(std::ostream & os, Indent indent) const override;
 
   void
   GenerateData() override;
@@ -120,8 +119,7 @@ protected:
 
 private:
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkStandardDeviationPerComponentSampleFilter.hxx"

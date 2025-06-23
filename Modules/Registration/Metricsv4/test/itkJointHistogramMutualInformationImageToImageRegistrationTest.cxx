@@ -91,9 +91,9 @@ public:
     std::cout << "Current optimizer iteration: " << optimizer->GetCurrentIteration() << '\n';
     std::cout << "Current optimizer value:     " << optimizer->GetCurrentMetricValue() << '\n';
 
-    std::string        ext = itksys::SystemTools::GetFilenameExtension(this->m_OutputFileNameBase);
-    std::string        name = itksys::SystemTools::GetFilenameWithoutExtension(this->m_OutputFileNameBase);
-    std::string        path = itksys::SystemTools::GetFilenamePath(this->m_OutputFileNameBase);
+    const std::string  ext = itksys::SystemTools::GetFilenameExtension(this->m_OutputFileNameBase);
+    const std::string  name = itksys::SystemTools::GetFilenameWithoutExtension(this->m_OutputFileNameBase);
+    const std::string  path = itksys::SystemTools::GetFilenamePath(this->m_OutputFileNameBase);
     std::ostringstream ostrm;
     ostrm << name << "_jointpdf_" << this->m_Count << ext;
     std::cout << "Writing joint pdf to:        " << ostrm.str() << std::endl;
@@ -122,10 +122,8 @@ public:
 protected:
   JointPDFStatus()
     : m_MIMetric(nullptr)
-
-  {
-    this->m_Writer = WriterType::New();
-  }
+    , m_Writer(WriterType::New())
+  {}
 
 private:
   const MIMetricType * m_MIMetric;
@@ -156,6 +154,7 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   std::cout << argc << std::endl;
   unsigned int numberOfIterations = 10;
   unsigned int numberOfDisplacementIterations = 10;
+  bool         useScalesEstimator = true;
   if (argc >= 5)
   {
     numberOfIterations = std::stoi(argv[4]);
@@ -163,6 +162,10 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   if (argc >= 6)
   {
     numberOfDisplacementIterations = std::stoi(argv[5]);
+  }
+  if (argc >= 7)
+  {
+    useScalesEstimator = std::stoi(argv[6]);
   }
   std::cout << " iterations " << numberOfIterations << " displacementIterations " << numberOfDisplacementIterations
             << std::endl;
@@ -184,9 +187,9 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
 
   // get the images
   fixedImageReader->Update();
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   movingImageReader->Update();
-  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
 
   /** define a resample filter that will ultimately be used to deform the image */
   using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -218,8 +221,7 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   std::cout << "fixedImage->GetLargestPossibleRegion(): " << fixedImage->GetLargestPossibleRegion() << std::endl;
   field->Allocate();
   // Fill it with 0's
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  constexpr DisplacementTransformType::OutputVectorType zeroVector{};
   field->FillBuffer(zeroVector);
   // Assign to transform
   displacementTransform->SetDisplacementField(field);
@@ -238,8 +240,9 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   metric->SetNumberOfHistogramBins(20);
 
   using PointType = PointSetType::PointType;
-  PointSetType::Pointer                             pset(PointSetType::New());
-  unsigned long                                     ind = 0, ct = 0;
+  const PointSetType::Pointer                       pset(PointSetType::New());
+  unsigned long                                     ind = 0;
+  unsigned long                                     ct = 0;
   itk::ImageRegionIteratorWithIndex<FixedImageType> It(fixedImage, fixedImage->GetLargestPossibleRegion());
   for (It.GoToBegin(); !It.IsAtEnd(); ++It)
   {
@@ -272,13 +275,13 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   metric->SetMovingImage(movingImage);
   metric->SetFixedTransform(identityTransform);
   metric->SetMovingTransform(affineTransform);
-  const bool gaussian = false;
+  constexpr bool gaussian = false;
   metric->SetUseMovingImageGradientFilter(gaussian);
   metric->SetUseFixedImageGradientFilter(gaussian);
   metric->Initialize();
 
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
 
@@ -313,7 +316,7 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
   RegistrationParameterScalesFromShiftType::ScalesType displacementScales(
     displacementTransform->GetNumberOfLocalParameters());
   displacementScales.Fill(1);
-  if (false)
+  if (!useScalesEstimator)
   {
     optimizer->SetScales(displacementScales);
   }
@@ -354,12 +357,12 @@ itkJointHistogramMutualInformationImageToImageRegistrationTest(int argc, char * 
 
   // write out the displacement field
   using DisplacementWriterType = itk::ImageFileWriter<DisplacementFieldType>;
-  auto        displacementwriter = DisplacementWriterType::New();
-  std::string outfilename(argv[3]);
-  std::string ext = itksys::SystemTools::GetFilenameExtension(outfilename);
-  std::string name = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
-  std::string path = itksys::SystemTools::GetFilenamePath(outfilename);
-  std::string defout = path + std::string("/") + name + std::string("_def") + ext;
+  auto              displacementwriter = DisplacementWriterType::New();
+  const std::string outfilename(argv[3]);
+  const std::string ext = itksys::SystemTools::GetFilenameExtension(outfilename);
+  const std::string name = itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+  const std::string path = itksys::SystemTools::GetFilenamePath(outfilename);
+  const std::string defout = path + std::string("/") + name + std::string("_def") + ext;
   displacementwriter->SetFileName(defout.c_str());
   displacementwriter->SetInput(displacementTransform->GetDisplacementField());
   displacementwriter->Update();

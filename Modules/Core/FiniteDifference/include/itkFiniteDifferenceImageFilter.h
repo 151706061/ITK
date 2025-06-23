@@ -141,7 +141,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FiniteDifferenceImageFilter);
 
   /** Input and output image types. */
@@ -178,36 +178,40 @@ public:
   itkGetConstReferenceObjectMacro(DifferenceFunction, FiniteDifferenceFunctionType);
 
   /** This method sets the pointer to a FiniteDifferenceFunction object that
-   * will be used by the filter to calculate updates at image pixels.
-   * \returns A FiniteDifferenceObject pointer. */
+   * will be used by the filter to calculate updates at image pixels. */
   itkSetObjectMacro(DifferenceFunction, FiniteDifferenceFunctionType);
 
   /** Set/Get the number of iterations that the filter will run. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfIterations, IdentifierType);
   itkGetConstReferenceMacro(NumberOfIterations, IdentifierType);
-
+  /** @ITKEndGrouping */
   /** Use the image spacing information in calculations. Use this option if you
    *  want derivatives in physical space. Default is UseImageSpacingOn. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
   itkGetConstReferenceMacro(UseImageSpacing, bool);
-
+  /** @ITKEndGrouping */
   /** Set/Get the maximum error allowed in the solution.  This may not be
       defined for all solvers and its meaning may change with the application. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumRMSError, double);
   itkGetConstReferenceMacro(MaximumRMSError, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the root mean squared change of the previous iteration. May not
       be used by all solvers. */
+  /** @ITKStartGrouping */
   itkSetMacro(RMSChange, double);
   itkGetConstReferenceMacro(RMSChange, double);
-
+  /** @ITKEndGrouping */
   /** Require the filter to be manually reinitialized (by calling
       SetStateToUninitialized() */
+  /** @ITKStartGrouping */
   itkSetMacro(ManualReinitialization, bool);
   itkGetConstReferenceMacro(ManualReinitialization, bool);
   itkBooleanMacro(ManualReinitialization);
-
+  /** @ITKEndGrouping */
   itkSetMacro(IsInitialized, bool);
   itkGetMacro(IsInitialized, bool);
 
@@ -222,11 +226,7 @@ public:
     this->SetIsInitialized(true);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputPixelIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputPixelValueType>));
-  // End concept checking
-#endif
 
 protected:
   FiniteDifferenceImageFilter();
@@ -370,7 +370,7 @@ private:
 
   /** Control whether derivatives use spacing of the input image in
       its calculation. */
-  bool m_UseImageSpacing{};
+  bool m_UseImageSpacing{ true };
 
   /** The function that will be used in calculating updates for each pixel. */
   typename FiniteDifferenceFunctionType::Pointer m_DifferenceFunction{};

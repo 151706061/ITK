@@ -55,7 +55,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest2(int argc, char * argv[])
   // Sample the helix
   for (RealType t = 0.0; t <= 1.0 + 1e-10; t += 0.05)
   {
-    unsigned long i = pointSet->GetNumberOfPoints();
+    const unsigned long i = pointSet->GetNumberOfPoints();
 
     PointSetType::PointType point;
     point[0] = t;
@@ -77,34 +77,28 @@ itkBSplineScatteredDataPointSetToImageFilterTest2(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, BSplineScatteredDataPointSetToImageFilter, PointSetToImageFilter);
 
   // Define the parametric domain
-  ImageType::SpacingType spacing;
-  spacing.Fill(0.01);
-  ImageType::SizeType size;
-  size.Fill(101);
-  ImageType::PointType origin;
-  origin.Fill(0.0);
+  auto                           spacing = itk::MakeFilled<ImageType::SpacingType>(0.01);
+  auto                           size = ImageType::SizeType::Filled(101);
+  constexpr ImageType::PointType origin{};
 
   filter->SetSize(size);
   filter->SetOrigin(origin);
   filter->SetSpacing(spacing);
   filter->SetInput(pointSet);
 
-  FilterType::RealType bSplineEpsilon = 1e-4;
+  constexpr FilterType::RealType bSplineEpsilon = 1e-4;
   filter->SetBSplineEpsilon(bSplineEpsilon);
   ITK_TEST_SET_GET_VALUE(bSplineEpsilon, filter->GetBSplineEpsilon());
 
   filter->SetSplineOrder(3);
-  FilterType::ArrayType ncps;
-  ncps.Fill(4);
+  auto ncps = itk::MakeFilled<FilterType::ArrayType>(4);
   filter->SetNumberOfControlPoints(ncps);
   filter->SetNumberOfLevels(5);
   filter->SetGenerateOutputImage(false);
 
-  FilterType::WeightsContainerType::Pointer pointWeights = FilterType::WeightsContainerType::New();
+  const FilterType::WeightsContainerType::Pointer pointWeights = FilterType::WeightsContainerType::New();
 
-  pointWeights->Initialize();
-
-  unsigned int abritrarySize = filter->GetInput()->GetNumberOfPoints() - 1;
+  const unsigned int abritrarySize = filter->GetInput()->GetNumberOfPoints() - 1;
   pointWeights->resize(abritrarySize);
   for (unsigned int i = 0; i < pointWeights->Size(); ++i)
   {

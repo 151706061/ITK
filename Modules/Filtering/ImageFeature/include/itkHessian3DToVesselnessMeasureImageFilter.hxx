@@ -26,12 +26,11 @@ namespace itk
 
 template <typename TPixel>
 Hessian3DToVesselnessMeasureImageFilter<TPixel>::Hessian3DToVesselnessMeasureImageFilter()
-{
-  m_Alpha1 = 0.5;
-  m_Alpha2 = 2.0;
-
+  : m_SymmetricEigenValueFilter(EigenAnalysisFilterType::New())
+  , m_Alpha1(0.5)
   // Hessian( Image ) = Jacobian( Gradient ( Image ) )  is symmetric
-  m_SymmetricEigenValueFilter = EigenAnalysisFilterType::New();
+  , m_Alpha2(2.0)
+{
   m_SymmetricEigenValueFilter->OrderEigenValuesBy(EigenValueOrderEnum::OrderByValue);
 }
 
@@ -43,7 +42,7 @@ Hessian3DToVesselnessMeasureImageFilter<TPixel>::GenerateData()
 
   m_SymmetricEigenValueFilter->SetInput(this->GetInput());
 
-  typename OutputImageType::Pointer output = this->GetOutput();
+  const typename OutputImageType::Pointer output = this->GetOutput();
 
   using EigenValueOutputImageType = typename EigenAnalysisFilterType::OutputImageType;
 
@@ -53,8 +52,8 @@ Hessian3DToVesselnessMeasureImageFilter<TPixel>::GenerateData()
 
   // walk the region of eigen values and get the vesselness measure
   EigenValueArrayType                                 eigenValue;
-  ImageRegionConstIterator<EigenValueOutputImageType> it;
-  it = ImageRegionConstIterator<EigenValueOutputImageType>(eigenImage, eigenImage->GetRequestedRegion());
+  ImageRegionConstIterator<EigenValueOutputImageType> it =
+    ImageRegionConstIterator<EigenValueOutputImageType>(eigenImage, eigenImage->GetRequestedRegion());
   ImageRegionIterator<OutputImageType> oit;
   this->AllocateOutputs();
   oit = ImageRegionIterator<OutputImageType>(output, output->GetRequestedRegion());
@@ -64,19 +63,16 @@ Hessian3DToVesselnessMeasureImageFilter<TPixel>::GenerateData()
     eigenValue = it.Get();
 
     // normalizeValue <= 0 for bright line structures
-    double normalizeValue = std::min(-1.0 * eigenValue[1], -1.0 * eigenValue[0]);
+    const double normalizeValue = std::min(-1.0 * eigenValue[1], -1.0 * eigenValue[0]);
 
     // Similarity measure to a line structure
     if (normalizeValue > 0)
     {
-      double lineMeasure;
+      double lineMeasure = std::exp(-0.5 * itk::Math::sqr(eigenValue[2] / (m_Alpha2 * normalizeValue)));
+
       if (eigenValue[2] <= 0)
       {
         lineMeasure = std::exp(-0.5 * itk::Math::sqr(eigenValue[2] / (m_Alpha1 * normalizeValue)));
-      }
-      else
-      {
-        lineMeasure = std::exp(-0.5 * itk::Math::sqr(eigenValue[2] / (m_Alpha2 * normalizeValue)));
       }
 
       lineMeasure *= normalizeValue;

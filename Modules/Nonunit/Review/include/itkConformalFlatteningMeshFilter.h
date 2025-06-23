@@ -36,7 +36,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Conformal Flattening ITK Filter"
  * by Gao Y., Melonakos J., Tannenbaum A.
- * https://www.insight-journal.org/browse/publication/112
+ * https://doi.org/10.54294/msr7a5
  *
  * \ingroup MeshFilters
  * \sa TransformMeshFilter
@@ -66,13 +66,17 @@ public:
   using OutputPointType = typename OutputMeshType::PointType;
 
   /** Type for representing coordinates. */
-  // using CoordRepType = typename TInputMesh::CoordRepType;
-  using CoordRepType = double;
+  // using CoordinateType = typename TInputMesh::CoordinateType;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConformalFlatteningMeshFilter);
 
   /** Convenient constants obtained from TMeshTraits template parameter. */
@@ -122,8 +126,8 @@ protected:
   GenerateData() override;
 
 private:
-  using VectorCoordType = vnl_vector<CoordRepType>;
-  using SparseMatrixCoordType = vnl_sparse_matrix<CoordRepType>;
+  using VectorCoordType = vnl_vector<CoordinateType>;
+  using SparseMatrixCoordType = vnl_sparse_matrix<CoordinateType>;
 
   /** Cell Id  in which the point P, which is used
    * to define the mapping, lies in. */

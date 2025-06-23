@@ -64,7 +64,7 @@ namespace itk
  * and uses the result as the estimate of \f$P_f(\omega)\f$.
  *
  * For further information on the Wiener deconvolution filter, please see
- * "Digital Signal Processing" by Kenneth R. Castleman, Prentice Hall, 1995
+ * \cite castleman1995.
  *
  * \author Gaetan Lehmann, Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France
  * \author Chris Mullins, The University of North Carolina at Chapel Hill
@@ -91,7 +91,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information ( and related methods ) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WienerDeconvolutionImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -123,9 +123,10 @@ public:
 
   /** Set/get the variance of the zero-mean Gaussian white noise
    * assumed to be added to the input. */
+  /** @ITKStartGrouping */
   itkSetMacro(NoiseVariance, double);
   itkGetConstMacro(NoiseVariance, double);
-
+  /** @ITKEndGrouping */
 protected:
   WienerDeconvolutionImageFilter();
   ~WienerDeconvolutionImageFilter() override = default;
@@ -149,10 +150,7 @@ class ITK_TEMPLATE_EXPORT WienerDeconvolutionFunctor
 public:
   WienerDeconvolutionFunctor() = default;
   ~WienerDeconvolutionFunctor() = default;
-  WienerDeconvolutionFunctor(const WienerDeconvolutionFunctor & f)
-    : m_NoisePowerSpectralDensityConstant(f.m_NoisePowerSpectralDensityConstant)
-    , m_KernelZeroMagnitudeThreshold(f.m_KernelZeroMagnitudeThreshold)
-  {}
+  WienerDeconvolutionFunctor(const WienerDeconvolutionFunctor & f) = default;
 
   bool
   operator==(const WienerDeconvolutionFunctor &) const
@@ -184,30 +182,32 @@ public:
 
   /** Set/get the constant defining the noise power spectral density
    * constant. */
+  /** @ITKStartGrouping */
   void
   SetNoisePowerSpectralDensityConstant(double constant)
   {
     m_NoisePowerSpectralDensityConstant = constant;
   }
-  double
+  [[nodiscard]] double
   GetNoisePowerSpectralDensityConstant() const
   {
     return m_NoisePowerSpectralDensityConstant;
   }
-
+  /** @ITKEndGrouping */
   /** Set/get the threshold value below which complex magnitudes are considered
    * to be zero. */
+  /** @ITKStartGrouping */
   void
   SetKernelZeroMagnitudeThreshold(double mu)
   {
     m_KernelZeroMagnitudeThreshold = mu;
   }
-  double
+  [[nodiscard]] double
   GetKernelZeroMagnitudeThreshold() const
   {
     return m_KernelZeroMagnitudeThreshold;
   }
-
+  /** @ITKEndGrouping */
 private:
   double m_NoisePowerSpectralDensityConstant = 0.0;
   double m_KernelZeroMagnitudeThreshold = 0.0;

@@ -52,9 +52,8 @@ itkRawImageIOTest3(int argc, char * argv[])
   size[0] = 517; // prime numbers are good bug testers...
   size[1] = 293;
 
-  ImageType::RegionType region;
-  ImageType::IndexType  index;
-  index.Fill(0);
+  ImageType::RegionType          region;
+  constexpr ImageType::IndexType index{};
 
   region.SetIndex(index);
   region.SetSize(size);
@@ -78,16 +77,14 @@ itkRawImageIOTest3(int argc, char * argv[])
   io->SetByteOrderToBigEndian();
 
   // Write out the image
-  itk::ImageFileWriter<ImageType>::Pointer writer;
-  writer = itk::ImageFileWriter<ImageType>::New();
+  const itk::ImageFileWriter<ImageType>::Pointer writer = itk::ImageFileWriter<ImageType>::New();
   writer->SetInput(image);
   writer->SetFileName(argv[1]);
   writer->SetImageIO(io);
   writer->Write();
 
   // Create a source object (in this case a reader)
-  itk::ImageFileReader<ImageType>::Pointer reader;
-  reader = itk::ImageFileReader<ImageType>::New();
+  const itk::ImageFileReader<ImageType>::Pointer reader = itk::ImageFileReader<ImageType>::New();
   reader->SetImageIO(io);
   reader->SetFileName(argv[1]);
   reader->Update();

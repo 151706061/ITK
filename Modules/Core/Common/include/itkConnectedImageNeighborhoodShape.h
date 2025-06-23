@@ -107,9 +107,8 @@ public:
     , m_NumberOfOffsets{ CalculateNumberOfOffsets(maximumCityblockDistance, includeCenterPixel) }
   {}
 
-
   /** Returns the number of offsets needed for this shape. */
-  constexpr size_t
+  [[nodiscard]] constexpr size_t
   GetNumberOfOffsets() const noexcept
   {
     return m_NumberOfOffsets;
@@ -196,8 +195,9 @@ private:
   static constexpr uintmax_t
   CalculateBinomialCoefficient(const uintmax_t n, const uintmax_t k) noexcept
   {
-    return (k > n) ? (assert(!"Out of range!"), 0)
-                   : (k == 0) ? 1 : Math::UnsignedProduct(n, CalculateBinomialCoefficient(n - 1, k - 1)) / k;
+    return (k > n)    ? (assert(!"Out of range!"), 0)
+           : (k == 0) ? 1
+                      : Math::UnsignedProduct(n, CalculateBinomialCoefficient(n - 1, k - 1)) / k;
   }
 
 
@@ -247,7 +247,6 @@ private:
     return (includeCenterPixel ? 1 : 0) + CalculateNumberOfConnectedNeighbors(maximumCityblockDistance);
   }
 };
-
 
 /** Generates the offsets for a connected image neighborhood shape. */
 template <unsigned int VImageDimension, size_t VMaximumCityblockDistance, bool VIncludeCenterPixel>

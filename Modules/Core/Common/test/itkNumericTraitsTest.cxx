@@ -17,15 +17,17 @@
  *=========================================================================*/
 
 #if !defined(ITK_LEGACY_REMOVE)
+#  ifdef _MSC_VER
 // Suppress MSVC warnings from VS2022, saying: "warning C4996: 'std::complex<T>::complex': warning STL4037: The effect
 // of instantiating the template std::complex for any type other than float, double, or long double is unspecified."
-#  define _SILENCE_NONFLOATING_COMPLEX_DEPRECATION_WARNING
+#    define _SILENCE_NONFLOATING_COMPLEX_DEPRECATION_WARNING
+#  endif
 #endif
 
 #include <iostream>
 #include <cstddef>
 
-// Better name demanging for gcc
+// Better name demangling for gcc
 #if defined(__GNUC__) && !defined(__EMSCRIPTEN__)
 #  define GCC_USEDEMANGLE
 #endif
@@ -36,6 +38,7 @@
 #endif
 
 #include "itkNumericTraitsArrayPixel.h"
+#include "itkNumericTraitsCovariantVectorPixel.h"
 #include "itkNumericTraitsRGBAPixel.h"
 #include "itkNumericTraitsRGBPixel.h"
 #include "itkNumericTraitsTensorPixel.h"
@@ -89,8 +92,8 @@ CheckVariableLengthArrayTraits(const T & t)
 {
   std::string name;
 #ifdef GCC_USEDEMANGLE
-  char const * mangledName = typeid(t).name();
-  int          status;
+  const char * mangledName = typeid(t).name();
+  int          status = 0;
   char *       unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
   name = unmangled;
   free(unmangled);
@@ -135,8 +138,8 @@ CheckFixedArrayTraits(const T & t)
 
   std::string name;
 #ifdef GCC_USEDEMANGLE
-  char const * mangledName = typeid(t).name();
-  int          status;
+  const char * mangledName = typeid(t).name();
+  int          status = 0;
   char *       unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
   name = unmangled;
   free(unmangled);

@@ -41,29 +41,26 @@ itkResampleImageTest7(int, char *[])
   using ImageRegionType = ImageType::RegionType;
   using ImageSizeType = ImageType::SizeType;
 
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
 
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
 
   // Create and configure an image
-  ImagePointerType image = ImageType::New();
-  ImageIndexType   index = { { 0, 0 } };
-  ImageSizeType    size = { { 64, 64 } };
-  ImageRegionType  region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImagePointerType  image = ImageType::New();
+  ImageIndexType          index = { { 0, 0 } };
+  constexpr ImageSizeType size = { { 64, 64 } };
+  const ImageRegionType   region{ index, size };
   image->SetRegions(region);
   image->Allocate();
 
   // Fill image with a ramp
   itk::ImageRegionIteratorWithIndex<ImageType> iter(image, region);
-  PixelType                                    value;
   for (iter.GoToBegin(); !iter.IsAtEnd(); ++iter)
   {
     index = iter.GetIndex();
-    value = index[0] + index[1];
+    const PixelType value = index[0] + index[1];
     iter.Set(value);
   }
 
@@ -76,7 +73,7 @@ itkResampleImageTest7(int, char *[])
   interp->SetInputImage(image);
 
   // Create and configure a resampling filter
-  itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
+  const itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
     itk::ResampleImageFilter<ImageType, ImageType>::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(resample, ResampleImageFilter, ImageToImageFilter);
@@ -98,31 +95,19 @@ itkResampleImageTest7(int, char *[])
   resample->SetOutputStartIndex(index);
   ITK_TEST_SET_GET_VALUE(index, resample->GetOutputStartIndex());
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
-  resample->SetOutputOrigin(origin);
-  ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
-
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-  resample->SetOutputSpacing(spacing);
-  ITK_TEST_SET_GET_VALUE(spacing, resample->GetOutputSpacing());
-
   using StreamerType = itk::StreamingImageFilter<ImageType, ImageType>;
   auto streamer = StreamerType::New();
 
   std::cout << "Test with normal AffineTransform." << std::endl;
   streamer->SetInput(resample->GetOutput());
 
-  unsigned char numStreamDiv;
-
   // Run the resampling filter without streaming, i.e. 1 StreamDivisions
-  numStreamDiv = 1; // do not split, i.e. do not stream
+  unsigned char numStreamDiv = 1; // do not split, i.e. do not stream
   streamer->SetNumberOfStreamDivisions(numStreamDiv);
   ITK_TRY_EXPECT_NO_EXCEPTION(streamer->UpdateLargestPossibleRegion());
 
-  ImagePointerType outputNoSDI = streamer->GetOutput(); // save output for later comparison
-  outputNoSDI->DisconnectPipeline();                    // disconnect to create new output
+  const ImagePointerType outputNoSDI = streamer->GetOutput(); // save output for later comparison
+  outputNoSDI->DisconnectPipeline();                          // disconnect to create new output
 
   // Run the resampling filter with streaming
   image->Modified();
@@ -137,11 +122,11 @@ itkResampleImageTest7(int, char *[])
   ITK_TEST_SET_GET_VALUE(60, finalRequestedRegion.GetSize(0));
   ITK_TEST_SET_GET_VALUE(12, finalRequestedRegion.GetSize(1));
 
-  ImagePointerType outputSDI = streamer->GetOutput();
+  const ImagePointerType outputSDI = streamer->GetOutput();
   outputSDI->DisconnectPipeline();
 
-  itk::ImageRegionIterator<ImageType> itNoSDI(outputNoSDI, outputNoSDI->GetLargestPossibleRegion()),
-    itSDI(outputSDI, outputSDI->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<ImageType> itNoSDI(outputNoSDI, outputNoSDI->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<ImageType> itSDI(outputSDI, outputSDI->GetLargestPossibleRegion());
   for (itNoSDI.GoToBegin(), itSDI.GoToBegin(); !itNoSDI.IsAtEnd() && !itSDI.IsAtEnd(); ++itNoSDI, ++itSDI)
   {
     if (itk::Math::NotAlmostEquals(itNoSDI.Value(), itSDI.Value()))
@@ -161,6 +146,16 @@ itkResampleImageTest7(int, char *[])
     std::cerr << "at index [" << itNoSDI.GetIndex() << ']' << std::endl;
     return EXIT_FAILURE;
   }
+
+  // Test non default values
+  constexpr auto origin = itk::MakeFilled<ImageType::PointType>(1234.0);
+  resample->SetOutputOrigin(origin);
+  ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
+
+  auto spacing = itk::MakeFilled<ImageType::SpacingType>(9876.0);
+  resample->SetOutputSpacing(spacing);
+  ITK_TEST_SET_GET_VALUE(spacing, resample->GetOutputSpacing());
+
 
   std::cout << "Test passed." << std::endl;
   return EXIT_SUCCESS;

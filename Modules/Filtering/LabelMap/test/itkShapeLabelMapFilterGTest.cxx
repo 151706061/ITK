@@ -59,8 +59,7 @@ protected:
     {
       auto image = ImageType::New();
 
-      typename ImageType::SizeType imageSize;
-      imageSize.Fill(25);
+      auto imageSize = ImageType::SizeType::Filled(25);
       image->SetRegions(typename ImageType::RegionType(imageSize));
       image->Allocate();
       image->FillBuffer(0);
@@ -139,11 +138,11 @@ TEST_F(ShapeLabelMapFixture, 3D_T1x1x1)
 
   using Utils = FixtureUtilities<3>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   image->SetPixel(itk::MakeIndex(5, 7, 9), 1);
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeIndex(5, 7, 9), labelObject->GetBoundingBox().GetIndex(), 1e-99);
@@ -181,7 +180,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T3x2x1)
 
   using Utils = FixtureUtilities<3>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   for (unsigned int i = 5; i < 8; ++i)
   {
@@ -189,7 +188,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T3x2x1)
     image->SetPixel(itk::MakeIndex(i, 10, 11), 1);
   }
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeIndex(5, 9, 11), labelObject->GetBoundingBox().GetIndex(), 1e-99);
@@ -228,7 +227,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T3x2x1_Direction)
 
   using Utils = FixtureUtilities<3>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   for (unsigned int i = 5; i < 8; ++i)
   {
@@ -236,17 +235,15 @@ TEST_F(ShapeLabelMapFixture, 3D_T3x2x1_Direction)
     image->SetPixel(itk::MakeIndex(i, 10, 11), 1);
   }
 
-  DirectionType direction;
+  constexpr itk::SpacePrecisionType d[9] = { 0.7950707161543119,     -0.44533237368675166, 0.41175433605536305,
+                                             -0.6065167008084678,    -0.5840224148057925,  0.5394954222649374,
+                                             0.00021898465942798317, -0.6786728931900383,  -0.7344406416415056 };
 
-  const double d[9] = { 0.7950707161543119,     -0.44533237368675166, 0.41175433605536305,
-                        -0.6065167008084678,    -0.5840224148057925,  0.5394954222649374,
-                        0.00021898465942798317, -0.6786728931900383,  -0.7344406416415056 };
-
-  direction = DirectionType::InternalMatrixType(d);
+  const DirectionType direction = DirectionType::InternalMatrixType(d);
 
   image->SetDirection(direction);
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeIndex(5, 9, 11), labelObject->GetBoundingBox().GetIndex(), 1e-99);
@@ -284,7 +281,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T2x2x2_Spacing)
 
   using Utils = FixtureUtilities<3>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   for (unsigned int i = 0; i < 2; ++i)
   {
@@ -297,7 +294,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T2x2x2_Spacing)
 
   image->SetSpacing(itk::MakeVector(1.0, 1.1, 2.2));
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeIndex(5, 9, 11), labelObject->GetBoundingBox().GetIndex(), 1e-99);
@@ -319,7 +316,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T2x2x2_Spacing)
   EXPECT_NEAR(19.36, labelObject->GetPhysicalSize(), 1e-10);
   // Because the sign of the Eigen vectors is not
   // unique, therefore the axes may not always point in the same
-  // direction making origin not unique. Therefore we check the expected origin the the list of vertices.
+  // direction making origin not unique. Therefore we check the expected origin the list of vertices.
   EXPECT_TRUE(Utils::TestListHasPoint(labelObject->GetOrientedBoundingBoxVertices(), itk::MakePoint(4.5, 9.35, 23.1)));
   // labelObject->GetPrincipalAxes(); omitted
   ITK_EXPECT_VECTOR_NEAR(itk::MakeVector(0.25, 0.3025, 1.21), labelObject->GetPrincipalMoments(), 1e-4);
@@ -338,13 +335,13 @@ TEST_F(ShapeLabelMapFixture, 3D_T2x2x2_Spacing_Direction)
 
   using Utils = FixtureUtilities<3>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   DirectionType direction;
 
-  const double d[9] = { 0.7950707161543119,     -0.44533237368675166, 0.41175433605536305,
-                        -0.6065167008084678,    -0.5840224148057925,  0.5394954222649374,
-                        0.00021898465942798317, -0.6786728931900383,  -0.7344406416415056 };
+  constexpr itk::SpacePrecisionType d[9] = { 0.7950707161543119,     -0.44533237368675166, 0.41175433605536305,
+                                             -0.6065167008084678,    -0.5840224148057925,  0.5394954222649374,
+                                             0.00021898465942798317, -0.6786728931900383,  -0.7344406416415056 };
 
   direction = DirectionType::InternalMatrixType(d);
 
@@ -361,7 +358,7 @@ TEST_F(ShapeLabelMapFixture, 3D_T2x2x2_Spacing_Direction)
 
   image->SetSpacing(itk::MakeVector(1.0, 1.1, 2.2));
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeIndex(5, 9, 11), labelObject->GetBoundingBox().GetIndex(), 1e-99);
@@ -401,11 +398,11 @@ TEST_F(ShapeLabelMapFixture, 2D_T1x1)
 
   using Utils = FixtureUtilities<2>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   image->SetPixel(itk::MakeIndex(5, 7), 1);
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeVector(1.0, 1.0), labelObject->GetOrientedBoundingBoxSize(), 1e-10);
   ITK_EXPECT_VECTOR_NEAR(itk::MakePoint(4.5, 6.5), labelObject->GetOrientedBoundingBoxOrigin(), 1e-4);
@@ -423,12 +420,12 @@ TEST_F(ShapeLabelMapFixture, 2D_T1_1)
 
   using Utils = FixtureUtilities<2>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   image->SetPixel(itk::MakeIndex(5, 7), 1);
   image->SetPixel(itk::MakeIndex(6, 8), 1);
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeSize(2, 2), labelObject->GetBoundingBox().GetSize(), 1e-99);
   ITK_EXPECT_VECTOR_NEAR(
@@ -448,21 +445,19 @@ TEST_F(ShapeLabelMapFixture, 2D_T1_1_FlipDirection)
 
   using Utils = FixtureUtilities<2>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   image->SetPixel(itk::MakeIndex(5, 7), 1);
   image->SetPixel(itk::MakeIndex(6, 8), 1);
 
-  DirectionType direction;
+  constexpr itk::SpacePrecisionType d[4] = { 0, 1.0, 1.0, 0 };
 
-  const double d[4] = { 0, 1.0, 1.0, 0 };
-
-  direction = DirectionType::InternalMatrixType(d);
+  const DirectionType direction = DirectionType::InternalMatrixType(d);
 
   image->SetDirection(direction);
 
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
   ITK_EXPECT_VECTOR_NEAR(
     itk::MakeVector(Math::sqrt2, 2.0 * Math::sqrt2), labelObject->GetOrientedBoundingBoxSize(), 1e-4);
@@ -482,21 +477,19 @@ TEST_F(ShapeLabelMapFixture, 2D_T1_2_Direction)
 
   using Utils = FixtureUtilities<2>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   image->SetPixel(itk::MakeIndex(5, 7), 1);
   image->SetPixel(itk::MakeIndex(5, 8), 1);
 
-  DirectionType direction;
+  constexpr itk::SpacePrecisionType d[4] = { 0, 1.0, 1.0, 0 };
 
-  const double d[4] = { 0, 1.0, 1.0, 0 };
-
-  direction = DirectionType::InternalMatrixType(d);
+  const DirectionType direction = DirectionType::InternalMatrixType(d);
 
   image->SetDirection(direction);
 
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
 
   auto obbVertices = labelObject->GetOrientedBoundingBoxVertices();
@@ -522,7 +515,7 @@ TEST_F(ShapeLabelMapFixture, 2D_T2x4)
 
   using Utils = FixtureUtilities<2>;
 
-  Utils::ImageType::Pointer image(Utils::CreateImage());
+  const Utils::ImageType::Pointer image(Utils::CreateImage());
 
   for (unsigned int i = 4; i < 6; ++i)
   {
@@ -532,7 +525,7 @@ TEST_F(ShapeLabelMapFixture, 2D_T2x4)
     }
   }
 
-  Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
+  const Utils::LabelObjectType::ConstPointer labelObject = Utils::ComputeLabelObject(image);
 
   ITK_EXPECT_VECTOR_NEAR(itk::MakeVector(2.0, 4.0), labelObject->GetOrientedBoundingBoxSize(), 1e-10);
   ITK_EXPECT_VECTOR_NEAR(itk::MakePoint(3.5, 2.5), labelObject->GetOrientedBoundingBoxOrigin(), 1e-4);

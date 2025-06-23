@@ -53,14 +53,14 @@ itkImageIODirection2DTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  ImageType::ConstPointer image = reader->GetOutput();
+  const ImageType::ConstPointer image = reader->GetOutput();
 
   ImageType::DirectionType directionCosines = image->GetDirection();
 
   std::cout << directionCosines << std::endl;
 
-  unsigned int element = 2;
-  const double tolerance = 1e-5;
+  unsigned int     element = 2;
+  constexpr double tolerance = 1e-5;
 
   for (unsigned int row = 0; row < Dimension; ++row)
   {

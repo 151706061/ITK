@@ -36,8 +36,6 @@ itkOrthogonallyCorrected2DParametricPathTest(int, char *[])
 
   bool passed = true;
 
-  InputType  input;
-  OffsetType offset;
   VertexType v;
 
   // Original Path
@@ -57,7 +55,7 @@ itkOrthogonallyCorrected2DParametricPathTest(int, char *[])
   originalPath->AddVertex(v);
 
   // 24 Alternating offsets
-  OrthogonalCorrectionTablePointer correctionTable = OrthogonalCorrectionTableType::New();
+  const OrthogonalCorrectionTablePointer correctionTable = OrthogonalCorrectionTableType::New();
   for (int i = 0; i < 24; ++i)
   {
     correctionTable->InsertElement(i, 1 - (i % 2)); // alternates 1, 0
@@ -85,8 +83,8 @@ itkOrthogonallyCorrected2DParametricPathTest(int, char *[])
     passed = false;
   }
 
-  input = 0;
-  offset = path->IncrementInput(input);
+  InputType  input = 0;
+  OffsetType offset = path->IncrementInput(input);
   std::cout << "Incrementing the input from 0 to " << input << ": " << offset << std::endl;
 
   input = 0.5;
@@ -98,9 +96,7 @@ itkOrthogonallyCorrected2DParametricPathTest(int, char *[])
     std::cout << "Test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed" << std::endl;
+  return EXIT_FAILURE;
 }

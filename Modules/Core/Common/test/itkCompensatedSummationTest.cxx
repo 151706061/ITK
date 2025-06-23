@@ -27,10 +27,10 @@ itkCompensatedSummationTest(int, char *[])
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope
   // scope.
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   using FloatType = float;
-  long seedValue = 17;
+  constexpr long seedValue = 17;
 
   constexpr FloatType expectedMean = 0.5;
 
@@ -38,12 +38,12 @@ itkCompensatedSummationTest(int, char *[])
 
   using GeneratorType = itk::Statistics::MersenneTwisterRandomVariateGenerator;
   auto generator = GeneratorType::New();
-  generator->Initialize(seedValue);
+  generator->SetSeed(seedValue);
 
   FloatType vanillaSum = 0.0;
   using CompensatedSummationType = itk::CompensatedSummation<FloatType>;
   CompensatedSummationType floatAccumulator;
-  FloatType                randomNumber;
+  FloatType                randomNumber = NAN;
   for (itk::SizeValueType ii = 0; ii < accumSize; ++ii)
   {
     randomNumber = generator->GetVariate();
@@ -73,15 +73,14 @@ itkCompensatedSummationTest(int, char *[])
   }
 
   // exercise other methods
-  CompensatedSummationType floatAccumulatorCopy = floatAccumulator;
+  const CompensatedSummationType floatAccumulatorCopy = floatAccumulator;
   if (itk::Math::NotExactlyEquals(floatAccumulatorCopy.GetSum(), floatAccumulator.GetSum()))
   {
     std::cerr << "The copy constructor failed." << std::endl;
     return EXIT_FAILURE;
   }
 
-  CompensatedSummationType floatAccumulatorCopy2;
-  floatAccumulatorCopy2 = floatAccumulator;
+  const CompensatedSummationType floatAccumulatorCopy2 = floatAccumulator;
   if (itk::Math::NotExactlyEquals(floatAccumulatorCopy2.GetSum(), floatAccumulator.GetSum()))
   {
     std::cerr << "The assignment operator failed." << std::endl;

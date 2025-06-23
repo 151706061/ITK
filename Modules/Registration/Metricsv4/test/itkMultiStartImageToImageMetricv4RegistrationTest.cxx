@@ -92,13 +92,13 @@ itkMultiStartImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   auto fixedcaster = CastFilterType::New();
   fixedcaster->SetInput(fixedImageReader->GetOutput()); // resample->GetOutput()
   fixedcaster->Update();
-  InternalImageType::Pointer fixedImage = fixedcaster->GetOutput();
+  const InternalImageType::Pointer fixedImage = fixedcaster->GetOutput();
 
   // get the images
   auto movingcaster = CastFilterType::New();
   movingcaster->SetInput(movingImageReader->GetOutput());
   movingcaster->Update();
-  InternalImageType::Pointer movingImage = movingcaster->GetOutput();
+  const InternalImageType::Pointer movingImage = movingcaster->GetOutput();
 
   /** Now set up a rotation about the center of the image */
   // create an affine transform
@@ -152,8 +152,9 @@ itkMultiStartImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   auto metric = MetricType::New();
   //  metric->SetNumberOfHistogramBins(20);
   using PointType = PointSetType::PointType;
-  PointSetType::Pointer                                pset(PointSetType::New());
-  unsigned long                                        ind = 0, ct = 0;
+  const PointSetType::Pointer                          pset(PointSetType::New());
+  unsigned long                                        ind = 0;
+  unsigned long                                        ct = 0;
   itk::ImageRegionIteratorWithIndex<InternalImageType> It(fixedImage, fixedImage->GetLargestPossibleRegion());
   for (It.GoToBegin(); !It.IsAtEnd(); ++It)
   {
@@ -177,13 +178,13 @@ itkMultiStartImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   }
   metric->SetFixedTransform(identityTransform);
   metric->SetMovingTransform(affineTransform);
-  bool gaussian = false;
+  constexpr bool gaussian = false;
   metric->SetUseMovingImageGradientFilter(gaussian);
   metric->SetUseFixedImageGradientFilter(gaussian);
   metric->Initialize();
 
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
 
@@ -199,13 +200,13 @@ itkMultiStartImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   using MOptimizerType = itk::MultiStartOptimizerv4;
   auto                               MOptimizer = MOptimizerType::New();
   MOptimizerType::ParametersListType parametersList = MOptimizer->GetParametersList();
-  float                              rotplus = 10;
+  constexpr float                    rotplus = 10;
   //  for (  float i = 180; i <= 180; i+=rotplus )
   for (float i = 0; i < 360; i += rotplus)
   {
     auto aff = AffineTransformType::New();
     aff->SetIdentity();
-    float rad = static_cast<float>(i) * itk::Math::pi / 180.0;
+    const float rad = static_cast<float>(i) * itk::Math::pi / 180.0;
     aff->Translate(moffset);
     aff->Rotate2D(rad);
     aff->Translate(foffset);
@@ -252,8 +253,6 @@ itkMultiStartImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   {
     return EXIT_SUCCESS;
   }
-  else
-  {
-    return EXIT_FAILURE;
-  }
+
+  return EXIT_FAILURE;
 }

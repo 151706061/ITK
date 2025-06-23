@@ -59,7 +59,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard part of every itk Object. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageContainerInterface);
 
   /** Save the template parameters. */
@@ -67,10 +67,12 @@ public:
   using Element = TElement;
 
   /** Index operator. This version can be an lvalue. */
-  virtual TElement & operator[](const ElementIdentifier) = 0;
+  virtual TElement &
+  operator[](const ElementIdentifier) = 0;
 
   /** Index operator. This version can only be an rvalue */
-  virtual const TElement & operator[](const ElementIdentifier) const = 0;
+  virtual const TElement &
+  operator[](const ElementIdentifier) const = 0;
 
   /** Return a pointer to the beginning of the buffer.  This is used by
    * the image iterator class. */

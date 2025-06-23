@@ -39,14 +39,14 @@ itkConfidenceConnectedImageFilterTest(int argc, char * argv[])
   using PixelType = unsigned char;
   using myImage = itk::Image<PixelType, 2>;
 
-  itk::ImageFileReader<myImage>::Pointer input = itk::ImageFileReader<myImage>::New();
+  const itk::ImageFileReader<myImage>::Pointer input = itk::ImageFileReader<myImage>::New();
   input->SetFileName(argv[1]);
 
   // Create a filter
   using FilterType = itk::ConfidenceConnectedImageFilter<myImage, myImage>;
 
-  auto                     filter = FilterType::New();
-  itk::SimpleFilterWatcher filterWatch(filter);
+  auto                           filter = FilterType::New();
+  const itk::SimpleFilterWatcher filterWatch(filter);
 
   filter->SetInput(input->GetOutput());
   filter->SetInitialNeighborhoodRadius(3); // measured in pixels
@@ -74,13 +74,13 @@ itkConfidenceConnectedImageFilterTest(int argc, char * argv[])
 
 
   // Test the GetMacros
-  double doubleMultiplier = filter->GetMultiplier();
+  const double doubleMultiplier = filter->GetMultiplier();
   std::cout << "filter->GetMultiplier(): " << doubleMultiplier << std::endl;
 
-  unsigned int uintNumberOfIterations = filter->GetNumberOfIterations();
+  const unsigned int uintNumberOfIterations = filter->GetNumberOfIterations();
   std::cout << "filter->GetNumberOfIterations(): " << uintNumberOfIterations << std::endl;
 
-  PixelType pixelReplaceValue = filter->GetReplaceValue();
+  const PixelType pixelReplaceValue = filter->GetReplaceValue();
   std::cout << "filter->GetReplaceValue(): " << static_cast<itk::NumericTraits<PixelType>::PrintType>(pixelReplaceValue)
             << std::endl;
 
@@ -94,8 +94,7 @@ itkConfidenceConnectedImageFilterTest(int argc, char * argv[])
   std::cout << "filter->GetVariance(): " << variance << std::endl;
 
   // Generate test image
-  itk::ImageFileWriter<myImage>::Pointer writer;
-  writer = itk::ImageFileWriter<myImage>::New();
+  const itk::ImageFileWriter<myImage>::Pointer writer = itk::ImageFileWriter<myImage>::New();
   writer->SetInput(filter->GetOutput());
   writer->SetFileName(argv[2]);
   writer->Update();

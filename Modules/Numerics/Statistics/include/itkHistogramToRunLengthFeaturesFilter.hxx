@@ -22,9 +22,7 @@
 #include "itkNumericTraits.h"
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 // constructor
@@ -92,13 +90,13 @@ HistogramToRunLengthFeaturesFilter<THistogram>::GenerateData()
   using HistogramIterator = typename HistogramType::ConstIterator;
   for (HistogramIterator hit = inputHistogram->Begin(); hit != inputHistogram->End(); ++hit)
   {
-    MeasurementType frequency = hit.GetFrequency();
+    const MeasurementType frequency = hit.GetFrequency();
     if (Math::ExactlyEquals(frequency, MeasurementType{}))
     {
       continue;
     }
-    MeasurementVectorType measurement = hit.GetMeasurementVector();
-    IndexType             index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
+    const MeasurementVectorType measurement = hit.GetMeasurementVector();
+    IndexType                   index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
 
     auto i2 = static_cast<double>((index[0] + 1) * (index[0] + 1));
     auto j2 = static_cast<double>((index[1] + 1) * (index[1] + 1));
@@ -352,8 +350,7 @@ HistogramToRunLengthFeaturesFilter<THistogram>::PrintSelf(std::ostream & os, Ind
   Superclass::PrintSelf(os, indent);
 }
 
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 
 #endif

@@ -76,20 +76,7 @@ LBFGSBOptimizerv4::PrintSelf(std::ostream & os, Indent indent) const
   os << indent << "UpperBound: " << m_UpperBound << std::endl;
   os << indent << "BoundSelection: " << m_BoundSelection << std::endl;
 
-  os << indent << "CostFunctionConvergenceFactor: " << m_CostFunctionConvergenceFactor << std::endl;
-
-  os << indent << "MaximumNumberOfEvaluations: " << m_MaximumNumberOfFunctionEvaluations << std::endl;
-
   os << indent << "MaximumNumberOfCorrections: " << m_MaximumNumberOfCorrections << std::endl;
-
-  os << indent << "Value: " << this->GetValue() << std::endl;
-
-  os << indent << "InfinityNormOfProjectedGradient: " << this->m_InfinityNormOfProjectedGradient << std::endl;
-
-  if (this->m_VnlOptimizer)
-  {
-    os << indent << "Vnl LBFGSB Failure Code: " << this->m_VnlOptimizer->get_failure_code() << std::endl;
-  }
 }
 
 void
@@ -201,7 +188,7 @@ LBFGSBOptimizerv4::StartOptimization(bool /*doOnlyInitialization*/)
 
   // Check if all the bounds parameters are the same size as the initial
   // parameters.
-  unsigned int numberOfParameters = m_Metric->GetNumberOfParameters();
+  const unsigned int numberOfParameters = m_Metric->GetNumberOfParameters();
 
   if (this->GetInitialPosition().Size() < numberOfParameters)
   {

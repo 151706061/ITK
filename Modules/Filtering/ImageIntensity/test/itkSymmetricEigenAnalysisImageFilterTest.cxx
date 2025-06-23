@@ -24,7 +24,7 @@
 #include "itkImageRegionIterator.h"
 
 /**
- * Function to convert image of double precison vector pixels to a
+ * Function to convert image of double precision vector pixels to a
  * representation of scalar values that are easy to view and test.
  * NOTE: Similar function in itkBSplineScatteredDataPointSetToImageFilterTest5.cxx
  */
@@ -35,7 +35,7 @@ makeTestableScalarImage(typename InternalImageType::Pointer internalImage, std::
   using OutputPixelType = uint8_t;
   using OutputImageType = itk::Image<OutputPixelType, 3>;
 
-  OutputImageType::Pointer outputImage = OutputImageType::New();
+  const OutputImageType::Pointer outputImage = OutputImageType::New();
   outputImage->CopyInformation(internalImage);
   outputImage->SetRegions(internalImage->GetBufferedRegion());
   outputImage->AllocateInitialized();
@@ -96,7 +96,7 @@ public:
   itkNewMacro(Self);
 
   static int
-  Exercise(itk::EigenValueOrderEnum order, std::string outputFilename)
+  Exercise(itk::EigenValueOrderEnum order, const std::string & outputFilename)
   {
 
     using SymmetricEigenAnalysisImageFilterType = SymmetricEigenAnalysisImageFilter<InputImageType, InternalImageType>;
@@ -119,8 +119,7 @@ public:
     size[1] = 8;
     size[2] = 8;
 
-    IndexType start;
-    start.Fill(0);
+    constexpr IndexType start{};
 
     RegionType region;
     region.SetIndex(start);
@@ -174,7 +173,7 @@ public:
     // It is important to do it AFTER the filter is Updated
     // Because the object connected to the output may be changed
     // by another during GenerateData() call
-    typename InternalImageType::Pointer internalImage = filter->GetOutput();
+    const typename InternalImageType::Pointer internalImage = filter->GetOutput();
     ITK_TRY_EXPECT_NO_EXCEPTION(makeTestableScalarImage<InternalImageType>(internalImage, outputFilename));
 
 
@@ -203,7 +202,7 @@ public:
   itkNewMacro(Self);
 
   static int
-  Exercise(itk::EigenValueOrderEnum order, std::string outputFilename)
+  Exercise(itk::EigenValueOrderEnum order, const std::string & outputFilename)
   {
 
     using SymmetricEigenAnalysisFixedDimensionImageFilterType =
@@ -227,8 +226,7 @@ public:
     size[1] = 8;
     size[2] = 8;
 
-    IndexType start;
-    start.Fill(0);
+    constexpr IndexType start{};
 
     RegionType region;
     region.SetIndex(start);
@@ -260,7 +258,7 @@ public:
     }
 
     // Create the filter
-    typename SymmetricEigenAnalysisFixedDimensionImageFilterType::Pointer filter =
+    const typename SymmetricEigenAnalysisFixedDimensionImageFilterType::Pointer filter =
       SymmetricEigenAnalysisFixedDimensionImageFilterType::New();
 
     // Set the input image
@@ -275,7 +273,7 @@ public:
     // It is important to do it AFTER the filter is Updated
     // Because the object connected to the output may be changed
     // by another during GenerateData() call
-    typename InternalImageType::Pointer internalImage = filter->GetOutput();
+    const typename InternalImageType::Pointer internalImage = filter->GetOutput();
     ITK_TRY_EXPECT_NO_EXCEPTION(makeTestableScalarImage<InternalImageType>(internalImage, outputFilename));
 
     std::cout << "Test succeeded." << std::endl;
@@ -335,7 +333,7 @@ itkSymmetricEigenAnalysisImageFilterTest(int argc, char * argv[])
 
 
   // Test the filter
-  int testResult =
+  const int testResult =
     itk::SymmetricEigenAnalysisImageFilterHelper<InputImageType, InternalImageType, OutputImageType>::Exercise(
       order, outputFilename);
 
@@ -356,7 +354,7 @@ itkSymmetricEigenAnalysisImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(
     filterFixedDimension, SymmetricEigenAnalysisFixedDimensionImageFilter, UnaryFunctorImageFilter);
 
-  int testFixedDimensionResult =
+  const int testFixedDimensionResult =
     itk::SymmetricEigenAnalysisFixedDimensionImageFilterHelper<Dimension,
                                                                InputImageType,
                                                                InternalImageType,
@@ -374,8 +372,6 @@ itkSymmetricEigenAnalysisImageFilterTest(int argc, char * argv[])
   {
     return EXIT_SUCCESS;
   }
-  else
-  {
-    return EXIT_FAILURE;
-  }
+
+  return EXIT_FAILURE;
 }

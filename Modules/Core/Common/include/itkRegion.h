@@ -65,6 +65,8 @@ namespace itk
 class ITKCommon_EXPORT Region
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(Region);
+
   /** Standard class type aliases. */
   using Self = Region;
 
@@ -75,12 +77,12 @@ public:
   static constexpr RegionEnum ITK_STRUCTURED_REGION = RegionEnum::ITK_STRUCTURED_REGION;
 #endif
 
-  /** Standard part of all itk objects. */
+  /** \see LightObject::GetNameOfClass() */
   itkVirtualGetNameOfClassMacro(Region);
 
   /** Subclasses must return a region type describing whether the region
    * is structured or unstructured. */
-  virtual RegionEnum
+  [[nodiscard]] virtual RegionEnum
   GetRegionType() const = 0;
 
   /** Print the region. */

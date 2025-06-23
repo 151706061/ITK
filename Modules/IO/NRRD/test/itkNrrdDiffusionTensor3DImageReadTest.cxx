@@ -54,7 +54,7 @@ itkNrrdDiffusionTensor3DImageReadTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  myImage::Pointer image = reader->GetOutput();
+  const myImage::Pointer image = reader->GetOutput();
 
   // Pick off some pixels in the test image (the first, the last, and
   // a few in between) and make sure that the values are very close to
@@ -63,12 +63,8 @@ itkNrrdDiffusionTensor3DImageReadTest(int argc, char * argv[])
   // differences near representational precision.
 
   float              err = 0;
-  myImage::IndexType coord;
-  PixelType          sample;
-  coord[0] = 0;
-  coord[1] = 0;
-  coord[2] = 0;
-  sample = image->GetPixel(coord);
+  myImage::IndexType coord{};
+  PixelType          sample = image->GetPixel(coord);
   err += itk::Math::abs(sample(0, 0) - 4.0248222);
   err += itk::Math::abs(sample(0, 1) - -0.2367909);
   err += itk::Math::abs(sample(0, 2) - 0.23370844);
@@ -120,14 +116,12 @@ itkNrrdDiffusionTensor3DImageReadTest(int argc, char * argv[])
   err += itk::Math::abs(sample(1, 2) - 0.43205333);
   err += itk::Math::abs(sample(2, 2) - 5.3755102);
 
-  double thresh = 0.00000041;
+  constexpr double thresh = 0.00000041;
   if (err > thresh)
   {
     std::cout << "failure because err == " << err << "> " << thresh << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    return EXIT_SUCCESS;
-  }
+
+  return EXIT_SUCCESS;
 }

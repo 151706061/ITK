@@ -45,7 +45,8 @@ public:
 };
 // Define how to print enumeration
 extern ITKFastMarching_EXPORT std::ostream &
-                              operator<<(std::ostream & out, const FastMarchingReachedTargetNodesStoppingCriterionEnums::TargetCondition value);
+operator<<(std::ostream & out, const FastMarchingReachedTargetNodesStoppingCriterionEnums::TargetCondition value);
+
 /**
  * \class FastMarchingReachedTargetNodesStoppingCriterion
  * \brief Stopping criterion for FastMarchingFilterBase.
@@ -71,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingReachedTargetNodesStoppingCriterion);
 
   using typename Superclass::OutputPixelType;
@@ -87,6 +88,7 @@ public:
 
   /** Set/Get TargetCondition to indicate if the user wants the front to
   reach one, some or all target nodes. */
+  /** @ITKStartGrouping */
   void
   SetTargetCondition(const TargetConditionEnum & iCondition)
   {
@@ -96,10 +98,13 @@ public:
   }
 
   itkGetConstReferenceMacro(TargetCondition, TargetConditionEnum);
+  /** @ITKEndGrouping */
 
   /** Set/Get TargetOffset */
+  /** @ITKStartGrouping */
   itkSetMacro(TargetOffset, OutputPixelType);
   itkGetMacro(TargetOffset, OutputPixelType);
+  /** @ITKEndGrouping */
 
   /** \brief Set the number of target nodes to be reached */
   void
@@ -134,8 +139,8 @@ public:
       // there is at least one TargetPoint.
       if (!m_TargetNodes.empty())
       {
-        typename std::vector<NodeType>::const_iterator pointsIter = m_TargetNodes.begin();
-        typename std::vector<NodeType>::const_iterator pointsEnd = m_TargetNodes.end();
+        auto       pointsIter = m_TargetNodes.begin();
+        const auto pointsEnd = m_TargetNodes.end();
 
         while (pointsIter != pointsEnd)
         {
@@ -160,14 +165,14 @@ public:
   }
 
   /** \brief returns if the stopping condition is satisfied or not. */
-  bool
+  [[nodiscard]] bool
   IsSatisfied() const override
   {
     return m_Satisfied && (this->m_CurrentValue >= m_StoppingValue);
   }
 
   /** \brief Get a short description of the stopping criterion. */
-  std::string
+  [[nodiscard]] std::string
   GetDescription() const override
   {
     return "Target Nodes Reached with possible overshoot";

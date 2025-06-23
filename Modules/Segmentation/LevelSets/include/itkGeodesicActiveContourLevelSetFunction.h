@@ -60,11 +60,7 @@ namespace itk
  *
  * This term behaves like a doublet attracting the contour to the edges.
  *
- * This implementation is based on:
- * "Geodesic Active Contours",
- * V. Caselles, R. Kimmel and G. Sapiro.
- * International Journal on Computer Vision,
- * Vol 22, No. 1, pp 61-97, 1997
+ * This implementation is based on \cite caselles1997.
  *
  * \sa LevelSetFunction
  * \sa SegmentationLevelSetImageFunction
@@ -90,7 +86,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GeodesicActiveContourLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -125,6 +121,7 @@ public:
 
   /** Set/Get the sigma for the Gaussian kernel used to compute the gradient
    * of the feature image needed for the advection term of the equation. */
+  /** @ITKStartGrouping */
   void
   SetDerivativeSigma(const double v)
   {
@@ -135,7 +132,7 @@ public:
   {
     return m_DerivativeSigma;
   }
-
+  /** @ITKEndGrouping */
   void
   Initialize(const RadiusType & r) override
   {
@@ -148,12 +145,11 @@ public:
 
 protected:
   GeodesicActiveContourLevelSetFunction()
+    : m_DerivativeSigma(1.0)
   {
     this->SetAdvectionWeight(NumericTraits<ScalarValueType>::OneValue());
     this->SetPropagationWeight(NumericTraits<ScalarValueType>::OneValue());
     this->SetCurvatureWeight(NumericTraits<ScalarValueType>::OneValue());
-
-    m_DerivativeSigma = 1.0;
   }
 
   ~GeodesicActiveContourLevelSetFunction() override = default;

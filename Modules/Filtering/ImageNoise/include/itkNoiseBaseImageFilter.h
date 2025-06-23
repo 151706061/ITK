@@ -49,13 +49,14 @@ public:
 
   using typename Superclass::OutputImagePixelType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NoiseBaseImageFilter);
 
   /** Set/Get the seed for random initialization  */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Seed, uint32_t);
   itkSetMacro(Seed, uint32_t);
-
+  /** @ITKEndGrouping */
   /** Set the seed to a value initialized with the current time and
    * process clock. */
   virtual void
@@ -69,7 +70,7 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  inline static uint32_t
+  static inline uint32_t
   Hash(uint32_t a, uint32_t b)
   {
     //  Knuth's Multiplicative Method for hashing

@@ -28,9 +28,7 @@
 
 #include "itkDistanceMetric.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class MahalanobisDistanceMetric
@@ -53,10 +51,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(MahalanobisDistanceMetric);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Typedef to represent the measurement vector type */
   using typename Superclass::MeasurementVectorType;
 
@@ -109,9 +108,10 @@ public:
   Evaluate(const MeasurementVectorType & x1, const MeasurementVectorType & x2) const override;
 
   /** Set/Get tolerance values */
+  /** @ITKStartGrouping */
   itkSetMacro(Epsilon, double);
   itkGetConstMacro(Epsilon, double);
-
+  /** @ITKEndGrouping */
   itkSetMacro(DoubleMax, double);
   itkGetConstMacro(DoubleMax, double);
 
@@ -135,8 +135,7 @@ private:
   void
   CalculateInverseCovariance();
 };
-} // end of namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkMahalanobisDistanceMetric.hxx"

@@ -51,12 +51,9 @@ itkTensorRelativeAnisotropyImageFilterTest(int, char *[])
   size[1] = 8;
   size[2] = 8;
 
-  myIndexType start;
-  start.Fill(0);
+  myIndexType start{};
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  myRegionType region{ start, size };
 
   // Initialize Image A
   inputImage->SetRegions(region);
@@ -134,7 +131,7 @@ itkTensorRelativeAnisotropyImageFilterTest(int, char *[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  myFaImageType::Pointer outputImage = relativeAnisotropyFilter->GetOutput();
+  const myFaImageType::Pointer outputImage = relativeAnisotropyFilter->GetOutput();
 
   // Declare Iterator type for the output image
   using myOutputIteratorType = itk::ImageRegionIteratorWithIndex<myFaImageType>;

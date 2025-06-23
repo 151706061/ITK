@@ -126,7 +126,7 @@ public:
   /*
    * The image is in the frequency domain already, return the index.
    */
-  IndexType
+  [[nodiscard]] IndexType
   GetFrequencyBin() const
   {
     return this->GetIndex();
@@ -135,7 +135,7 @@ public:
   /* Similar to TransformIndexToPhysicalPoint on GetIndex(),
    * but the result is cast to FrequencyType. And direction is not taken into account.
    */
-  FrequencyType
+  [[nodiscard]] FrequencyType
   GetFrequency() const
   {
     FrequencyType freq;
@@ -148,7 +148,7 @@ public:
     return freq;
   }
 
-  FrequencyValueType
+  [[nodiscard]] FrequencyValueType
   GetFrequencyModuloSquare() const
   {
     FrequencyValueType w2(0);
@@ -174,8 +174,11 @@ private:
   void
   Init()
   {
-    this->m_FrequencyOrigin = this->m_Image->GetOrigin();
-    this->m_FrequencySpacing = this->m_Image->GetSpacing();
+    for (unsigned int dim = 0; dim < ImageType::ImageDimension; ++dim)
+    {
+      this->m_FrequencyOrigin[dim] = this->m_Image->GetOrigin()[dim];
+      this->m_FrequencySpacing[dim] = this->m_Image->GetSpacing()[dim];
+    }
   }
 
   FrequencyType m_FrequencyOrigin;

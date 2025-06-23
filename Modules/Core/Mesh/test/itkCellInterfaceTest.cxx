@@ -17,6 +17,7 @@
  *=========================================================================*/
 
 #include <iostream>
+#include <string_view>
 
 #include "itkMesh.h"
 #include "itkPolyLineCell.h"
@@ -44,9 +45,9 @@ using CellAutoPointer = CellType::CellAutoPointer;
 
 template <typename TCell>
 int
-TestCellInterface(std::string name, TCell * aCell)
+TestCellInterface(const std::string_view name, TCell * aCell)
 {
-  CellAutoPointer cell(aCell, true);
+  const CellAutoPointer cell(aCell, true);
 
   std::cout << "-------- " << name << " (" << aCell->GetNameOfClass() << ')' << std::endl;
   std::cout << "    Type: " << static_cast<int>(cell->GetType()) << std::endl;

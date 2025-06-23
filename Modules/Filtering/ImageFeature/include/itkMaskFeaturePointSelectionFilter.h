@@ -42,9 +42,7 @@ namespace itk
  * This filter is intended to be used for initializing the process of
  * Physics-Based Non-Rigid Registration. It selects a fraction of non-masked
  * points with highest variance. Optionally, tensors are computed for each
- * point and stored as pixel values. [ M. Bierling, Displacement estimation
- * by hierarchical block matching, Proc. SPIE Vis. Comm. and Image Proc.,
- * vol. 1001, pp. 942-951, 1988. ].
+ * point and stored as pixel values \cite bierling1988.
  *
  * The filter is templated over input image and mask and output pointset.
  * \author Andriy Kot, Center for Real-Time Computing, Old Dominion University,
@@ -74,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MaskFeaturePointSelectionFilter);
 
   static constexpr unsigned int ImageDimension = 3u;
@@ -113,33 +111,34 @@ public:
    * 0 <= connect < ImageDimension; 0 is vertex connectivity (e.g., 26 in 3D),
    * 1 is edge connectivity (e.g., 18 in 3D), 2 is face connectivity
    * (e.g., 6 in 3D), etc */
+  /** @ITKStartGrouping */
   itkSetMacro(NonConnectivity, unsigned int);
   itkGetMacro(NonConnectivity, unsigned int);
-
+  /** @ITKEndGrouping */
   /** set/get mask */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MaskImage, MaskType);
   itkGetInputMacro(MaskImage, MaskType);
-
+  /** @ITKEndGrouping */
   /** set/get half size of the block for calculating variance */
+  /** @ITKStartGrouping */
   itkSetMacro(BlockRadius, SizeType);
   itkGetConstReferenceMacro(BlockRadius, SizeType);
-
+  /** @ITKEndGrouping */
   /** enable/disable tensor computations */
+  /** @ITKStartGrouping */
   itkSetMacro(ComputeStructureTensors, bool);
   itkGetMacro(ComputeStructureTensors, bool);
   itkBooleanMacro(ComputeStructureTensors);
-
+  /** @ITKEndGrouping */
   /** set fraction of eligible points to select */
+  /** @ITKStartGrouping */
   itkSetClampMacro(SelectFraction, double, 0, 1);
   itkGetMacro(SelectFraction, double);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(ImageDimensionShouldBe3, (Concept::SameDimension<TImage::ImageDimension, 3u>));
   itkConceptMacro(MaskDimensionShouldBe3, (Concept::SameDimension<TMask::ImageDimension, 3u>));
   itkConceptMacro(PointDimensionShouldBe3, (Concept::SameDimension<TFeatures::PointType::PointDimension, 3u>));
-  // End concept checking
-#endif
 
 protected:
   MaskFeaturePointSelectionFilter();

@@ -47,9 +47,9 @@ itk_fetch_module(
   "Perturb itk::Mesh and itk::QuadEdgeMesh coordinates with Gaussian noise.
   Please see the following Insight Journal article for an introduction to this module:
   Vigneault, DM.  Perturbing Mesh Vertices with Additive Gaussian Noise.
-  https://www.insight-journal.org/browse/publication/981
+  https://doi.org/10.54294/evr01z
   "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKMeshNoise.git
-  GIT_TAG a01fae4f1d637eb6d4a183d940b9ce79970db14e
+  GIT_TAG ab1c3bdd2ebeba3bf291a186cc56b1d53ccda78f
   )

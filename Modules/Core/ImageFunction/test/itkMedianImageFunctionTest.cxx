@@ -35,8 +35,8 @@ itkMedianImageFunctionTest(int, char *[])
   ImageType::SizeType   size;
   ImageType::IndexType  start;
   ImageType::RegionType region;
-  const int             sizeDim(50);
-  const int             centerIndex(sizeDim / 2);
+  constexpr int         sizeDim(50);
+  constexpr int         centerIndex(sizeDim / 2);
   size[0] = 50;
   size[1] = 50;
   size[2] = 50;
@@ -48,7 +48,7 @@ itkMedianImageFunctionTest(int, char *[])
   image->SetRegions(region);
   image->Allocate();
 
-  ImageType::PixelType initialValue = 27;
+  constexpr ImageType::PixelType initialValue = 27;
 
   image->FillBuffer(initialValue);
 
@@ -65,9 +65,7 @@ itkMedianImageFunctionTest(int, char *[])
   index[1] = centerIndex;
   index[2] = centerIndex;
 
-  FunctionType::OutputType median;
-
-  median = function->EvaluateAtIndex(index);
+  FunctionType::OutputType median = function->EvaluateAtIndex(index);
   std::cout << "function->EvaluateAtIndex( index ): "
             << static_cast<itk::NumericTraits<FunctionType::OutputType>::PrintType>(median) << std::endl;
 
@@ -76,8 +74,7 @@ itkMedianImageFunctionTest(int, char *[])
   point[0] = centerIndex;
   point[1] = centerIndex;
   point[2] = centerIndex;
-  FunctionType::OutputType median2;
-  median2 = function->Evaluate(point);
+  const FunctionType::OutputType median2 = function->Evaluate(point);
   std::cout << "function->Evaluate(point): "
             << static_cast<itk::NumericTraits<FunctionType::OutputType>::PrintType>(median2) << std::endl;
 
@@ -86,8 +83,7 @@ itkMedianImageFunctionTest(int, char *[])
   cindex[0] = centerIndex;
   cindex[1] = centerIndex;
   cindex[2] = centerIndex;
-  FunctionType::OutputType median3;
-  median3 = function->EvaluateAtContinuousIndex(cindex);
+  const FunctionType::OutputType median3 = function->EvaluateAtContinuousIndex(cindex);
   std::cout << "function->EvaluateAtContinuousIndex(cindex): "
             << static_cast<itk::NumericTraits<FunctionType::OutputType>::PrintType>(median3) << std::endl;
 
@@ -140,7 +136,7 @@ itkMedianImageFunctionTest(int, char *[])
   }
 
   // now set the radius
-  unsigned int neighborhoodRadius = 2;
+  constexpr unsigned int neighborhoodRadius = 2;
   function->SetNeighborhoodRadius(neighborhoodRadius);
   ITK_TEST_SET_GET_VALUE(neighborhoodRadius, function->GetNeighborhoodRadius());
 

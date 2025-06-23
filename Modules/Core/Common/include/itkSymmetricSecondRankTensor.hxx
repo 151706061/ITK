@@ -136,8 +136,8 @@ SymmetricSecondRankTensor<T, VDimension>::operator/=(const RealValueType & r)
  * Performs multiplication with a scalar
  */
 template <typename T, unsigned int VDimension>
-SymmetricSecondRankTensor<T, VDimension> SymmetricSecondRankTensor<T, VDimension>::operator*(
-  const RealValueType & r) const
+SymmetricSecondRankTensor<T, VDimension>
+SymmetricSecondRankTensor<T, VDimension>::operator*(const RealValueType & r) const
 {
   Self result;
 
@@ -171,7 +171,7 @@ template <typename T, unsigned int VDimension>
 auto
 SymmetricSecondRankTensor<T, VDimension>::operator()(unsigned int row, unsigned int col) const -> const ValueType &
 {
-  unsigned int k;
+  unsigned int k = 0;
 
   if (row < col)
   {
@@ -197,17 +197,8 @@ template <typename T, unsigned int VDimension>
 auto
 SymmetricSecondRankTensor<T, VDimension>::operator()(unsigned int row, unsigned int col) -> ValueType &
 {
-  unsigned int k;
-
-  if (row < col)
-  {
-    k = row * Dimension + col - row * (row + 1) / 2;
-  }
-  else
-  {
-    k = col * Dimension + row - col * (col + 1) / 2;
-  }
-
+  unsigned int k =
+    (row < col) ? row * Dimension + col - row * (row + 1) / 2 : col * Dimension + row - col * (col + 1) / 2;
   if (k >= InternalDimension)
   {
     k = 0;
@@ -256,7 +247,7 @@ template <typename T, unsigned int VDimension>
 void
 SymmetricSecondRankTensor<T, VDimension>::ComputeEigenValues(EigenValuesArrayType & eigenValues) const
 {
-  SymmetricEigenAnalysisType symmetricEigenSystem;
+  const SymmetricEigenAnalysisType symmetricEigenSystem;
 
   MatrixType tensorMatrix;
 
@@ -280,7 +271,7 @@ void
 SymmetricSecondRankTensor<T, VDimension>::ComputeEigenAnalysis(EigenValuesArrayType &   eigenValues,
                                                                EigenVectorsMatrixType & eigenVectors) const
 {
-  SymmetricEigenAnalysisType symmetricEigenSystem;
+  const SymmetricEigenAnalysisType symmetricEigenSystem;
 
   MatrixType tensorMatrix;
 
@@ -302,7 +293,7 @@ SymmetricSecondRankTensor<T, VDimension>::ComputeEigenAnalysis(EigenValuesArrayT
  */
 template <typename T, unsigned int VDimension>
 template <typename TMatrixValueType>
-SymmetricSecondRankTensor<T, VDimension>
+[[nodiscard]] SymmetricSecondRankTensor<T, VDimension>
 SymmetricSecondRankTensor<T, VDimension>::Rotate(const Matrix<TMatrixValueType, VDimension, VDimension> & m) const
 {
   Self result;

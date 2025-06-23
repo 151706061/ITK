@@ -85,7 +85,7 @@ itkForward1DFFTImageFilterTest(int argc, char * argv[])
   }
 
   using PixelType = double;
-  const unsigned int Dimension = 2;
+  constexpr unsigned int Dimension = 2;
 
   using ImageType = itk::Image<PixelType, Dimension>;
   using ComplexImageType = itk::Image<std::complex<PixelType>, Dimension>;
@@ -104,12 +104,12 @@ itkForward1DFFTImageFilterTest(int argc, char * argv[])
     auto fft = FFTForwardType::New();
     ITK_EXERCISE_BASIC_OBJECT_METHODS(fft, Forward1DFFTImageFilter, ImageToImageFilter);
 
-    itk::SizeValueType sizeGreatestPrimeFactor = 2;
+    constexpr itk::SizeValueType sizeGreatestPrimeFactor = 2;
     ITK_TEST_SET_GET_VALUE(sizeGreatestPrimeFactor, fft->GetSizeGreatestPrimeFactor());
 
     return doTest<FFTForwardType>(argv[1], argv[2]);
   }
-  else if (backend == 1)
+  if (backend == 1)
   {
     using FFTForwardType = itk::VnlForward1DFFTImageFilter<ImageType, ComplexImageType>;
 

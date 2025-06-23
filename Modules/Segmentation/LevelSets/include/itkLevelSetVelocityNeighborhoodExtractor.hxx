@@ -27,9 +27,9 @@ namespace itk
  */
 template <typename TLevelSet, typename TAuxValue, unsigned int VAuxDimension>
 LevelSetVelocityNeighborhoodExtractor<TLevelSet, TAuxValue, VAuxDimension>::LevelSetVelocityNeighborhoodExtractor()
+  : m_AuxInsideValues(nullptr)
+  , m_AuxOutsideValues(nullptr)
 {
-  m_AuxInsideValues = nullptr;
-  m_AuxOutsideValues = nullptr;
   for (unsigned int i = 0; i < VAuxDimension; ++i)
   {
     m_AuxImage[i] = nullptr;
@@ -46,8 +46,8 @@ LevelSetVelocityNeighborhoodExtractor<TLevelSet, TAuxValue, VAuxDimension>::Prin
 {
   Superclass::PrintSelf(os, indent);
   os << indent << "Input aux image: [";
-  unsigned int j;
-  for (j = 0; j + 1 < VAuxDimension; ++j)
+  unsigned int j = 0;
+  for (; j + 1 < VAuxDimension; ++j)
   {
     os << m_AuxImage[j].GetPointer() << ", ";
   }
@@ -77,7 +77,7 @@ template <typename TLevelSet, typename TAuxValue, unsigned int VAuxDimension>
 double
 LevelSetVelocityNeighborhoodExtractor<TLevelSet, TAuxValue, VAuxDimension>::CalculateDistance(Index & index)
 {
-  double distance = this->Superclass::CalculateDistance(index);
+  const double distance = this->Superclass::CalculateDistance(index);
 
   if (distance >= this->GetLargeValue())
   {

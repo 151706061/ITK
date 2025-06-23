@@ -50,11 +50,7 @@ namespace itk
  *  the itk::DanielssonDistanceImageFilter class except it does not return
  *  the Voronoi map.
  *
- *  Reference:
- *  C. R. Maurer, Jr., R. Qi, and V. Raghavan, "A Linear Time Algorithm
- *  for Computing Exact Euclidean Distance Transforms of Binary Images in
- *  Arbitrary Dimensions", IEEE - Transactions on Pattern Analysis and
- *  Machine Intelligence, 25(2): 265-270, 2003.
+ *  For algorithmic details see \cite maurer2003.
  *
  * \ingroup ImageFeatureExtraction
  * \ingroup ITKDistanceMap
@@ -91,7 +87,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SignedMaurerDistanceMapImageFilter);
 
   using InputRegionType = typename InputImageType::RegionType;
@@ -150,16 +146,13 @@ public:
    * Set the background value which defines the object.  Usually this
    * value is = 0.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, InputPixelType);
   itkGetConstReferenceMacro(BackgroundValue, InputPixelType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputPixelType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
   itkConceptMacro(OutputImagePixelTypeIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   SignedMaurerDistanceMapImageFilter();

@@ -244,18 +244,7 @@ main(int argc, char * argv[])
   thresholder->SetOutsideValue(0);
   thresholder->SetInsideValue(255);
 
-
-  // We instantiate reader and writer types in the following lines.
-  //
-  using ReaderType = itk::ImageFileReader<InternalImageType>;
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-
-  auto reader = ReaderType::New();
-  auto writer = WriterType::New();
-
-  reader->SetFileName(argv[1]);
-  writer->SetFileName(argv[2]);
-
+  const auto input = itk::ReadImage<InternalImageType>(argv[1]);
 
   //  The RescaleIntensityImageFilter type is declared below. This filter will
   //  renormalize image before sending them to writers.
@@ -418,7 +407,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  center->SetInput(reader->GetOutput());
+  center->SetInput(input);
   smoothing->SetInput(center->GetOutput());
   gradientMagnitude->SetInput(smoothing->GetOutput());
   reciprocal->SetInput(gradientMagnitude->GetOutput());
@@ -427,7 +416,6 @@ main(int argc, char * argv[])
   geodesicActiveContour->SetFeatureImage(reciprocal->GetOutput());
 
   thresholder->SetInput(geodesicActiveContour->GetOutput());
-  writer->SetInput(thresholder->GetOutput());
   // Software Guide : EndCodeSnippet
 
 
@@ -539,39 +527,25 @@ main(int argc, char * argv[])
   auto caster3 = CastFilterType::New();
   auto caster4 = CastFilterType::New();
 
-  auto writer1 = WriterType::New();
-  auto writer2 = WriterType::New();
-  auto writer3 = WriterType::New();
-  auto writer4 = WriterType::New();
-
   caster1->SetInput(smoothing->GetOutput());
-  writer1->SetInput(caster1->GetOutput());
-  writer1->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput1.png");
   caster1->SetOutputMinimum(0);
   caster1->SetOutputMaximum(255);
-  writer1->Update();
+  itk::WriteImage(caster1->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput1.png");
 
   caster2->SetInput(gradientMagnitude->GetOutput());
-  writer2->SetInput(caster2->GetOutput());
-  writer2->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput2.png");
   caster2->SetOutputMinimum(0);
   caster2->SetOutputMaximum(255);
-  writer2->Update();
+  itk::WriteImage(caster2->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput2.png");
 
   caster3->SetInput(reciprocal->GetOutput());
-  writer3->SetInput(caster3->GetOutput());
-  writer3->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput3.png");
   caster3->SetOutputMinimum(0);
   caster3->SetOutputMaximum(255);
-  writer3->Update();
+  itk::WriteImage(caster3->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput3.png");
 
   caster4->SetInput(fastMarching->GetOutput());
-  writer4->SetInput(caster4->GetOutput());
-  writer4->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput4.png");
   caster4->SetOutputMinimum(0);
   caster4->SetOutputMaximum(255);
 
@@ -638,9 +612,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  auto meanShapeReader = ReaderType::New();
-  meanShapeReader->SetFileName(argv[13]);
-  meanShapeReader->Update();
+  const auto meanShapeImage = itk::ReadImage<InternalImageType>(argv[13]);
 
   std::vector<InternalImageType::Pointer> shapeModeImages(numberOfPCAModes);
 
@@ -654,13 +626,11 @@ main(int argc, char * argv[])
 
   for (unsigned int k = 0; k < numberOfPCAModes; ++k)
   {
-    auto shapeModeReader = ReaderType::New();
-    shapeModeReader->SetFileName(shapeModeFileNames[k].c_str());
-    shapeModeReader->Update();
-    shapeModeImages[k] = shapeModeReader->GetOutput();
+    shapeModeImages[k] =
+      itk::ReadImage<InternalImageType>(shapeModeFileNames[k].c_str());
   }
 
-  shape->SetMeanImage(meanShapeReader->GetOutput());
+  shape->SetMeanImage(meanShapeImage);
   shape->SetPrincipalComponentImages(shapeModeImages);
   // Software Guide : EndCodeSnippet
 
@@ -847,9 +817,9 @@ main(int argc, char * argv[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  double initRadius = 1.05;
-  double grow = 1.1;
-  double shrink = pow(grow, -0.25);
+  constexpr double initRadius = 1.05;
+  constexpr double grow = 1.1;
+  const double     shrink = pow(grow, -0.25);
   optimizer->Initialize(initRadius, grow, shrink);
 
   optimizer->SetEpsilon(1.0e-6); // minimal search radius
@@ -904,7 +874,7 @@ main(int argc, char * argv[])
   // Software Guide : BeginCodeSnippet
   try
   {
-    writer->Update();
+    itk::WriteImage(thresholder->GetOutput(), argv[2]);
   }
   catch (const itk::ExceptionObject & excep)
   {
@@ -928,7 +898,8 @@ main(int argc, char * argv[])
   std::cout << "Parameters: " << geodesicActiveContour->GetCurrentParameters()
             << std::endl;
 
-  writer4->Update();
+  itk::WriteImage(caster4->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput4.png");
 
 
   // The following writer type is used to save the output of the time-crossing
@@ -969,20 +940,19 @@ main(int argc, char * argv[])
   shape->SetParameters(geodesicActiveContour->GetInitialParameters());
 
   thresholder->SetInput(evaluator->GetOutput());
-  writer->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput5.png");
-  writer->Update();
+  itk::WriteImage(thresholder->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput5.png");
 
   shape->SetParameters(geodesicActiveContour->GetCurrentParameters());
   evaluator->Modified();
-  writer->SetFileName(
-    "GeodesicActiveContourShapePriorImageFilterOutput6.png");
-  writer->Update();
+  itk::WriteImage(thresholder->GetOutput(),
+                  "GeodesicActiveContourShapePriorImageFilterOutput6.png");
 
 
   //  Software Guide : BeginLatex
   //
-  //  Deviating from previous examples, we will demonstrate this example using
+  //  Deviating from previous examples, we will demonstrate this example
+  //  using
   //  \code{BrainMidSagittalSlice.png}
   //  (Figure~\ref{fig:GeodesicActiveContourShapePriorImageFilterOutput},
   //  left) from the \code{Examples/Data} directory. The aim here is to
@@ -991,10 +961,10 @@ main(int argc, char * argv[])
   //  components \code{CorpusCallosumMode0.mha},
   //  \code{CorpusCallosumMode1.mha} and \code{CorpusCallosumMode12.mha}. As
   //  shown in Figure~\ref{fig:CorpusCallosumPCAModes}, the first mode
-  //  captures scaling, the second mode captures the shifting of mass between
-  //  the rostrum and the splenium and the third mode captures the degree of
-  //  curvature. Segmentation results with and without shape guidance are
-  //  shown in
+  //  captures scaling, the second mode captures the shifting of mass
+  //  between the rostrum and the splenium and the third mode captures the
+  //  degree of curvature. Segmentation results with and without shape
+  //  guidance are shown in
   //  Figure~\ref{fig:GeodesicActiveContourShapePriorImageFilterOutput2}.
   //
   //
@@ -1019,11 +989,13 @@ main(int argc, char * argv[])
   //  & $-3\sigma$ & mean & $+3\sigma$ \\ mode 0: &
   //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModeMinus0} &
   //  \includegraphics[width=0.10\textwidth]{CorpusCallosumMeanShape} &
-  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModePlus0} \\ mode
-  //  1: & \includegraphics[width=0.10\textwidth]{CorpusCallosumModeMinus1} &
+  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModePlus0}
+  //  \\ mode 1: &
+  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModeMinus1} &
   //  \includegraphics[width=0.10\textwidth]{CorpusCallosumMeanShape} &
-  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModePlus1} \\ mode
-  //  2: & \includegraphics[width=0.10\textwidth]{CorpusCallosumModeMinus2} &
+  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModePlus1}
+  //  \\ mode 2: &
+  //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModeMinus2} &
   //  \includegraphics[width=0.10\textwidth]{CorpusCallosumMeanShape} &
   //  \includegraphics[width=0.10\textwidth]{CorpusCallosumModePlus2}
   //  \\ \end{tabular}
@@ -1047,17 +1019,19 @@ main(int argc, char * argv[])
   //  Figure~\ref{fig:GeodesicActiveContourShapePriorImageFilterOutput}
   //  (right).
   //
-  //  From Figure~\ref{fig:GeodesicActiveContourShapePriorImageFilterOutput2}
-  //  it can be observed that without shape guidance (left), segmentation
-  //  using geodesic active contour leaks in the regions where the corpus
-  //  callosum blends into the surrounding brain tissues. With shape guidance
+  //  From
+  //  Figure~\ref{fig:GeodesicActiveContourShapePriorImageFilterOutput2} it
+  //  can be observed that without shape guidance (left), segmentation using
+  //  geodesic active contour leaks in the regions where the corpus callosum
+  //  blends into the surrounding brain tissues. With shape guidance
   //  (center), the segmentation is constrained by the global shape model to
   //  prevent leaking.
   //
   //  The final best-fit shape parameters after the segmentation process is:
   //
   //  \begin{verbatim}
-  //  Parameters: [-0.384988, -0.578738, 0.557793, 0.275202, 16.9992, 4.73473]
+  //  Parameters: [-0.384988, -0.578738, 0.557793,
+  //  0.275202, 16.9992, 4.73473]
   //  \end{verbatim}
   //
   //  and is shown in
@@ -1065,12 +1039,13 @@ main(int argc, char * argv[])
   //  (right). Note that a $0.28$ radian ($15.8$ degree) rotation has been
   //  introduced to match the model to the corpus callosum in the image.
   //  Additionally, a negative weight for the first mode shrinks the size
-  //  relative to the mean shape. A negative weight for the second mode shifts
-  //  the mass to splenium, and a positive weight for the third mode increases
-  //  the curvature. It can also be observed that the final segmentation is a
-  //  combination of the best-fit shape with additional local deformation. The
-  //  combination of both global and local shape allows the segmentation to
-  //  capture fine details not represented in the shape model.
+  //  relative to the mean shape. A negative weight for the second mode
+  //  shifts the mass to splenium, and a positive weight for the third mode
+  //  increases the curvature. It can also be observed that the final
+  //  segmentation is a combination of the best-fit shape with additional
+  //  local deformation. The combination of both global and local shape
+  //  allows the segmentation to capture fine details not represented in the
+  //  shape model.
   //
   //
   //  \begin{figure} \center

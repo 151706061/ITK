@@ -30,11 +30,11 @@ itkMinimumMaximumImageCalculatorTest(int, char *[])
   using MinMaxCalculatorType = itk::MinimumMaximumImageCalculator<ImageType>;
 
   /* Define the image size and physical coordinates */
-  SizeType size = { { 20, 20, 20 } };
-  double   origin[3] = { 0.0, 0.0, 0.0 };
-  double   spacing[3] = { 1, 1, 1 };
+  constexpr SizeType size = { { 20, 20, 20 } };
+  constexpr double   origin[3] = { 0.0, 0.0, 0.0 };
+  constexpr double   spacing[3] = { 1, 1, 1 };
 
-  std::cout << "Testing Minimum and Maximum Image Calulator:\n";
+  std::cout << "Testing Minimum and Maximum Image Calculator:\n";
 
   // Allocate a simple test image
   auto                  image = ImageType::New();
@@ -97,11 +97,9 @@ itkMinimumMaximumImageCalculatorTest(int, char *[])
   ITK_TEST_SET_GET_VALUE(maxIntensityValueIndex, calculator->GetIndexOfMaximum());
 
   // Set the region over which perform the computations
-  itk::Size<3>                     regionSize = { { 4, 4, 4 } };
-  itk::Index<3>                    idx = { { 0, 0, 0 } };
-  MinMaxCalculatorType::RegionType computationRegion;
-  computationRegion.SetSize(regionSize);
-  computationRegion.SetIndex(idx);
+  constexpr itk::Size<3>                 regionSize = { { 4, 4, 4 } };
+  constexpr itk::Index<3>                idx = { { 0, 0, 0 } };
+  const MinMaxCalculatorType::RegionType computationRegion{ idx, regionSize };
 
   calculator->SetRegion(computationRegion);
 

@@ -40,8 +40,7 @@ itkPathToImageFilterTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(path, PolyLineParametricPath, ParametricPath);
 
   std::cout << "Making a square Path with v0 at (30,30) and v2 at (33,33)" << std::endl;
-  VertexType v;
-  v.Fill(30);
+  auto v = itk::MakeFilled<VertexType>(30);
   path->AddVertex(v);
   v[0] = 33;
   v[1] = 30;
@@ -61,11 +60,11 @@ itkPathToImageFilterTest(int, char *[])
 
   pathToImageFilter->SetInput(path);
 
-  PathToImageFilterType::ValueType pathValue = 1;
+  constexpr PathToImageFilterType::ValueType pathValue = 1;
   pathToImageFilter->SetPathValue(pathValue);
   ITK_TEST_SET_GET_VALUE(pathValue, pathToImageFilter->GetPathValue());
 
-  PathToImageFilterType::ValueType backgroundValue = 0;
+  constexpr PathToImageFilterType::ValueType backgroundValue = 0;
   pathToImageFilter->SetBackgroundValue(backgroundValue);
   ITK_TEST_SET_GET_VALUE(backgroundValue, pathToImageFilter->GetBackgroundValue());
 
@@ -116,7 +115,7 @@ itkPathToImageFilterTest(int, char *[])
   // Update the filter
   ITK_TRY_EXPECT_NO_EXCEPTION(pathToImageFilter->Update());
 
-  ImageType::Pointer image = pathToImageFilter->GetOutput();
+  const ImageType::Pointer image = pathToImageFilter->GetOutput();
 
   // Test the output image
   //
@@ -128,21 +127,11 @@ itkPathToImageFilterTest(int, char *[])
   {
     for (int j = 0; j <= 3; ++j)
     {
-      double targetValue;
-
       index[0] = 30 + i;
       index[1] = 30 + j;
 
-      if (0 < i && i < 3 && 0 < j && j < 3)
-      {
-        // Inside the closed path, but not on it
-        targetValue = 0;
-      }
-      else
-      {
-        // On the path
-        targetValue = 1;
-      }
+      //           ? 0-Inside the closed path, but not on it : 1-On the path
+      const double targetValue = (0 < i && i < 3 && 0 < j && j < 3) ? 0 : 1;
       if (itk::Math::NotAlmostEquals(image->GetPixel(index), targetValue))
       {
         std::cout << "[FAILURE]" << std::endl;

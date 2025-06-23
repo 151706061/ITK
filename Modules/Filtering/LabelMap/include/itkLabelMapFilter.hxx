@@ -47,7 +47,7 @@ LabelMapFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
 
   if (!input)
   {
@@ -86,7 +86,7 @@ LabelMapFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(const Out
   TotalProgressReporter progress(this, numberOfLabelObjects, numberOfLabelObjects);
   while (true)
   {
-    LabelObjectType * labelObject;
+    LabelObjectType * labelObject = nullptr;
     // begin mutex lock
     {
       const std::lock_guard<std::mutex> lockGuard(m_LabelObjectContainerLock);

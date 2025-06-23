@@ -72,16 +72,18 @@ itkKappaSigmaThresholdImageCalculatorTest(int argc, char * argv[])
   calculator->Compute();
 
   // Regression test: compare computed threshold
-  CalculatorType::InputPixelType expectedThreshold = std::stod(argv[5]);
-  CalculatorType::InputPixelType resultThreshold = calculator->GetOutput();
-  double                         tolerance = 1e-3;
+  const CalculatorType::InputPixelType expectedThreshold = std::stod(argv[5]);
+  const CalculatorType::InputPixelType resultThreshold = calculator->GetOutput();
+  constexpr double                     tolerance = 1e-3;
   if (!itk::Math::FloatAlmostEqual(
         static_cast<double>(expectedThreshold), static_cast<double>(resultThreshold), 10, tolerance))
   {
     std::cerr << "Test failed!" << std::endl;
     std::cerr << "Error in GetOutput()" << std::endl;
-    std::cerr << "Expected: " << itk::NumericTraits<CalculatorType::InputPixelType>::PrintType(expectedThreshold)
-              << ", but got: " << itk::NumericTraits<CalculatorType::InputPixelType>::PrintType(resultThreshold)
+    std::cerr << "Expected: "
+              << static_cast<itk::NumericTraits<CalculatorType::InputPixelType>::PrintType>(expectedThreshold)
+              << ", but got: "
+              << static_cast<itk::NumericTraits<CalculatorType::InputPixelType>::PrintType>(resultThreshold)
               << std::endl;
     return EXIT_FAILURE;
   }

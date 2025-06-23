@@ -25,7 +25,7 @@
  * Urish KL, August J, Huard J. "Unsupervised segmentation for myofiber
  * counting in immunoflourescent microscopy images". Insight Journal.
  * ISC/NA-MIC/MICCAI Workshop on Open-Source Software (2005)
- * https://insight-journal.org/browse/publication/40
+ * https://doi.org/10.54294/h1vbsl
  */
 
 
@@ -54,8 +54,8 @@ itkThresholdMaximumConnectedComponentsImageFilterTest(int argc, char * argv[])
   using InputImageType = itk::Image<InputPixelType, Dimension>;
   using OutputImageType = itk::Image<OutputPixelType, Dimension>;
 
-  InputPixelType maxLabel = itk::NumericTraits<InputPixelType>::max();
-  InputPixelType minLabel = itk::NumericTraits<InputPixelType>::NonpositiveMin();
+  constexpr InputPixelType maxLabel = itk::NumericTraits<InputPixelType>::max();
+  constexpr InputPixelType minLabel = itk::NumericTraits<InputPixelType>::NonpositiveMin();
 
   const unsigned int minimumPixelArea = std::stoi(argv[3]);
 
@@ -72,9 +72,6 @@ itkThresholdMaximumConnectedComponentsImageFilterTest(int argc, char * argv[])
   // As a note, SetInsideValue(maxLabel)/SetOutsideValue(minLabel) will count
   // the number of light objects. If the reverse, it will count the number of
   // dark objects.
-
-  unsigned int numberOfObjects;
-  unsigned int thresholdValue;
 
   using ThresholdType = itk::ThresholdMaximumConnectedComponentsImageFilter<InputImageType>;
   auto automaticThreshold = ThresholdType::New();
@@ -96,15 +93,15 @@ itkThresholdMaximumConnectedComponentsImageFilterTest(int argc, char * argv[])
   automaticThreshold->SetOutsideValue(maxLabel);
   ITK_TEST_SET_GET_VALUE(maxLabel, automaticThreshold->GetOutsideValue());
 
-  typename ThresholdType::PixelType upperBoundary = itk::NumericTraits<ThresholdType::PixelType>::max();
+  constexpr typename ThresholdType::PixelType upperBoundary = itk::NumericTraits<ThresholdType::PixelType>::max();
   automaticThreshold->SetUpperBoundary(upperBoundary);
   ITK_TEST_SET_GET_VALUE(upperBoundary, automaticThreshold->GetUpperBoundary());
 
   ITK_TRY_EXPECT_NO_EXCEPTION(automaticThreshold->Update());
 
 
-  numberOfObjects = automaticThreshold->GetNumberOfObjects();
-  thresholdValue = automaticThreshold->GetThresholdValue();
+  const unsigned int numberOfObjects = automaticThreshold->GetNumberOfObjects();
+  const unsigned int thresholdValue = automaticThreshold->GetThresholdValue();
 
   std::cout << "Number of Objects = " << numberOfObjects << std::endl;
   std::cout << "Threshold Value   = " << thresholdValue << std::endl;

@@ -3,7 +3,7 @@ Updating Third Party Projects
 
 When updating a third party project, any changes to the imported project
 itself (e.g., the `ThirdParty/VNL` directory for VNL), should go through the
-[UpdateThirdPartyFromUpstream.sh] framework. This framework ensures that all
+[update-third-party.bash] framework. This framework ensures that all
 patches to the third party projects are tracked externally and available for
 (preferably) upstream  or other projects also embedding the library.
 
@@ -18,7 +18,7 @@ repository specified in its `UpdateFromUpstream.sh` script. Once the upstream
 changes are merged, pulling the changes involves running the
 `UpdateFromUpstream.sh` script. This will update the local copy of the project
 to the version specified in `UpdateFromUpstream.sh` (usually a `for/foo`
-branch, like `for/itk` for example, but may be `master` or any other Git
+branch, like `for/itk` for example, but may be `main` or any other Git
 reference) and merge it into the main tree.
 
 This requires a Git 2.5 or higher due the `worktree` tool being used to
@@ -50,7 +50,7 @@ Porting a Project
 
 When converting a project, if there are any local patches, a project should be
 created on
-[GitHub](https://github.com/InsightSoftwareConsortium/ITK/tree/master/Modules/ThirdParty)
+[GitHub](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Modules/ThirdParty)
 to track it. If the upstream project does not use Git, it should be imported
 into Git (there may be existing conversions available on GitHub already). The
 project's description should indicate where the source repository lives.
@@ -78,12 +78,12 @@ git push --set-upstream insight for/itk
 
 Making the initial import involves filling out the project's
 `UpdateFromUpstream.sh` script in its directory. The
-[UpdateThirdPartyFromUpstream.sh] script describes what is
+[update-third-party.bash] script describes what is
 necessary, but in a nutshell, it is basically metadata such as the name of the
 project and where it goes in the importing project.
 
 Use the instructions in the comments at the top of the
-[UpdateThirdPartyFromUpstream] script to know the essential parts each third
+[update-third-party.bash] script to know the essential parts each third
 party module's `UpdateFromUpstream.sh` script should have.
 
 Make sure `UpdateFromUpstream.sh` is executable before commit. On Unix, run:
@@ -116,4 +116,4 @@ if necessary.
 
 
 
-[UpdateThirdPartyFromUpstream.sh]: https://github.com/InsightSoftwareConsortium/ITK/blob/master/Utilities/Maintenance/UpdateThirdPartyFromUpstream.sh
+[update-third-party.bash]: https://github.com/InsightSoftwareConsortium/ITK/blob/main/Utilities/Maintenance/update-third-party.bash

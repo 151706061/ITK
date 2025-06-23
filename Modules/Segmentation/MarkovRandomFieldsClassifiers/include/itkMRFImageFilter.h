@@ -97,23 +97,23 @@ extern ITKMarkovRandomFieldsClassifiers_EXPORT std::ostream &
  * assigned a weight 1.5.  A weight of 1.3 is assigned to the influence of
  * the north, south, east, west, and diagonal pixels in the previous and next
  * slices.
- * \f[\begin{tabular}{ccc}
- *  \begin{tabular}{|c|c|c|}
+ * \f[\begin{array}{ccc}
+ *  \begin{array}{|c|c|c|}
  *   1.3 & 1.3 & 1.3 \\
  *   1.3 & 1.5 & 1.3 \\
  *   1.3 & 1.3 & 1.3 \\
- *  \end{tabular} &
- *  \begin{tabular}{|c|c|c|}
+ *  \end{array} &
+ *  \begin{array}{|c|c|c|}
  *   1.7 & 1.7 & 1.7 \\
  *   1.7 & 0 & 1.7 \\
  *   1.7 & 1.7 & 1.7 \\
- *  \end{tabular} &
- *  \begin{tabular}{|c|c|c|}
+ *  \end{array} &
+ *  \begin{array}{|c|c|c|}
  *   1.3 & 1.3 & 1.3 \\
  *   1.5 & 1.5 & 1.3 \\
  *   1.3 & 1.3 & 1.3 \\
- *  \end{tabular} \\
- * \end{tabular}\f]
+ *  \end{array} \\
+ * \end{array}\f]
  *
  * The user needs to set the neighborhood size using the SetNeighborhoodRadius
  * function. The details on the semantics of a neighborhood can be found
@@ -123,9 +123,8 @@ extern ITKMarkovRandomFieldsClassifiers_EXPORT std::ostream &
  *
  * For minimization of the MRF labeling function the MinimizeFunctional
  * virtual method is called. For our current implementation we use
- * the iterated conditional modes (ICM) algorithm described by Besag in the
- * paper "On the Statistical Analysis of Dirty Pictures" in J. Royal Stat.
- * Soc. B, Vol. 48, 1986.
+ * the iterated conditional modes (ICM) algorithm described in
+ * \cite besag1986.
  *
  * In each iteration, the algorithm visits each pixel in turn and
  * determines whether to update its classification by computing the influence
@@ -161,7 +160,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MRFImageFilter);
 
   /** Type definition for the input image. */
@@ -249,24 +248,28 @@ public:
   SetClassifier(typename ClassifierType::Pointer ptrToClassifier);
 
   /** Set/Get the number of classes. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfClasses, unsigned int);
   itkGetConstMacro(NumberOfClasses, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of iteration of the Iterated Conditional Mode
    * (ICM) algorithm. A default value is set at 50 iterations. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumNumberOfIterations, unsigned int);
   itkGetConstMacro(MaximumNumberOfIterations, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get the error tolerance level which is used as a threshold
    * to quit the iterations */
+  /** @ITKStartGrouping */
   itkSetMacro(ErrorTolerance, double);
   itkGetConstMacro(ErrorTolerance, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the degree of smoothing desired
    * */
+  /** @ITKStartGrouping */
   itkSetMacro(SmoothingFactor, double);
   itkGetConstMacro(SmoothingFactor, double);
-
+  /** @ITKEndGrouping */
   /** Set the neighborhood radius. */
   void
   SetNeighborhoodRadius(const NeighborhoodRadiusType &);
@@ -324,8 +327,6 @@ public:
   /* Get macro for number of iterations */
   itkGetConstReferenceMacro(NumberOfIterations, unsigned int);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(UnsignedIntConvertibleToClassifiedCheck,
                   (Concept::Convertible<unsigned int, LabelledImagePixelType>));
   itkConceptMacro(ClassifiedConvertibleToUnsignedIntCheck,
@@ -333,8 +334,6 @@ public:
   itkConceptMacro(ClassifiedConvertibleToIntCheck, (Concept::Convertible<LabelledImagePixelType, int>));
   itkConceptMacro(IntConvertibleToClassifiedCheck, (Concept::Convertible<int, LabelledImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ClassifiedImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   MRFImageFilter();
@@ -347,9 +346,7 @@ protected:
   Allocate();
 
   /** Apply MRF Classifier. In this example the images are labelled using
-   * Iterated Conditional Mode algorithm by J. Besag, "On statistical
-   * analysis of dirty pictures," J. Royal Stat. Soc. B, vol. 48,
-   * pp. 259-302, 1986. */
+   * Iterated Conditional Mode algorithm \cite besag1986.*/
   virtual void
   ApplyMRFImageFilter();
 

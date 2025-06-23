@@ -23,13 +23,10 @@ namespace itk
 
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
 DemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField>::DemonsRegistrationFilter()
+
 {
-  typename DemonsRegistrationFunctionType::Pointer drfp;
-  drfp = DemonsRegistrationFunctionType::New();
-
+  auto drfp = DemonsRegistrationFunctionType::New();
   this->SetDifferenceFunction(static_cast<FiniteDifferenceFunctionType *>(drfp.GetPointer()));
-
-  m_UseMovingImageGradient = false;
 }
 
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
@@ -39,7 +36,7 @@ DemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField>::PrintSe
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "UseMovingImageGradient: " << (m_UseMovingImageGradient ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseMovingImageGradient);
 }
 
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>

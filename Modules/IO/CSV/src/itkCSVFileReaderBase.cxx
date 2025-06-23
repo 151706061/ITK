@@ -23,16 +23,13 @@ namespace itk
 {
 
 CSVFileReaderBase::CSVFileReaderBase()
-{
-  this->m_FileName = "";
-  this->m_FieldDelimiterCharacter = ',';
-  this->m_StringDelimiterCharacter = '"';
-  this->m_HasColumnHeaders = true;
-  this->m_HasRowHeaders = true;
-  this->m_UseStringDelimiterCharacter = false;
-  this->m_Line = "";
-  this->m_EndOfColumnHeadersLine = 0;
-}
+  : m_FileName("")
+  , m_FieldDelimiterCharacter(',')
+  , m_StringDelimiterCharacter('"')
+  , m_HasRowHeaders(true)
+  , m_HasColumnHeaders(true)
+  , m_Line("")
+{}
 
 void
 CSVFileReaderBase::PrintSelf(std::ostream & os, Indent indent) const
@@ -52,8 +49,7 @@ CSVFileReaderBase::PrepareForParsing()
 {
   if (this->m_FileName.empty())
   {
-    itkExceptionMacro("There is no file name provided!"
-                      << "Please provide a filename.");
+    itkExceptionMacro("There is no file name provided! Please provide a filename.");
   }
 
   if (this->m_UseStringDelimiterCharacter && !(this->m_HasRowHeaders || this->m_HasColumnHeaders))
@@ -177,8 +173,7 @@ CSVFileReaderBase::GetDataDimension(SizeValueType & rows, SizeValueType & cols)
   // warning to the user.
   if (!isSame)
   {
-    itkWarningMacro("Warning: Data appears to contain missing data! "
-                    << "These will be set to NaN.");
+    itkWarningMacro("Warning: Data appears to contain missing data! These will be set to NaN.");
   }
 
   cols = max_cols;

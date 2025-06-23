@@ -117,8 +117,7 @@ main(int argc, char * argv[])
   size[1] = 200; // size along Y
   size[2] = 200; // size along Z
 
-  ImportFilterType::IndexType start;
-  start.Fill(0);
+  constexpr ImportFilterType::IndexType start{};
 
   ImportFilterType::RegionType region;
   region.SetIndex(start);
@@ -135,7 +134,7 @@ main(int argc, char * argv[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  const itk::SpacePrecisionType origin[Dimension] = { 0.0, 0.0, 0.0 };
+  constexpr itk::SpacePrecisionType origin[Dimension] = { 0.0, 0.0, 0.0 };
   importFilter->SetOrigin(origin);
   // Software Guide : EndCodeSnippet
 
@@ -147,7 +146,7 @@ main(int argc, char * argv[])
 
   // Software Guide : BeginCodeSnippet
   // spacing isotropic volumes to 1.0
-  const itk::SpacePrecisionType spacing[Dimension] = { 1.0, 1.0, 1.0 };
+  constexpr itk::SpacePrecisionType spacing[Dimension] = { 1.0, 1.0, 1.0 };
   importFilter->SetSpacing(spacing);
   // Software Guide : EndCodeSnippet
 
@@ -226,7 +225,7 @@ main(int argc, char * argv[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  const bool importImageFilterWillOwnTheBuffer = true;
+  constexpr bool importImageFilterWillOwnTheBuffer = true;
   importFilter->SetImportPointer(
     localBuffer, numberOfPixels, importImageFilterWillOwnTheBuffer);
   // Software Guide : EndCodeSnippet

@@ -52,7 +52,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineTransformInitializer);
 
   /** Type of the transform to initialize. */
@@ -63,7 +63,12 @@ public:
   using ImagePointer = typename ImageType::ConstPointer;
   using IndexType = typename ImageType::IndexType;
   using ImagePointType = typename ImageType::PointType;
-  using ImagePointCoordRepType = typename ImagePointType::CoordRepType;
+  using ImagePointCoordinateType = typename ImagePointType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using ImagePointCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `ImagePointCoordRepType`. Please use `ImagePointCoordinateType` instead!") =
+    ImagePointCoordinateType;
+#endif
 
   /** Types defined from transform traits. */
   using TransformPointer = typename TransformType::Pointer;
@@ -80,20 +85,23 @@ public:
   static constexpr unsigned int SpaceDimension = TransformType::SpaceDimension;
 
   /** Set/Get the transform to be initialized. */
+  /** @ITKStartGrouping */
   itkGetConstObjectMacro(Transform, TransformType);
   itkSetObjectMacro(Transform, TransformType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the image to initialize the domain. */
+  /** @ITKStartGrouping */
   itkGetConstObjectMacro(Image, ImageType);
   itkSetConstObjectMacro(Image, ImageType);
-
+  /** @ITKEndGrouping */
   /** Allow the user to set the mesh size of the transform via the initializer,
    * even though the initializer does not do anything with that information.
    * Default size is 1^ImageDimension. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(TransformDomainMeshSize, MeshSizeType);
   void
   SetTransformDomainMeshSize(const MeshSizeType);
-
+  /** @ITKEndGrouping */
   /** Initialize the transform using the specified transformation domain. */
   virtual void
   InitializeTransform() const;

@@ -31,7 +31,6 @@ template <typename TParametersValueType>
 static int
 oneTest(const char * goodname, const char * badname)
 {
-  unsigned int i;
   using AffineTransformType = itk::AffineTransform<TParametersValueType, 4>;
   using AffineTransformTypeNotRegistered = itk::AffineTransform<TParametersValueType, 10>;
   auto affine = AffineTransformType::New();
@@ -44,7 +43,7 @@ oneTest(const char * goodname, const char * badname)
   // Set its parameters
   {
     typename AffineTransformType::ParametersType p = affine->GetParameters();
-    for (i = 0; i < p.GetSize(); ++i)
+    for (unsigned int i = 0; i < p.GetSize(); ++i)
     {
       p[i] = i;
     }
@@ -52,7 +51,7 @@ oneTest(const char * goodname, const char * badname)
   }
   {
     typename AffineTransformType::FixedParametersType p = affine->GetFixedParameters();
-    for (i = 0; i < p.GetSize(); ++i)
+    for (unsigned int i = 0; i < p.GetSize(); ++i)
     {
       p[i] = i;
     }
@@ -112,7 +111,7 @@ oneTest(const char * goodname, const char * badname)
   // Set its parameters
   {
     typename AffineTransformType::ParametersType p = Bogus->GetParameters();
-    for (i = 0; i < p.GetSize(); ++i)
+    for (unsigned int i = 0; i < p.GetSize(); ++i)
     {
       p[i] = i;
     }
@@ -120,7 +119,7 @@ oneTest(const char * goodname, const char * badname)
   }
   {
     typename AffineTransformType::FixedParametersType p = Bogus->GetFixedParameters();
-    for (i = 0; i < p.GetSize(); ++i)
+    for (unsigned int i = 0; i < p.GetSize(); ++i)
     {
       p[i] = i;
     }
@@ -185,7 +184,10 @@ int
 secondTest()
 {
   std::filebuf fb;
-  fb.open("IllegalTransform.txt", std::ios::out);
+  if (!fb.open("IllegalTransform.txt", std::ios::out))
+  {
+    return EXIT_FAILURE;
+  }
   std::ostream os(&fb);
   os << "#Insight Transform File V1.0" << std::endl
      << "#Transform 0" << std::endl
@@ -228,7 +230,10 @@ int
 thirdTest()
 {
   std::filebuf fb;
-  fb.open("IllegalMat.mat", std::ios::out);
+  if (!fb.open("IllegalMat.mat", std::ios::out))
+  {
+    return EXIT_FAILURE;
+  }
   std::ostream os(&fb);
   os << "Baz, Bar" << std::endl;
   fb.close();
@@ -260,13 +265,13 @@ itkIOTransformMatlabTest(int argc, char * argv[])
     itksys::SystemTools::ChangeDirectory(argv[1]);
   }
 
-  int result1 = oneTest<float>("Transforms_float.mat", "TransformsBad_float.mat");
-  int result2 = secondTest<float>();
+  const int result1 = oneTest<float>("Transforms_float.mat", "TransformsBad_float.mat");
+  const int result2 = secondTest<float>();
 
-  int result3 = oneTest<double>("Transforms_double.mat", "TransformsBad_double.mat");
-  int result4 = secondTest<double>();
+  const int result3 = oneTest<double>("Transforms_double.mat", "TransformsBad_double.mat");
+  const int result4 = secondTest<double>();
 
-  int result5 = thirdTest<double>();
+  const int result5 = thirdTest<double>();
 
   return ((!(result1 == EXIT_SUCCESS && result2 == EXIT_SUCCESS)) &&
           (!(result3 == EXIT_SUCCESS && result4 == EXIT_SUCCESS)) && (!(result5 == EXIT_SUCCESS)));

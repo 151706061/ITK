@@ -46,14 +46,12 @@ itkVectorImageToImageAdaptorTest(int, char *[])
   VectorImageType::SizeType            size;
   for (unsigned int i = 0; i < VectorLength; ++i)
   {
-    f[i] = PixelType(i);
+    f[i] = static_cast<PixelType>(i);
   }
   start.Fill(0);
   size.Fill(50);
 
-  VectorImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const VectorImageType::RegionType region{ start, size };
   vectorImage->SetVectorLength(VectorLength);
   vectorImage->SetRegions(region);
   vectorImage->Allocate();
@@ -76,8 +74,8 @@ itkVectorImageToImageAdaptorTest(int, char *[])
   adaptIt.GoToBegin();
   while (!adaptIt.IsAtEnd())
   {
-    PixelType pixelV = adaptIt.Get();
-    if (itk::Math::NotAlmostEquals(pixelV, PixelType(componentToExtract)))
+    const PixelType pixelV = adaptIt.Get();
+    if (itk::Math::NotAlmostEquals(pixelV, static_cast<PixelType>(componentToExtract)))
     {
       std::cout << "Wrong Pixel Value: adaptIt(" << adaptIt.GetIndex() << ") = " << adaptIt.Get() << std::endl;
 
@@ -87,11 +85,10 @@ itkVectorImageToImageAdaptorTest(int, char *[])
   }
 
   // test Get/SetPixel() methods
-  VectorImageToImageAdaptorType::IndexType index;
-  index.Fill(10);
+  auto index = VectorImageToImageAdaptorType::IndexType::Filled(10);
   ITK_TEST_EXPECT_EQUAL(PixelType(componentToExtract), vectorImageToImageAdaptor->GetPixel(index));
 
-  PixelType v = 4.4f;
+  constexpr PixelType v = 4.4f;
   vectorImageToImageAdaptor->SetPixel(index, v);
   ITK_TEST_EXPECT_EQUAL(v, vectorImageToImageAdaptor->GetPixel(index));
 

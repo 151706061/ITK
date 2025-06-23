@@ -30,7 +30,7 @@ itkTernaryOperatorImageFilterTest(int, char *[])
   // Test the functor
   //
 
-  itk::Functor::TernaryOperator<bool, short, short, short> func;
+  constexpr itk::Functor::TernaryOperator<bool, short, short, short> func;
 
   if ((true ? 12 : 37) != func(true, 12, 37))
   {
@@ -67,11 +67,9 @@ itkTernaryOperatorImageFilterTest(int, char *[])
   using MaskImageType = itk::Image<MaskPixelType, ImageDimension>;
   using GrayImageType = itk::Image<GrayPixelType, ImageDimension>;
 
-  MaskImageType::IndexType origin;
-  origin.Fill(0);
-  MaskImageType::SizeType size;
-  size.Fill(20);
-  MaskImageType::RegionType region(origin, size);
+  constexpr MaskImageType::IndexType origin{};
+  auto                               size = MaskImageType::SizeType::Filled(20);
+  const MaskImageType::RegionType    region(origin, size);
 
   auto mask = MaskImageType::New();
   mask->SetRegions(region);

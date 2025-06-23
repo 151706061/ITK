@@ -64,7 +64,6 @@ namespace itk
  * \sphinxexample{Core/Common/CovariantVectorDotProduct, Covariant Vector Dot Product}
  * \endsphinx
  */
-
 template <typename T, unsigned int VVectorDimension = 3>
 class ITK_TEMPLATE_EXPORT CovariantVector : public FixedArray<T, VVectorDimension>
 {
@@ -106,7 +105,7 @@ public:
   GetVnlVector();
 
   /** Get a vnl_vector with a copy of the internal memory block. */
-  vnl_vector<T>
+  [[nodiscard]] vnl_vector<T>
   GetVnlVector() const;
 
   /** Default-constructor.
@@ -190,15 +189,18 @@ public:
    * Performs the inner product of two covariant vectors.
    * \warning This is equivalent to the scalar product only if the reference
    * system has orthogonal axis and equal scales.  */
-  ValueType operator*(const Self & other) const;
+  ValueType
+  operator*(const Self & other) const;
 
   /** operator*.  Performs the scalar product with a vector (contravariant).
    * This scalar product is invariant under affine transformations */
-  ValueType operator*(const Vector<T, VVectorDimension> & other) const;
+  ValueType
+  operator*(const Vector<T, VVectorDimension> & other) const;
 
   /** Scalar operator*. Scale the elements of a vector by a scalar.
    * Return a new vector. */
-  inline Self operator*(const ValueType & val) const
+  inline Self
+  operator*(const ValueType & val) const
   {
     Self result;
 
@@ -225,7 +227,7 @@ public:
   }
 
   /** Returns the Euclidean Norm of the vector  */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetNorm() const;
 
   /** Returns the number of components in this vector type */
@@ -240,14 +242,14 @@ public:
   Normalize();
 
   /** Returns vector's Squared Euclidean Norm  */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetSquaredNorm() const;
 
   /** Copy from another CovariantVector with a different representation type.
    *  Casting is done with C-Like rules  */
-  template <typename TCoordRepB>
+  template <typename TCoordinateB>
   void
-  CastFrom(const CovariantVector<TCoordRepB, VVectorDimension> & pa)
+  CastFrom(const CovariantVector<TCoordinateB, VVectorDimension> & pa)
   {
     for (unsigned int i = 0; i < VVectorDimension; ++i)
     {
@@ -259,7 +261,8 @@ public:
 /** Premultiply Operator for product of a vector and a scalar.
  *  CovariantVector< T, N >  =  T * CovariantVector< T,N > */
 template <typename T, unsigned int VVectorDimension>
-inline CovariantVector<T, VVectorDimension> operator*(const T & scalar, const CovariantVector<T, VVectorDimension> & v)
+inline CovariantVector<T, VVectorDimension>
+operator*(const T & scalar, const CovariantVector<T, VVectorDimension> & v)
 {
   return v.operator*(scalar);
 }
@@ -267,8 +270,8 @@ inline CovariantVector<T, VVectorDimension> operator*(const T & scalar, const Co
 /** Performs the scalar product of a covariant with a contravariant.
  * This scalar product is invariant under affine transformations */
 template <typename T, unsigned int VVectorDimension>
-inline T operator*(const Vector<T, VVectorDimension> &          contravariant,
-                   const CovariantVector<T, VVectorDimension> & covariant)
+inline T
+operator*(const Vector<T, VVectorDimension> & contravariant, const CovariantVector<T, VVectorDimension> & covariant)
 {
   return covariant.operator*(contravariant);
 }
@@ -285,7 +288,7 @@ CrossProduct(CovariantVector<int, 3>, const Vector<int, 3> &, const Vector<int, 
 
 template <typename T, unsigned int VVectorDimension>
 inline void
-swap(CovariantVector<T, VVectorDimension> & a, CovariantVector<T, VVectorDimension> & b)
+swap(CovariantVector<T, VVectorDimension> & a, CovariantVector<T, VVectorDimension> & b) noexcept
 {
   a.swap(b);
 }

@@ -23,9 +23,7 @@
 #include "itkMath.h"
 #include <memory> // For make_unique.
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 // constructor
 template <typename THistogram>
@@ -79,17 +77,17 @@ HistogramToTextureFeaturesFilter<THistogram>::GenerateData()
 
   for (HistogramIterator hit = inputHistogram->Begin(); hit != inputHistogram->End(); ++hit)
   {
-    AbsoluteFrequencyType frequency = hit.GetFrequency();
-    RelativeFrequencyType relativeFrequency = frequency / totalFrequency;
+    const AbsoluteFrequencyType frequency = hit.GetFrequency();
+    const RelativeFrequencyType relativeFrequency = frequency / totalFrequency;
     m_RelativeFrequencyContainer.push_back(relativeFrequency);
   }
 
   // Now get the various means and variances. This is takes two passes
   // through the histogram.
-  double pixelMean;
-  double marginalMean;
-  double marginalDevSquared;
-  double pixelVariance;
+  double pixelMean = NAN;
+  double marginalMean = NAN;
+  double marginalDevSquared = NAN;
+  double pixelVariance = NAN;
 
   this->ComputeMeansAndVariances(pixelMean, marginalMean, marginalDevSquared, pixelVariance);
 
@@ -116,11 +114,11 @@ HistogramToTextureFeaturesFilter<THistogram>::GenerateData()
   }
   const double log2 = std::log(2.0);
 
-  typename RelativeFrequencyContainerType::const_iterator rFreqIterator = m_RelativeFrequencyContainer.begin();
+  auto rFreqIterator = m_RelativeFrequencyContainer.begin();
 
   for (HistogramIterator hit = inputHistogram->Begin(); hit != inputHistogram->End(); ++hit)
   {
-    RelativeFrequencyType frequency = *rFreqIterator;
+    const RelativeFrequencyType frequency = *rFreqIterator;
     ++rFreqIterator;
     if (Math::AlmostEquals(frequency, RelativeFrequencyType{}))
     {
@@ -182,19 +180,19 @@ HistogramToTextureFeaturesFilter<THistogram>::ComputeMeansAndVariances(double & 
   const HistogramType * inputHistogram = this->GetInput();
 
   // Initialize everything
-  typename HistogramType::SizeValueType binsPerAxis = inputHistogram->GetSize(0);
-  const auto                            marginalSums = std::make_unique<double[]>(binsPerAxis);
+  const typename HistogramType::SizeValueType binsPerAxis = inputHistogram->GetSize(0);
+  const auto                                  marginalSums = std::make_unique<double[]>(binsPerAxis);
   pixelMean = 0;
 
-  typename RelativeFrequencyContainerType::const_iterator rFreqIterator = m_RelativeFrequencyContainer.begin();
+  auto rFreqIterator = m_RelativeFrequencyContainer.begin();
 
   // Ok, now do the first pass through the histogram to get the marginal sums
   // and compute the pixel mean
   HistogramIterator hit = inputHistogram->Begin();
   while (hit != inputHistogram->End())
   {
-    RelativeFrequencyType frequency = *rFreqIterator;
-    IndexType             index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
+    const RelativeFrequencyType frequency = *rFreqIterator;
+    IndexType                   index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
     pixelMean += index[0] * frequency;
     marginalSums[index[0]] += frequency;
     ++hit;
@@ -215,13 +213,13 @@ HistogramToTextureFeaturesFilter<THistogram>::ComputeMeansAndVariances(double & 
   marginalDevSquared = 0;
   for (unsigned int arrayIndex = 1; arrayIndex < binsPerAxis; ++arrayIndex)
   {
-    int    k = arrayIndex + 1;
-    double M_k_minus_1 = marginalMean;
-    double S_k_minus_1 = marginalDevSquared;
-    double x_k = marginalSums[arrayIndex];
+    const int    k = arrayIndex + 1;
+    const double M_k_minus_1 = marginalMean;
+    const double S_k_minus_1 = marginalDevSquared;
+    const double x_k = marginalSums[arrayIndex];
 
-    double M_k = M_k_minus_1 + (x_k - M_k_minus_1) / k;
-    double S_k = S_k_minus_1 + (x_k - M_k_minus_1) * (x_k - M_k);
+    const double M_k = M_k_minus_1 + (x_k - M_k_minus_1) / k;
+    const double S_k = S_k_minus_1 + (x_k - M_k_minus_1) * (x_k - M_k);
 
     marginalMean = M_k;
     marginalDevSquared = S_k;
@@ -233,8 +231,8 @@ HistogramToTextureFeaturesFilter<THistogram>::ComputeMeansAndVariances(double & 
   pixelVariance = 0;
   for (hit = inputHistogram->Begin(); hit != inputHistogram->End(); ++hit)
   {
-    RelativeFrequencyType frequency = *rFreqIterator;
-    IndexType             index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
+    const RelativeFrequencyType frequency = *rFreqIterator;
+    IndexType                   index = inputHistogram->GetIndex(hit.GetInstanceIdentifier());
     pixelVariance += (index[0] - pixelMean) * (index[0] - pixelMean) * frequency;
     ++rFreqIterator;
   }
@@ -385,7 +383,6 @@ HistogramToTextureFeaturesFilter<THistogram>::PrintSelf(std::ostream & os, Inden
 {
   Superclass::PrintSelf(os, indent);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

@@ -22,9 +22,7 @@
 #include "itkFEMMaterialBase.h"
 #include "ITKFEMExport.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class MaterialLinearElasticity
@@ -47,7 +45,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MaterialLinearElasticity);
 
   /** CreateAnother method will clone the existing instance of this type,
@@ -172,7 +170,6 @@ protected:
    */
   double m_DensityHeatCapacity{ 1.0 };
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMMaterialLinearElasticity_h

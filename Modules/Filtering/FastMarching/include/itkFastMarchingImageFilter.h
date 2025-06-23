@@ -73,9 +73,7 @@ extern ITKFastMarching_EXPORT std::ostream &
  * Fast Marching sweeps through N grid points in (N log N) steps to obtain
  * the arrival time value as the front propagates through the grid.
  *
- * Implementation of this class is based on Chapter 8 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999a.
  *
  * This class is templated over the level set image type and the speed
  * image type. The initial front is specified by two containers: one
@@ -146,7 +144,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingImageFilter);
 
   /** Typedef support of level set method types. */
@@ -168,7 +166,7 @@ public:
   {
   public:
     AxisNodeType() = default;
-    int
+    [[nodiscard]] int
     GetAxis() const
     {
       return m_Axis;
@@ -315,8 +313,10 @@ public:
       The values in the Speed Image is divided by this
       factor. This allows the use of images with
       integer pixel types to represent the speed. */
+  /** @ITKStartGrouping */
   itkSetMacro(NormalizationFactor, double);
   itkGetConstMacro(NormalizationFactor, double);
+  /** @ITKEndGrouping */
 
   /** Set the Fast Marching algorithm Stopping Value. The Fast Marching
    * algorithm is terminated when the value of the smallest trial point
@@ -333,8 +333,10 @@ public:
   itkSetMacro(CollectPoints, bool);
 
   /** Get the Const Collect Points flag. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(CollectPoints, bool);
   itkBooleanMacro(CollectPoints);
+  /** @ITKEndGrouping */
 
   /** Get the container of Processed Points. If the CollectPoints flag
    * is set, the algorithm collects a container of all processed nodes.
@@ -352,6 +354,7 @@ public:
    * parameters can be specified using methods SetOutputRegion(), SetOutputSpacing(), SetOutputDirection(),
    * and SetOutputOrigin(). Else if the speed image is not nullptr, the output information
    * is copied from the input speed image. */
+  /** @ITKStartGrouping */
   virtual void
   SetOutputSize(const OutputSizeType & size)
   {
@@ -373,15 +376,12 @@ public:
   itkSetMacro(OverrideOutputInformation, bool);
   itkGetConstReferenceMacro(OverrideOutputInformation, bool);
   itkBooleanMacro(OverrideOutputInformation);
+  /** @ITKEndGrouping */
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<SetDimension, SpeedImageDimension>));
   itkConceptMacro(SpeedConvertibleToDoubleCheck, (Concept::Convertible<typename TSpeedImage::PixelType, double>));
   itkConceptMacro(DoubleConvertibleToLevelSetCheck, (Concept::Convertible<double, PixelType>));
   itkConceptMacro(LevelSetOStreamWritableCheck, (Concept::OStreamWritable<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   FastMarchingImageFilter();

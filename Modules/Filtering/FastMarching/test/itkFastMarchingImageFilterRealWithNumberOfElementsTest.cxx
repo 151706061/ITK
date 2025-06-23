@@ -53,10 +53,9 @@ itkFastMarchingImageFilterRealWithNumberOfElementsTest(int, char *[])
 
   NodePairType node_pair;
 
-  FloatImageType::OffsetType offset0 = { { 28, 35 } };
+  constexpr FloatImageType::OffsetType offset0 = { { 28, 35 } };
 
-  itk::Index<2> index;
-  index.Fill(0);
+  itk::Index<2> index{};
 
   node_pair.SetValue(0.0);
   node_pair.SetNode(index + offset0);
@@ -104,7 +103,7 @@ itkFastMarchingImageFilterRealWithNumberOfElementsTest(int, char *[])
   marcher->SetTrialPoints(trial);
 
   // specify the size of the output image
-  FloatImageType::SizeType size = { { 64, 64 } };
+  constexpr FloatImageType::SizeType size = { { 64, 64 } };
   marcher->SetOutputSize(size);
 
   // setup a speed image of ones
@@ -144,7 +143,7 @@ itkFastMarchingImageFilterRealWithNumberOfElementsTest(int, char *[])
   ITK_TRY_EXPECT_NO_EXCEPTION(thresholder->Update());
 
 
-  OutputImageType::Pointer output = thresholder->GetOutput();
+  const OutputImageType::Pointer output = thresholder->GetOutput();
 
   using OutputIteratorType = itk::ImageRegionConstIterator<OutputImageType>;
 
@@ -166,8 +165,6 @@ itkFastMarchingImageFilterRealWithNumberOfElementsTest(int, char *[])
   {
     return EXIT_SUCCESS;
   }
-  else
-  {
-    return EXIT_FAILURE;
-  }
+
+  return EXIT_FAILURE;
 }

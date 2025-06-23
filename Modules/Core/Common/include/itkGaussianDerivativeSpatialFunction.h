@@ -53,7 +53,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianDerivativeSpatialFunction);
 
   /** Input type for the function. */
@@ -79,6 +79,7 @@ public:
   EvaluateVector(const TInput & position) const;
 
   /** Gets and sets for gaussian parameters */
+  /** @ITKStartGrouping */
   itkSetMacro(Scale, double);
   itkGetConstMacro(Scale, double);
   itkSetMacro(Normalized, bool);
@@ -89,7 +90,7 @@ public:
   itkGetConstMacro(Mean, ArrayType);
   itkSetMacro(Direction, unsigned int);
   itkGetConstMacro(Direction, unsigned int);
-
+  /** @ITKEndGrouping */
 protected:
   GaussianDerivativeSpatialFunction() = default;
   ~GaussianDerivativeSpatialFunction() override = default;

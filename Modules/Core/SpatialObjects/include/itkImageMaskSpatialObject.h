@@ -18,6 +18,7 @@
 #ifndef itkImageMaskSpatialObject_h
 #define itkImageMaskSpatialObject_h
 
+#include "itkNumericTraits.h"
 #include "itkImageSpatialObject.h"
 #include "itkImageSliceConstIteratorWithIndex.h"
 
@@ -33,9 +34,10 @@ namespace itk
  * Image Registration Metrics.
  *
  * \note The bounding box of an image mask is defined in such a way that
- * any point whose nearest pixel has a non-zero value is inside the
- * bounding box. When all the pixels of an image are zero, the bounding box
- * of the image mask is empty, and its bounds are all zero.
+ * any point whose nearest pixel has a non-zero value (or matches the
+ * specified mask value) is inside the bounding box. When all the pixels of
+ * an image are zero, the bounding box of the image mask is empty, and
+ * its bounds are all zero.
  *
  * \sa ImageSpatialObject SpatialObject CompositeSpatialObject
  * \ingroup ITKSpatialObjects
@@ -69,18 +71,31 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageMaskSpatialObject);
 
   /** Test whether a point is inside the object.
    *
-   * A point is inside the image mask when the value of its nearest pixel is non-zero.
+   * A point is inside the image mask when the value of its nearest pixel is
+   * non-zero or matches the Mask_Value value.
    *
    * For computational speed purposes, it is faster if the method does not  check the name of the class and the
    * current depth.
    */
   bool
   IsInsideInObjectSpace(const PointType & point) const override;
+
+  /** Specify the value in the mask image that defines the object.
+   * You must also call SetUseMaskValue(true) to enable the use
+   * of the mask value, otherwise the value is ignored and any
+   * non-zero value in the mask is used to define the object. */
+  /** @ITKStartGrouping */
+  itkSetMacro(MaskValue, PixelType);
+  itkGetConstReferenceMacro(MaskValue, PixelType);
+  /** @ITKEndGrouping */
+  itkBooleanMacro(UseMaskValue);
+  itkSetMacro(UseMaskValue, bool);
+  itkGetConstReferenceMacro(UseMaskValue, bool);
 
   /* Avoid hiding the overload that supports depth and name arguments */
   using Superclass::IsInsideInObjectSpace;
@@ -102,7 +117,7 @@ public:
   /** Compute axis aligned bounding box from the image mask.
    * \note With ITK 5.0, this function is superseded by `ComputeMyBoundingBoxInIndexSpace()`
    */
-  itkLegacyMacro(RegionType GetAxisAlignedBoundingBoxRegion() const);
+  itkLegacyMacro(RegionType GetAxisAlignedBoundingBoxRegion() const;)
 
 #endif
 
@@ -116,8 +131,12 @@ protected:
   ImageMaskSpatialObject();
   ~ImageMaskSpatialObject() override = default;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
+
+private:
+  bool      m_UseMaskValue{ false };
+  PixelType m_MaskValue{ NumericTraits<PixelType>::OneValue() };
 };
 } // end of namespace itk
 

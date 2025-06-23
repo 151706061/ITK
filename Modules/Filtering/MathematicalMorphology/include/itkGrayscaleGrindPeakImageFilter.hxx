@@ -37,11 +37,7 @@
 namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
-GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::GrayscaleGrindPeakImageFilter()
-
-{
-  m_FullyConnected = false;
-}
+GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::GrayscaleGrindPeakImageFilter() = default;
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -51,7 +47,7 @@ GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::GenerateInputRequested
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -80,16 +76,14 @@ GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::GenerateData()
   //
 
   // compute the minimum pixel value in the input
-  typename MinimumMaximumImageCalculator<TInputImage>::Pointer calculator =
-    MinimumMaximumImageCalculator<TInputImage>::New();
+  auto calculator = MinimumMaximumImageCalculator<TInputImage>::New();
   calculator->SetImage(this->GetInput());
   calculator->ComputeMinimum();
 
-  InputImagePixelType minValue;
-  minValue = calculator->GetMinimum();
+  const InputImagePixelType minValue = calculator->GetMinimum();
 
   // allocate a marker image
-  InputImagePointer markerPtr = InputImageType::New();
+  const InputImagePointer markerPtr = InputImageType::New();
   markerPtr->SetRegions(this->GetInput()->GetRequestedRegion());
   markerPtr->CopyInformation(this->GetInput());
   markerPtr->Allocate();
@@ -120,8 +114,7 @@ GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Delegate to a geodesic dilation filter.
   //
   //
-  typename ReconstructionByDilationImageFilter<TInputImage, TInputImage>::Pointer dilate =
-    ReconstructionByDilationImageFilter<TInputImage, TInputImage>::New();
+  auto dilate = ReconstructionByDilationImageFilter<TInputImage, TInputImage>::New();
 
   // Create a process accumulator for tracking the progress of this minipipeline
   auto progress = ProgressAccumulator::New();
@@ -154,7 +147,7 @@ GrayscaleGrindPeakImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream
   Superclass::PrintSelf(os, indent);
 
   os << indent << "Number of iterations used to produce current output: " << m_NumberOfIterationsUsed << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

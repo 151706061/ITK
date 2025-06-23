@@ -40,7 +40,7 @@ namespace itk
  * possible, and so m_Origin and m_Spacing should be ignored.  They exist only
  * to allow the possibility of running a "spatially-aware" filter in raw index
  * space, as if the SpecialCoordinatesImage data was laid out on a regular grid.
- * Note that this may or may not produce useful results, and it is up the the
+ * Note that this may or may not produce useful results, and it is up the
  * user to determine the appropriateness of running a filter designed for normal
  * images on special-coordinates images.
  *
@@ -107,7 +107,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SpecialCoordinatesImage);
 
   /** Pixel type alias support Used to declare pixel type in filters
@@ -193,7 +193,7 @@ public:
   void
   SetPixel(const IndexType & index, const TPixel & value)
   {
-    OffsetValueType offset = this->FastComputeOffset(index);
+    const OffsetValueType offset = this->FastComputeOffset(index);
     (*m_Buffer)[offset] = value;
   }
 
@@ -204,7 +204,7 @@ public:
   const TPixel &
   GetPixel(const IndexType & index) const
   {
-    OffsetValueType offset = this->FastComputeOffset(index);
+    const OffsetValueType offset = this->FastComputeOffset(index);
     return ((*m_Buffer)[offset]);
   }
 
@@ -215,7 +215,7 @@ public:
   TPixel &
   GetPixel(const IndexType & index)
   {
-    OffsetValueType offset = this->FastComputeOffset(index);
+    const OffsetValueType offset = this->FastComputeOffset(index);
     return ((*m_Buffer)[offset]);
   }
 
@@ -223,16 +223,25 @@ public:
    *
    * For efficiency, this function does not check that the
    * image has actually been allocated yet. */
-  TPixel & operator[](const IndexType & index) { return this->GetPixel(index); }
+  TPixel &
+  operator[](const IndexType & index)
+  {
+    return this->GetPixel(index);
+  }
 
   /** \brief Access a pixel. This version can only be an rvalue.
    *
    * For efficiency, this function does not check that the
    * image has actually been allocated yet. */
-  const TPixel & operator[](const IndexType & index) const { return this->GetPixel(index); }
+  const TPixel &
+  operator[](const IndexType & index) const
+  {
+    return this->GetPixel(index);
+  }
 
   /** Return a pointer to the beginning of the buffer.  This is used by
    * the image iterator class. */
+  /** @ITKStartGrouping */
   TPixel *
   GetBufferPointer()
   {
@@ -243,7 +252,7 @@ public:
   {
     return m_Buffer ? m_Buffer->GetBufferPointer() : nullptr;
   }
-
+  /** @ITKEndGrouping */
   /** Return a pointer to the container. */
   PixelContainer *
   GetPixelContainer()
@@ -281,6 +290,7 @@ public:
    * to the output of a normal filter which is being used to output a
    * special-coordinates image.  Filters designed to produce a particular kind
    * of special-coordinates image should do this automatically. */
+  /** @ITKStartGrouping */
   void
   SetSpacing(const SpacingType &) override
   {}
@@ -299,29 +309,29 @@ public:
   void
   SetOrigin(const float[VImageDimension]) override
   {}
-
+  /** @ITKEndGrouping */
   /* It is ILLEGAL in C++ to make a templated member function virtual! */
   /* Therefore, we must just let templates take care of everything.    */
   /*
-  template<typename TCoordRep>
+  template<typename TCoordinate>
   virtual bool TransformPhysicalPointToContinuousIndex(
-              const Point<TCoordRep, VImageDimension>& point,
-              ContinuousIndex<TCoordRep, VImageDimension>& index   ) const = 0;
+              const Point<TCoordinate, VImageDimension>& point,
+              ContinuousIndex<TCoordinate, VImageDimension>& index   ) const = 0;
 
-  template<typename TCoordRep>
+  template<typename TCoordinate>
   virtual bool TransformPhysicalPointToIndex(
-            const Point<TCoordRep, VImageDimension>&,
+            const Point<TCoordinate, VImageDimension>&,
             IndexType & index                                ) const = 0;
 
-  template<typename TCoordRep>
+  template<typename TCoordinate>
   virtual void TransformContinuousIndexToPhysicalPoint(
-            const ContinuousIndex<TCoordRep, VImageDimension>& index,
-            Point<TCoordRep, VImageDimension>& point        ) const = 0;
+            const ContinuousIndex<TCoordinate, VImageDimension>& index,
+            Point<TCoordinate, VImageDimension>& point        ) const = 0;
 
-  template<typename TCoordRep>
+  template<typename TCoordinate>
   virtual void TransformIndexToPhysicalPoint(
                       const IndexType & index,
-                      Point<TCoordRep, VImageDimension>& point ) const = 0;
+                      Point<TCoordinate, VImageDimension>& point ) const = 0;
   */
 
 protected:

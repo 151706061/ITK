@@ -78,7 +78,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MatchCardinalityImageToImageMetric);
 
   /** Types transferred from the base class */
@@ -120,9 +120,11 @@ public:
    * other words, the metric measures the percentage of pixel matches
    * or mismatches. The default is to measure matches
    * (MeasureMatchesOn). */
+  /** @ITKStartGrouping */
   itkSetMacro(MeasureMatches, bool);
   itkBooleanMacro(MeasureMatches);
   itkGetConstMacro(MeasureMatches, bool);
+  /** @ITKEndGrouping */
 
   /** Return the multithreader used by this class. */
   MultiThreaderBase *

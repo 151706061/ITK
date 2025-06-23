@@ -87,7 +87,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PipelineMonitorImageFilter);
 
   /** Enable/Disable clearing all saved pipeline information when
@@ -128,7 +128,7 @@ public:
   bool
   VerifyDownStreamFilterExecutedPropagation();
 
-  /** Verifies the the GenerateData executed the expected number of
+  /** Verifies the GenerateData executed the expected number of
    * times.
    *
    * If expectedNumber is positive then the number of updates must
@@ -158,7 +158,7 @@ public:
   VerifyInputFilterRequestedLargestRegion();
 
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfUpdates() const
   {
     return m_NumberOfUpdates;

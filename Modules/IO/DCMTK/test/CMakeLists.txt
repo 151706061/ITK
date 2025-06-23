@@ -1,16 +1,18 @@
 itk_module_test()
-set(ITKIODCMTKTests
-    itkDCMTKImageIOTest.cxx
-    itkDCMTKRGBImageIOTest.cxx
-    itkDCMTKSeriesReadImageWrite.cxx
-    itkDCMTKSeriesStreamReadImageWrite.cxx
-    itkDCMTKImageIOOrthoDirTest.cxx
-    itkDCMTKMultiFrame4DTest.cxx
-    itkDCMTKLoggerTest.cxx
-    itkDCMTKImageIOSlopeInterceptTest.cxx
-    itkDCMTKImageIOMultiFrameImageTest.cxx
-    itkDCMTKImageIONoPreambleTest.cxx
-    itkDCMTKImageIOSpacingTest.cxx)
+set(
+  ITKIODCMTKTests
+  itkDCMTKImageIOTest.cxx
+  itkDCMTKRGBImageIOTest.cxx
+  itkDCMTKSeriesReadImageWrite.cxx
+  itkDCMTKSeriesStreamReadImageWrite.cxx
+  itkDCMTKImageIOOrthoDirTest.cxx
+  itkDCMTKMultiFrame4DTest.cxx
+  itkDCMTKLoggerTest.cxx
+  itkDCMTKImageIOSlopeInterceptTest.cxx
+  itkDCMTKImageIOMultiFrameImageTest.cxx
+  itkDCMTKImageIONoPreambleTest.cxx
+  itkDCMTKImageIOSpacingTest.cxx
+)
 
 createtestdriver(ITKIODCMTK "${ITKIODCMTK-Test_LIBRARIES}" "${ITKIODCMTKTests}")
 
@@ -23,7 +25,8 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Input/dicom-sc_cs-1.dcm}
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest.dcm
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest.png
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest.dcm)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest.dcm
+)
 
 itk_add_test(
   NAME
@@ -34,7 +37,8 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Input/itkGDCMImageIOTest.dcm}
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest2.dcm
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest2.png
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest2.dcm)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest2.dcm
+)
 
 itk_add_test(
   NAME
@@ -45,7 +49,8 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Input/012345.002.050}
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest3.dcm
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest3.png
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest3.dcm)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest3.dcm
+)
 
 itk_add_test(
   NAME
@@ -56,7 +61,32 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Input/itkGDCMImageIOTest3.dcm}
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest4.dcm
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest4.png
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest4.dcm)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest4.dcm
+)
+
+itk_add_test(
+  NAME
+  itkDCMTKImageIOTest5
+  COMMAND
+  ITKIODCMTKTestDriver
+  itkDCMTKImageIOTest
+  DATA{Input/preamble.dcm}
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest5.dcm
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest5.png
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest5.dcm
+)
+
+itk_add_test(
+  NAME
+  itkDCMTKImageIOTest6
+  COMMAND
+  ITKIODCMTKTestDriver
+  itkDCMTKImageIOTest
+  DATA{Input/no_preamble.dcm}
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest6.dcm
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKImageIOTest6.png
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKRescaleImageIOTest6.dcm
+)
 
 itk_add_test(
   NAME
@@ -68,7 +98,8 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKSeriesReadImageWrite.vtk
   0
   0
-  0)
+  0
+)
 
 itk_add_test(
   NAME
@@ -80,12 +111,17 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKSeriesReadImageWrite.vtk
   0
   0
-  0)
+  0
+)
 
 set_property(
-  TEST itkDCMTKSeriesReadImageWrite
+  TEST
+    itkDCMTKSeriesReadImageWrite
   APPEND
-  PROPERTY DEPENDS ITKData)
+  PROPERTY
+    DEPENDS
+      ITKData
+)
 
 itk_add_test(
   NAME
@@ -98,7 +134,8 @@ itk_add_test(
   0.859375
   0.85939
   1.60016
-  0)
+  0
+)
 
 itk_add_test(
   NAME
@@ -115,7 +152,8 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKSeriesImageOrientationWrite1.mha
   0
   0
-  0)
+  0
+)
 
 itk_add_test(
   NAME
@@ -123,7 +161,8 @@ itk_add_test(
   COMMAND
   ITKIODCMTKTestDriver
   itkDCMTKImageIOOrthoDirTest
-  DATA{${ITK_DATA_ROOT}/Input/OrthogonalDirectionsTest.dcm})
+  DATA{${ITK_DATA_ROOT}/Input/OrthogonalDirectionsTest.dcm}
+)
 
 itk_add_test(
   NAME
@@ -132,7 +171,8 @@ itk_add_test(
   ITKIODCMTKTestDriver
   itkDCMTKMultiFrame4DTest
   DATA{${ITK_DATA_ROOT}/Input/Philips_4D_DICOM.dcm}
-  ${ITK_TEST_OUTPUT_DIR}/Philips_4D_DICOM.nrrd)
+  ${ITK_TEST_OUTPUT_DIR}/Philips_4D_DICOM.nrrd
+)
 
 itk_add_test(
   NAME
@@ -146,7 +186,8 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Input/itkDCMTKNonSquare.dcm}
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKNonSquare.nii.gz
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKNonSquare.nii.gz
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKNonSquareRescale.dcm)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKNonSquareRescale.dcm
+)
 
 itk_add_test(
   NAME
@@ -158,14 +199,29 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkDCMTKColorImage.png
   itkDCMTKRGBImageIOTest
   DATA{${ITK_DATA_ROOT}/Input/RGBDicomTest.dcm}
-  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKColorImage.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKColorImage.png
+)
+
+itk_add_test(
+  NAME
+  itkDCMTKRGBImageIOColorImageSpatialMetadataTest
+  COMMAND
+  ITKIODCMTKTestDriver
+  --compare
+  DATA{Baseline/itkDCMTKColorImageSpatialMetadata.nrrd}
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKColorImageSpatialMetadata.nrrd
+  itkDCMTKRGBImageIOTest
+  DATA{Input/visible-male-rgb-slice.dcm}
+  ${ITK_TEST_OUTPUT_DIR}/itkDCMTKColorImageSpatialMetadata.nrrd
+)
 
 itk_add_test(
   NAME
   ITKDCMTKLoggerTest
   COMMAND
   ITKIODCMTKTestDriver
-  itkDCMTKLoggerTest)
+  itkDCMTKLoggerTest
+)
 
 itk_add_test(
   NAME
@@ -174,7 +230,8 @@ itk_add_test(
   ITKIODCMTKTestDriver
   itkDCMTKImageIOSlopeInterceptTest
   DATA{Input/slopeInterceptOrig.dcm}
-  DATA{Input/slopeIntercept.dcm})
+  DATA{Input/slopeIntercept.dcm}
+)
 
 # Requires additional logic in DCMTKFileReader::GetSpacing
 #itk_add_test(NAME itkDCMTKImageIOMultiFrameImageTest
@@ -188,9 +245,22 @@ itk_add_test(
   COMMAND
   ITKIODCMTKTestDriver
   itkDCMTKImageIONoPreambleTest
-  DATA{Input/NoPreambleDicomTest.dcm})
+  DATA{Input/NoPreambleDicomTest.dcm}
+)
+
+# Re-use the test driver to ensure that CanReadFile returns true for a file
+# with a preamble.
+itk_add_test(
+  NAME
+  itkDCMTKImageIOPreambleCanReadTest
+  COMMAND
+  ITKIODCMTKTestDriver
+  itkDCMTKImageIONoPreambleTest
+  DATA{Input/preamble.dcm}
+)
 
 itk_add_test(
   NAME itkDCMTKImageIOSpacingTest
   COMMAND ITKIODCMTKTestDriver itkDCMTKImageIOSpacingTest
-  DATA{Input/MultiFrameMRIZSpacing.dcm})
+  DATA{Input/MultiFrameMRIZSpacing.dcm}
+)

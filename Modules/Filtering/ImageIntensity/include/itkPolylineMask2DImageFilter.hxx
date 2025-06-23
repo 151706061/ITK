@@ -67,9 +67,10 @@ PolylineMask2DImageFilter<TInputImage, TPolyline, TOutputImage>::GenerateData()
   using VertexType = typename TPolyline::VertexType;
   using VertexListType = typename TPolyline::VertexListType;
 
-  typename TInputImage::ConstPointer inputImagePtr(dynamic_cast<const TInputImage *>(this->ProcessObject::GetInput(0)));
-  typename TPolyline::ConstPointer   polylinePtr(dynamic_cast<const TPolyline *>(this->ProcessObject::GetInput(1)));
-  typename TOutputImage::Pointer     outputImagePtr(dynamic_cast<TOutputImage *>(this->ProcessObject::GetOutput(0)));
+  const typename TInputImage::ConstPointer inputImagePtr(
+    dynamic_cast<const TInputImage *>(this->ProcessObject::GetInput(0)));
+  const typename TPolyline::ConstPointer polylinePtr(dynamic_cast<const TPolyline *>(this->ProcessObject::GetInput(1)));
+  const typename TOutputImage::Pointer outputImagePtr(dynamic_cast<TOutputImage *>(this->ProcessObject::GetOutput(0)));
 
   outputImagePtr->SetOrigin(inputImagePtr->GetOrigin());
   outputImagePtr->SetSpacing(inputImagePtr->GetSpacing());
@@ -106,14 +107,12 @@ PolylineMask2DImageFilter<TInputImage, TPolyline, TOutputImage>::GenerateData()
   // reset piter
   piter = container->Begin();
 
-  /* define flag to indicate the line segment slope */
-  bool pflag;
 
   /* define background, foreground pixel values and unlabeled pixel value */
-  PixelType zero_val{};
-  auto      u_val = static_cast<PixelType>(0);
-  auto      b_val = static_cast<PixelType>(2);
-  auto      f_val = static_cast<PixelType>(255);
+  constexpr PixelType zero_val{};
+  auto                u_val = static_cast<PixelType>(0);
+  auto                b_val = static_cast<PixelType>(2);
+  auto                f_val = static_cast<PixelType>(255);
   outputImagePtr->FillBuffer(u_val);
 
   pstartVertex = piter.Value();
@@ -121,8 +120,7 @@ PolylineMask2DImageFilter<TInputImage, TPolyline, TOutputImage>::GenerateData()
   tmpVertex = pstartVertex;
   ++piter;
 
-  ImageIndexType tmpImageIndex;
-  tmpImageIndex.Fill(0);
+  ImageIndexType tmpImageIndex{};
 
   ImageLineIteratorType imit(outputImagePtr, outputImagePtr->GetLargestPossibleRegion());
   imit.SetDirection(0);
@@ -131,7 +129,8 @@ PolylineMask2DImageFilter<TInputImage, TPolyline, TOutputImage>::GenerateData()
 
   while (piter != container->End())
   {
-    pflag = false;
+    /* define flag to indicate the line segment slope */
+    bool pflag = false;
     startVertex = tmpVertex;
     endVertex = piter.Value();
 
@@ -178,7 +177,7 @@ PolylineMask2DImageFilter<TInputImage, TPolyline, TOutputImage>::GenerateData()
   }
 
   /* Close the polygon */
-  pflag = false;
+  bool pflag = false;
   startVertex = tmpVertex;
   endVertex = pstartVertex;
 

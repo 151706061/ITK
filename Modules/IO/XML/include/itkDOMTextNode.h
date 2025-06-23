@@ -51,13 +51,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DOMTextNode);
 
   /** Functions to set/get the enclosed text of this node. */
+  /** @ITKStartGrouping */
   itkSetMacro(Text, const std::string &);
   itkGetConstReferenceMacro(Text, std::string);
-
+  /** @ITKEndGrouping */
 protected:
   DOMTextNode() { this->SetName("!"); }
 

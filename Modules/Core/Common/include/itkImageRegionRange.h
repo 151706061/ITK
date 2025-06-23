@@ -225,7 +225,11 @@ private:
 
 
     /**  Returns a reference to the current pixel. */
-    reference operator*() const noexcept { return *m_BufferIterator; }
+    reference
+    operator*() const noexcept
+    {
+      return *m_BufferIterator;
+    }
 
     /** Prefix increment ('++it'). */
     QualifiedIterator &
@@ -363,7 +367,7 @@ public:
 
 
   /** Returns an iterator to the first pixel. */
-  iterator
+  [[nodiscard]] iterator
   begin() const noexcept
   {
     return iterator{ m_BufferBegin + Self::ComputeOffset(m_OffsetTable, m_BufferedRegionIndex, m_IterationRegionIndex),
@@ -373,7 +377,7 @@ public:
   }
 
   /** Returns an 'end iterator' for this range. */
-  iterator
+  [[nodiscard]] iterator
   end() const noexcept
   {
     auto endRegionIndex = m_IterationRegionIndex;
@@ -390,42 +394,42 @@ public:
 
   /** Returns a const iterator to the first pixel.
    * Provides only read-only access to the pixel data. */
-  const_iterator
+  [[nodiscard]] const_iterator
   cbegin() const noexcept
   {
     return this->begin();
   }
 
   /** Returns a const 'end iterator' for this range. */
-  const_iterator
+  [[nodiscard]] const_iterator
   cend() const noexcept
   {
     return this->end();
   }
 
   /** Returns a reverse 'begin iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rbegin() const noexcept
   {
     return reverse_iterator{ this->end() };
   }
 
   /** Returns a reverse 'end iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rend() const noexcept
   {
     return reverse_iterator{ this->begin() };
   }
 
   /** Returns a const reverse 'begin iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crbegin() const noexcept
   {
     return this->rbegin();
   }
 
   /** Returns a const reverse 'end iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crend() const noexcept
   {
     return this->rend();
@@ -433,7 +437,7 @@ public:
 
 
   /** Returns the size of the range, that is the number of pixels in the region. */
-  size_t
+  [[nodiscard]] size_t
   size() const noexcept
   {
     return std::accumulate(
@@ -442,7 +446,7 @@ public:
 
 
   /** Tells whether the range is empty. */
-  bool
+  [[nodiscard]] bool
   empty() const noexcept
   {
     return std::any_of(m_IterationRegionSize.begin(), m_IterationRegionSize.end(), [](const SizeValueType sizeValue) {
@@ -458,7 +462,7 @@ public:
 
 // Deduction guide to avoid compiler warnings (-wctad-maybe-unsupported) when using class template argument deduction.
 template <typename TImage>
-ImageRegionRange(TImage &)->ImageRegionRange<TImage>;
+ImageRegionRange(TImage &) -> ImageRegionRange<TImage>;
 
 } // namespace itk
 

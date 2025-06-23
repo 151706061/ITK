@@ -139,6 +139,7 @@ public:
    * Index type alias support While these were already typedef'ed in the superclass
    * they need to be redone here for this subclass to compile properly with gcc.
    */
+
   /** Types inherited from the Superclass */
   using typename Superclass::IndexType;
   using typename Superclass::SizeType;
@@ -151,8 +152,8 @@ public:
     : ImageConstIteratorWithOnlyIndex<TImage>()
   {}
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageRegionConstIteratorWithOnlyIndex(const TImage * ptr, const RegionType & region)
     : ImageConstIteratorWithOnlyIndex<TImage>(ptr, region)
   {}

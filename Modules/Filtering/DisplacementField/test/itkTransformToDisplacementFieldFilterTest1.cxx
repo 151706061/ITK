@@ -72,11 +72,9 @@ itkTransformToDisplacementFieldFilterTest1(int argc, char * argv[])
 
 
   // Create input image.
-  SizeType size;
-  size.Fill(24);
-  IndexType index;
-  index.Fill(0);
-  SpacingType spacing;
+  auto                size = SizeType::Filled(24);
+  constexpr IndexType index{};
+  SpacingType         spacing;
   spacing[0] = 1.1;
   spacing[1] = 2.2;
   spacing[2] = 3.3;
@@ -97,10 +95,8 @@ itkTransformToDisplacementFieldFilterTest1(int argc, char * argv[])
   inputDirection[2][1] = -1;
   inputDirection[2][2] = 0;
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
-  auto image = ImageType::New();
+  const RegionType region{ index, size };
+  auto             image = ImageType::New();
   image->SetRegions(region);
   image->Allocate();
   image->SetSpacing(spacing);
@@ -136,14 +132,10 @@ itkTransformToDisplacementFieldFilterTest1(int argc, char * argv[])
   }
 
   // Set Output information.
-  IndexType outputIndex;
-  outputIndex.Fill(0);
-  SpacingType outputSpacing;
-  SizeType    outputSize;
-  outputSize.Fill(24);
-  RegionType outputRegion;
-  outputRegion.SetSize(outputSize);
-  outputRegion.SetIndex(outputIndex);
+  constexpr IndexType outputIndex{};
+  SpacingType         outputSpacing;
+  auto                outputSize = SizeType::Filled(24);
+  const RegionType    outputRegion{ outputIndex, outputSize };
   outputSpacing[0] = 1.0;
   outputSpacing[1] = 2.0;
   outputSpacing[2] = 3.0;
@@ -151,14 +143,13 @@ itkTransformToDisplacementFieldFilterTest1(int argc, char * argv[])
   outputOrigin[0] = 50;
   outputOrigin[1] = 30;
   outputOrigin[2] = -60;
-  DirectionType outputDirection = inputDirection;
+  const DirectionType outputDirection = inputDirection;
 
   // Create transforms.
   auto eulerTransform = TransformType::New();
   {
     // Set the options.
-    IndexType imageCenter;
-    imageCenter.Fill(11);
+    auto      imageCenter = IndexType::Filled(11);
     PointType centerPoint;
     image->TransformIndexToPhysicalPoint(imageCenter, centerPoint);
     eulerTransform->SetCenter(centerPoint);

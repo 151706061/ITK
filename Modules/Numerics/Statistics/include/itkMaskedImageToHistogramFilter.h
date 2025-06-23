@@ -22,9 +22,7 @@
 #include "itkImageToHistogramFilter.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class MaskedImageToHistogramFilter
@@ -54,7 +52,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MaskedImageToHistogramFilter);
 
   /** standard New() method support */
@@ -77,9 +75,10 @@ public:
   using MaskPixelType = typename MaskImageType::PixelType;
 
   /** Method to set/get the mask */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MaskImage, MaskImageType);
   itkGetInputMacro(MaskImage, MaskImageType);
-
+  /** @ITKEndGrouping */
   /** Set the pixel value treated as on in the mask.
    * Only pixels with this value will be added to the histogram.
    */
@@ -94,8 +93,7 @@ protected:
   void
   ThreadedComputeMinimumAndMaximum(const RegionType & inputRegionForThread) override;
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkMaskedImageToHistogramFilter.hxx"

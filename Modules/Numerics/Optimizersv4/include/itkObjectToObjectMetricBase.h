@@ -59,9 +59,10 @@ public:
 };
 // Define how to print enumeration
 extern ITKOptimizersv4_EXPORT std::ostream &
-                              operator<<(std::ostream & out, const ObjectToObjectMetricBaseTemplateEnums::GradientSource value);
+operator<<(std::ostream & out, const ObjectToObjectMetricBaseTemplateEnums::GradientSource value);
 extern ITKOptimizersv4_EXPORT std::ostream &
-                              operator<<(std::ostream & out, const ObjectToObjectMetricBaseTemplateEnums::MetricCategory value);
+operator<<(std::ostream & out, const ObjectToObjectMetricBaseTemplateEnums::MetricCategory value);
+
 /**
  * \class ObjectToObjectMetricBaseTemplate
  * \brief Base class for all object-to-object similarity metrics added in ITKv4.
@@ -98,7 +99,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ObjectToObjectMetricBaseTemplate);
 
   /** Type used for representing object components  */
@@ -120,13 +121,15 @@ public:
   using ObjectConstPointer = typename ObjectType::ConstPointer;
 
   /** Get/Set the Fixed Object.  */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(FixedObject, ObjectType);
   itkGetConstObjectMacro(FixedObject, ObjectType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the Moving Object.  */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(MovingObject, ObjectType);
   itkGetConstObjectMacro(MovingObject, ObjectType);
-
+  /** @ITKEndGrouping */
   using GradientSourceEnum = itk::ObjectToObjectMetricBaseTemplateEnums::GradientSource;
 #if !defined(ITK_LEGACY_REMOVE)
   /** Enables backwards compatibility for enum values */
@@ -192,11 +195,12 @@ public:
   /** Methods for working with the metric's 'active' transform, e.g. the
    * transform being optimized in the case of registration. Some of these are
    * used in non-metric classes, e.g. optimizers. */
+  /** @ITKStartGrouping */
   NumberOfParametersType
   GetNumberOfParameters() const override = 0;
   virtual NumberOfParametersType
   GetNumberOfLocalParameters() const = 0;
-
+  /** @ITKEndGrouping */
   /** Set the active transform's parameters by value*/
   virtual void
   SetParameters(ParametersType & params) = 0;

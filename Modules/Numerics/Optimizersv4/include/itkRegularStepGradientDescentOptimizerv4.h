@@ -56,7 +56,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegularStepGradientDescentOptimizerv4);
 
   /** New macro for creation of through a Smart Pointer. */
@@ -87,21 +87,25 @@ public:
    *
    *  The default value is set to 1e-4 to pass all tests.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(MinimumStepLength, TInternalComputationValueType);
   itkGetConstReferenceMacro(MinimumStepLength, TInternalComputationValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get relaxation factor value. */
+  /** @ITKStartGrouping */
   itkSetMacro(RelaxationFactor, TInternalComputationValueType);
   itkGetConstReferenceMacro(RelaxationFactor, TInternalComputationValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get gradient magnitude tolerance value for convergence checking. */
+  /** @ITKStartGrouping */
   itkSetMacro(GradientMagnitudeTolerance, TInternalComputationValueType);
   itkGetConstReferenceMacro(GradientMagnitudeTolerance, TInternalComputationValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get current scale for learning rate. */
+  /** @ITKStartGrouping */
   itkSetMacro(CurrentLearningRateRelaxation, MeasureType);
   itkGetConstReferenceMacro(CurrentLearningRateRelaxation, MeasureType);
-
+  /** @ITKEndGrouping */
   /** Start and run the optimization. */
   void
   StartOptimization(bool doOnlyInitialization = false) override;
@@ -111,7 +115,7 @@ public:
   EstimateLearningRate() override;
 
   /** Get current gradient step value. */
-  double
+  [[nodiscard]] double
   GetCurrentStepLength() const;
 
 protected:
@@ -121,11 +125,12 @@ protected:
   AdvanceOneStep() override;
 
   /** Modify the input gradient over a given index range. */
+  /** @ITKStartGrouping */
   void
   ModifyGradientByScalesOverSubRange(const IndexRangeType & subrange) override;
   void
   ModifyGradientByLearningRateOverSubRange(const IndexRangeType & subrange) override;
-
+  /** @ITKEndGrouping */
 
   /** Default constructor. */
   RegularStepGradientDescentOptimizerv4();

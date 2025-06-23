@@ -67,15 +67,12 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TanHelperImageFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToDoubleCheck, (Concept::Convertible<typename TInputImage::PixelType, double>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
+
 protected:
   TanHelperImageFilter() = default;
   ~TanHelperImageFilter() override = default;
@@ -108,10 +105,9 @@ itkSimpleFilterWatcherTest(int, char *[])
   }
 
   // Test default constructor.
-  WatcherType watcher3;
 
   // Test assignment operator.
-  watcher3 = watcher2;
+  WatcherType watcher3 = watcher2;
   if (watcher3.GetNameOfClass() != watcher2.GetNameOfClass() || watcher3.GetProcess() != watcher2.GetProcess() ||
       watcher3.GetSteps() != watcher2.GetSteps() || watcher3.GetIterations() != watcher2.GetIterations() ||
       watcher3.GetQuiet() != watcher2.GetQuiet() || watcher3.GetComment() != watcher2.GetComment())
@@ -122,7 +118,7 @@ itkSimpleFilterWatcherTest(int, char *[])
   }
 
   // Test GetNameOfClass().
-  std::string name = watcher3.GetNameOfClass();
+  const std::string name = watcher3.GetNameOfClass();
   if (name != filter->GetNameOfClass())
   {
     std::cout << "GetNameOfClass failed. Expected: " << filter->GetNameOfClass()

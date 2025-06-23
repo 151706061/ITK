@@ -50,7 +50,7 @@ itkNeighborhoodOperatorImageFunctionTest(int, char *[])
   image->SetRegions(region);
   image->Allocate();
 
-  ImageType::PixelType initialValue = 27;
+  constexpr ImageType::PixelType initialValue = 27;
   image->FillBuffer(initialValue);
 
 
@@ -61,19 +61,15 @@ itkNeighborhoodOperatorImageFunctionTest(int, char *[])
 
   function->SetInputImage(image);
 
-  auto * oper = new NeighborhoodOperatorType;
-  oper->CreateToRadius(3);
+  NeighborhoodOperatorType oper;
+  oper.CreateToRadius(3);
 
-  function->SetOperator(*oper);
-  delete oper;
+  function->SetOperator(oper);
 
-  itk::Index<3> index;
-  index.Fill(25);
-
-  FunctionType::OutputType Blur;
+  auto index = itk::Index<3>::Filled(25);
 
   std::cout << "EvaluateAtIndex: ";
-  Blur = function->EvaluateAtIndex(index);
+  const FunctionType::OutputType Blur = function->EvaluateAtIndex(index);
 
   // since the input image is constant
   // the should be equal to the initial value
@@ -86,8 +82,7 @@ itkNeighborhoodOperatorImageFunctionTest(int, char *[])
 
   std::cout << "EvaluateAtContinuousIndex: ";
 
-  FunctionType::ContinuousIndexType continuousIndex;
-  continuousIndex.Fill(25);
+  auto continuousIndex = itk::MakeFilled<FunctionType::ContinuousIndexType>(25);
 
   function->EvaluateAtContinuousIndex(continuousIndex);
 

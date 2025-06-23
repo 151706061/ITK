@@ -57,12 +57,9 @@ itkHessian3DToVesselnessMeasureImageFilterTest(int argc, char * argv[])
   size[1] = 8;
   size[2] = 8;
 
-  myIndexType start;
-  start.Fill(0);
+  myIndexType start{};
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  myRegionType region{ start, size };
 
   // Initialize Image A
   inputImage->SetRegions(region);
@@ -142,7 +139,7 @@ itkHessian3DToVesselnessMeasureImageFilterTest(int argc, char * argv[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  myVesselnessImageType::Pointer outputImage = filterVesselness->GetOutput();
+  const myVesselnessImageType::Pointer outputImage = filterVesselness->GetOutput();
 
   // Declare Iterator type for the output image
   using myOutputIteratorType = itk::ImageRegionIteratorWithIndex<myVesselnessImageType>;

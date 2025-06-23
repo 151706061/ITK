@@ -20,9 +20,7 @@
 #include "itkHistogram.h"
 #include "itkMahalanobisDistanceMetric.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 class MyCovarianceSampleFilter : public CovarianceSampleFilter<TSample>
@@ -43,10 +41,10 @@ public:
   void
   CreateInvalidOutput()
   {
-    unsigned int index = 3;
+    constexpr unsigned int index = 3;
     Superclass::MakeOutput(index);
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetMeasurementVectorSize() const
   {
     return this->Superclass::GetMeasurementVectorSize();
@@ -56,8 +54,8 @@ private:
   MyCovarianceSampleFilter() = default;
   ~MyCovarianceSampleFilter() override = default;
 };
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics
+
 
 int
 itkCovarianceSampleFilterTest3(int, char *[])
@@ -120,8 +118,8 @@ itkCovarianceSampleFilterTest3(int, char *[])
   memberFunction->SetMean(mean);
   memberFunction->SetCovariance(covariance);
 
-  HistogramType::Iterator itr = histogram->Begin();
-  HistogramType::Iterator end = histogram->End();
+  HistogramType::Iterator       itr = histogram->Begin();
+  const HistogramType::Iterator end = histogram->End();
 
   using AbsoluteFrequencyType = HistogramType::AbsoluteFrequencyType;
 
@@ -131,7 +129,7 @@ itkCovarianceSampleFilterTest3(int, char *[])
 
     const double MahalanobisDistance2 = MahalanobisDistance * MahalanobisDistance;
 
-    auto frequency = (AbsoluteFrequencyType)std::floor(1e5 * std::exp(-0.5 * MahalanobisDistance2));
+    auto frequency = static_cast<AbsoluteFrequencyType>(std::floor(1e5 * std::exp(-0.5 * MahalanobisDistance2)));
 
     itr.SetFrequency(frequency);
     ++itr;
@@ -198,8 +196,8 @@ itkCovarianceSampleFilterTest3(int, char *[])
     {
       if (itk::Math::abs(covariance[i][j] - covarianceOutput[i][j]) > epsilon)
       {
-        std::cerr << "Computed covariance matrix value is incorrrect:" << i << ',' << j << '=' << covariance[i][j]
-                  << ',' << covarianceOutput[i][j] << std::endl;
+        std::cerr << "Computed covariance matrix value is incorrect:" << i << ',' << j << '=' << covariance[i][j] << ','
+                  << covarianceOutput[i][j] << std::endl;
         return EXIT_FAILURE;
       }
     }

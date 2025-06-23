@@ -25,13 +25,10 @@ namespace itk
 {
 template <typename TEquationContainer, typename TLevelSet>
 LevelSetEvolutionBase<TEquationContainer, TLevelSet>::LevelSetEvolutionBase()
-{
-  this->m_Alpha = 0.9;
-  this->m_Dt = 1.;
-  this->m_RMSChangeAccumulator = 0.;
-  this->m_UserGloballyDefinedTimeStep = false;
-  this->m_NumberOfIterations = 0;
-}
+  : m_Alpha(0.9)
+  , m_Dt(1.)
+  , m_RMSChangeAccumulator(0.)
+{}
 
 template <typename TEquationContainer, typename TLevelSet>
 void
@@ -94,7 +91,7 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::CheckSetUp()
   }
 
   // Get the image to be segmented
-  InputImageConstPointer inputImage = this->m_EquationContainer->GetInput();
+  const InputImageConstPointer inputImage = this->m_EquationContainer->GetInput();
 
   if (inputImage.IsNull())
   {
@@ -102,7 +99,7 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::CheckSetUp()
   }
 
   // Get the LevelSetContainer from the EquationContainer
-  TermContainerPointer                 termContainer = eqIt->GetEquation();
+  const TermContainerPointer           termContainer = eqIt->GetEquation();
   typename TermContainerType::Iterator termIt = termContainer->Begin();
 
   if (termIt == termContainer->End())
@@ -115,7 +112,7 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::CheckSetUp()
     itkGenericExceptionMacro("this->m_LevelSetContainer != termContainer->GetLevelSetContainer()");
   }
 
-  TermPointer term = termIt->GetTerm();
+  const TermPointer term = termIt->GetTerm();
 
   if (this->m_LevelSetContainer != term->GetLevelSetContainer())
   {
@@ -135,14 +132,15 @@ void
 LevelSetEvolutionBase<TEquationContainer, TLevelSet>::InitializeIteration()
 {
   // Get the image to be segmented
-  InputImageConstPointer inputImage = this->m_EquationContainer->GetInput();
+  const InputImageConstPointer inputImage = this->m_EquationContainer->GetInput();
 
   // Initialize parameters here
   this->m_EquationContainer->InitializeParameters();
 
   if (this->m_LevelSetContainer->HasDomainMap())
   {
-    typename DomainMapImageFilterType::ConstPointer domainMapFilter = this->m_LevelSetContainer->GetDomainMapFilter();
+    const typename DomainMapImageFilterType::ConstPointer domainMapFilter =
+      this->m_LevelSetContainer->GetDomainMapFilter();
     using DomainMapType = typename DomainMapImageFilterType::DomainMapType;
     const DomainMapType domainMap = domainMapFilter->GetDomainMap();
     auto                mapIt = domainMap.begin();
@@ -169,7 +167,7 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::InitializeIteration()
         while (idListIt != idList->end())
         {
           //! \todo Fix me for string identifiers
-          TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(*idListIt - 1);
+          const TermContainerPointer termContainer = this->m_EquationContainer->GetEquation(*idListIt - 1);
           termContainer->Initialize(it.GetIndex());
           ++idListIt;
         }
@@ -180,7 +178,7 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::InitializeIteration()
   }
   else // assume there is one level set that covers the RequestedRegion of the InputImage
   {
-    TermContainerPointer                              termContainer = this->m_EquationContainer->GetEquation(0);
+    const TermContainerPointer                        termContainer = this->m_EquationContainer->GetEquation(0);
     ImageRegionConstIteratorWithIndex<InputImageType> it(inputImage, inputImage->GetRequestedRegion());
     it.GoToBegin();
     while (!it.IsAtEnd())
@@ -234,21 +232,6 @@ LevelSetEvolutionBase<TEquationContainer, TLevelSet>::Evolve()
     this->InvokeEvent(IterationEvent());
   }
 }
-
-template <typename TEquationContainer, typename TLevelSet>
-void
-LevelSetEvolutionBase<TEquationContainer, TLevelSet>::AllocateUpdateBuffer()
-{}
-
-template <typename TEquationContainer, typename TLevelSet>
-void
-LevelSetEvolutionBase<TEquationContainer, TLevelSet>::ComputeIteration()
-{}
-
-template <typename TEquationContainer, typename TLevelSet>
-void
-LevelSetEvolutionBase<TEquationContainer, TLevelSet>::ComputeTimeStepForNextIteration()
-{}
 
 } // namespace itk
 #endif // itkLevelSetEvolutionBase_hxx

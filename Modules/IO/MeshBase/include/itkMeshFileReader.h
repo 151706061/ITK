@@ -92,12 +92,16 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeshFileReader);
 
   /** Define output mesh types */
   using OutputMeshType = TOutputMesh;
-  using OutputCoordRepType = typename OutputMeshType::CoordRepType;
+  using OutputCoordinateType = typename OutputMeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using OutputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `OutputCoordRepType`. Please use `OutputCoordinateType` instead!") = OutputCoordinateType;
+#endif
   using OutputPointPixelType = typename OutputMeshType::PixelType;
   using OutputCellPixelType = typename OutputMeshType::CellPixelType;
   using OutputPointType = typename OutputMeshType::PointType;
@@ -122,8 +126,10 @@ public:
   static constexpr unsigned int OutputPointDimension = OutputMeshType::PointDimension;
 
   /** Specify the file to read. This is forwarded to the IO instance. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
+  /** @ITKEndGrouping */
 
   /** Set/Get the MeshIO helper class. Often this is created via the object
    * factory mechanism that determines whether a particular MeshIO can
@@ -131,9 +137,11 @@ public:
    * instance that is created. Or you can directly specify the MeshIO
    * to use to read a particular file in case the factory mechanism will
    * not work properly (e.g., unknown or unusual extension). */
+  /** @ITKStartGrouping */
   void
   SetMeshIO(MeshIOBase * meshIO);
   itkGetModifiableObjectMacro(MeshIO, MeshIOBase);
+  /** @ITKEndGrouping */
 
   /** Prepare the allocation of the output mesh during the first back
    * propagation of the pipeline. */
@@ -219,7 +227,6 @@ ReadMesh(const std::string & filename)
   reader->Update();
   return reader->GetOutput();
 }
-
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

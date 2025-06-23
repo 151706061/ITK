@@ -38,10 +38,8 @@ SphereSpatialFunction<VImageDimension, TInput>::Evaluate(const InputType & posit
   {
     return 1;
   }
-  else
-  {
-    return 0; // outside the sphere
-  }
+
+  return 0; // outside the sphere
 }
 
 template <unsigned int VImageDimension, typename TInput>
@@ -50,9 +48,8 @@ SphereSpatialFunction<VImageDimension, TInput>::PrintSelf(std::ostream & os, Ind
 {
   Superclass::PrintSelf(os, indent);
 
-  unsigned int i;
   os << indent << "Center: [";
-  for (i = 0; i < VImageDimension - 1; ++i)
+  for (unsigned int i = 0; i < VImageDimension - 1; ++i)
   {
     os << m_Center[i] << ", ";
   }

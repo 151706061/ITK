@@ -93,7 +93,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegionGrowImageFilter);
 
   /** Type definition for the input image. */
@@ -115,13 +115,15 @@ public:
   using GridSizeType = typename TInputImage::SizeType;
 
   /** Set/Get the initial grid. */
+  /** @ITKStartGrouping */
   itkSetMacro(GridSize, GridSizeType);
   itkGetConstReferenceMacro(GridSize, GridSizeType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of regions desired. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumNumberOfRegions, unsigned int);
   itkGetConstReferenceMacro(MaximumNumberOfRegions, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Define a virtual RegionGrowImageFilter function. */
   virtual void
   ApplyRegionGrowImageFilter() = 0;

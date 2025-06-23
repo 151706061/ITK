@@ -17,7 +17,9 @@
  *=========================================================================*/
 
 // Enable testing legacy member function GetAxisAlignedBoundingBoxRegion()
-#define ITK_LEGACY_TEST
+#ifndef ITK_LEGACY_REMOVE
+#  define ITK_LEGACY_TEST
+#endif
 
 // First include the header file to be tested:
 #include "itkImageMaskSpatialObject.h"
@@ -93,8 +95,7 @@ Expect_AxisAlignedBoundingBoxRegion_equals_region_of_single_pixel_when_it_is_the
 
   // Expected size: the "region size" of a single pixel (1x1, in 2D, 1x1x1 in 3D).
   const itk::Size<VImageDimension> expectedSize = [] {
-    itk::Size<VImageDimension> size;
-    size.Fill(1);
+    auto size = itk::Size<VImageDimension>::Filled(1);
     return size;
   }();
 
@@ -286,7 +287,7 @@ TEST(ImageMaskSpatialObject, IsInsideIndependentOfDistantPixels)
   spatialObject->Update();
 
   // Point of interest: a point close to the non-zero pixel.
-  const auto pointOfInterest = itk::MakeFilled<PointType>(indexValue - 0.25);
+  constexpr auto pointOfInterest = itk::MakeFilled<PointType>(indexValue - 0.25);
 
   const bool isInsideBefore = spatialObject->IsInside(pointOfInterest);
 
@@ -318,7 +319,7 @@ TEST(ImageMaskSpatialObject, CornerPointIsNotInsideMaskOfZeroValues)
 
   const auto imageMaskSpatialObject = itk::ImageMaskSpatialObject<2>::New();
   imageMaskSpatialObject->SetImage(image);
-  const double cornerPoint[] = { 1.5, 1.5 };
+  constexpr double cornerPoint[] = { 1.5, 1.5 };
   ASSERT_FALSE(imageMaskSpatialObject->IsInsideInObjectSpace(cornerPoint));
 }
 

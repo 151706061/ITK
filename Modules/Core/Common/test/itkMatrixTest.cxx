@@ -33,8 +33,7 @@ itkMatrixTest(int, char *[])
 
   using vnlVectorType = vnl_vector_fixed<NumericType, 3>;
 
-  MatrixType matrix;
-  matrix.Fill(0.0);
+  MatrixType matrix{};
   matrix.SetIdentity();
 
   VectorType v1;
@@ -47,8 +46,8 @@ itkMatrixTest(int, char *[])
   std::cout << resultVector[1] << ", ";
   std::cout << resultVector[2] << std::endl;
 
-  PointType::ValueType p1Init[3] = { 3, 4, 5 };
-  PointType            p1 = p1Init;
+  constexpr PointType::ValueType p1Init[3] = { 3, 4, 5 };
+  const PointType                p1 = p1Init;
 
   PointType resultPoint = matrix * p1;
   std::cout << resultPoint[0] << ", ";
@@ -56,7 +55,7 @@ itkMatrixTest(int, char *[])
   std::cout << resultPoint[2] << std::endl;
 
   CovariantVectorType::ValueType cv1Init[3] = { 3, 4, 5 };
-  CovariantVectorType            cv1 = cv1Init;
+  const CovariantVectorType      cv1 = cv1Init;
 
   CovariantVectorType resultCovariantVector = matrix * cv1;
   std::cout << resultCovariantVector[0] << ", ";
@@ -86,8 +85,7 @@ itkMatrixTest(int, char *[])
   MatrixType matrix4;
   matrix4 = matrix.GetTranspose();
 
-  MatrixType matrix5;
-  matrix5.Fill(1.7);
+  auto matrix5 = itk::MakeFilled<MatrixType>(1.7);
 
   constexpr NumericType value = 2;
   matrix5[1][1] = value;
@@ -233,7 +231,7 @@ itkMatrixTest(int, char *[])
 
     // Check the addition and subtraction values
     {
-      const double tolerance = 1e-7;
+      constexpr double tolerance = 1e-7;
       for (unsigned int r = 0; r < nr; ++r)
       {
         for (unsigned int c = 0; c < nc; ++c)
@@ -259,7 +257,7 @@ itkMatrixTest(int, char *[])
 
     // Check the in-place addition and subtraction values
     {
-      const double tolerance = 1e-7;
+      constexpr double tolerance = 1e-7;
       for (unsigned int r = 0; r < nr; ++r)
       {
         for (unsigned int c = 0; c < nc; ++c)
@@ -294,12 +292,12 @@ itkMatrixTest(int, char *[])
       }
     }
 
-    MatrixType::InternalMatrixType vnlMatrixA = matrixA.GetVnlMatrix();
+    const MatrixType::InternalMatrixType vnlMatrixA = matrixA.GetVnlMatrix();
 
     MatrixType matrixB(vnlMatrixA); // Test constructor
 
     { // verify values
-      const double tolerance = 1e-7;
+      constexpr double tolerance = 1e-7;
       for (unsigned int row = 0; row < 3; ++row)
       {
         for (unsigned int col = 0; col < 3; ++col)
@@ -317,7 +315,7 @@ itkMatrixTest(int, char *[])
     matrixC = vnlMatrixA; // Test assignment
 
     { // verify values
-      const double tolerance = 1e-7;
+      constexpr double tolerance = 1e-7;
       for (unsigned int row = 0; row < 3; ++row)
       {
         for (unsigned int col = 0; col < 3; ++col)
@@ -333,12 +331,11 @@ itkMatrixTest(int, char *[])
   }
 
   using LargeMatrixType = itk::Matrix<NumericType, 7, 7>;
-  LargeMatrixType matrixBad;
-  matrixBad.Fill(2.0);
-  ITK_TRY_EXPECT_EXCEPTION(matrixBad.GetInverse());
+  auto matrixBad = itk::MakeFilled<LargeMatrixType>(2.0);
+  ITK_TRY_EXPECT_EXCEPTION([[maybe_unused]] auto inverse = matrixBad.GetInverse());
 
   matrixBad.SetIdentity();
-  ITK_TRY_EXPECT_NO_EXCEPTION(matrixBad.GetInverse());
+  ITK_TRY_EXPECT_NO_EXCEPTION([[maybe_unused]] auto inverse2 = matrixBad.GetInverse());
 
   {
     /*

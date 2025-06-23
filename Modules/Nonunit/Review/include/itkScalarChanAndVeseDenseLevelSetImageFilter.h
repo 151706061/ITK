@@ -27,28 +27,13 @@ namespace itk
 /** \class ScalarChanAndVeseDenseLevelSetImageFilter
  * \brief Dense implementation of the Chan and Vese multiphase level set image filter.
  *
- * This code was adapted from the paper:
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * This code was adapted from the paper \cite chan1999.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ITKReview
  */
@@ -71,7 +56,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarChanAndVeseDenseLevelSetImageFilter);
 
   static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
@@ -107,11 +92,7 @@ public:
   using ROIFilterType = RegionOfInterestImageFilter<FeatureImageType, FeatureImageType>;
   using ROIFilterPointer = typename ROIFilterType::Pointer;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelType>));
-  // End concept checking
-#endif
 
   /** Set/Get the feature image to be used for speed function of the level set
    *  equation.  Equivalent to calling Set/GetInput(1, ..) */
@@ -122,7 +103,9 @@ public:
   }
 
 protected:
-  ScalarChanAndVeseDenseLevelSetImageFilter() { this->m_SharedData = SharedDataType::New(); }
+  ScalarChanAndVeseDenseLevelSetImageFilter()
+    : m_SharedData(SharedDataType::New())
+  {}
 
   ~ScalarChanAndVeseDenseLevelSetImageFilter() override = default;
 

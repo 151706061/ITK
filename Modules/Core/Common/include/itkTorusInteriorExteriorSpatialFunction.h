@@ -49,7 +49,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run time information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TorusInteriorExteriorSpatialFunction);
 
   /** Method for creation through the object factory. */
@@ -67,17 +67,20 @@ public:
 
   /** Set/Get the origin of the torus (the point from which the major
    * radius is measured). */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Origin, InputType);
   itkSetMacro(Origin, InputType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the major radius of the torus. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(MajorRadius, double);
   itkSetMacro(MajorRadius, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the minor radius of the torus (radius of tube). */
+  /** @ITKStartGrouping */
   itkGetConstMacro(MinorRadius, double);
   itkSetMacro(MinorRadius, double);
-
+  /** @ITKEndGrouping */
 protected:
   TorusInteriorExteriorSpatialFunction() = default;
   ~TorusInteriorExteriorSpatialFunction() override = default;

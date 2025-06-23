@@ -18,10 +18,7 @@
 #ifndef itkDistanceMetric_hxx
 #define itkDistanceMetric_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TVector>
 DistanceMetric<TVector>::DistanceMetric()
@@ -30,7 +27,7 @@ DistanceMetric<TVector>::DistanceMetric()
   // initialize the vector size to it.
   if (!MeasurementVectorTraits::IsResizable<MeasurementVectorType>({}))
   {
-    MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
+    const MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
 
     this->m_MeasurementVectorSize = defaultLength;
     this->m_Origin.SetSize(this->m_MeasurementVectorSize);
@@ -51,8 +48,7 @@ DistanceMetric<TVector>::SetOrigin(const OriginType & x)
   {
     if (x.Size() != this->m_MeasurementVectorSize)
     {
-      itkExceptionMacro("Size of the origin must be same as the length of"
-                        << " each measurement vector.");
+      itkExceptionMacro("Size of the origin must be same as the length of each measurement vector.");
     }
   }
 
@@ -70,7 +66,6 @@ DistanceMetric<TVector>::PrintSelf(std::ostream & os, Indent indent) const
   os << indent << "Origin: " << this->GetOrigin() << std::endl;
   os << indent << "MeasurementVectorSize: " << this->GetMeasurementVectorSize() << std::endl;
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

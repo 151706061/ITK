@@ -52,7 +52,7 @@ public:
   itkNewMacro(Self);
 
 protected:
-  CommandIterationUpdate() { m_IterationNumber = 0; }
+  CommandIterationUpdate() = default;
 
 public:
   using OptimizerType = itk::AmoebaOptimizer;
@@ -78,7 +78,7 @@ public:
   }
 
 private:
-  unsigned long m_IterationNumber;
+  unsigned long m_IterationNumber{ 0 };
 };
 
 int
@@ -164,7 +164,8 @@ main(int argc, char * argv[])
   fixedImageReader->Update();
   movingImageReader->Update();
 
-  FixedImageType::ConstPointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::ConstPointer fixedImage =
+    fixedImageReader->GetOutput();
 
   registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
 
@@ -279,7 +280,7 @@ main(int argc, char * argv[])
   const double finalTranslationX = finalParameters[0];
   const double finalTranslationY = finalParameters[1];
 
-  double bestValue = optimizer->GetValue();
+  const double bestValue = optimizer->GetValue();
 
 
   // Print out results

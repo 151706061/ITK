@@ -44,9 +44,7 @@ public:
  * \brief This filter is an implementation of a Canny edge detector for
  * scalar-valued images.
  *
- *  Based on John Canny's paper "A Computational Approach
- * to Edge Detection"(IEEE Transactions on Pattern Analysis and Machine
- * Intelligence, Vol. PAMI-8, No.6, November 1986),  there are four major steps
+ * Based on John Canny's paper \cite canny1986 there are four major steps
  * used in the edge-detection scheme:
  * (1) Smooth the input image with Gaussian filter.
  * (2) Calculate the second directional derivatives of the smoothed image.
@@ -106,7 +104,7 @@ public:
   using InputImagePixelType = typename TInputImage::PixelType;
   using OutputImagePixelType = typename TOutputImage::PixelType;
   using IndexType = typename TInputImage::IndexType;
-  using SizeValueType = typename TInputImage::SizeValueType;
+  using SizeValueType = itk::SizeValueType;
 
   /** The default boundary condition is used unless overridden
    *in the Evaluate() method. */
@@ -129,7 +127,7 @@ public:
   using OutputImageRegionType = typename TOutputImage::RegionType;
   using InputImageRegionType = typename TInputImage::RegionType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CannyEdgeDetectionImageFilter);
 
   /** ImageDimension constant. */
@@ -140,13 +138,17 @@ public:
   using ArrayType = FixedArray<double, Self::ImageDimension>;
 
   /** Set/Get the variance of the Gaussian smoothing filter. */
+  /** @ITKStartGrouping */
   itkSetMacro(Variance, ArrayType);
   itkGetConstMacro(Variance, const ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the maximum error of the Gaussian smoothing kernel in each dimensional
    *  direction. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumError, ArrayType);
   itkGetConstMacro(MaximumError, const ArrayType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the variance of the Gaussian smoothing filter. */
   void
@@ -195,15 +197,11 @@ public:
     return this->m_MultiplyImageFilter->GetOutput();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImagePixelType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(InputIsFloatingPointCheck, (Concept::IsFloatingPoint<InputImagePixelType>));
   itkConceptMacro(OutputIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   CannyEdgeDetectionImageFilter();

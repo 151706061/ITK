@@ -46,7 +46,7 @@ TestPointsContainer(typename TMesh::PointsContainerPointer points0, typename TMe
     PointsContainerConstIterator pt0 = points0->Begin();
     PointsContainerConstIterator pt1 = points1->Begin();
 
-    const double tol = 1e-6;
+    constexpr double tol = 1e-6;
     while ((pt0 != points0->End()) && (pt1 != points1->End()))
     {
       if (pt0->Index() != pt1->Index())
@@ -257,7 +257,7 @@ test(char * inputFileName, char * outputFileName, bool isBinary)
   using MeshFileWriterType = itk::MeshFileWriter<MeshType>;
   using MeshFileWriterPointer = typename MeshFileWriterType::Pointer;
 
-  MeshFileReaderPointer reader = MeshFileReaderType::New();
+  const MeshFileReaderPointer reader = MeshFileReaderType::New();
   reader->SetFileName(inputFileName);
   try
   {
@@ -277,7 +277,7 @@ test(char * inputFileName, char * outputFileName, bool isBinary)
     return EXIT_FAILURE;
   }
 
-  MeshFileWriterPointer writer = MeshFileWriterType::New();
+  const MeshFileWriterPointer writer = MeshFileWriterType::New();
   if (itksys::SystemTools::GetFilenameLastExtension(inputFileName) ==
       itksys::SystemTools::GetFilenameLastExtension(outputFileName))
   {

@@ -31,7 +31,7 @@ itkQuadEdgeMeshEulerOperatorJoinFacetTest(int, char *[])
   using JoinFacet = itk::QuadEdgeMeshEulerOperatorJoinFacetFunction<MeshType, QEType>;
 
   // EULER OPERATOR TESTS
-  MeshPointer mesh = MeshType::New();
+  const MeshPointer mesh = MeshType::New();
   CreateSquareTriangularMesh<MeshType>(mesh);
 
   // The initial configuration and numbering of simpleSquare.vtk:
@@ -83,14 +83,15 @@ itkQuadEdgeMeshEulerOperatorJoinFacetTest(int, char *[])
   std::cout << "OK" << std::endl;
 #endif
 
-  (void)joinFacet->GetNameOfClass();
+  ITK_TEST_EXPECT_EQUAL(std::string_view("QuadEdgeMeshEulerOperatorJoinFacetFunction"),
+                        std::string_view(joinFacet->GetNameOfClass()));
 
   joinFacet->SetInput(mesh);
 
 #ifndef NDEBUG
   std::cout << "     "
             << "Test QE Input not internal";
-  QEType * dummy = new QEType;
+  auto * dummy = new QEType;
   if (joinFacet->Evaluate(dummy))
   {
     std::cout << "FAILED." << std::endl;

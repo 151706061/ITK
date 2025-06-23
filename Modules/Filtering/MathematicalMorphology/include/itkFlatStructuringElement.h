@@ -124,11 +124,7 @@ public:
   ~FlatStructuringElement() override = default;
 
   /** Default constructor. */
-  FlatStructuringElement()
-  {
-    m_Decomposable = false;
-    m_RadiusIsParametric = false;
-  }
+  FlatStructuringElement() = default;
 
   /** Various constructors */
 
@@ -164,7 +160,8 @@ public:
    * structuring is decomposable, the set of lines associated with the
    * structuring may be used by an algorithm instead of the standard buffer.
    */
-  bool
+  /** @ITKStartGrouping */
+  [[nodiscard]] bool
   GetDecomposable() const
   {
     return m_Decomposable;
@@ -174,9 +171,10 @@ public:
   {
     m_Decomposable = v;
   }
-
+  /** @ITKEndGrouping */
   /** Return the lines associated with the structuring element */
-  const DecompType &
+  /** @ITKStartGrouping */
+  [[nodiscard]] const DecompType &
   GetLines() const
   {
     return (m_Lines);
@@ -186,8 +184,8 @@ public:
   {
     m_Lines.push_back(l);
   }
-
-  bool
+  /** @ITKEndGrouping */
+  [[nodiscard]] bool
   CheckParallel(LType NewVec) const;
 
   /**
@@ -202,7 +200,8 @@ public:
    * corresponds to the radius that was specified.
    * This defaults to "off" for backward compatibility.
    */
-  bool
+  /** @ITKStartGrouping */
+  [[nodiscard]] bool
   GetRadiusIsParametric() const
   {
     return m_RadiusIsParametric;
@@ -213,7 +212,7 @@ public:
     m_RadiusIsParametric = flag;
   }
   itkBooleanMacro(RadiusIsParametric);
-
+  /** @ITKEndGrouping */
   /** Create a FlatStructureElement from a bool
    *  image. Image must be odd in all dimensions.*/
   static Self
@@ -237,9 +236,11 @@ private:
 
   template <typename TStructuringElement, typename TRadius>
   static void
-              GeneratePolygon(TStructuringElement & res, TRadius radius, unsigned int lines);
-  static void GeneratePolygon(itk::FlatStructuringElement<2> & res, itk::Size<2> radius, unsigned int lines);
-  static void GeneratePolygon(itk::FlatStructuringElement<3> & res, itk::Size<3> radius, unsigned int lines);
+  GeneratePolygon(TStructuringElement & res, TRadius radius, unsigned int lines);
+  static void
+  GeneratePolygon(itk::FlatStructuringElement<2> & res, itk::Size<2> radius, unsigned int lines);
+  static void
+  GeneratePolygon(itk::FlatStructuringElement<3> & res, itk::Size<3> radius, unsigned int lines);
 
   using LType2 = Vector<float, 2>;
 

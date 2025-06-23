@@ -35,7 +35,7 @@ itkQuadEdgeMeshPointTest1(int, char *[])
   using PrimalDataType = bool;
   using DualDataType = bool;
 
-  const bool ThisIsDual = true;
+  constexpr bool ThisIsDual = true;
 
   using QuadEdgeType =
     itk::GeometricalQuadEdge<PointIdentifier, FaceIdentifier, PrimalDataType, DualDataType, ThisIsDual>;
@@ -44,16 +44,12 @@ itkQuadEdgeMeshPointTest1(int, char *[])
 
   using SuperclassPointType = PointType::Superclass;
 
-
-  PointType p0; // Test default constructor
-
   PointType p1;
-
   p1[0] = 17.7;
   p1[1] = 39.7;
   p1[2] = -49.7;
 
-  PointType p2(p1); // Test copy constructor
+  const PointType p2(p1); // Test copy constructor
 
   if (p1.EuclideanDistanceTo(p2) > 1e-6)
   {
@@ -70,7 +66,7 @@ itkQuadEdgeMeshPointTest1(int, char *[])
   ps[1] = 31;
   ps[2] = 37;
 
-  PointType pp = ps;
+  const PointType pp = ps;
 
   if (pp.EuclideanDistanceTo(ps) > 1e-6)
   {
@@ -92,7 +88,7 @@ itkQuadEdgeMeshPointTest1(int, char *[])
   cc[1] = 39.7;
   cc[2] = -49.7;
 
-  PointType p3(cc); // Test Array based constructor
+  const PointType p3(cc); // Test Array based constructor
 
   if (p2.EuclideanDistanceTo(p1) > 1e-6)
   {
@@ -100,9 +96,8 @@ itkQuadEdgeMeshPointTest1(int, char *[])
     return EXIT_FAILURE;
   }
 
-  PointType p4;
-  PointType p4b;
-  p4b = p4 = p1; // Test assignment operator to Self
+  const PointType p4 = p1;
+  const PointType p4b = p1; // Test assignment operator to Self
 
   if (p4.EuclideanDistanceTo(p1) > 1e-6)
   {
@@ -121,9 +116,8 @@ itkQuadEdgeMeshPointTest1(int, char *[])
   pp1[1] = 39.7;
   pp1[2] = -49.7;
 
-  PointType p5;
-  PointType p5b;
-  p5b = p5 = pp1; // Test assignment operator from Superclass
+  const PointType p5 = pp1;
+  const PointType p5b = pp1; // Test assignment operator from Superclass
 
   if (p5.EuclideanDistanceTo(pp1) > 1e-6)
   {
@@ -137,9 +131,8 @@ itkQuadEdgeMeshPointTest1(int, char *[])
     return EXIT_FAILURE;
   }
 
-  PointType p6;
-  PointType p6b;
-  p6b = p6 = cc; // Test assignment operator from array
+  PointType       p6 = cc;
+  const PointType p6b = cc; // Test assignment operator from array
 
   if (p6.EuclideanDistanceTo(p3) > 1e-6)
   {

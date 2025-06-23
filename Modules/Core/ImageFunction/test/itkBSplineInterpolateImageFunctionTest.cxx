@@ -35,7 +35,7 @@
 
 
 using InputPixelType = double;
-using CoordRepType = double;
+using CoordinateType = itk::SpacePrecisionType;
 
 // Set up for 1D Images
 enum
@@ -46,7 +46,7 @@ enum
 using ImageType1D = itk::Image<InputPixelType, ImageDimension1D>;
 using ImageTypePtr1D = ImageType1D::Pointer;
 using SizeType1D = ImageType1D::SizeType;
-using InterpolatorType1D = itk::BSplineInterpolateImageFunction<ImageType1D, CoordRepType>;
+using InterpolatorType1D = itk::BSplineInterpolateImageFunction<ImageType1D, CoordinateType>;
 //  using IndexType1D = InterpolatorType1D::IndexType;
 using PointType1D = InterpolatorType1D::PointType;
 using ContinuousIndexType1D = InterpolatorType1D::ContinuousIndexType;
@@ -62,7 +62,7 @@ enum
 using ImageType2D = itk::Image<InputPixelType, ImageDimension2D>;
 using ImageTypePtr2D = ImageType2D::Pointer;
 using SizeType2D = ImageType2D::SizeType;
-using InterpolatorType2D = itk::BSplineInterpolateImageFunction<ImageType2D, CoordRepType>;
+using InterpolatorType2D = itk::BSplineInterpolateImageFunction<ImageType2D, CoordinateType>;
 //  using IndexType2D = InterpolatorType2D::IndexType;
 using PointType2D = InterpolatorType2D::PointType;
 using ContinuousIndexType2D = InterpolatorType2D::ContinuousIndexType;
@@ -78,13 +78,13 @@ enum
 using ImageType3D = itk::Image<InputPixelType, ImageDimension3D>;
 using ImageTypePtr3D = ImageType3D::Pointer;
 using SizeType3D = ImageType3D::SizeType;
-using InterpolatorType3D = itk::BSplineInterpolateImageFunction<ImageType3D, CoordRepType>;
+using InterpolatorType3D = itk::BSplineInterpolateImageFunction<ImageType3D, CoordinateType>;
 using IndexType3D = InterpolatorType3D::IndexType;
 using PointType3D = InterpolatorType3D::PointType;
 using ContinuousIndexType3D = InterpolatorType3D::ContinuousIndexType;
 
 using ImageIntegerType3D = itk::Image<unsigned int, ImageDimension3D>;
-using InterpolatorIntegerType3D = itk::BSplineInterpolateImageFunction<ImageIntegerType3D, CoordRepType>;
+using InterpolatorIntegerType3D = itk::BSplineInterpolateImageFunction<ImageIntegerType3D, CoordinateType>;
 using IndexIntegerType3D = InterpolatorIntegerType3D::IndexType;
 using PointIntegerType3D = InterpolatorIntegerType3D::PointType;
 using ContinuousIntegerIndexType3D = InterpolatorIntegerType3D::ContinuousIndexType;
@@ -135,7 +135,7 @@ TestGeometricPoint(const TInterpolator * interp, const PointType & point, bool i
 
   std::cout << " Point: " << point;
 
-  bool bvalue = interp->IsInsideBuffer(point);
+  const bool bvalue = interp->IsInsideBuffer(point);
   std::cout << " Inside: " << bvalue << ' ';
 
   if (bvalue != isInside)
@@ -146,7 +146,7 @@ TestGeometricPoint(const TInterpolator * interp, const PointType & point, bool i
 
   if (isInside)
   {
-    double value = interp->Evaluate(point);
+    const double value = interp->Evaluate(point);
     std::cout << " Value: " << value;
 
     if (itk::Math::abs(value - trueValue) > 1e-9)
@@ -171,7 +171,7 @@ TestContinuousIndex(const TInterpolator * interp, const ContinuousIndexType & in
 
   std::cout << " Index: " << index;
 
-  bool bvalue = interp->IsInsideBuffer(index);
+  const bool bvalue = interp->IsInsideBuffer(index);
   std::cout << " Inside: " << bvalue;
 
   if (bvalue != isInside)
@@ -182,7 +182,7 @@ TestContinuousIndex(const TInterpolator * interp, const ContinuousIndexType & in
 
   if (isInside)
   {
-    double value = interp->EvaluateAtContinuousIndex(index);
+    const double value = interp->EvaluateAtContinuousIndex(index);
     std::cout << " Value: " << value;
 
     if (itk::Math::abs(value - trueValue) > 1e-4)
@@ -209,7 +209,7 @@ TestContinuousIndexDerivative(const TInterpolator *       interp,
 
   std::cout << " Index: " << index;
 
-  bool bvalue = interp->IsInsideBuffer(index);
+  const bool bvalue = interp->IsInsideBuffer(index);
   std::cout << " Inside: " << bvalue << '\n';
 
   if (bvalue != isInside)
@@ -221,7 +221,7 @@ TestContinuousIndexDerivative(const TInterpolator *       interp,
   if (isInside)
   {
     typename TInterpolator::CovariantVectorType value;
-    double                                      value2 = interp->EvaluateAtContinuousIndex(index);
+    const double                                value2 = interp->EvaluateAtContinuousIndex(index);
     std::cout << "Interpolated Value: " << value2 << '\n';
     value = interp->EvaluateDerivativeAtContinuousIndex(index);
     std::cout << " Value: ";
@@ -252,7 +252,7 @@ test1DCubicSpline()
   int flag = 0;
 
   // Allocate a simple test image
-  ImageTypePtr1D image = ImageType1D::New();
+  const ImageTypePtr1D image = ImageType1D::New();
 
   set1DInterpData(image);
 
@@ -268,11 +268,11 @@ test1DCubicSpline()
   ITK_EXERCISE_BASIC_OBJECT_METHODS(interp, BSplineInterpolateImageFunction, InterpolateImageFunction);
 
 
-  itk::ThreadIdType numberOfWorkUnits = 1;
+  constexpr itk::ThreadIdType numberOfWorkUnits = 1;
   interp->SetNumberOfWorkUnits(numberOfWorkUnits);
   ITK_TEST_SET_GET_VALUE(numberOfWorkUnits, interp->GetNumberOfWorkUnits());
 
-  bool useImageDirection = true;
+  constexpr bool useImageDirection = true;
   ITK_TEST_SET_GET_BOOLEAN(interp, UseImageDirection, useImageDirection);
 
   interp->SetInputImage(image);
@@ -282,31 +282,30 @@ test1DCubicSpline()
   // gemetric points
   std::cout << "Testing 1D Cubic B-Spline:\n";
   std::cout << "Evaluate at: " << std::endl;
-  ContinuousIndexType1D cindex;
-  PointType1D           point;
-  bool                  passed;
+
 
   // These values test 1) near border,
   //    2) inside
   //    3) integer value
   //    4) outside image
 #define NPOINTS 5 // number of points
-  itk::SpacePrecisionType darray1[NPOINTS] = { 1.4, 8.9, 10.0, 40.0, -0.3 };
-  double                  truth[NPOINTS] = { 334.41265437584, 18.158173426944, 4.0000, 0, 442.24157192006658 };
-  bool                    b_Inside[NPOINTS] = { true, true, true, false, true };
+  constexpr itk::SpacePrecisionType darray1[NPOINTS] = { 1.4, 8.9, 10.0, 40.0, -0.3 };
+  constexpr double truth[NPOINTS] = { 334.41265437584, 18.158173426944, 4.0000, 0, 442.24157192006658 };
+  constexpr bool   b_Inside[NPOINTS] = { true, true, true, false, true };
 
   // an integer position inside the image
   for (int ii = 0; ii < NPOINTS; ++ii)
   {
 
-    cindex = ContinuousIndexType1D(&darray1[ii]);
-    passed = TestContinuousIndex<InterpolatorType1D, ContinuousIndexType1D>(interp, cindex, b_Inside[ii], truth[ii]);
+    auto cindex = ContinuousIndexType1D(&darray1[ii]);
+    bool passed =
+      TestContinuousIndex<InterpolatorType1D, ContinuousIndexType1D>(interp, cindex, b_Inside[ii], truth[ii]);
 
     if (!passed)
     {
       flag += 1;
     }
-
+    PointType1D point;
     image->TransformContinuousIndexToPhysicalPoint(cindex, point);
     passed = TestGeometricPoint<InterpolatorType1D, PointType1D>(interp, point, b_Inside[ii], truth[ii]);
 
@@ -325,13 +324,13 @@ test2DSpline()
   int flag = 0;
 
   /* Allocate a simple test image */
-  ImageTypePtr2D image = ImageType2D::New();
+  const ImageTypePtr2D image = ImageType2D::New();
 
   set2DInterpData(image);
 
   /* Set origin and spacing of physical coordinates */
-  double origin[] = { 0.5, 1.0 };
-  double spacing[] = { 0.1, 0.5 };
+  constexpr double origin[] = { 0.5, 1.0 };
+  constexpr double spacing[] = { 0.1, 0.5 };
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
@@ -353,9 +352,6 @@ test2DSpline()
     gemetric points */
     std::cout << "Testing 2D B-Spline of Order " << splineOrder << ":\n";
     std::cout << "Evaluate at: " << std::endl;
-    ContinuousIndexType2D cindex;
-    PointType2D           point;
-    bool                  passed;
 
     // These values test 1) near border,
     //    2) inside
@@ -363,28 +359,30 @@ test2DSpline()
     //    4) outside image
 #define NPOINTS2 4 // number of points
 
-    itk::SpacePrecisionType darray1[NPOINTS2][2] = { { 0.1, 0.2 }, { 3.4, 5.8 }, { 4.0, 6.0 }, { 2.1, 8.0 } };
-    double truth[NPOINTS2][6] = { { 154.5, 140.14, 151.86429192392, 151.650316034, 151.865916515, 151.882483111 },
-                                  { 0, 13.84, 22.688125812495, 22.411473093, 22.606968306, 22.908345604 },
-                                  { 36.2, 36.2, 36.2, 36.2, 36.2, 36.2 },
-                                  { 0, 0, 0, 0, 0, 0 } };
-    bool   b_Inside[NPOINTS2] = { true, true, true, false };
+    constexpr itk::SpacePrecisionType darray1[NPOINTS2][2] = { { 0.1, 0.2 }, { 3.4, 5.8 }, { 4.0, 6.0 }, { 2.1, 8.0 } };
+    constexpr double                  truth[NPOINTS2][6] = {
+      { 154.5, 140.14, 151.86429192392, 151.650316034, 151.865916515, 151.882483111 },
+      { 0, 13.84, 22.688125812495, 22.411473093, 22.606968306, 22.908345604 },
+      { 36.2, 36.2, 36.2, 36.2, 36.2, 36.2 },
+      { 0, 0, 0, 0, 0, 0 }
+    };
+    constexpr bool b_Inside[NPOINTS2] = { true, true, true, false };
 
     // an integer position inside the image
     for (int ii = 0; ii < NPOINTS2; ++ii)
     {
-      cindex = ContinuousIndexType2D(&darray1[ii][0]);
+      auto cindex = ContinuousIndexType2D(&darray1[ii][0]);
       cindex[0] += startIndex[0];
       cindex[1] += startIndex[1];
 
-      passed = TestContinuousIndex<InterpolatorType2D, ContinuousIndexType2D>(
+      bool passed = TestContinuousIndex<InterpolatorType2D, ContinuousIndexType2D>(
         interp, cindex, b_Inside[ii], truth[ii][splineOrder]);
 
       if (!passed)
       {
         flag += 1;
       }
-
+      PointType2D point;
       image->TransformContinuousIndexToPhysicalPoint(cindex, point);
       passed = TestGeometricPoint<InterpolatorType2D, PointType2D>(interp, point, b_Inside[ii], truth[ii][splineOrder]);
 
@@ -404,13 +402,13 @@ test3DSpline()
   int flag = 0;
 
   /* Allocate a simple test image */
-  ImageTypePtr3D image = ImageType3D::New();
+  const ImageTypePtr3D image = ImageType3D::New();
 
   set3DInterpData<ImageType3D>(image);
 
   /* Set origin and spacing of physical coordinates */
-  double origin[] = { 0.5, 1.0, 1.333 };
-  double spacing[] = { 0.1, 0.5, 0.75 };
+  constexpr double origin[] = { 0.5, 1.0, 1.333 };
+  constexpr double spacing[] = { 0.1, 0.5, 0.75 };
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
@@ -426,9 +424,6 @@ test3DSpline()
     gemetric points */
     std::cout << "Testing 3D B-Spline of Order " << splineOrder << ":\n";
     std::cout << "Evaluate at: " << std::endl;
-    ContinuousIndexType3D cindex;
-    PointType3D           point;
-    bool                  passed;
 
     // These values test
     //    1) near border,
@@ -437,21 +432,23 @@ test3DSpline()
     //    4) outside image
 #define NPOINTS3 5 // number of points
 
-    itk::SpacePrecisionType darray1[NPOINTS3][ImageDimension3D] = {
+    constexpr itk::SpacePrecisionType darray1[NPOINTS3][ImageDimension3D] = {
       { 0.1, 20.1, 28.4 }, { 21.58, 34.5, 17.2 }, { 10, 20, 12 }, { 15, 20.2, 31 }, { 2, 0.3, -0.3 }
     };
-    double truth[NPOINTS3][4] = { { 48.621593795, 48.651173138, 48.656914878, 48.662256571 },
-                                  { 73.280126903, 73.280816965, 73.282780615, 73.285315943 },
-                                  { 42.0, 42.0, 42.0, 42.0 },
-                                  { 0, 0, 0, 0 },
-                                  { 2.2545584407825165, 2.2722384004239382, 2.2533523347849744, 2.2516795363567588 } };
-    bool   b_Inside[NPOINTS3] = { true, true, true, false, true };
+    constexpr double truth[NPOINTS3][4] = {
+      { 48.621593795, 48.651173138, 48.656914878, 48.662256571 },
+      { 73.280126903, 73.280816965, 73.282780615, 73.285315943 },
+      { 42.0, 42.0, 42.0, 42.0 },
+      { 0, 0, 0, 0 },
+      { 2.2545584407825165, 2.2722384004239382, 2.2533523347849744, 2.2516795363567588 }
+    };
+    constexpr bool b_Inside[NPOINTS3] = { true, true, true, false, true };
 
     // an integer position inside the image
     for (int ii = 0; ii < NPOINTS3; ++ii)
     {
-      cindex = ContinuousIndexType3D(&darray1[ii][0]);
-      passed = TestContinuousIndex<InterpolatorType3D, ContinuousIndexType3D>(
+      auto cindex = ContinuousIndexType3D(&darray1[ii][0]);
+      bool passed = TestContinuousIndex<InterpolatorType3D, ContinuousIndexType3D>(
         interp, cindex, b_Inside[ii], truth[ii][splineOrder - 2]);
 
       if (!passed)
@@ -459,6 +456,7 @@ test3DSpline()
         flag += 1;
       }
 
+      PointType3D point;
       image->TransformContinuousIndexToPhysicalPoint(cindex, point);
       passed =
         TestGeometricPoint<InterpolatorType3D, PointType3D>(interp, point, b_Inside[ii], truth[ii][splineOrder - 2]);
@@ -479,13 +477,13 @@ test3DSplineDerivative()
   int flag = 0;
 
   /* Allocate a simple test image */
-  ImageTypePtr3D image = ImageType3D::New();
+  const ImageTypePtr3D image = ImageType3D::New();
 
   set3DDerivativeData(image);
 
   /* Set origin and spacing of physical coordinates */
-  double origin[] = { 0.0, 0.0, 0.0 };
-  double spacing[] = { 1, 1, 1 };
+  constexpr double origin[] = { 0.0, 0.0, 0.0 };
+  constexpr double spacing[] = { 1, 1, 1 };
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
@@ -501,8 +499,6 @@ test3DSplineDerivative()
     gemetric points */
     std::cout << "Testing Derivatives of 3D B-Spline of Order " << splineOrder << ":\n";
     std::cout << "Evaluate at: " << std::endl;
-    ContinuousIndexType3D cindex;
-    bool                  passed;
 
     // These values test
     //    1) near border,
@@ -511,7 +507,7 @@ test3DSplineDerivative()
     //    4) outside image
 #define NPOINTS4 4 // number of points
 
-    itk::SpacePrecisionType darray1[NPOINTS4][ImageDimension3D] = {
+    constexpr itk::SpacePrecisionType darray1[NPOINTS4][ImageDimension3D] = {
       { 25.3, 26.8, 24.5 }, { 21.0, 1.4, 0.6 }, { 18, 31, 10 }, { 4.3, 17.9, 42 }
     };
     // Calculated Truth is: {19.4158,5,-24}, {0.9,5,71.6}, {-7.2, 5, 34}, {0,0,0}
@@ -524,13 +520,13 @@ test3DSplineDerivative()
       { { 19.4164, 5, -24 }, { 0.9, 4.9925, 94.5082 }, { -7.2, 5.00044, 33.9976 }, { 0, 0, 0 } },
       { { 19.4223, 5, -24 }, { 0.900157, 5.0544, 93.8607 }, { -7.19929, 5.00189, 33.9879 }, { 0, 0, 0 } }
     };
-    bool b_Inside[NPOINTS4] = { true, true, true, false };
+    constexpr bool b_Inside[NPOINTS4] = { true, true, true, false };
 
     // an integer position inside the image
     for (int ii = 0; ii < NPOINTS4; ++ii)
     {
-      cindex = ContinuousIndexType3D(&darray1[ii][0]);
-      passed = TestContinuousIndexDerivative<InterpolatorType3D, ContinuousIndexType3D>(
+      auto       cindex = ContinuousIndexType3D(&darray1[ii][0]);
+      const bool passed = TestContinuousIndexDerivative<InterpolatorType3D, ContinuousIndexType3D>(
         interp, cindex, b_Inside[ii], &truth[splineOrder - 1][ii][0]);
       if (!passed)
       {
@@ -553,8 +549,8 @@ testInteger3DSpline()
   set3DInterpData<ImageIntegerType3D>(image);
 
   /* Set origin and spacing of physical coordinates */
-  double origin[] = { 0.5, 1.0, 1.333 };
-  double spacing[] = { 0.1, 0.5, 0.75 };
+  constexpr double origin[] = { 0.5, 1.0, 1.333 };
+  constexpr double spacing[] = { 0.1, 0.5, 0.75 };
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
@@ -570,9 +566,6 @@ testInteger3DSpline()
     gemetric points */
     std::cout << "Testing 3D Integer B-Spline of Order " << splineOrder << ":\n";
     std::cout << "Evaluate at: " << std::endl;
-    ContinuousIntegerIndexType3D cindex;
-    PointIntegerType3D           point;
-    bool                         passed;
 
     // These values test
     //    1) near border,
@@ -582,27 +575,27 @@ testInteger3DSpline()
 #define NPOINTS4b 4 // number of points
 
     // Note: the answers should be the same as for the test3DSpline
-    itk::SpacePrecisionType darray1[NPOINTS4b][ImageDimension3D] = {
+    constexpr itk::SpacePrecisionType darray1[NPOINTS4b][ImageDimension3D] = {
       { 0.1, 20.1, 28.4 }, { 21.58, 34.5, 17.2 }, { 10, 20, 12 }, { 15, 20.2, 31 }
     };
-    double truth[NPOINTS4b][4] = { { 48.621593795, 48.651173138, 48.656914878, 48.662256571 },
-                                   { 73.280126903, 73.280816965, 73.282780615, 73.285315943 },
-                                   { 42.0, 42.0, 42.0, 42.0 },
-                                   { 0, 0, 0, 0 } };
-    bool   b_Inside[NPOINTS4b] = { true, true, true, false };
+    constexpr double truth[NPOINTS4b][4] = { { 48.621593795, 48.651173138, 48.656914878, 48.662256571 },
+                                             { 73.280126903, 73.280816965, 73.282780615, 73.285315943 },
+                                             { 42.0, 42.0, 42.0, 42.0 },
+                                             { 0, 0, 0, 0 } };
+    constexpr bool   b_Inside[NPOINTS4b] = { true, true, true, false };
 
     // an integer position inside the image
     for (int ii = 0; ii < NPOINTS4b; ++ii)
     {
-      cindex = ContinuousIntegerIndexType3D(&darray1[ii][0]);
-      passed = TestContinuousIndex<InterpolatorIntegerType3D, ContinuousIntegerIndexType3D>(
+      auto cindex = ContinuousIntegerIndexType3D(&darray1[ii][0]);
+      bool passed = TestContinuousIndex<InterpolatorIntegerType3D, ContinuousIntegerIndexType3D>(
         interp, cindex, b_Inside[ii], truth[ii][splineOrder - 2]);
 
       if (!passed)
       {
         flag += 1;
       }
-
+      PointIntegerType3D point;
       image->TransformContinuousIndexToPhysicalPoint(cindex, point);
       passed = TestGeometricPoint<InterpolatorIntegerType3D, PointIntegerType3D>(
         interp, point, b_Inside[ii], truth[ii][splineOrder - 2]);
@@ -627,8 +620,8 @@ testEvaluateValueAndDerivative()
   using ImageType = itk::Image<PixelType, ImageDimension>;
   using BSplineInterpolatorFunctionType = itk::BSplineInterpolateImageFunction<ImageType, double, double>;
 
-  constexpr unsigned int                   SplineOrder = 3;
-  BSplineInterpolatorFunctionType::Pointer interpolator =
+  constexpr unsigned int                         SplineOrder = 3;
+  const BSplineInterpolatorFunctionType::Pointer interpolator =
     makeRandomImageInterpolator<BSplineInterpolatorFunctionType>(SplineOrder);
 
   /** Test the EvaluateDerivative and EvaluateValueAndDerivative functions **/
@@ -641,7 +634,7 @@ testEvaluateValueAndDerivative()
   const CovariantVectorType dx_1 = interpolator->EvaluateDerivativeAtContinuousIndex(x);
   CovariantVectorType       dx_2;
 
-  BSplineInterpolatorFunctionType::OutputType value;
+  BSplineInterpolatorFunctionType::OutputType value = NAN;
   interpolator->EvaluateValueAndDerivativeAtContinuousIndex(x, value, dx_2);
 
   for (unsigned int i = 0; i < ImageDimension; ++i)
@@ -684,22 +677,20 @@ itkBSplineInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
 
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "All tests successfully passed" << std::endl;
-    return EXIT_SUCCESS;
-  }
+
+  std::cout << "All tests successfully passed" << std::endl;
+  return EXIT_SUCCESS;
 }
 
 void
 set1DInterpData(ImageType1D::Pointer imgPtr)
 {
-
-  SizeType1D size = { { 36 } };
-  double     mydata[36] = { 454.0000, 369.4000, 295.2000, 230.8000, 175.6000, 129.0000, 90.4000,   59.2000,   34.8000,
-                        16.6000,  4.0000,   -3.6000,  -6.8000,  -6.2000,  -2.4000,  4.0000,    12.4000,   22.2000,
-                        32.8000,  43.6000,  54.0000,  63.4000,  71.2000,  76.8000,  79.6000,   79.0000,   74.4000,
-                        65.2000,  50.8000,  30.6000,  4.0000,   -29.6000, -70.8000, -120.2000, -178.4000, -246.0000 };
+  constexpr SizeType1D size = { { 36 } };
+  constexpr double     mydata[36] = { 454.0000, 369.4000,  295.2000,  230.8000, 175.6000, 129.0000, 90.4000, 59.2000,
+                                      34.8000,  16.6000,   4.0000,    -3.6000,  -6.8000,  -6.2000,  -2.4000, 4.0000,
+                                      12.4000,  22.2000,   32.8000,   43.6000,  54.0000,  63.4000,  71.2000, 76.8000,
+                                      79.6000,  79.0000,   74.4000,   65.2000,  50.8000,  30.6000,  4.0000,  -29.6000,
+                                      -70.8000, -120.2000, -178.4000, -246.0000 };
 
   ImageType1D::RegionType region;
   region.SetSize(size);
@@ -724,20 +715,17 @@ set1DInterpData(ImageType1D::Pointer imgPtr)
 void
 set2DInterpData(ImageType2D::Pointer imgPtr)
 {
-  SizeType2D size = { { 7, 7 } };
-  double mydata[49] = { 154.5000,  82.4000,   30.9000,   0,         -10.3000, 0,        30.9000,   117.0000,  62.4000,
-                        23.4000,   0,         -7.8000,   0,         23.4000,  18.0000,  9.6000,    3.6000,    0,
-                        -1.2000,   0,         3.6000,    -120.0000, -64.0000, -24.0000, 0,         8.0000,    0,
-                        -24.0000,  -274.5000, -146.4000, -54.9000,  0,        18.3000,  0,         -54.9000,  -423.0000,
-                        -225.6000, -84.6000,  0,         28.2000,   0,        -84.6000, -543.0000, -289.6000, -108.6000,
-                        0,         36.2000,   0,         -108.6000 };
+  constexpr SizeType2D size = { { 7, 7 } };
+  constexpr double     mydata[49] = {
+    154.5000,  82.4000,   30.9000,   0, -10.3000, 0, 30.9000,  117.0000,  62.4000,   23.4000,  0, -7.8000, 0, 23.4000,
+    18.0000,   9.6000,    3.6000,    0, -1.2000,  0, 3.6000,   -120.0000, -64.0000,  -24.0000, 0, 8.0000,  0, -24.0000,
+    -274.5000, -146.4000, -54.9000,  0, 18.3000,  0, -54.9000, -423.0000, -225.6000, -84.6000, 0, 28.2000, 0, -84.6000,
+    -543.0000, -289.6000, -108.6000, 0, 36.2000,  0, -108.6000
+  };
 
-  ImageType2D::IndexType index;
-  index.Fill(10);
+  auto index = ImageType2D::IndexType::Filled(10);
 
-  ImageType2D::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImageType2D::RegionType region{ index, size };
 
   imgPtr->SetRegions(region);
   imgPtr->Allocate();
@@ -778,22 +766,21 @@ set3DDerivativeData(ImageType3D::Pointer imgPtr)
   // df(x)/dx = 0.4x^3 - 1.5x^2 + 2
   // df(y)/dy = 5
   // df(z)/dz = -4z - 6
-  double      value;
-  double      slice1, row1, col1;
+
   IndexType3D index;
   for (unsigned int slice = 0; slice < size[2]; ++slice)
   {
     index[2] = slice;
-    slice1 = slice - 20.0; // Center offset
+    const double slice1 = slice - 20.0; // Center offset
     for (unsigned int row = 0; row < size[1]; ++row)
     {
       index[1] = row;
-      row1 = row - 20.0; // Center
+      const double row1 = row - 20.0; // Center
       for (unsigned int col = 0; col < size[0]; ++col)
       {
         index[0] = col;
-        col1 = col - 20.0; // Center
-        value = 0.1 * col1 * col1 * col1 * col1 - 0.5 * col1 * col1 * col1 + 2.0 * col1 - 43.0;
+        const double col1 = col - 20.0; // Center
+        double       value = 0.1 * col1 * col1 * col1 * col1 - 0.5 * col1 * col1 * col1 + 2.0 * col1 - 43.0;
         value += 5.0 * row1 + 7.0;
         value += -2.0 * slice1 * slice1 - 6.0 * slice1 + 10.0;
         imgPtr->SetPixel(index, value);

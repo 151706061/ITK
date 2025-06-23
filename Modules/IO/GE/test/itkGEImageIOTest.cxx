@@ -87,10 +87,10 @@ itkGEImageIOTest(int argc, char * argv[])
   {
     return EXIT_FAILURE;
   }
-  std::string               failmode(argv[1]);
-  std::string               filetype(argv[2]);
-  std::string               filename(argv[3]);
-  bool                      Failmode = failmode == std::string("true");
+  const std::string         failmode(argv[1]);
+  const std::string         filetype(argv[2]);
+  const std::string         filename(argv[3]);
+  const bool                Failmode = failmode == std::string("true");
   itk::ImageIOBase::Pointer io;
   if (filetype == "GE4")
   {
@@ -128,14 +128,14 @@ itkGEImageIOTest(int argc, char * argv[])
     if (Failmode)
     {
       std::cout << "Caught unexpected exception. Test Failed!" << std::endl;
+      std::cout << e << std::endl;
+      return EXIT_FAILURE;
     }
     else
     {
       std::cout << "Caught expected exception. Test Passed!" << std::endl;
       return EXIT_SUCCESS;
     }
-    std::cout << e << std::endl;
-    return Failmode ? 1 : 0;
   }
 
   if (failmode == std::string("true"))

@@ -31,21 +31,20 @@ template <typename TPixel, unsigned int VImageDimension>
 void
 ImportImageFilter<TPixel, VImageDimension>::PrintSelf(std::ostream & os, Indent indent) const
 {
-  int i;
-
   Superclass::PrintSelf(os, indent);
 
   itkPrintSelfObjectMacro(ImportImageContainer);
   os << indent << "Import buffer size: " << m_Size << std::endl;
   os << indent << "Spacing: [";
-  for (i = 0; i < static_cast<int>(VImageDimension) - 1; ++i)
+  int i = 0;
+  for (; i < int{ VImageDimension } - 1; ++i)
   {
     os << m_Spacing[i] << ", ";
   }
   os << m_Spacing[i] << ']' << std::endl;
 
   os << indent << "Origin: [";
-  for (i = 0; i < static_cast<int>(VImageDimension) - 1; ++i)
+  for (i = 0; i < int{ VImageDimension } - 1; ++i)
   {
     os << m_Origin[i] << ", ";
   }
@@ -92,7 +91,7 @@ ImportImageFilter<TPixel, VImageDimension>::EnlargeOutputRequestedRegion(DataObj
   Superclass::EnlargeOutputRequestedRegion(output);
 
   // get pointer to the output
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   // set the requested region to the largest possible region (in this case
   // the amount of data that we have)
@@ -110,7 +109,7 @@ ImportImageFilter<TPixel, VImageDimension>::GenerateOutputInformation()
   Superclass::GenerateOutputInformation();
 
   // get pointer to the output
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   // we need to compute the output spacing, the output origin, the
   // output image size, and the output image start index
@@ -132,7 +131,7 @@ ImportImageFilter<TPixel, VImageDimension>::GenerateData()
   // Therefore, this filter does not call outputPtr->Allocate().
 
   // get pointer to the output
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   // the output buffer size is set to the size specified by the user via the
   // SetRegion() method.

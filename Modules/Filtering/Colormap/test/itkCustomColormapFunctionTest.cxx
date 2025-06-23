@@ -21,10 +21,7 @@
 #include "itkImageFileReader.h"
 #include "itkTestingMacros.h"
 
-
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 
 /**
@@ -99,8 +96,7 @@ public:
 protected:
 };
 
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 
 int
@@ -115,21 +111,23 @@ itkCustomColormapFunctionTest(int argc, char * argv[])
 
   using RGBPixelType = itk::RGBPixel<unsigned char>;
 
-  double              value;
-  std::vector<double> redChannel, greenChannel, blueChannel;
-
   std::ifstream str(argv[1]);
-  std::string   line;
 
   // Get red values
+  std::string line;
   std::getline(str, line);
   std::istringstream issr(line);
+
+  double value = NAN;
+
+  std::vector<double> redChannel;
   while (issr >> value)
   {
     redChannel.push_back(value);
   }
 
   // Get green values
+  std::vector<double> greenChannel;
   std::getline(str, line);
   std::istringstream issg(line);
   while (issg >> value)
@@ -138,6 +136,7 @@ itkCustomColormapFunctionTest(int argc, char * argv[])
   }
 
   // Get blue values
+  std::vector<double> blueChannel;
   std::getline(str, line);
   std::istringstream issb(line);
   while (issb >> value)
@@ -146,7 +145,7 @@ itkCustomColormapFunctionTest(int argc, char * argv[])
   }
 
   // The scalar valur to be mapped into an RGB colormap value
-  int scalarValue = std::stoi(argv[2]);
+  const int scalarValue = std::stoi(argv[2]);
 
   // Test for all possible scalar pixel types
   itk::Function::CustomColormapFunctionHelper<unsigned char, RGBPixelType>::Exercise(

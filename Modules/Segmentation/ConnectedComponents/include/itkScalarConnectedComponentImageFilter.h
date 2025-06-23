@@ -54,7 +54,9 @@ template <typename TInput>
 class SimilarPixelsFunctor
 {
 public:
-  SimilarPixelsFunctor() { m_Threshold = TInput{}; }
+  SimilarPixelsFunctor()
+    : m_Threshold(TInput{})
+  {}
 
   ~SimilarPixelsFunctor() = default;
 
@@ -88,10 +90,8 @@ public:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 
 protected:
@@ -123,7 +123,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarConnectedComponentImageFilter);
 
   using InputPixelType = typename TInputImage::PixelType;
@@ -140,15 +140,11 @@ public:
     return (this->GetFunctor().GetDistanceThreshold());
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputPixelType>));
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<typename TOutputImage::PixelType>));
   itkConceptMacro(MaskEqualityComparableCheck, (Concept::EqualityComparable<typename TMaskImage::PixelType>));
   itkConceptMacro(OutputIncrementDecrementOperatorsCheck,
                   (Concept::IncrementDecrementOperators<typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ScalarConnectedComponentImageFilter() = default;

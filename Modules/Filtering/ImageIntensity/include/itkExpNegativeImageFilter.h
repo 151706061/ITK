@@ -34,9 +34,8 @@ template <typename TInput, typename TOutput>
 class ExpNegative
 {
 public:
-  ExpNegative() { m_Factor = 1.0; }
+  ExpNegative() = default;
   ~ExpNegative() = default;
-
 
   bool
   operator==(const ExpNegative & other) const
@@ -59,14 +58,14 @@ public:
     m_Factor = factor;
   }
 
-  double
+  [[nodiscard]] double
   GetFactor() const
   {
     return m_Factor;
   }
 
 private:
-  double m_Factor;
+  double m_Factor{ 1.0 };
 };
 } // namespace Functor
 
@@ -106,7 +105,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExpNegativeImageFilter);
 
   void
@@ -119,18 +118,14 @@ public:
     this->GetFunctor().SetFactor(factor);
     this->Modified();
   }
-  double
+  [[nodiscard]] double
   GetFactor() const
   {
     return this->GetFunctor().GetFactor();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToDoubleCheck, (Concept::Convertible<typename TInputImage::PixelType, double>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ExpNegativeImageFilter() = default;

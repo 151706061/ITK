@@ -38,7 +38,7 @@ static bool
 IsEqualTolerant(const float lm, const float rm, double tol)
 {
   tol = itk::Math::abs(tol);
-  float temp = itk::Math::abs(lm - rm);
+  const float temp = itk::Math::abs(lm - rm);
   return temp <= tol * itk::Math::abs(lm) || temp <= tol * itk::Math::abs(rm) ||
          (itk::Math::abs(lm) < std::numeric_limits<float>::epsilon() &&
           itk::Math::abs(rm) < std::numeric_limits<float>::epsilon());
@@ -76,7 +76,7 @@ itkGDCMSeriesStreamReadImageWriteTest(int argc, char * argv[])
     }
   }
 
-  bool expectedToStream = !forceNoStreaming;
+  const bool expectedToStream = !forceNoStreaming;
 
   using ImageIOType = itk::GDCMImageIO;
   using SeriesFileNames = itk::GDCMSeriesFileNames;
@@ -191,7 +191,7 @@ itkGDCMSeriesStreamReadImageWriteTest(int argc, char * argv[])
   ImageType::SpacingType spacing = reader->GetOutput()->GetSpacing();
 
   // we only give 4 bits of tolerance, IEEE float a 24-bit mantissa
-  const double percentTolerance = 1.0 / static_cast<double>(1U << 18);
+  constexpr double percentTolerance = 1.0 / static_cast<double>(1U << 18);
 
   if (!IsEqualTolerant(spacing[0], expectedSpacing[0], percentTolerance) ||
       !IsEqualTolerant(spacing[1], expectedSpacing[1], percentTolerance) ||

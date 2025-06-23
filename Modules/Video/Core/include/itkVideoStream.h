@@ -72,7 +72,7 @@ public:
   using SpacingMapType = typename std::map<SizeValueType, SpacingType>;
   using NumberOfComponentsPerPixelMapType = typename std::map<SizeValueType, NumberOfComponentsPerPixelType>;
 
-  /** Access the spacial dimensionality of the frames */
+  /** Access the spatial dimensionality of the frames */
   static constexpr unsigned int FrameDimension = FrameType::ImageDimension;
   static unsigned int
   GetFrameDimension()
@@ -82,7 +82,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VideoStream);
 
   /** Safely expand the internal ring buffer. */
@@ -99,6 +99,7 @@ public:
   InitializeEmptyFrames();
 
   /** Provide access to the internal frame buffer object */
+  /** @ITKStartGrouping */
   BufferType *
   GetFrameBuffer()
   {
@@ -109,12 +110,13 @@ public:
   {
     return reinterpret_cast<BufferType *>(m_DataObjectBuffer.GetPointer());
   }
-
+  /** @ITKEndGrouping */
   /** Set the internal pixel buffer */
   void
   SetFrameBuffer(BufferType * buffer);
 
   /** Provide access to the internal caches for the meta data */
+  /** @ITKStartGrouping */
   const SpatialRegionMapType &
   GetLargestPossibleSpatialRegionCache() const
   {
@@ -125,7 +127,7 @@ public:
   {
     m_LargestPossibleSpatialRegionCache = map;
   }
-
+  /** @ITKEndGrouping */
   const SpatialRegionMapType &
   GetRequestedSpatialRegionCache() const
   {
@@ -200,11 +202,12 @@ public:
    * Head of the ring buffer in place and just use the frame number as an
    * offset. This allows all references to frames to be processed by an
    * explicit frame number rather than a potentially confusing offset. */
+  /** @ITKStartGrouping */
   FrameType *
   GetFrame(SizeValueType frameNumber);
   const FrameType *
   GetFrame(SizeValueType frameNumber) const;
-
+  /** @ITKEndGrouping */
   /** Get/Set the LargestPossibleRegion of a frame */
   void
   SetFrameLargestPossibleSpatialRegion(SizeValueType frameNumber, SpatialRegionType region);

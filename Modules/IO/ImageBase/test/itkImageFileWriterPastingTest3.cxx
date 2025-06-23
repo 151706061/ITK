@@ -33,9 +33,9 @@ namespace
 bool
 SameImage(ImagePointer testImage, ImagePointer baselineImage)
 {
-  PixelType     intensityTolerance = 0;
-  int           radiusTolerance = 0;
-  unsigned long numberOfPixelTolerance = 0;
+  constexpr PixelType     intensityTolerance = 0;
+  constexpr int           radiusTolerance = 0;
+  constexpr unsigned long numberOfPixelTolerance = 0;
 
   using DiffType = itk::Testing::ComparisonImageFilter<ImageType, ImageType>;
   auto diff = DiffType::New();
@@ -45,7 +45,7 @@ SameImage(ImagePointer testImage, ImagePointer baselineImage)
   diff->SetToleranceRadius(radiusTolerance);
   diff->UpdateLargestPossibleRegion();
 
-  unsigned long status = diff->GetNumberOfPixelsWithDifferences();
+  const unsigned long status = diff->GetNumberOfPixelsWithDifferences();
 
   if (status > numberOfPixelTolerance)
   {
@@ -94,10 +94,9 @@ itkImageFileWriterPastingTest3(int argc, char * argv[])
     reader->SetUseStreaming(true);
     reader->UpdateOutputInformation();
 
-    ImageType::RegionType largestRegion = reader->GetOutput()->GetLargestPossibleRegion();
+    const ImageType::RegionType largestRegion = reader->GetOutput()->GetLargestPossibleRegion();
 
-    ImageType::RegionType ioRegion;
-    ImageType::IndexType  ioIndex;
+    ImageType::IndexType ioIndex;
     ioIndex[0] = largestRegion.GetIndex()[0] + largestRegion.GetSize()[0] / 3;
     ioIndex[1] = largestRegion.GetIndex()[1] + largestRegion.GetSize()[1] / 3;
     ioIndex[2] = largestRegion.GetIndex()[2] + largestRegion.GetSize()[2] / 3;
@@ -105,7 +104,7 @@ itkImageFileWriterPastingTest3(int argc, char * argv[])
     ioSize[0] = largestRegion.GetSize()[0] / 3;
     ioSize[1] = largestRegion.GetSize()[1] / 3;
     ioSize[2] = largestRegion.GetSize()[2] / 3;
-    ioRegion = ImageType::RegionType(ioIndex, ioSize);
+    const ImageType::RegionType ioRegion = ImageType::RegionType(ioIndex, ioSize);
 
     image = reader->GetOutput();
 

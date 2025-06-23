@@ -6,7 +6,7 @@ A question that is often asked is: I am trying to read/write a DICOM image,
 but the pixel data has changed (the scalar range has changed from input file).
 
 This surely comes from the fact that you did not used the proper
-pixel type to instanciate your reader. You have to consider:
+pixel type to instantiate your reader. You have to consider:
 
 - `Bits Allocated`
 - `Bits Stored`
@@ -59,7 +59,7 @@ $ DicomImageReadPrintTags image.dcm | grep "Image Pixel Value"
 ## Why did the header of my DICOM file change?
 
 A common question that frequently arises after using
-[`itk::GDCMImageIO`](https://itk.org/Doxygen/html/classitk_1_1GDCMImageIO.html)
+[`itk::GDCMImageIO`](https://docs.itk.org/projects/doxygen/en/stable/classitk_1_1GDCMImageIO.html)
 to read, update and write out a DICOM file is: why did my header file
 change during the update mechanism?
 
@@ -114,7 +114,7 @@ is however allowed that both files uses different transfer syntax uid
 (implicit/explicit, little/big endian). When a DICOM file is sent to a
 PACS, it is up to the implementor to decide what to do in case of
 duplicate `SOP Instance UID`. In most case you should expect that the
-image is not resent, as standard garantee this is already the same
+image is not resent, as standard guarantee this is already the same
 object.
 
 > ⚠️ **Warning**

@@ -64,10 +64,7 @@ namespace itk
  * NIA AG 17919, PI: E.V. Sullivan.
  *
  *
- * \par References
- * E. R. Melhem, S. Mori, G. Mukundan, M. A. Kraut, M. G. Pomper, and
- * P. C. M. van Zijl, "Diffusion tensor MR imaging of the brain and white
- * matter tractography," Am. J. Roentgenol., vol. 178, pp. 3-16, 2002.
+ * For algorithmic details see \cite melhem2002.
  *
  * \sa SymmetricSecondRankTensor
  *
@@ -98,13 +95,14 @@ public:
   DiffusionTensor3D() = default;
 
   /** Constructor with initialization. */
+  /** @ITKStartGrouping */
   DiffusionTensor3D(const Superclass & r);
   DiffusionTensor3D(const ComponentType & r);
   DiffusionTensor3D(const ComponentArrayType r);
-
+  /** @ITKEndGrouping */
   /** Constructor to enable casting...  */
-  template <typename TCoordRepB>
-  DiffusionTensor3D(const DiffusionTensor3D<TCoordRepB> & pa)
+  template <typename TCoordinateB>
+  DiffusionTensor3D(const DiffusionTensor3D<TCoordinateB> & pa)
     : SymmetricSecondRankTensor<TComponent, 3>(pa)
   {}
 
@@ -119,14 +117,14 @@ public:
   operator=(const ComponentArrayType r);
 
   /** Templated Pass-through assignment for the Array base class. */
-  template <typename TCoordRepB>
+  template <typename TCoordinateB>
   Self &
-  operator=(const DiffusionTensor3D<TCoordRepB> & pa)
+  operator=(const DiffusionTensor3D<TCoordinateB> & pa)
   {
     // NOTE (this != &pa ) because they are different pointer types
     // if this templated function is called
     // ComponentType 'itk::DiffusionTensor3D<double> *'
-    // TCoordRepB   'const DiffusionTensor3D<float> *')
+    // TCoordinateB   'const DiffusionTensor3D<float> *')
     SymmetricSecondRankTensor<TComponent, 3>::operator=(pa);
     return *this;
   }
@@ -145,26 +143,26 @@ public:
    * M[0], M[3] and M[5].
    *
    */
-  AccumulateValueType
+  [[nodiscard]] AccumulateValueType
   GetTrace() const;
 
   /** Get the value of Fractional Anisotropy from the Tensor. */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetFractionalAnisotropy() const;
 
   /** Get the value of Relative Anisotropy from the Tensor. */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetRelativeAnisotropy() const;
 
   /** Get the inner scalar product from the Tensor. */
-  RealValueType
+  [[nodiscard]] RealValueType
   GetInnerScalarProduct() const;
 };
 
 
 template <typename T>
 inline void
-swap(DiffusionTensor3D<T> & a, DiffusionTensor3D<T> & b)
+swap(DiffusionTensor3D<T> & a, DiffusionTensor3D<T> & b) noexcept
 {
   a.swap(b);
 }

@@ -76,7 +76,7 @@ public:
     return 0;
   }
 
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     return nullptr;
@@ -148,11 +148,10 @@ itkCurvatureFlowTest(int argc, char * argv[])
     std::cout << "Test when wrong function type." << std::endl;
     using FunctionType = itk::DummyFunction<ImageType>;
     filter = FilterType::New();
-    auto                function = FunctionType::New();
-    auto                dummy = ImageType::New();
-    ImageType::SizeType size;
-    size.Fill(3);
-    ImageType::RegionType region(size);
+    auto                        function = FunctionType::New();
+    auto                        dummy = ImageType::New();
+    auto                        size = ImageType::SizeType::Filled(3);
+    const ImageType::RegionType region(size);
     dummy->SetRegions(region);
     dummy->Allocate();
     dummy->FillBuffer(0.2);
@@ -191,9 +190,9 @@ itkCurvatureFlowTest(int argc, char * argv[])
   denoiser->SetTimeStep(0.05);
   denoiser->SetNumberOfIterations(8);
 
-  ShowProgressObject                                    progressWatch(denoiser);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(denoiser);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   denoiser->AddObserver(itk::ProgressEvent(), command);
 
@@ -247,8 +246,7 @@ itkCurvatureFlowTest(int argc, char * argv[])
   // Exercise other member functions here
   denoiser->Print(std::cout);
 
-  itk::VTKImageIO::Pointer vtkIO;
-  vtkIO = itk::VTKImageIO::New();
+  const itk::VTKImageIO::Pointer vtkIO = itk::VTKImageIO::New();
   using WriterType = itk::ImageFileWriter<ImageType>;
 
   auto writer = WriterType::New();

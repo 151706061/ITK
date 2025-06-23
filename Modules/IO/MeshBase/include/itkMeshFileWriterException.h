@@ -32,23 +32,19 @@ namespace itk
 class ITKIOMeshBase_EXPORT MeshFileWriterException : public ExceptionObject
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(MeshFileWriterException);
+
   /** Has to have empty throw(). */
   ~MeshFileWriterException() noexcept override;
 
-  /** Run-time information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeshFileWriterException);
 
   /** Constructor. */
-  MeshFileWriterException(const char * file,
+  MeshFileWriterException(std::string  file,
                           unsigned int line,
-                          const char * message = "Error in IO",
-                          const char * loc = "Unknown");
-
-  /** Constructor. */
-  MeshFileWriterException(const std::string & file,
-                          unsigned int        line,
-                          const char *        message = "Error in IO",
-                          const char *        loc = "Unknown");
+                          std::string  message = "Error in IO",
+                          std::string  location = {});
 };
 } // end namespace itk
 

@@ -27,7 +27,7 @@ namespace
 static bool
 CheckEqual(const itk::Point<double, 2> & p1, const itk::Point<double, 2> & p2)
 {
-  const double epsilon = 1e-5;
+  constexpr double epsilon = 1e-5;
 
   for (unsigned int i = 0; i < 2; ++i)
   {
@@ -49,7 +49,7 @@ itkCenteredRigid2DTransformTest(int, char *[])
   std::cout << "==================================" << std::endl;
   std::cout << "Testing CenteredRigid 2D Transform" << std::endl << std::endl;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 2;
   bool                   Ok = true;
 
@@ -65,9 +65,9 @@ itkCenteredRigid2DTransformTest(int, char *[])
   transform->SetAngle(angle);
 
   // Rotate an itk::Point
-  CenteredRigidTransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
-  CenteredRigidTransformType::InputPointType            p = pInit;
-  CenteredRigidTransformType::InputPointType            q;
+  constexpr CenteredRigidTransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
+  CenteredRigidTransformType::InputPointType                      p = pInit;
+  CenteredRigidTransformType::InputPointType                      q;
 
   q[0] = p[0] * costh - p[1] * sinth;
   q[1] = p[0] * sinth + p[1] * costh;
@@ -88,17 +88,16 @@ itkCenteredRigid2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   std::cout << "Testing Translation:";
 
   transform->SetAngle(0);
 
   CenteredRigidTransformType::OffsetType::ValueType ioffsetInit[2] = { 1, 4 };
-  CenteredRigidTransformType::OffsetType            ioffset = ioffsetInit;
+  const CenteredRigidTransformType::OffsetType      ioffset = ioffsetInit;
 
   transform->SetOffset(ioffset);
 
@@ -120,10 +119,9 @@ itkCenteredRigid2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   {
     std::cout << "Testing Inverse:";
@@ -173,13 +171,12 @@ itkCenteredRigid2DTransformTest(int, char *[])
       std::cerr << "Reported Result is     : " << p3 << std::endl;
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cout << " [ PASSED ] " << std::endl;
-    }
+
+    std::cout << " [ PASSED ] " << std::endl;
+
 
     // Get inverse transform and transform point p2 to obtain point p3
-    CenteredRigidTransformType::Pointer inversebis =
+    const CenteredRigidTransformType::Pointer inversebis =
       dynamic_cast<CenteredRigidTransformType *>(transform2->GetInverseTransform().GetPointer());
 
     if (!inversebis)
@@ -207,10 +204,8 @@ itkCenteredRigid2DTransformTest(int, char *[])
       std::cerr << "Reported Result is     : " << p3 << std::endl;
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cout << " [ PASSED ] " << std::endl;
-    }
+
+    std::cout << " [ PASSED ] " << std::endl;
   }
 
   {
@@ -239,7 +234,7 @@ itkCenteredRigid2DTransformTest(int, char *[])
     TransformType::Pointer t2;
     t1->CloneInverseTo(t2);
 
-    TransformType::InputPointType p3 = t2->TransformPoint(p2);
+    const TransformType::InputPointType p3 = t2->TransformPoint(p2);
 
     std::cout << "Test CloneInverseTo(): ";
     if (!CheckEqual(p1, p3))
@@ -275,7 +270,7 @@ itkCenteredRigid2DTransformTest(int, char *[])
     TransformType::Pointer t3;
     t1->CloneTo(t3);
 
-    TransformType::InputPointType p4 = t3->TransformPoint(p1);
+    const TransformType::InputPointType p4 = t3->TransformPoint(p1);
 
     std::cout << "Test Clone(): ";
     if (!CheckEqual(p2, p4))
@@ -358,7 +353,7 @@ itkCenteredRigid2DTransformTest(int, char *[])
           std::cerr << " [ FAILED ] " << std::endl;
           return EXIT_FAILURE;
         } // if
-      }   // for j
+      } // for j
 
     } // for k
 

@@ -31,16 +31,11 @@ namespace itk
  * various computer vision tasks such as texture segmentation,
  * motion analysis, and object recognition. It is essentially
  * a complex sinusoid enveloped within a Gaussian.
- * See the discussion in
- *
- *   Andreas Klein, Forester Lee, and Amir A. Amini, "Quantitative
- *   Coronary Angiography with Deformable Spline Models", IEEE-TMI
- *   16(5):468-482, October 1997.
- *
- * for a basic discussion including additional references.
+ * See \cite klein1997 for a basic discussion
+ * including additional references.
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/150
+ * https://doi.org/10.54294/dhogdz
  *
  * \sa KernelFunctionBase
  *
@@ -61,7 +56,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaborKernelFunction);
 
   /** Evaluate the function. */
@@ -76,38 +71,39 @@ public:
     {
       return envelope * std::sin(phase);
     }
-    else
-    {
-      return envelope * std::cos(phase);
-    }
+
+    return envelope * std::cos(phase);
   }
 
   /** Set/Get the standard deviation of the Gaussian envelope. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sigma, TRealValueType);
   itkGetConstMacro(Sigma, TRealValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the modulation frequency of the sine or cosine component. */
+  /** @ITKStartGrouping */
   itkSetMacro(Frequency, TRealValueType);
   itkGetConstMacro(Frequency, TRealValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the phase offset of the sine or cosine component .*/
+  /** @ITKStartGrouping */
   itkSetMacro(PhaseOffset, TRealValueType);
   itkGetConstMacro(PhaseOffset, TRealValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get whether the kernel function evaluation is performed using the
    * complex part. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(CalculateImaginaryPart, bool);
   itkGetConstMacro(CalculateImaginaryPart, bool);
   itkBooleanMacro(CalculateImaginaryPart);
-
+  /** @ITKEndGrouping */
 protected:
   GaborKernelFunction()
-  {
-    this->m_CalculateImaginaryPart = false;
-    this->m_Sigma = TRealValueType{ 1.0 };
-    this->m_Frequency = TRealValueType{ 0.4 };
-    this->m_PhaseOffset = TRealValueType{ 0.0 };
-  }
+    : m_Sigma(TRealValueType{ 1.0 })
+    , m_Frequency(TRealValueType{ 0.4 })
+    , m_PhaseOffset(TRealValueType{ 0.0 })
+
+  {}
   ~GaborKernelFunction() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override

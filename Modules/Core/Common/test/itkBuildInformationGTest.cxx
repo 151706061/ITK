@@ -32,7 +32,7 @@ TEST(ITKBuildInformation, InformationFeatures)
 {
   using MapType = itk::BuildInformation::MapType;
 
-  itk::BuildInformation::Pointer instance = itk::BuildInformation::GetInstance();
+  const itk::BuildInformation::Pointer instance = itk::BuildInformation::GetInstance();
   EXPECT_EQ(instance.IsNull(), false);
 
 
@@ -47,7 +47,7 @@ TEST(ITKBuildInformation, InformationFeatures)
     EXPECT_EQ(it->second.m_Description, std::string{ "The URL of project." });
   }
 
-  for (auto mapEntry : localMap)
+  for (const auto & mapEntry : localMap)
   {
     const auto & key = mapEntry.first;
 

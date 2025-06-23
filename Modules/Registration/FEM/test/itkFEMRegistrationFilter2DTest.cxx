@@ -102,12 +102,9 @@ itkFEMRegistrationFilter2DTest(int argc, char * argv[])
   SizeType size;
   size.SetSize(sizeArray);
 
-  IndexType index;
-  index.Fill(0);
+  IndexType index{};
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  RegionType region{ index, size };
 
   auto movingImage = InputImageType::New();
   auto fixedImage = InputImageType::New();
@@ -146,8 +143,7 @@ itkFEMRegistrationFilter2DTest(int argc, char * argv[])
   FillWithCircle<InputImageType>(movingImage, center, radius, fgnd, bgnd);
 
   // Fill initial deformation with zero vectors
-  DeformationFieldVectorType zeroVec;
-  zeroVec.Fill(0.0);
+  DeformationFieldVectorType zeroVec{};
   FillImage<DeformationFieldImageType>(initField, zeroVec);
 
 
@@ -256,8 +252,7 @@ itkFEMRegistrationFilter2DTest(int argc, char * argv[])
     // ITK_TEST_SET_GET_VALUE( standardDeviations, registrator->GetStandardDeviations() );
 
     standardDeviation = 1.0;
-    RegistrationType::StandardDeviationsType standardDeviations;
-    standardDeviations.Fill(standardDeviation);
+    auto standardDeviations = itk::MakeFilled<RegistrationType::StandardDeviationsType>(standardDeviation);
     registrator->SetStandardDeviations(standardDeviations);
     // ITK_TEST_SET_GET_VALUE( standardDeviations, registrator->GetStandardDeviations() );
 

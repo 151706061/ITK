@@ -1,84 +1,89 @@
 itk_module_test()
-set(ITKImageIntensityTests
-    itkBoundedReciprocalImageFilterTest.cxx
-    itkCosImageFilterAndAdaptorTest.cxx
-    itkExpImageFilterAndAdaptorTest.cxx
-    itkVectorRescaleIntensityImageFilterTest.cxx
-    itkTernaryMagnitudeSquaredImageFilterTest.cxx
-    itkTernaryOperatorImageFilterTest.cxx
-    itkMinimumImageFilterTest.cxx
-    itkLog10ImageFilterAndAdaptorTest.cxx
-    itkVectorIndexSelectionCastImageFilterTest.cxx
-    itkInvertIntensityImageFilterTest.cxx
-    itkSymmetricEigenAnalysisImageFilterTest.cxx
-    itkEdgePotentialImageFilterTest.cxx
-    itkComplexToModulusFilterAndAdaptorTest.cxx
-    itkAddImageAdaptorTest.cxx
-    itkAndImageFilterTest.cxx
-    itkAdaptImageFilterTest2.cxx
-    itkLogImageFilterAndAdaptorTest.cxx
-    itkNotImageFilterTest.cxx
-    itkImageAdaptorNthElementTest.cxx
-    itkConstrainedValueAdditionImageFilterTest.cxx
-    itkAtanImageFilterAndAdaptorTest.cxx
-    itkMaskNegatedImageFilterTest.cxx
-    itkAddImageFilterTest.cxx
-    itkAddImageFilterTest2.cxx
-    itkAddImageFilterFrameTest.cxx
-    itkPowImageFilterTest.cxx
-    itkMultiplyImageFilterTest.cxx
-    itkWeightedAddImageFilterTest.cxx
-    itkRescaleIntensityImageFilterTest.cxx
-    itkNormalizeImageFilterTest.cxx
-    itkNaryAddImageFilterTest.cxx
-    itkShiftScaleImageFilterTest.cxx
-    itkComplexToPhaseFilterAndAdaptorTest.cxx
-    itkIntensityWindowingImageFilterTest.cxx
-    itkTernaryMagnitudeImageFilterTest.cxx
-    itkAbsImageFilterAndAdaptorTest.cxx
-    itkMaximumImageFilterTest.cxx
-    itkBinaryMagnitudeImageFilterTest.cxx
-    itkMatrixIndexSelectionImageFilterTest.cxx
-    itkSquareImageFilterTest.cxx
-    itkRGBToVectorAdaptImageFilterTest.cxx
-    itkComplexToRealFilterAndAdaptorTest.cxx
-    itkNaryMaximumImageFilterTest.cxx
-    itkAtan2ImageFilterTest.cxx
-    itkSqrtImageFilterAndAdaptorTest.cxx
-    itkAsinImageFilterAndAdaptorTest.cxx
-    itkMaskImageFilterTest.cxx
-    itkHistogramMatchingImageFilterTest.cxx
-    itkAcosImageFilterAndAdaptorTest.cxx
-    itkExpNegativeImageFilterAndAdaptorTest.cxx
-    itkTanImageFilterAndAdaptorTest.cxx
-    itkSigmoidImageFilterTest.cxx
-    itkDivideImageFilterTest.cxx
-    itkDivideImageFilterTest2.cxx
-    itkDivideOrZeroOutImageFilterTest.cxx
-    itkAdaptImageFilterTest.cxx
-    itkOrImageFilterTest.cxx
-    itkRGBToLuminanceImageFilterAndAdaptorTest.cxx
-    itkXorImageFilterTest.cxx
-    itkSubtractImageFilterTest.cxx
-    itkComplexToImaginaryFilterAndAdaptorTest.cxx
-    itkVectorToRGBImageAdaptorTest.cxx
-    itkSinImageFilterAndAdaptorTest.cxx
-    itkPolylineMask2DImageFilterTest.cxx
-    itkPolylineMaskImageFilterTest.cxx
-    itkPromoteDimensionImageTest.cxx
-    itkModulusImageFilterTest.cxx
-    itkVectorMagnitudeImageFilterTest.cxx
-    itkNormalizeToConstantImageFilterTest.cxx
-    itkEqualTest.cxx
-    itkNotEqualTest.cxx
-    itkGreaterEqualTest.cxx
-    itkGreaterTest.cxx
-    itkLessEqualTest.cxx
-    itkLessTest.cxx
-    itkClampImageFilterTest.cxx
-    itkNthElementPixelAccessorTest2.cxx
-    itkMagnitudeAndPhaseToComplexImageFilterTest.cxx
-    itkRoundImageFilterTest.cxx)
+set(
+  ITKImageIntensityTests
+  itkBoundedReciprocalImageFilterTest.cxx
+  itkCosImageFilterAndAdaptorTest.cxx
+  itkDiscreteHessianGaussianImageFunctionTest.cxx
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest.cxx
+  itkDiscreteGaussianDerivativeImageFunctionTest.cxx
+  itkExpImageFilterAndAdaptorTest.cxx
+  itkVectorRescaleIntensityImageFilterTest.cxx
+  itkTernaryMagnitudeSquaredImageFilterTest.cxx
+  itkTernaryOperatorImageFilterTest.cxx
+  itkMinimumImageFilterTest.cxx
+  itkLog10ImageFilterAndAdaptorTest.cxx
+  itkVectorIndexSelectionCastImageFilterTest.cxx
+  itkInvertIntensityImageFilterTest.cxx
+  itkSymmetricEigenAnalysisImageFilterTest.cxx
+  itkEdgePotentialImageFilterTest.cxx
+  itkComplexToModulusFilterAndAdaptorTest.cxx
+  itkAddImageAdaptorTest.cxx
+  itkAndImageFilterTest.cxx
+  itkAdaptImageFilterTest2.cxx
+  itkLogImageFilterAndAdaptorTest.cxx
+  itkNotImageFilterTest.cxx
+  itkImageAdaptorNthElementTest.cxx
+  itkConstrainedValueAdditionImageFilterTest.cxx
+  itkAtanImageFilterAndAdaptorTest.cxx
+  itkMaskNegatedImageFilterTest.cxx
+  itkAddImageFilterTest.cxx
+  itkAddImageFilterTest2.cxx
+  itkAddImageFilterFrameTest.cxx
+  itkPowImageFilterTest.cxx
+  itkMultiplyImageFilterTest.cxx
+  itkWeightedAddImageFilterTest.cxx
+  itkRescaleIntensityImageFilterTest.cxx
+  itkNormalizeImageFilterTest.cxx
+  itkNaryAddImageFilterTest.cxx
+  itkShiftScaleImageFilterTest.cxx
+  itkComplexToPhaseFilterAndAdaptorTest.cxx
+  itkIntensityWindowingImageFilterTest.cxx
+  itkTernaryMagnitudeImageFilterTest.cxx
+  itkAbsImageFilterAndAdaptorTest.cxx
+  itkMaximumImageFilterTest.cxx
+  itkBinaryMagnitudeImageFilterTest.cxx
+  itkMatrixIndexSelectionImageFilterTest.cxx
+  itkSquareImageFilterTest.cxx
+  itkRGBToVectorAdaptImageFilterTest.cxx
+  itkComplexToRealFilterAndAdaptorTest.cxx
+  itkNaryMaximumImageFilterTest.cxx
+  itkAtan2ImageFilterTest.cxx
+  itkSqrtImageFilterAndAdaptorTest.cxx
+  itkAsinImageFilterAndAdaptorTest.cxx
+  itkMaskImageFilterTest.cxx
+  itkHistogramMatchingImageFilterTest.cxx
+  itkAcosImageFilterAndAdaptorTest.cxx
+  itkExpNegativeImageFilterAndAdaptorTest.cxx
+  itkTanImageFilterAndAdaptorTest.cxx
+  itkSigmoidImageFilterTest.cxx
+  itkDivideImageFilterTest.cxx
+  itkDivideImageFilterTest2.cxx
+  itkDivideOrZeroOutImageFilterTest.cxx
+  itkAdaptImageFilterTest.cxx
+  itkOrImageFilterTest.cxx
+  itkRGBToLuminanceImageFilterAndAdaptorTest.cxx
+  itkXorImageFilterTest.cxx
+  itkSubtractImageFilterTest.cxx
+  itkComplexToImaginaryFilterAndAdaptorTest.cxx
+  itkVectorToRGBImageAdaptorTest.cxx
+  itkSinImageFilterAndAdaptorTest.cxx
+  itkPolylineMask2DImageFilterTest.cxx
+  itkPolylineMaskImageFilterTest.cxx
+  itkPromoteDimensionImageTest.cxx
+  itkModulusImageFilterTest.cxx
+  itkVectorMagnitudeImageFilterTest.cxx
+  itkNormalizeToConstantImageFilterTest.cxx
+  itkEqualTest.cxx
+  itkNotEqualTest.cxx
+  itkGreaterEqualTest.cxx
+  itkGreaterTest.cxx
+  itkLessEqualTest.cxx
+  itkLessTest.cxx
+  itkClampImageFilterTest.cxx
+  itkNthElementPixelAccessorTest2.cxx
+  itkMagnitudeAndPhaseToComplexImageFilterTest.cxx
+  itkRoundImageFilterTest.cxx
+)
 
 if(NOT ITK_LEGACY_REMOVE)
   list(APPEND ITKImageIntensityTests itkVectorExpandImageFilterTest.cxx)
@@ -90,7 +95,12 @@ endif()
 # CMAKE_CXX_FLAGS) which means that on gcc, MSVC, and the Intel
 # compiler, it will override any other optimization flag.
 if(DEFINED ITK_CXX_DISABLE_OPTIMIZATION_FLAG)
-  set_source_files_properties(itkClampImageFilterTest.cxx PROPERTIES COMPILE_FLAGS ${ITK_CXX_DISABLE_OPTIMIZATION_FLAG})
+  set_source_files_properties(
+    itkClampImageFilterTest.cxx
+    PROPERTIES
+      COMPILE_FLAGS
+        ${ITK_CXX_DISABLE_OPTIMIZATION_FLAG}
+  )
 endif()
 
 createtestdriver(ITKImageIntensity "${ITKImageIntensity-Test_LIBRARIES}" "${ITKImageIntensityTests}")
@@ -103,43 +113,50 @@ itk_add_test(
   COMMAND
   ITKImageIntensityTestDriver
   itkBoundedReciprocalImageFilterTest
-  DATA{${ITK_DATA_ROOT}/Input/Gourds.png})
+  DATA{${ITK_DATA_ROOT}/Input/Gourds.png}
+)
 itk_add_test(
   NAME
   itkCosImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkCosImageFilterAndAdaptorTest)
+  itkCosImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkVectorRescaleIntensityImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkVectorRescaleIntensityImageFilterTest)
+  itkVectorRescaleIntensityImageFilterTest
+)
 itk_add_test(
   NAME
   itkTernaryMagnitudeSquaredImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkTernaryMagnitudeSquaredImageFilterTest)
+  itkTernaryMagnitudeSquaredImageFilterTest
+)
 itk_add_test(
   NAME
   itkTernaryOperatorImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkTernaryOperatorImageFilterTest)
+  itkTernaryOperatorImageFilterTest
+)
 itk_add_test(
   NAME
   itkMinimumImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkMinimumImageFilterTest)
+  itkMinimumImageFilterTest
+)
 itk_add_test(
   NAME
   itkLog10ImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkLog10ImageFilterAndAdaptorTest)
+  itkLog10ImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkVectorIndexSelectionCastImageFilterTest1
@@ -151,7 +168,8 @@ itk_add_test(
   itkVectorIndexSelectionCastImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/RGBTestImage.tif}
   ${ITK_TEST_OUTPUT_DIR}/itkVectorIndexSelectionCastImageFilterTest1.mha
-  0)
+  0
+)
 itk_add_test(
   NAME
   itkVectorIndexSelectionCastImageFilterTest2
@@ -163,7 +181,8 @@ itk_add_test(
   itkVectorIndexSelectionCastImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/RGBTestImage.tif}
   ${ITK_TEST_OUTPUT_DIR}/itkVectorIndexSelectionCastImageFilterTest2.mha
-  1)
+  1
+)
 itk_add_test(
   NAME
   itkVectorIndexSelectionCastImageFilterTest3
@@ -175,7 +194,8 @@ itk_add_test(
   itkVectorIndexSelectionCastImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/RGBTestImage.tif}
   ${ITK_TEST_OUTPUT_DIR}/itkVectorIndexSelectionCastImageFilterTest3.mha
-  2)
+  2
+)
 itk_add_test(
   NAME
   itkInvertIntensityImageFilterTest
@@ -186,7 +206,8 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/InvertIntensityImageFilterTest.png
   itkInvertIntensityImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
-  ${ITK_TEST_OUTPUT_DIR}/InvertIntensityImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/InvertIntensityImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkSymmetricEigenAnalysisImageFilterTestOrderByValue
@@ -201,7 +222,8 @@ itk_add_test(
   itkSymmetricEigenAnalysisImageFilterTest
   ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisImageFilterTestOrderByValue.png
   1
-  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestOrderByValue.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestOrderByValue.png
+)
 itk_add_test(
   NAME
   itkSymmetricEigenAnalysisImageFilterTestOrderByMagnitude
@@ -216,7 +238,8 @@ itk_add_test(
   itkSymmetricEigenAnalysisImageFilterTest
   ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisImageFilterTestOrderByMagnitude.png
   2
-  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestOrderByMagnitude.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestOrderByMagnitude.png
+)
 # FixedDimension (with Eigen3) orders by value by default.
 itk_add_test(
   NAME
@@ -232,25 +255,29 @@ itk_add_test(
   itkSymmetricEigenAnalysisImageFilterTest
   ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisImageFilterTestDoNotOrder.png
   3
-  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestDoNotOrder.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkSymmetricEigenAnalysisFixedDimensionImageFilterTestDoNotOrder.png
+)
 itk_add_test(
   NAME
   itkEdgePotentialImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkEdgePotentialImageFilterTest)
+  itkEdgePotentialImageFilterTest
+)
 itk_add_test(
   NAME
   itkComplexToModulusFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkComplexToModulusFilterAndAdaptorTest)
+  itkComplexToModulusFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkAddImageAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAddImageAdaptorTest)
+  itkAddImageAdaptorTest
+)
 itk_add_test(
   NAME
   itkAndImageFilterTest
@@ -260,31 +287,36 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkAndImageFilterTest.png
   93d46ee3d5e0c157e2b2d27977ae4d0f
   itkAndImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/itkAndImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkAndImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkAdaptImageFilterTest2
   COMMAND
   ITKImageIntensityTestDriver
-  itkAdaptImageFilterTest2)
+  itkAdaptImageFilterTest2
+)
 itk_add_test(
   NAME
   itkLogImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkLogImageFilterAndAdaptorTest)
+  itkLogImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkNotImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkNotImageFilterTest)
+  itkNotImageFilterTest
+)
 itk_add_test(
   NAME
   itkImageAdaptorNthElementTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkImageAdaptorNthElementTest)
+  itkImageAdaptorNthElementTest
+)
 itk_add_test(
   NAME
   itkConstrainedValueAdditionImageFilterTest
@@ -294,25 +326,29 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkConstrainedValueAdditionImageFilterTest.png
   6ef609d089e93e2eed8f089f75bc67fb
   itkConstrainedValueAdditionImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/itkConstrainedValueAdditionImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkConstrainedValueAdditionImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkAtanImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAtanImageFilterAndAdaptorTest)
+  itkAtanImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkMaskNegatedImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkMaskNegatedImageFilterTest)
+  itkMaskNegatedImageFilterTest
+)
 itk_add_test(
   NAME
   itkAddImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAddImageFilterTest)
+  itkAddImageFilterTest
+)
 itk_add_test(
   NAME
   itkAddImageFilterTest2
@@ -320,38 +356,44 @@ itk_add_test(
   ITKImageIntensityTestDriver
   itkAddImageFilterTest2
   DATA{${ITK_DATA_ROOT}/Input/HeadMRVolume.mha}
-  ${TEMP}/itkAddImageFilterTest2.mha)
+  ${TEMP}/itkAddImageFilterTest2.mha
+)
 itk_add_test(
   NAME
   itkAddImageFilterFrameTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAddImageFilterFrameTest)
+  itkAddImageFilterFrameTest
+)
 itk_add_test(
   NAME
   itkPowImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkPowImageFilterTest)
+  itkPowImageFilterTest
+)
 itk_add_test(
   NAME
   itkMultiplyImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkMultiplyImageFilterTest)
+  itkMultiplyImageFilterTest
+)
 itk_add_test(
   NAME
   itkWeightedAddImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
   itkWeightedAddImageFilterTest
-  0.4)
+  0.4
+)
 itk_add_test(
   NAME
   itkRescaleIntensityImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkRescaleIntensityImageFilterTest)
+  itkRescaleIntensityImageFilterTest
+)
 
 itk_add_test(
   NAME
@@ -360,34 +402,43 @@ itk_add_test(
   ITKImageIntensityTestDriver
   --redirectOutput
   ${TEMP}/itkNormalizeImageFilterTest.txt
-  itkNormalizeImageFilterTest)
-set_tests_properties(itkNormalizeImageFilterTest PROPERTIES ATTACHED_FILES_ON_FAIL
-                                                            ${TEMP}/itkNormalizeImageFilterTest.txt)
+  itkNormalizeImageFilterTest
+)
+set_tests_properties(
+  itkNormalizeImageFilterTest
+  PROPERTIES
+    ATTACHED_FILES_ON_FAIL
+      ${TEMP}/itkNormalizeImageFilterTest.txt
+)
 
 itk_add_test(
   NAME
   itkNaryAddImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkNaryAddImageFilterTest)
+  itkNaryAddImageFilterTest
+)
 itk_add_test(
   NAME
   itkShiftScaleImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkShiftScaleImageFilterTest)
+  itkShiftScaleImageFilterTest
+)
 itk_add_test(
   NAME
   itkComplexToPhaseFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkComplexToPhaseFilterAndAdaptorTest)
+  itkComplexToPhaseFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkIntensityWindowingImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkIntensityWindowingImageFilterTest)
+  itkIntensityWindowingImageFilterTest
+)
 itk_add_test(
   NAME
   itkTernaryMagnitudeImageFilterTest
@@ -397,25 +448,29 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkTernaryMagnitudeImageFilterTest.png
   7f199e1363c4b754eb03cf4d0ba8d343
   itkTernaryMagnitudeImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/itkTernaryMagnitudeImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkTernaryMagnitudeImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkAbsImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAbsImageFilterAndAdaptorTest)
+  itkAbsImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkMaximumImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkMaximumImageFilterTest)
+  itkMaximumImageFilterTest
+)
 itk_add_test(
   NAME
   itkBinaryMagnitudeImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkBinaryMagnitudeImageFilterTest)
+  itkBinaryMagnitudeImageFilterTest
+)
 itk_add_test(
   NAME
   itkMatrixIndexSelectionImageFilterTest
@@ -425,123 +480,143 @@ itk_add_test(
   DATA{${ITK_DATA_ROOT}/Baseline/BasicFilters/MatrixIndexSelectionImageFilterTest.png}
   ${ITK_TEST_OUTPUT_DIR}/MatrixIndexSelectionImageFilterTest.png
   itkMatrixIndexSelectionImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/MatrixIndexSelectionImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/MatrixIndexSelectionImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkSquareImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkSquareImageFilterTest)
+  itkSquareImageFilterTest
+)
 itk_add_test(
   NAME
   itkRGBToVectorAdaptImageFilterTest.cxx
   COMMAND
   ITKImageIntensityTestDriver
-  itkRGBToVectorAdaptImageFilterTest)
+  itkRGBToVectorAdaptImageFilterTest
+)
 itk_add_test(
   NAME
   itkComplexToRealFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkComplexToRealFilterAndAdaptorTest)
+  itkComplexToRealFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkNaryMaximumImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkNaryMaximumImageFilterTest)
+  itkNaryMaximumImageFilterTest
+)
 itk_add_test(
   NAME
   itkAtan2ImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAtan2ImageFilterTest)
+  itkAtan2ImageFilterTest
+)
 itk_add_test(
   NAME
   itkSqrtImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkSqrtImageFilterAndAdaptorTest)
+  itkSqrtImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkAsinImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAsinImageFilterAndAdaptorTest)
+  itkAsinImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkMaskImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkMaskImageFilterTest)
+  itkMaskImageFilterTest
+)
 itk_add_test(
   NAME
   itkHistogramMatchingImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkHistogramMatchingImageFilterTest)
+  itkHistogramMatchingImageFilterTest
+)
 itk_add_test(
   NAME
   itkAcosImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAcosImageFilterAndAdaptorTest)
+  itkAcosImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkExpNegativeImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkExpNegativeImageFilterAndAdaptorTest)
+  itkExpNegativeImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkExpImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkExpImageFilterAndAdaptorTest)
+  itkExpImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkTanImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkTanImageFilterAndAdaptorTest)
+  itkTanImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkSigmoidImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkSigmoidImageFilterTest)
+  itkSigmoidImageFilterTest
+)
 itk_add_test(
   NAME
   itkDivideImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkDivideImageFilterTest)
+  itkDivideImageFilterTest
+)
 itk_add_test(
   NAME
   itkDivideImageFilterTest2
   COMMAND
   ITKImageIntensityTestDriver
-  itkDivideImageFilterTest2)
+  itkDivideImageFilterTest2
+)
 itk_add_test(
   NAME
   itkDivideOrZeroOutImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkDivideOrZeroOutImageFilterTest)
+  itkDivideOrZeroOutImageFilterTest
+)
 if(NOT ITK_LEGACY_REMOVE)
   itk_add_test(
-    NAME
-    itkVectorExpandImageFilterTest
-    COMMAND
-    ITKImageIntensityTestDriver
-    itkVectorExpandImageFilterTest)
+      NAME
+      itkVectorExpandImageFilterTest
+      COMMAND
+      ITKImageIntensityTestDriver
+      itkVectorExpandImageFilterTest
+  )
 endif()
 itk_add_test(
   NAME
   itkAdaptImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkAdaptImageFilterTest)
+  itkAdaptImageFilterTest
+)
 itk_add_test(
   NAME
   itkOrImageFilterTest
@@ -551,13 +626,15 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkOrImageFilterTest.png
   817d6d96c1c07cb12bfc200134aa57ba
   itkOrImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/itkOrImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkOrImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkRGBToLuminanceImageFilterAndAdaptorTest.cxx
   COMMAND
   ITKImageIntensityTestDriver
-  itkRGBToLuminanceImageFilterAndAdaptorTest)
+  itkRGBToLuminanceImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkXorImageFilterTest
@@ -567,31 +644,36 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/itkXorImageFilterTest.png
   3b5b9852567ef7618aac7f5f2d74ef74
   itkXorImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/itkXorImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkXorImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkSubtractImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkSubtractImageFilterTest)
+  itkSubtractImageFilterTest
+)
 itk_add_test(
   NAME
   itkComplexToImaginaryFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkComplexToImaginaryFilterAndAdaptorTest)
+  itkComplexToImaginaryFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkVectorToRGBImageAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkVectorToRGBImageAdaptorTest)
+  itkVectorToRGBImageAdaptorTest
+)
 itk_add_test(
   NAME
   itkSinImageFilterAndAdaptorTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkSinImageFilterAndAdaptorTest)
+  itkSinImageFilterAndAdaptorTest
+)
 itk_add_test(
   NAME
   itkPolylineMask2DImageFilterTest
@@ -599,7 +681,8 @@ itk_add_test(
   ITKImageIntensityTestDriver
   itkPolylineMask2DImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
-  ${ITK_TEST_OUTPUT_DIR}/itkPolylineMask2DImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/itkPolylineMask2DImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkPolylineMaskImageFilterTest
@@ -609,7 +692,8 @@ itk_add_test(
   DATA{Baseline/PolylineMaskImageFilterTest.mha}
   ${ITK_TEST_OUTPUT_DIR}/PolylineMaskImageFilterTest.mha
   itkPolylineMaskImageFilterTest
-  ${ITK_TEST_OUTPUT_DIR}/PolylineMaskImageFilterTest.mha)
+  ${ITK_TEST_OUTPUT_DIR}/PolylineMaskImageFilterTest.mha
+)
 itk_add_test(
   NAME
   itkPromoteDimensionImageTest
@@ -620,7 +704,8 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/PromoteDimensionImageTest.mhd
   itkPromoteDimensionImageTest
   DATA{${ITK_DATA_ROOT}/Input/VisibleWomanEyeSlice.png}
-  ${ITK_TEST_OUTPUT_DIR}/PromoteDimensionImageTest.mhd)
+  ${ITK_TEST_OUTPUT_DIR}/PromoteDimensionImageTest.mhd
+)
 itk_add_test(
   NAME
   itkModulusImageFilterTest
@@ -631,67 +716,78 @@ itk_add_test(
   ${ITK_TEST_OUTPUT_DIR}/ModulusImageFilterTest.png
   itkModulusImageFilterTest
   DATA{${ITK_DATA_ROOT}/Input/Spots.png}
-  ${ITK_TEST_OUTPUT_DIR}/ModulusImageFilterTest.png)
+  ${ITK_TEST_OUTPUT_DIR}/ModulusImageFilterTest.png
+)
 itk_add_test(
   NAME
   itkVectorMagnitudeImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkVectorMagnitudeImageFilterTest)
+  itkVectorMagnitudeImageFilterTest
+)
 itk_add_test(
   NAME
   itkNormalizeToConstantImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkNormalizeToConstantImageFilterTest)
+  itkNormalizeToConstantImageFilterTest
+)
 itk_add_test(
   NAME
   itkEqualTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkEqualTest)
+  itkEqualTest
+)
 itk_add_test(
   NAME
   itkNotEqualTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkNotEqualTest)
+  itkNotEqualTest
+)
 itk_add_test(
   NAME
   itkGreaterEqualTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkGreaterEqualTest)
+  itkGreaterEqualTest
+)
 itk_add_test(
   NAME
   itkGreaterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkGreaterTest)
+  itkGreaterTest
+)
 itk_add_test(
   NAME
   itkLessEqualTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkLessEqualTest)
+  itkLessEqualTest
+)
 itk_add_test(
   NAME
   itkLessTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkLessTest)
+  itkLessTest
+)
 itk_add_test(
   NAME
   itkClampImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkClampImageFilterTest)
+  itkClampImageFilterTest
+)
 itk_add_test(
   NAME
   itkNthElementPixelAccessorTest2
   COMMAND
   ITKImageIntensityTestDriver
-  itkNthElementPixelAccessorTest2)
+  itkNthElementPixelAccessorTest2
+)
 itk_add_test(
   NAME
   itkMagnitudeAndPhaseToComplexImageFilterTest
@@ -703,20 +799,131 @@ itk_add_test(
   itkMagnitudeAndPhaseToComplexImageFilterTest
   DATA{Input/itkBrainSliceComplexMagnitude.mha}
   DATA{Input/itkBrainSliceComplexPhase.mha}
-  ${ITK_TEST_OUTPUT_DIR}/itkMagnitudeAndPhaseToComplexImageFilterTest.mha)
+  ${ITK_TEST_OUTPUT_DIR}/itkMagnitudeAndPhaseToComplexImageFilterTest.mha
+)
 itk_add_test(
   NAME
   itkRoundImageFilterTest
   COMMAND
   ITKImageIntensityTestDriver
-  itkRoundImageFilterTest)
+  itkRoundImageFilterTest
+)
+itk_add_test(
+  NAME
+  itkDiscreteHessianGaussianImageFunctionTest
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare
+  DATA{Baseline/itkDiscreteHessianGaussianImageFunctionTest.mha}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteHessianGaussianImageFunctionTest.mha
+  itkDiscreteHessianGaussianImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteHessianGaussianImageFunctionTest.mha
+  2.0
+  0.01
+  32
+)
+itk_add_test(
+  NAME
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest01
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare
+  DATA{Baseline/itkDiscreteGradientMagnitudeGaussianImageFunctionTest01.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTest01.png
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTest01.png
+  2.0
+  0.01
+  32
+  0
+  1
+)
+itk_add_test(
+  NAME
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest02
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare-MD5
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTest02.png
+  de1904605e667018baaa3f73c5e5c220
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTest02.png
+  1.5
+  0.03
+  64
+  1
+  1
+)
+itk_add_test(
+  NAME
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTestUseImageSpacingOff
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare-MD5
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTestUseImageSpacingOff.png
+  de1904605e667018baaa3f73c5e5c220
+  itkDiscreteGradientMagnitudeGaussianImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGradientMagnitudeGaussianImageFunctionTestUseImageSpacingOff.png
+  1.5
+  0.03
+  64
+  1
+  0
+)
+itk_add_test(
+  NAME
+  itkDiscreteGaussianDerivativeImageFunctionTest01
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare
+  DATA{Baseline/itkDiscreteGaussianDerivativeImageFunctionTest01.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGaussianDerivativeImageFunctionTest01.png
+  itkDiscreteGaussianDerivativeImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGaussianDerivativeImageFunctionTest01.png
+  1
+  2.0
+  0.01
+  32
+  0
+)
+itk_add_test(
+  NAME
+  itkDiscreteGaussianDerivativeImageFunctionTest02
+  COMMAND
+  ITKImageIntensityTestDriver
+  --compare-MD5
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGaussianDerivativeImageFunctionTest02.png
+  488a4bf5daa08cadb3e8b1018a3fe5c0
+  itkDiscreteGaussianDerivativeImageFunctionTest
+  DATA{${ITK_DATA_ROOT}/Input/cthead1.png}
+  ${ITK_TEST_OUTPUT_DIR}/itkDiscreteGaussianDerivativeImageFunctionTest02.png
+  2
+  1.5
+  0.03
+  16
+  1
+)
 
-set(ITKImageIntensityGTests itkBitwiseOpsFunctorsTest.cxx itkArithmeticOpsFunctorsTest.cxx)
+set(
+  ITKImageIntensityGTests
+  itkBitwiseOpsFunctorsTest.cxx
+  itkArithmeticOpsFunctorsTest.cxx
+)
 
 if(MSVC)
   # disable false warning about floating division by zero
   # Floating division by zero is defined unlike integer division
-  set_source_files_properties(itkArithmeticOpsFunctorsTest.cxx PROPERTIES COMPILE_FLAGS -wd4723)
+  set_source_files_properties(
+    itkArithmeticOpsFunctorsTest.cxx
+    PROPERTIES
+      COMPILE_FLAGS
+        -wd4723
+  )
 endif()
 
 creategoogletestdriver(ITKImageIntensity "${ITKImageIntensity-Test_LIBRARIES}" "${ITKImageIntensityGTests}")

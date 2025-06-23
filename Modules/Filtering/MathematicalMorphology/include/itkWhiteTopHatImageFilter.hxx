@@ -27,11 +27,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 WhiteTopHatImageFilter<TInputImage, TOutputImage, TKernel>::WhiteTopHatImageFilter()
-{
-  m_SafeBorder = true;
-  m_Algorithm = AlgorithmEnum::HISTO;
-  m_ForceAlgorithm = false;
-}
+  : m_SafeBorder(true)
+  , m_Algorithm(AlgorithmEnum::HISTO)
+{}
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 void
@@ -46,8 +44,7 @@ WhiteTopHatImageFilter<TInputImage, TOutputImage, TKernel>::GenerateData()
   this->AllocateOutputs();
 
   // Delegate to an opening filter.
-  typename GrayscaleMorphologicalOpeningImageFilter<TInputImage, TInputImage, TKernel>::Pointer open =
-    GrayscaleMorphologicalOpeningImageFilter<TInputImage, TInputImage, TKernel>::New();
+  auto open = GrayscaleMorphologicalOpeningImageFilter<TInputImage, TInputImage, TKernel>::New();
 
   open->SetInput(this->GetInput());
   open->SetKernel(this->GetKernel());
@@ -62,8 +59,7 @@ WhiteTopHatImageFilter<TInputImage, TOutputImage, TKernel>::GenerateData()
   }
 
   // Need to subtract the opened image from the input
-  typename SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::Pointer subtract =
-    SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
+  auto subtract = SubtractImageFilter<TInputImage, TInputImage, TOutputImage>::New();
 
   subtract->SetInput1(this->GetInput());
   subtract->SetInput2(open->GetOutput());

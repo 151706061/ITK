@@ -30,14 +30,14 @@ template <typename TParametersValueType, unsigned int VInputDimension, unsigned 
 MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimension>::MatrixOffsetTransformBase(
   unsigned int paramDims)
   : Superclass(paramDims)
+  , m_InverseMatrixMTime(m_MatrixMTime)
 {
   m_MatrixMTime.Modified();
-  m_InverseMatrixMTime = m_MatrixMTime;
   this->m_FixedParameters.SetSize(VInputDimension);
   this->m_FixedParameters.Fill(0.0);
 }
 
-
+#if !defined(ITK_LEGACY_REMOVE)
 template <typename TParametersValueType, unsigned int VInputDimension, unsigned int VOutputDimension>
 MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimension>::MatrixOffsetTransformBase(
   const MatrixType &       matrix,
@@ -48,7 +48,10 @@ MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimensio
   m_MatrixMTime.Modified();
   std::copy_n(offset.begin(), VOutputDimension, m_Translation.begin());
   this->ComputeMatrixParameters();
+  this->m_FixedParameters.SetSize(VInputDimension);
+  this->m_FixedParameters.Fill(0.0);
 }
+#endif
 
 template <typename TParametersValueType, unsigned int VInputDimension, unsigned int VOutputDimension>
 void
@@ -57,18 +60,8 @@ MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimensio
 {
   Superclass::PrintSelf(os, indent);
 
-  unsigned int i, j;
-
   os << indent << "Matrix: " << std::endl;
-  for (i = 0; i < VInputDimension; ++i)
-  {
-    os << indent.GetNextIndent();
-    for (j = 0; j < VOutputDimension; ++j)
-    {
-      os << m_Matrix[i][j] << ' ';
-    }
-    os << std::endl;
-  }
+  this->m_Matrix.PrintSelf(os, indent.GetNextIndent());
 
   os << indent << "Offset: " << m_Offset << std::endl;
   os << indent << "Center: " << m_Center << std::endl;
@@ -78,15 +71,8 @@ MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimensio
 
   const auto & inverseMatrix = this->GetInverseMatrix();
 
-  for (i = 0; i < VInputDimension; ++i)
-  {
-    os << indent.GetNextIndent();
-    for (j = 0; j < VOutputDimension; ++j)
-    {
-      os << inverseMatrix[i][j] << ' ';
-    }
-    os << std::endl;
-  }
+  inverseMatrix.PrintSelf(os, indent.GetNextIndent());
+
   os << indent << "Singular: " << m_Singular << std::endl;
 }
 
@@ -99,7 +85,9 @@ MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimensio
   m_MatrixMTime.Modified();
   m_Offset.Fill(OutputVectorValueType{});
   m_Translation.Fill(OutputVectorValueType{});
-  m_Center.Fill(InputPointValueType{});
+  // Fixed parameters must be preserved when setting the transform to identity
+  // the center is part of the stationary fixed parameters
+  // and should not be modified by SetIdentity. m_Center.Fill(InputPointValueType{});
   m_Singular = false;
   m_InverseMatrix.SetIdentity();
   m_InverseMatrixMTime = m_MatrixMTime;
@@ -461,9 +449,7 @@ auto
 MatrixOffsetTransformBase<TParametersValueType, VInputDimension, VOutputDimension>::GetInverseTransform() const
   -> InverseTransformBasePointer
 {
-  auto inv = InverseTransformType::New();
-
-  return GetInverse(inv) ? inv.GetPointer() : nullptr;
+  return Superclass::InvertTransform(*this);
 }
 
 

@@ -43,8 +43,7 @@ itkContourMeanDistanceImageFilterTest(int argc, char * argv[])
   auto image1 = Image1Type::New();
   auto image2 = Image2Type::New();
 
-  Image1Type::SizeType size;
-  size.Fill(50);
+  auto size = Image1Type::SizeType::Filled(50);
 
   image1->SetRegions(size);
   image2->SetRegions(size);
@@ -96,7 +95,7 @@ itkContourMeanDistanceImageFilterTest(int argc, char * argv[])
     ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, ContourMeanDistanceImageFilter, ImageToImageFilter);
 
 
-    itk::SimpleFilterWatcher watcher(filter, "filter");
+    const itk::SimpleFilterWatcher watcher(filter, "filter");
 
     filter->SetInput1(image1);
     filter->SetInput2(image2);
@@ -105,9 +104,9 @@ itkContourMeanDistanceImageFilterTest(int argc, char * argv[])
 
     // check results
 
-    FilterType::RealType trueDistance = 8.07158;
-    // std::sqrt( static_cast<double>(ImageDimension) );
-    FilterType::RealType distance = filter->GetMeanDistance();
+    constexpr FilterType::RealType trueDistance = 8.07158;
+    // std::sqrt( double{ ImageDimension } );
+    const FilterType::RealType distance = filter->GetMeanDistance();
 
     std::cout << " True     distance: " << trueDistance << std::endl;
     std::cout << " Computed distance: " << distance << std::endl;
@@ -130,8 +129,8 @@ itkContourMeanDistanceImageFilterTest(int argc, char * argv[])
 
 
     // check results
-    FilterType::RealType trueDistance = 8.07158;
-    FilterType::RealType distance = filter->GetMeanDistance();
+    constexpr FilterType::RealType trueDistance = 8.07158;
+    const FilterType::RealType     distance = filter->GetMeanDistance();
 
     std::cout << " True     distance: " << trueDistance << std::endl;
     std::cout << " Computed distance: " << distance << std::endl;
@@ -168,8 +167,8 @@ itkContourMeanDistanceImageFilterTest(int argc, char * argv[])
     filter->Update();
 
     // check results
-    FilterType::RealType trueDistance = 8.07158 / 2;
-    FilterType::RealType distance = filter->GetMeanDistance();
+    constexpr FilterType::RealType trueDistance = 8.07158 / 2;
+    const FilterType::RealType     distance = filter->GetMeanDistance();
     std::cout << " True     distance: " << trueDistance << std::endl;
     std::cout << " Computed distance: " << distance << std::endl;
     if (itk::Math::abs(trueDistance - distance) > 0.5)

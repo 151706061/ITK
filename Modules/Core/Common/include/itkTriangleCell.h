@@ -51,10 +51,11 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(TriangleCell);
 
   /** Standard class type aliases. */
+  /** @ITKStartGrouping */
   itkCellCommonTypedefs(TriangleCell);
   itkCellInheritedTypedefs(TCellInterface);
-
-  /** Standard part of every itk Object. */
+  /** @ITKEndGrouping */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TriangleCell);
 
   /** The type of boundary for this triangle's vertices. */
@@ -74,20 +75,21 @@ public:
   // Standard CellInterface
 
   /** Implement the standard CellInterface. */
-  CellGeometryEnum
+  /** @ITKStartGrouping */
+  [[nodiscard]] CellGeometryEnum
   GetType() const override
   {
     return CellGeometryEnum::TRIANGLE_CELL;
   }
   void
   MakeCopy(CellAutoPointer &) const override;
-
+  /** @ITKEndGrouping */
   /** Get the topological dimension of this cell. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetDimension() const override;
 
   /** Get the number of points required to define the cell. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoints() const override;
 
   /** Get the number of boundary features of the given dimension. */
@@ -157,10 +159,10 @@ public:
 
   /** Evaluate the position of a given point inside the cell */
   bool
-  EvaluatePosition(CoordRepType *,
+  EvaluatePosition(CoordinateType *,
                    PointsContainer *,
-                   CoordRepType *,
-                   CoordRepType[],
+                   CoordinateType *,
+                   CoordinateType[],
                    double *,
                    InterpolationWeightType *) override;
 
@@ -168,11 +170,11 @@ public:
   itkCellVisitMacro(CellGeometryEnum::TRIANGLE_CELL);
 
   /** Compute Area to a TriangleCell given a PointsContainer. */
-  CoordRepType
+  CoordinateType
   ComputeArea(PointsContainer *);
 
   PointType
-  ComputeBarycenter(CoordRepType *, PointsContainer *);
+  ComputeBarycenter(CoordinateType *, PointsContainer *);
 
   PointType
   ComputeCenterOfGravity(PointsContainer *);
@@ -182,16 +184,7 @@ public:
 
 public:
   TriangleCell() = default;
-#if defined(__GNUC__)
-  // A bug in some versions of the GCC and Clang compilers
-  // result in an ICE or linker error when "= default" is requested.
-  // This was observed in at least gcc 4.8 and 5.4.0, and
-  // AppleClang 7.0.2 and 8.0.0. Probably others too.
-  // "= default" doesn't gain us much, so just don't use it here.
-  ~TriangleCell() override{};
-#else
   ~TriangleCell() override = default;
-#endif
 
 protected:
   /** Store the number of points needed for a triangle. */
@@ -202,7 +195,7 @@ private:
   /** Compute the squared distance between a point and a line segment defined by two other points. Returns the
    * parametric coordinate t and point location on line. */
   double
-  DistanceToLine(PointType x, PointType p1, PointType p2, double & t, CoordRepType * closestPoint);
+  DistanceToLine(PointType x, PointType p1, PointType p2, double & t, CoordinateType * closestPoint);
 
   double
   DistanceToLine(PointType x, PointType p1, PointType p2, double & t, PointType & closestPoint);

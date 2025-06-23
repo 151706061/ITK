@@ -49,8 +49,7 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
   size[0] = 20;
   size[1] = 4;
 
-  IndexType start;
-  start.Fill(0);
+  IndexType start{};
 
   RegionType region;
   region.SetIndex(start);
@@ -69,7 +68,7 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
   // Initialize the contents of the input image
   while (!it.IsAtEnd())
   {
-    if (it.GetIndex()[0] > itk::IndexValueType(size[0] / 2))
+    if (it.GetIndex()[0] > static_cast<itk::IndexValueType>(size[0] / 2))
     {
       it.Set(1.0);
     }
@@ -91,7 +90,7 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, UnsharpMaskImageFilter, ImageToImageFilter);
 
-  itk::SimpleFilterWatcher watchit(filter);
+  const itk::SimpleFilterWatcher watchit(filter);
 
   // Connect the input images
   filter->SetInput(inputImage);
@@ -104,15 +103,15 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
 
 
   // Set the filter properties
-  UnsharpMaskImageFilterFilterType::SigmaArrayType::ValueType sigma = 2.5;
+  constexpr UnsharpMaskImageFilterFilterType::SigmaArrayType::ValueType sigma = 2.5;
   filter->SetSigma(sigma);
 
   UnsharpMaskImageFilterFilterType::SigmaArrayType sigmas = filter->GetSigmas();
 
-  double tolerance = 10e-6;
+  constexpr double tolerance = 10e-6;
   for (unsigned int i = 0; i < sigmas.Size(); ++i)
   {
-    UnsharpMaskImageFilterFilterType::SigmaArrayType::ValueType sigma2 = sigmas[i];
+    const UnsharpMaskImageFilterFilterType::SigmaArrayType::ValueType sigma2 = sigmas[i];
     if (!itk::Math::FloatAlmostEqual(sigma, sigma2, 10, tolerance))
     {
       std::cerr.precision(static_cast<int>(itk::Math::abs(std::log10(tolerance))));
@@ -124,7 +123,7 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
     }
   }
 
-  UnsharpMaskImageFilterFilterType::InternalPrecisionType amount = 0.8;
+  constexpr UnsharpMaskImageFilterFilterType::InternalPrecisionType amount = 0.8;
   filter->SetAmount(amount);
   ITK_TEST_SET_GET_VALUE(amount, filter->GetAmount());
 
@@ -132,7 +131,7 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
   filter->SetThreshold(threshold);
   ITK_TEST_SET_GET_VALUE(threshold, filter->GetThreshold());
 
-  const bool clamp = std::is_integral_v<UnsharpMaskImageFilterFilterType::OutputPixelType>;
+  constexpr bool clamp = std::is_integral_v<UnsharpMaskImageFilterFilterType::OutputPixelType>;
   filter->SetClamp(clamp);
   ITK_TEST_SET_GET_VALUE(clamp, filter->GetClamp());
 
@@ -154,12 +153,12 @@ itkUnsharpMaskImageFilterTestSimple(int, char *[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  GradientImageType::Pointer outputImage = filter->GetOutput();
+  const GradientImageType::Pointer outputImage = filter->GetOutput();
 
   // check that output is correct near the step
   start[0] = 9;
-  float mins[4] = { -0.21f, -0.33f, 1.32f, 1.20f };
-  float maxs[4] = { -0.20f, -0.32f, 1.33f, 1.21f };
+  constexpr float mins[4] = { -0.21f, -0.33f, 1.32f, 1.20f };
+  constexpr float maxs[4] = { -0.20f, -0.32f, 1.33f, 1.21f };
   for (unsigned int i = 0; i < 4; ++i)
   {
     if (outputImage->GetPixel(start) < mins[i] || outputImage->GetPixel(start) > maxs[i])

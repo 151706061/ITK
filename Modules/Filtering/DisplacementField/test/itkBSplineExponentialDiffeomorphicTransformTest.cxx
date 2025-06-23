@@ -48,7 +48,7 @@ itkBSplineExponentialDiffeomorphicTransformTest(int, char *[])
   FieldType::SizeType   size;
   FieldType::IndexType  start;
   FieldType::RegionType region;
-  int                   dimLength = 20;
+  constexpr int         dimLength = 20;
   size.Fill(dimLength);
   start.Fill(0);
   region.SetSize(size);
@@ -56,8 +56,7 @@ itkBSplineExponentialDiffeomorphicTransformTest(int, char *[])
   field->SetRegions(region);
   field->Allocate();
 
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  constexpr DisplacementTransformType::OutputVectorType zeroVector{};
   field->FillBuffer(zeroVector);
 
   displacementTransform->SetConstantVelocityField(field);
@@ -65,31 +64,29 @@ itkBSplineExponentialDiffeomorphicTransformTest(int, char *[])
 
   /* Test SmoothDisplacementFieldBSpline */
   std::cout << "Test SmoothDisplacementFieldBSpline" << std::endl;
-  DisplacementTransformType::ParametersType      params;
-  DisplacementTransformType::ParametersType      paramsFill(displacementTransform->GetNumberOfParameters());
-  DisplacementTransformType::ParametersValueType paramsFillValue = 0.0;
+  DisplacementTransformType::ParametersType                paramsFill(displacementTransform->GetNumberOfParameters());
+  constexpr DisplacementTransformType::ParametersValueType paramsFillValue = 0.0;
   paramsFill.Fill(paramsFillValue);
   // Add an outlier to visually see that some smoothing is taking place.
-  unsigned int outlier = dimLength * dimensions * 4 + dimLength * dimensions / 2;
+  constexpr unsigned int outlier = dimLength * dimensions * 4 + dimLength * dimensions / 2;
   paramsFill(outlier) = 99.0;
   paramsFill(outlier + 1) = 99.0;
 
-  DisplacementTransformType::ArrayType meshSizeForUpdateField;
-  meshSizeForUpdateField.Fill(15);
+  auto meshSizeForUpdateField = itk::MakeFilled<DisplacementTransformType::ArrayType>(15);
   displacementTransform->SetMeshSizeForTheUpdateField(meshSizeForUpdateField);
-  DisplacementTransformType::ArrayType meshSizeForVelocityField;
-  meshSizeForVelocityField.Fill(30);
+  auto meshSizeForVelocityField = itk::MakeFilled<DisplacementTransformType::ArrayType>(30);
   displacementTransform->SetMeshSizeForTheConstantVelocityField(meshSizeForVelocityField);
   displacementTransform->SetSplineOrder(3);
   displacementTransform->SetParameters(paramsFill);
 
-  DisplacementTransformType::NumberOfParametersType numberOfParameters = displacementTransform->GetNumberOfParameters();
+  const DisplacementTransformType::NumberOfParametersType numberOfParameters =
+    displacementTransform->GetNumberOfParameters();
 
   DisplacementTransformType::DerivativeType update1(numberOfParameters);
   update1.Fill(1.2);
 
   displacementTransform->UpdateTransformParameters(update1);
-  params = displacementTransform->GetParameters();
+  DisplacementTransformType::ParametersType params = displacementTransform->GetParameters();
 
   /* We should see 0's on all boundaries from the smoothing routine */
   unsigned int linelength = dimLength * dimensions;
@@ -129,7 +126,7 @@ itkBSplineExponentialDiffeomorphicTransformTest(int, char *[])
   {
     for (int j = -2; j < 3; ++j)
     {
-      unsigned int index = outlier + static_cast<unsigned int>(i * (int)(dimLength * dimensions) + j);
+      const unsigned int index = outlier + static_cast<unsigned int>(i * static_cast<int>(dimLength * dimensions) + j);
       std::cout << params(index) << ' ';
       if (itk::Math::AlmostEquals(params(index), paramsFillValue))
       {
@@ -202,7 +199,7 @@ itkBSplineExponentialDiffeomorphicTransformTest(int, char *[])
   {
     for (int j = -2; j < 3; ++j)
     {
-      unsigned int index = outlier + static_cast<unsigned int>(i * (int)(dimLength * dimensions) + j);
+      const unsigned int index = outlier + static_cast<unsigned int>(i * static_cast<int>(dimLength * dimensions) + j);
       std::cout << params(index) << ' ';
       if (itk::Math::AlmostEquals(params(index), paramsFillValue))
       {

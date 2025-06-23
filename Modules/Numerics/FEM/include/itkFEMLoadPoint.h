@@ -23,9 +23,7 @@
 #include "ITKFEMExport.h"
 #include "vnl/vnl_vector.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class LoadPoint
@@ -45,7 +43,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LoadPoint);
 
   /** CreateAnother method will clone the existing instance of this type,
@@ -92,7 +90,6 @@ protected:
   /** The actual load vector. */
   vnl_vector<Float> m_ForcePoint{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMLoadPoint_h

@@ -139,6 +139,7 @@ public:
 
   /** Default constructor. Needed since we provide a cast constructor. */
   ImageRandomConstIteratorWithOnlyIndex() = default;
+
   ~ImageRandomConstIteratorWithOnlyIndex() override = default;
 
   /** Constructor establishes an iterator to walk a particular image and a
@@ -173,14 +174,14 @@ public:
   }
 
   /** Is the iterator at the beginning of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtBegin() const
   {
     return (m_NumberOfSamplesDone == 0L);
   }
 
   /** Is the iterator at the end of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtEnd() const
   {
     return (m_NumberOfSamplesDone >= m_NumberOfSamplesRequested);
@@ -213,7 +214,7 @@ public:
     m_NumberOfSamplesRequested = number;
   }
 
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfSamples() const
   {
     return m_NumberOfSamplesRequested;

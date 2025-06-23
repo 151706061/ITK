@@ -93,7 +93,6 @@ public:
     other.m_ElementCount = 0;
   }
 
-
   /** Assignment operator. */
   Self &
   operator=(const Self & other)
@@ -105,7 +104,6 @@ public:
     }
     return *this;
   }
-
 
   /** Move-assignment. */
   Self &
@@ -120,14 +118,14 @@ public:
     return *this;
   }
 
-
   /** STL-style iterator support for the memory buffer. */
+  /** @ITKStartGrouping */
   iterator
   begin()
   {
     return m_Data.get();
   }
-  const_iterator
+  [[nodiscard]] const_iterator
   begin() const
   {
     return m_Data.get();
@@ -137,20 +135,31 @@ public:
   {
     return (m_Data.get() + m_ElementCount);
   }
-  const_iterator
+  [[nodiscard]] const_iterator
   end() const
   {
     return (m_Data.get() + m_ElementCount);
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   size() const
   {
     return m_ElementCount;
   }
+  /** @ITKEndGrouping */
 
   /** Data access methods */
-  const TPixel & operator[](unsigned int i) const { return m_Data[i]; }
-  TPixel &       operator[](unsigned int i) { return m_Data[i]; }
+  /** @ITKStartGrouping */
+  const TPixel &
+  operator[](unsigned int i) const
+  {
+    return m_Data[i];
+  }
+  TPixel &
+  operator[](unsigned int i)
+  {
+    return m_Data[i];
+  }
+  /** @ITKEndGrouping */
 
   /** Allocates a buffer of size n */
   void
@@ -170,7 +179,7 @@ public:
     return m_Data.get();
   }
 
-  const TPixel *
+  [[nodiscard]] const TPixel *
   data() const noexcept
   {
     return m_Data.get();

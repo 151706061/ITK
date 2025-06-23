@@ -27,6 +27,10 @@ namespace itk
  */
 template <typename TOutputMesh>
 SphereMeshSource<TOutputMesh>::SphereMeshSource()
+  : m_ResolutionX(4)
+  , m_ResolutionY(4)
+  , m_Squareness1(1.0)
+  , m_Squareness2(1.0)
 {
   /**
    * Create the output
@@ -34,12 +38,8 @@ SphereMeshSource<TOutputMesh>::SphereMeshSource()
   auto output = TOutputMesh::New();
   this->ProcessObject::SetNumberOfRequiredOutputs(1);
   this->ProcessObject::SetNthOutput(0, output.GetPointer());
-  m_Squareness1 = 1.0;
-  m_Squareness2 = 1.0;
   m_Center.Fill(0);
   m_Scale.Fill(1);
-  m_ResolutionX = 4;
-  m_ResolutionY = 4;
 }
 
 /*
@@ -49,18 +49,14 @@ template <typename TOutputMesh>
 void
 SphereMeshSource<TOutputMesh>::GenerateData()
 {
-  IdentifierType i, j, jn, p, numpts;
-  double         ustep, vstep, ubeg, vbeg, u, v;
-  int            signu, signv;
-
   // calculate the number os cells and points
-  numpts = m_ResolutionX * m_ResolutionY + 2;
+  const IdentifierType numpts = m_ResolutionX * m_ResolutionY + 2;
 
   // calculate the steps using resolution
-  ustep = itk::Math::pi / (m_ResolutionX + 1);
-  vstep = 2.0 * itk::Math::pi / m_ResolutionY;
-  ubeg = (-itk::Math::pi / 2.0) + ustep;
-  vbeg = -itk::Math::pi;
+  const double ustep = itk::Math::pi / (m_ResolutionX + 1);
+  const double vstep = 2.0 * itk::Math::pi / m_ResolutionY;
+  const double ubeg = (-itk::Math::pi / 2.0) + ustep;
+  const double vbeg = -itk::Math::pi;
 
   ///////////////////////////////////////////////////////////////////////////
   // nodes allocation
@@ -69,13 +65,13 @@ SphereMeshSource<TOutputMesh>::GenerateData()
   typename OutputMeshType::PointIdentifier tripoints[3] = { 0, 1, 2 };
 
   // memory allocation for nodes
-  typename OutputMeshType::Pointer outputMesh = this->GetOutput();
+  const typename OutputMeshType::Pointer outputMesh = this->GetOutput();
 
   outputMesh->GetPoints()->Reserve(numpts);
 
   outputMesh->SetCellsAllocationMethod(MeshEnums::MeshClassCellsAllocationMethod::CellsAllocatedDynamicallyCellByCell);
 
-  PointsContainerPointer             myPoints = outputMesh->GetPoints();
+  const PointsContainerPointer       myPoints = outputMesh->GetPoints();
   typename PointsContainer::Iterator point = myPoints->Begin();
 
   OPointType p1;
@@ -83,57 +79,28 @@ SphereMeshSource<TOutputMesh>::GenerateData()
   // calculate all regular nodes
   while (point != myPoints->End())
   {
-    for (u = ubeg, i = 0; i < m_ResolutionX; u += ustep, i++)
+    double u = ubeg;
+    for (IdentifierType i = 0; i < m_ResolutionX; u += ustep, i++)
     {
-      for (v = vbeg, j = 0; j < m_ResolutionY; v += vstep, j++)
+      double v = vbeg;
+      for (IdentifierType j = 0; j < m_ResolutionY; v += vstep, j++)
       {
-        if (std::cos(u) > 0)
-        {
-          signu = 1;
-        }
-        else
-        {
-          signu = -1;
-        }
-        if (std::cos(v) > 0)
-        {
-          signv = 1;
-        }
-        else
-        {
-          signv = -1;
-        }
+        int signu = (std::cos(u) > 0) ? 1 : -1;
+        int signv = (std::cos(v) > 0) ? 1 : -1;
 
         p1[0] = m_Scale[0] * signu *
-                  (std::pow(static_cast<float>(itk::Math::abs(std::cos(u))), static_cast<float>(m_Squareness1))) *
-                  signv *
+                  (std::pow(static_cast<float>(itk::Math::abs(std::cos(u))), static_cast<float>(m_Squareness1)))*signv *
                   (std::pow(static_cast<float>(itk::Math::abs(std::cos(v))), static_cast<float>(m_Squareness2))) +
                 m_Center[0];
 
-        if (std::sin(v) > 0)
-        {
-          signv = 1;
-        }
-        else
-        {
-          signv = -1;
-        }
+        signv = (std::sin(v) > 0) ? 1 : -1;
 
         p1[1] = m_Scale[1] * signu *
-                  (std::pow(static_cast<float>(itk::Math::abs(std::cos(u))), static_cast<float>(m_Squareness1))) *
-                  signv *
+                  (std::pow(static_cast<float>(itk::Math::abs(std::cos(u))), static_cast<float>(m_Squareness1)))*signv *
                   (std::pow(static_cast<float>(itk::Math::abs(std::sin(v))), static_cast<float>(m_Squareness2))) +
                 m_Center[1];
 
-        if (std::sin(u) > 0)
-        {
-          signu = 1;
-        }
-        else
-        {
-          signu = -1;
-        }
-
+        signu = (std::sin(u) > 0) ? 1 : -1;
         p1[2] = m_Scale[2] * signu *
                   (std::pow(static_cast<float>(itk::Math::abs(std::sin(u))), static_cast<float>(m_Squareness1))) +
                 m_Center[2];
@@ -170,7 +137,8 @@ SphereMeshSource<TOutputMesh>::GenerateData()
 
   ///////////////////////////////////////////////////////////////////////////
   // cells allocation
-  p = 0;
+
+  IdentifierType p = 0;
 
   // store all regular cells
   CellAutoPointer testCell;
@@ -178,7 +146,7 @@ SphereMeshSource<TOutputMesh>::GenerateData()
   {
     for (unsigned int jj = 0; jj < m_ResolutionY; ++jj)
     {
-      jn = (jj + 1) % m_ResolutionY;
+      const IdentifierType jn = (jj + 1) % m_ResolutionY;
       tripoints[0] = ii * m_ResolutionY + jj;
       tripoints[1] = tripoints[0] - jj + jn;
       tripoints[2] = tripoints[0] + m_ResolutionY;
@@ -200,7 +168,7 @@ SphereMeshSource<TOutputMesh>::GenerateData()
   // store cells containing the south pole nodes
   for (unsigned int jj = 0; jj < m_ResolutionY; ++jj)
   {
-    jn = (jj + 1) % m_ResolutionY;
+    const IdentifierType jn = (jj + 1) % m_ResolutionY;
     tripoints[0] = numpts - 2;
     tripoints[1] = jn;
     tripoints[2] = jj;
@@ -214,7 +182,7 @@ SphereMeshSource<TOutputMesh>::GenerateData()
   // store cells containing the north pole nodes
   for (unsigned int jj = 0; jj < m_ResolutionY; ++jj)
   {
-    jn = (jj + 1) % m_ResolutionY;
+    const IdentifierType jn = (jj + 1) % m_ResolutionY;
     tripoints[2] = (m_ResolutionX - 1) * m_ResolutionY + jj;
     tripoints[1] = numpts - 1;
     tripoints[0] = tripoints[2] - jj + jn;

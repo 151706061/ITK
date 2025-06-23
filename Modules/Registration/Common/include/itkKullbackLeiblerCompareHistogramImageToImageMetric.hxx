@@ -29,9 +29,8 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage>
 KullbackLeiblerCompareHistogramImageToImageMetric<TFixedImage,
                                                   TMovingImage>::KullbackLeiblerCompareHistogramImageToImageMetric()
-{
-  m_Epsilon = 1e-12; // should be smaller than 1/numBins^2
-}
+  : m_Epsilon(1e-12) // should be smaller than 1/numBins^2
+{}
 
 template <typename TFixedImage, typename TMovingImage>
 void
@@ -51,17 +50,17 @@ KullbackLeiblerCompareHistogramImageToImageMetric<TFixedImage, TMovingImage>::Ev
 
   MeasureType KullbackLeibler{};
 
-  HistogramIteratorType measured_it = histogram.Begin();
-  HistogramIteratorType measured_end = histogram.End();
+  HistogramIteratorType       measured_it = histogram.Begin();
+  const HistogramIteratorType measured_end = histogram.End();
 
-  HistogramIteratorType training_it = this->GetTrainingHistogram()->Begin();
-  HistogramIteratorType training_end = this->GetTrainingHistogram()->End();
+  HistogramIteratorType       training_it = this->GetTrainingHistogram()->Begin();
+  const HistogramIteratorType training_end = this->GetTrainingHistogram()->End();
 
   while (measured_it != measured_end)
   {
     // Every bin gets epsilon added to it
-    double TrainingFreq = training_it.GetFrequency() + m_Epsilon;
-    double MeasuredFreq = measured_it.GetFrequency() + m_Epsilon;
+    const double TrainingFreq = training_it.GetFrequency() + m_Epsilon;
+    const double MeasuredFreq = measured_it.GetFrequency() + m_Epsilon;
 
     KullbackLeibler += MeasuredFreq * std::log(MeasuredFreq / TrainingFreq);
 
@@ -75,14 +74,14 @@ KullbackLeiblerCompareHistogramImageToImageMetric<TFixedImage, TMovingImage>::Ev
   }
 
   // Get the total frequency for each histogram.
-  HistogramFrequencyType totalTrainingFreq = this->GetTrainingHistogram()->GetTotalFrequency();
-  HistogramFrequencyType totalMeasuredFreq = histogram.GetTotalFrequency();
+  const HistogramFrequencyType totalTrainingFreq = this->GetTrainingHistogram()->GetTotalFrequency();
+  const HistogramFrequencyType totalMeasuredFreq = histogram.GetTotalFrequency();
 
   // The actual number of total frequency is a bit larger
   // than the number of counts because we add m_Epsilon to every bin
-  double AdjustedTotalTrainingFreq =
+  const double AdjustedTotalTrainingFreq =
     totalTrainingFreq + this->GetHistogramSize()[0] * this->GetHistogramSize()[1] * m_Epsilon;
-  double AdjustedTotalMeasuredFreq =
+  const double AdjustedTotalMeasuredFreq =
     totalMeasuredFreq + this->GetHistogramSize()[0] * this->GetHistogramSize()[1] * m_Epsilon;
 
   KullbackLeibler = KullbackLeibler / static_cast<MeasureType>(AdjustedTotalMeasuredFreq) -

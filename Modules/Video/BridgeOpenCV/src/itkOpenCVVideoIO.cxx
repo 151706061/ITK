@@ -21,15 +21,9 @@
 namespace itk
 {
 
-OpenCVVideoIO::OpenCVVideoIO()
-{
-  this->ResetMembers();
-}
+OpenCVVideoIO::OpenCVVideoIO() { this->ResetMembers(); }
 
-OpenCVVideoIO::~OpenCVVideoIO()
-{
-  this->FinishReadingOrWriting();
-}
+OpenCVVideoIO::~OpenCVVideoIO() { this->FinishReadingOrWriting(); }
 
 void
 OpenCVVideoIO::FinishReadingOrWriting()
@@ -218,7 +212,7 @@ OpenCVVideoIO::ReadImageInformation()
       static_cast<OpenCVVideoIO::FrameOffsetType>(cvGetCaptureProperty(localCapture, CV_CAP_PROP_FRAME_COUNT));
 
     // Try to figure out if there are I-Frame issues we need to worry about
-    // and compensate accrodingly
+    // and compensate accordingly
     if (this->m_FrameTotal > 0)
     {
       // Try setting frame to 1 and see what actually gets set
@@ -350,7 +344,7 @@ OpenCVVideoIO::Read(void * buffer)
   this->UpdateReaderProperties();
 
   // Put the frame's buffer into the supplied output buffer
-  void * tempBuffer = reinterpret_cast<void *>(this->m_CVImage->imageData);
+  auto * tempBuffer = reinterpret_cast<void *>(this->m_CVImage->imageData);
   size_t bufferSize = this->m_CVImage->imageSize;
   memcpy(buffer, tempBuffer, bufferSize);
 }

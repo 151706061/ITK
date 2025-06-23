@@ -44,8 +44,7 @@ namespace itk
  * \c ExponentialDisplacementImageFilter to yield both the forward and inverse
  * displacement fields.
  *
- * \li J. Ashburner. A Fast Diffeomorphic Image Registration Algorithm.
- * NeuroImage, 38(1):95-113, 2007.
+ * See \cite ashburner2007 for more details.
  *
  * \author Nick Tustison
  * \author Brian Avants
@@ -65,7 +64,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianExponentialDiffeomorphicTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -106,15 +105,17 @@ public:
   /**
    * Set/Get Gaussian smoothing parameter for the smoothed velocity field.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheConstantVelocityField, ScalarType);
   itkGetConstMacro(GaussianSmoothingVarianceForTheConstantVelocityField, ScalarType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get Gaussian smoothing parameter for the smoothed update field.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(GaussianSmoothingVarianceForTheUpdateField, ScalarType);
   itkGetConstMacro(GaussianSmoothingVarianceForTheUpdateField, ScalarType);
-
+  /** @ITKEndGrouping */
 protected:
   GaussianExponentialDiffeomorphicTransform();
   ~GaussianExponentialDiffeomorphicTransform() override = default;

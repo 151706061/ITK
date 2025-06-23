@@ -62,7 +62,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ChainCodePath);
 
   /** OutputType type alias support */
@@ -108,8 +108,10 @@ public:
   itkNewMacro(Self);
 
   /** Set/Get the index associated with the initial position of the path */
+  /** @ITKStartGrouping */
   itkSetMacro(Start, IndexType);
   itkGetConstReferenceMacro(Start, IndexType);
+  /** @ITKEndGrouping */
 
   /** Insert a new step into the chaincode at a specified position */
   virtual inline void

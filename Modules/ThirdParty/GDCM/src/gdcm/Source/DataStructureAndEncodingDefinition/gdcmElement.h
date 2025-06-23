@@ -392,7 +392,7 @@ static void x16printf(char *buf, int size, Float f) {
       strcpy(buf, mant);
       return;
     }
-    strncpy(buf, mant, iexp + 1);
+    memcpy(buf, mant, iexp + 1);
     buf[iexp + 1] = '.';
     strncpy(buf + iexp + 2, mant + iexp + 1, size - iexp - 1);
     buf[size] = 0;
@@ -409,7 +409,7 @@ static void x16printf(char *buf, int size, Float f) {
     for(j=0; j< -1 - iexp; j++) {
       buf[j+1] = '0';
     }
-    strncpy(buf - iexp, mant, size + 1 + iexp);
+    memcpy(buf - iexp, mant, size + 1 + iexp);
     buf[size] = 0;
     clean(buf);
   }
@@ -473,7 +473,7 @@ public:
     assert( _is ); // Is stream valid ?
     _is.read( reinterpret_cast<char*>(data+0), type_size);
     for(unsigned long i=1; i<length; ++i) {
-      assert( _is );
+      if( _is )
       _is.read( reinterpret_cast<char*>(data+i), type_size );
     }
     //ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(data,
@@ -489,7 +489,7 @@ public:
     assert( _is ); // Is stream valid ?
     _is.read( reinterpret_cast<char*>(data+0), type_size);
     for(unsigned long i=1; i<length; ++i) {
-      assert( _is );
+      if( _is )
       _is.read( reinterpret_cast<char*>(data+i), type_size );
     }
     //ByteSwap<T>::SwapRangeFromSwapCodeIntoSystem(data,

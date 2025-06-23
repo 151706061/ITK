@@ -32,7 +32,7 @@
 TEST(ImageRandomConstIteratorWithIndex, IsDeterministicWhenGlobalRandomSeedsAreReset)
 {
   using PixelType = int;
-  const unsigned int Dimension{ 2 };
+  constexpr unsigned int Dimension{ 2 };
   using ImageType = itk::Image<PixelType, Dimension>;
 
   // Create just a small test image, but still having enough pixels for the iterator to pick different samples from.
@@ -64,7 +64,7 @@ TEST(ImageRandomConstIteratorWithIndex, IsDeterministicWhenGlobalRandomSeedsAreR
 
       while (!iterator.IsAtEnd())
       {
-        samples.push_back({ iterator.Get(), iterator.GetIndex() });
+        samples.emplace_back(iterator.Get(), iterator.GetIndex());
         ++iterator;
       }
       return samples;

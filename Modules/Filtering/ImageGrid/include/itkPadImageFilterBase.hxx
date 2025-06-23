@@ -30,8 +30,8 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 PadImageFilterBase<TInputImage, TOutputImage>::PadImageFilterBase()
+  : m_BoundaryCondition(nullptr)
 {
-  m_BoundaryCondition = nullptr;
   this->DynamicMultiThreadingOn();
   this->ThreaderUpdateProgressOff();
 }
@@ -59,8 +59,8 @@ void
 PadImageFilterBase<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
 {
   // Get pointers to the input and output.
-  typename Superclass::InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
-  typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
+  const typename Superclass::InputImagePointer  inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
   const InputImageRegionType &  inputLargestPossibleRegion = inputPtr->GetLargestPossibleRegion();
   const OutputImageRegionType & outputRequestedRegion = outputPtr->GetRequestedRegion();
@@ -70,7 +70,7 @@ PadImageFilterBase<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   {
     itkExceptionMacro("Boundary condition is nullptr so no request region can be generated.");
   }
-  InputImageRegionType inputRequestedRegion =
+  const InputImageRegionType inputRequestedRegion =
     m_BoundaryCondition->GetInputRequestedRegion(inputLargestPossibleRegion, outputRequestedRegion);
 
   inputPtr->SetRequestedRegion(inputRequestedRegion);
@@ -82,15 +82,15 @@ PadImageFilterBase<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
 
-  typename Superclass::OutputImagePointer     outputPtr = this->GetOutput();
-  typename Superclass::InputImageConstPointer inputPtr = this->GetInput();
+  const typename Superclass::OutputImagePointer     outputPtr = this->GetOutput();
+  const typename Superclass::InputImageConstPointer inputPtr = this->GetInput();
 
   TotalProgressReporter progress(this, outputPtr->GetRequestedRegion().GetNumberOfPixels());
 
   // Use the region copy method to copy the input image values to the
   // output image.
   OutputImageRegionType copyRegion(outputRegionForThread);
-  bool                  regionOverlaps = copyRegion.Crop(inputPtr->GetLargestPossibleRegion());
+  const bool            regionOverlaps = copyRegion.Crop(inputPtr->GetLargestPossibleRegion());
   if (regionOverlaps)
   {
     // Do a block copy for the overlapping region.
@@ -128,7 +128,7 @@ PadImageFilterBase<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
 template <typename TInputImage, typename TOutputImage>
 void
 PadImageFilterBase<TInputImage, TOutputImage>::InternalSetBoundaryCondition(
-  const BoundaryConditionPointerType boundaryCondition)
+  BoundaryConditionType * const boundaryCondition)
 {
   m_BoundaryCondition = boundaryCondition;
 }

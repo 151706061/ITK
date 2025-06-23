@@ -20,19 +20,15 @@
 #include <iostream>
 
 int
-itkTriangleHelperTest(int argc, char * argv[])
+itkTriangleHelperTest(int itkNotUsed(argc), char * itkNotUsed(argv)[])
 {
-  (void)argc;
-  (void)argv;
-
   constexpr unsigned int Dimension = 3;
-  using CoordRepType = double;
-  using PointType = itk::Point<CoordRepType, Dimension>;
+  using CoordinateType = double;
+  using PointType = itk::Point<CoordinateType, Dimension>;
   using VectorType = PointType::VectorType;
   using TriangleHelperType = itk::TriangleHelper<PointType>;
 
-  PointType Org;
-  Org.Fill(0.);
+  PointType Org{};
 
   PointType a;
   a[0] = 1.;
@@ -130,7 +126,7 @@ itkTriangleHelperTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  CoordRepType area = TriangleHelperType::ComputeArea(a, Org, b);
+  CoordinateType area = TriangleHelperType::ComputeArea(a, Org, b);
   if (itk::Math::abs(area - 0.25) > 1e-6)
   {
     std::cout << "TriangleHelperType::ComputeArea( a, Org, b ) FAILED" << std::endl;

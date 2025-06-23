@@ -77,7 +77,7 @@ LabelVotingImageFilter<TInputImage, TOutputImage>::BeforeThreadedGenerateData()
   }
 
   // Allocate the output image
-  typename TOutputImage::Pointer output = this->GetOutput();
+  const typename TOutputImage::Pointer output = this->GetOutput();
   output->SetBufferedRegion(output->GetRequestedRegion());
   output->Allocate();
 }
@@ -90,7 +90,7 @@ LabelVotingImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   using IteratorType = ImageRegionConstIterator<TInputImage>;
   using OutIteratorType = ImageRegionIterator<TOutputImage>;
 
-  typename TOutputImage::Pointer output = this->GetOutput();
+  const typename TOutputImage::Pointer output = this->GetOutput();
 
   TotalProgressReporter progress(this, output->GetRequestedRegion().GetNumberOfPixels());
 
@@ -152,7 +152,7 @@ LabelVotingImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, 
 
   os << indent << "LabelForUndecidedPixels: "
      << static_cast<typename NumericTraits<OutputPixelType>::PrintType>(m_HasLabelForUndecidedPixels) << std::endl;
-  os << indent << "HasLabelForUndecidedPixels: " << (m_HasLabelForUndecidedPixels ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(HasLabelForUndecidedPixels);
   os << indent << "TotalLabelCount: " << m_TotalLabelCount << std::endl;
 }
 } // end namespace itk

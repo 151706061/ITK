@@ -24,21 +24,17 @@ namespace itk
 {
 template <typename TInputImage, typename TSparseOutputImage>
 ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::ImplicitManifoldNormalVectorFilter()
+  : m_NormalFunction(nullptr)
+  , m_MaxIteration(25)
+  , m_IsoLevelLow(NodeValueType{})
+  , m_IsoLevelHigh(NodeValueType{})
+  , m_MinVectorNorm(static_cast<NodeValueType>(1.0e-6))
+  , m_UnsharpMaskingWeight(NodeValueType{})
 {
   this->SetPrecomputeFlag(true);
-  m_NormalFunction = nullptr;
-
   // set defaults for parameters
-  m_IsoLevelLow = NodeValueType{};
-  m_IsoLevelHigh = NodeValueType{};
-  m_MaxIteration = 25;
-  m_MinVectorNorm = static_cast<NodeValueType>(1.0e-6);
-  m_UnsharpMaskingFlag = false;
-  m_UnsharpMaskingWeight = NodeValueType{};
-
   // compute constants used in computations
-  unsigned int j;
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     m_Indicator[j] = 1 << j;
     m_ManifoldRadius[j] = 1;
@@ -87,8 +83,8 @@ template <typename TInputImage, typename TSparseOutputImage>
 void
 ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::SetNormalBand()
 {
-  typename InputImageType::ConstPointer   ManifoldImage = this->GetInput();
-  typename SparseOutputImageType::Pointer output = this->GetOutput();
+  const typename InputImageType::ConstPointer   ManifoldImage = this->GetInput();
+  const typename SparseOutputImageType::Pointer output = this->GetOutput();
 
   InputImageIteratorType it(m_ManifoldRadius, ManifoldImage, ManifoldImage->GetRequestedRegion());
 
@@ -118,27 +114,24 @@ ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::InitializeN
   NormalBandNodeType *           node,
   const InputImageIteratorType & it)
 {
-  unsigned int     i, j, k;
-  unsigned int     counter;
-  unsigned long    position, center;
   unsigned long    stride[ImageDimension];
   NormalVectorType normalvector;
   NodeValueType    derivative;
 
-  for (i = 0; i < ImageDimension; ++i)
+  for (unsigned int i = 0; i < ImageDimension; ++i)
   {
     stride[i] = it.GetStride(i);
   }
-  center = it.Size() / 2;
+  const unsigned long center = it.Size() / 2;
 
   // Normal vector computation -- use positive quadrant of neighborhood
-  for (j = 0; j < ImageDimension; ++j) // derivative axis
+  for (unsigned int j = 0; j < ImageDimension; ++j) // derivative axis
   {
     normalvector[j] = NodeValueType{};
-    for (counter = 0; counter < m_NumVertex; ++counter)
+    for (unsigned int counter = 0; counter < m_NumVertex; ++counter)
     {
-      position = center;
-      for (k = 0; k < ImageDimension; ++k)
+      unsigned long position = center;
+      for (unsigned int k = 0; k < ImageDimension; ++k)
       {
         if (counter & m_Indicator[k])
         {
@@ -159,19 +152,19 @@ ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::InitializeN
   node->m_InputData = node->m_Data;
 
   // Manifold normal vector computation
-  for (i = 0; i < ImageDimension; ++i) // offset axis (flux position)
+  for (unsigned int i = 0; i < ImageDimension; ++i) // offset axis (flux position)
   {
-    for (j = 0; j < ImageDimension; ++j) // derivative axis
+    for (unsigned int j = 0; j < ImageDimension; ++j) // derivative axis
     {
       derivative = NodeValueType{};
       if (i != j)
       {
-        for (counter = 0; counter < m_NumVertex; ++counter)
+        for (unsigned int counter = 0; counter < m_NumVertex; ++counter)
         {
           if (!(counter & m_Indicator[i])) // is the offset axis bit off?
           {
-            position = center;
-            for (k = 0; k < ImageDimension; ++k)
+            auto position = center;
+            for (unsigned int k = 0; k < ImageDimension; ++k)
             {
               if (counter & m_Indicator[k])
               {
@@ -187,15 +180,15 @@ ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::InitializeN
               derivative -= it.GetPixel(position);
             }
           } // if
-        }   // counter loop
+        } // counter loop
         derivative *= m_DimConst2;
       } // if i!=j
       else
       {
-        for (counter = 0; counter < m_NumVertex; ++counter)
+        for (unsigned int counter = 0; counter < m_NumVertex; ++counter)
         {
-          position = center;
-          for (k = 0; k < ImageDimension; ++k)
+          auto position = center;
+          for (unsigned int k = 0; k < ImageDimension; ++k)
           {
             if ((k != i) && (counter & m_Indicator[k]))
             {
@@ -223,12 +216,12 @@ template <typename TInputImage, typename TSparseOutputImage>
 void
 ImplicitManifoldNormalVectorFilter<TInputImage, TSparseOutputImage>::PostProcessOutput()
 {
-  if (m_UnsharpMaskingFlag == true)
+  if (m_UnsharpMaskingFlag)
   {
-    typename NodeListType::Pointer       nodelist = this->GetOutput()->GetNodeList();
-    typename NodeListType::Iterator      it = nodelist->Begin();
-    typename NodeListType::ConstIterator last = nodelist->End();
-    NormalVectorType                     nv;
+    const typename NodeListType::Pointer       nodelist = this->GetOutput()->GetNodeList();
+    typename NodeListType::Iterator            it = nodelist->Begin();
+    const typename NodeListType::ConstIterator last = nodelist->End();
+    NormalVectorType                           nv;
 
     while (it != last)
     {

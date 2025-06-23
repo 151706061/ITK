@@ -78,7 +78,7 @@ SynchronizeList(FactoryListType & output, FactoryListType & input, bool internal
     }
     if (pos == -1)
     {
-      if (internal == true)
+      if (internal)
       {
         itk::ObjectFactoryBase::RegisterFactoryInternal(factory);
       }
@@ -130,8 +130,8 @@ public:
 auto
 ObjectFactoryBase::GetPimplGlobalsPointer() -> ObjectFactoryBasePrivate *
 {
-  const auto                 deleteLambda = []() { m_PimplGlobals->UnRegister(); };
-  ObjectFactoryBasePrivate * globalInstance = Singleton<ObjectFactoryBasePrivate>("ObjectFactoryBase", deleteLambda);
+  const auto deleteLambda = []() { m_PimplGlobals->UnRegister(); };
+  auto *     globalInstance = Singleton<ObjectFactoryBasePrivate>("ObjectFactoryBase", deleteLambda);
   if (globalInstance != m_PimplGlobals)
   {
     SynchronizeObjectFactoryBase(globalInstance);
@@ -256,7 +256,7 @@ ObjectFactoryBase::LoadDynamicFactories()
 #  ifdef _WIN32
   char PathSeparator = ';';
 #  else
-  char       PathSeparator = ':';
+  const char PathSeparator = ':';
 #  endif
 
   const std::string itk_autoload_env{ "ITK_AUTOLOAD_PATH" };
@@ -286,7 +286,8 @@ ObjectFactoryBase::LoadDynamicFactories()
       EndSeparatorPosition = LoadPath.size() + 1; // Add 1 to simulate
                                                   // having a separator
     }
-    std::string CurrentPath = LoadPath.substr(StartSeparatorPosition, EndSeparatorPosition - StartSeparatorPosition);
+    const std::string CurrentPath =
+      LoadPath.substr(StartSeparatorPosition, EndSeparatorPosition - StartSeparatorPosition);
 
     ObjectFactoryBase::LoadLibrariesInPath(CurrentPath.c_str());
 
@@ -320,7 +321,7 @@ CreateFullPath(const char * path, const char * file)
 #  ifdef _WIN32
   const char sep = '\\';
 #  else
-  const char sep = '/';
+  constexpr char sep = '/';
 #  endif
   /**
    * make sure the end of path is a separator
@@ -348,12 +349,12 @@ using ITK_LOAD_FUNCTION = ObjectFactoryBase * (*)();
  * lower case for LibExtension values.
  */
 inline bool
-NameIsSharedLibrary(const char * name)
+NameIsSharedLibrary([[maybe_unused]] const char * name)
 {
 #ifdef ITK_DYNAMIC_LOADING
   std::string extension = itksys::DynamicLoader::LibExtension();
 
-  std::string sname = name;
+  const std::string sname = name;
   if (sname.rfind(extension) == sname.size() - extension.size())
   {
     return true;
@@ -368,7 +369,6 @@ NameIsSharedLibrary(const char * name)
     return true;
   }
 #else // ITK_DYNAMIC_LOADING
-  (void)name;
   itkGenericExceptionMacro("ITK was not built with support for dynamic loading.");
 #endif
   return false;
@@ -400,8 +400,8 @@ ObjectFactoryBase::LoadLibrariesInPath(const char * path)
      */
     if (NameIsSharedLibrary(file))
     {
-      std::string fullpath = CreateFullPath(path, file);
-      LibHandle   lib = DynamicLoader::OpenLibrary(fullpath.c_str());
+      const std::string fullpath = CreateFullPath(path, file);
+      LibHandle         lib = DynamicLoader::OpenLibrary(fullpath.c_str());
       if (lib)
       {
         /**
@@ -419,7 +419,7 @@ ObjectFactoryBase::LoadLibrariesInPath(const char * path)
           /**
            * initialize class members if load worked
            */
-          newfactory->m_LibraryHandle = (void *)lib;
+          newfactory->m_LibraryHandle = static_cast<void *>(lib);
           newfactory->m_LibraryPath = fullpath;
           newfactory->m_LibraryDate = 0; // unused for now...
 
@@ -466,10 +466,7 @@ ObjectFactoryBase::ReHash()
  */
 ObjectFactoryBase::ObjectFactoryBase()
   : m_OverrideMap{ std::make_unique<OverrideMap>() }
-{
-  m_LibraryHandle = nullptr;
-  m_LibraryDate = 0;
-}
+{}
 
 /**
  * Unload the library and free the path string
@@ -513,7 +510,7 @@ ObjectFactoryBase::RegisterFactory(ObjectFactoryBase * factory, InsertionPositio
 
   if (factory->m_LibraryHandle == nullptr)
   {
-    const char nonDynamicName[] = "Non-Dynamicaly loaded factory";
+    constexpr char nonDynamicName[] = "Non-Dynamicaly loaded factory";
     factory->m_LibraryPath = nonDynamicName;
   }
   else
@@ -588,11 +585,9 @@ ObjectFactoryBase::RegisterFactory(ObjectFactoryBase * factory, InsertionPositio
         m_PimplGlobals->m_RegisteredFactories.insert(fitr, factory);
         break;
       }
-      else
-      {
-        itkGenericExceptionMacro("Position" << position << " is outside range. \
+
+      itkGenericExceptionMacro("Position" << position << " is outside range. \
           Only " << numberOfFactories << " factories are registered");
-      }
     }
   }
   factory->Register();
@@ -607,7 +602,7 @@ ObjectFactoryBase::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Factory DLL path: " << m_LibraryPath.c_str() << '\n';
+  os << indent << "Factory DLL path: " << m_LibraryPath << '\n';
   os << indent << "Factory description: " << this->GetDescription() << std::endl;
 
   auto num = static_cast<int>(m_OverrideMap->size());
@@ -616,8 +611,8 @@ ObjectFactoryBase::PrintSelf(std::ostream & os, Indent indent) const
   indent = indent.GetNextIndent();
   for (auto & i : *m_OverrideMap)
   {
-    os << indent << "Class : " << i.first.c_str() << '\n';
-    os << indent << "Overridden with: " << i.second.m_OverrideWithName.c_str() << std::endl;
+    os << indent << "Class : " << i.first << '\n';
+    os << indent << "Overridden with: " << i.second.m_OverrideWithName << std::endl;
     os << indent << "Enable flag: " << i.second.m_EnabledFlag << std::endl;
     os << indent << "Create object: " << i.second.m_CreateObject << std::endl;
     os << std::endl;

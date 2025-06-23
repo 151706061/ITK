@@ -69,18 +69,13 @@ static constexpr GaussianOrderEnum SecondOrder = GaussianOrderEnum::SecondOrder;
  * RecursiveGaussianImageFilter is the base class for recursive filters that
  * approximate convolution with the Gaussian kernel.
  * This class implements the recursive filtering
- * method proposed by R.Deriche in IEEE-PAMI
- * Vol.12, No.1, January 1990, pp 78-87,
- * "Fast Algorithms for Low-Level Vision"
+ * method proposed by R.Deriche in \cite deriche1990.
  *
  * Details of the implementation are described in the technical report:
  * R. Deriche, "Recursively Implementing The Gaussian and Its Derivatives",
  * INRIA, 1993, ftp://ftp.inria.fr/INRIA/tech-reports/RR/RR-1893.ps.gz
  *
- * Further improvements of the algorithm are described in:
- * G. Farnebäck & C.-F. Westin, "Improving Deriche-style Recursive Gaussian
- * Filters". J Math Imaging Vis 26, 293–299 (2006).
- * https://doi.org/10.1007/s10851-006-8464-z
+ * Further improvements of the algorithm are described in \cite farneback2006.
  *
  * As compared to itk::DiscreteGaussianImageFilter, this filter tends
  * to be faster for large kernels, and it can take the derivative
@@ -114,16 +109,17 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Type macro that defines a name for this class */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RecursiveGaussianImageFilter);
 
   /** Set/Get the Sigma, measured in world coordinates, of the Gaussian
    * kernel.  The default is 1.0. An exception will be generated if
    * the Sigma value is less than or equal to zero.
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Sigma, ScalarRealType);
   itkSetMacro(Sigma, ScalarRealType);
-
+  /** @ITKEndGrouping */
   /** Type of the output image */
   using OutputImageType = TOutputImage;
 
@@ -137,6 +133,7 @@ public:
   static constexpr GaussianOrderEnum FirstOrder = GaussianOrderEnum::FirstOrder;
   static constexpr GaussianOrderEnum SecondOrder = GaussianOrderEnum::SecondOrder;
 #endif
+
   /** Set/Get the flag for normalizing the gaussian over scale-space.
 
       This flag enables the analysis of the differential shape of
@@ -186,9 +183,10 @@ public:
       \li FirstOrder is equivalent to convolving with the first derivative of a Gaussian.
       \li SecondOrder is equivalent to convolving with the second derivative of a Gaussian.
     */
+  /** @ITKStartGrouping */
   itkSetMacro(Order, GaussianOrderEnum);
   itkGetConstMacro(Order, GaussianOrderEnum);
-
+  /** @ITKEndGrouping */
   /** Explicitly set a zeroth order derivative. */
   void
   SetZeroOrder();
@@ -217,7 +215,7 @@ protected:
   /* See superclass for doxygen. This method adds the additional check
    * that sigma is greater than zero. */
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
 
 private:
   /** Compute the N coefficients in the recursive filter. */

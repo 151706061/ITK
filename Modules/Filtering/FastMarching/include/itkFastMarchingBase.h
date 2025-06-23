@@ -98,12 +98,7 @@ extern ITKFastMarching_EXPORT std::ostream &
  * \par Topology constraints:
  * Additional flexibility in this class includes the implementation of
  * topology constraints for image-based fast marching.  Further details
- * can be found in the paper
- *
- * NJ Tustison, BA Avants, MF Siqueira, JC Gee. "Topological Well-
- * Composedness and Glamorous Glue: A Digital Gluing Algorithm for
- * Topologically Constrained Front Propagation, IEEE Transactions on
- * Image Processing, 20(6):1756-1761, June 2011.
+ * can be found in \cite tustison2011a.
  *
  * Essentially, one can constrain the propagating front(s) such that
  * they either:
@@ -135,7 +130,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingBase);
 
   /** Input Domain related definitions */
@@ -186,25 +181,30 @@ public:
 
   /** Set/Get the TopologyCheckType macro indicating whether the user
   wants to check topology (and which one). */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(TopologyCheck, TopologyCheckEnum);
   itkGetConstReferenceMacro(TopologyCheck, TopologyCheckEnum);
-
+  /** @ITKEndGrouping */
   /** Set/Get TrialPoints */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(TrialPoints, NodePairContainerType);
   itkGetModifiableObjectMacro(TrialPoints, NodePairContainerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get AlivePoints */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(AlivePoints, NodePairContainerType);
   itkGetModifiableObjectMacro(AlivePoints, NodePairContainerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get ProcessedPoints */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(ProcessedPoints, NodePairContainerType);
   itkGetModifiableObjectMacro(ProcessedPoints, NodePairContainerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get ForbiddenPoints */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(ForbiddenPoints, NodePairContainerType);
   itkGetModifiableObjectMacro(ForbiddenPoints, NodePairContainerType);
-
+  /** @ITKEndGrouping */
   /** \brief Set/Get the Stopping Criterion */
   itkSetObjectMacro(StoppingCriterion, StoppingCriterionType);
   itkGetModifiableObjectMacro(StoppingCriterion, StoppingCriterionType);
@@ -227,9 +227,10 @@ public:
   itkSetMacro(CollectPoints, bool);
 
   /** Get the Collect Points flag. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(CollectPoints, bool);
   itkBooleanMacro(CollectPoints);
-
+  /** @ITKEndGrouping */
 protected:
   /** \brief Constructor */
   FastMarchingBase();
@@ -265,7 +266,7 @@ protected:
   TopologyCheckEnum m_TopologyCheck{};
 
   /** \brief Get the total number of nodes in the domain */
-  virtual IdentifierType
+  [[nodiscard]] virtual IdentifierType
   GetTotalNumberOfNodes() const = 0;
 
   /** \brief Get the output value (front value) for a given node */

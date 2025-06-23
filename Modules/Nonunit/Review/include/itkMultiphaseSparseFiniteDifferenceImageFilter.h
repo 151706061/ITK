@@ -136,37 +136,15 @@ namespace itk
  *  FiniteDifferenceFunction to use for calculations.  This is set using the
  *  method SetDifferenceFunction in the parent class.
  *
- * \par REFERENCES
- * Whitaker, Ross. A Level-Set Approach to 3D Reconstruction from Range Data.
- * International Journal of Computer Vision.  V. 29 No. 3, 203-231. 1998.
+ * For algorithmic details see \cite whitaker1998 and \cite sethian1996.
  *
- * \par
- * Sethian, J.A. Level Set Methods. Cambridge University Press. 1996.
- *
- *
- *
- * This code was adapted from the paper
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * This code was adapted from \cite chan1999.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ITKReview
  */
@@ -191,7 +169,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiphaseSparseFiniteDifferenceImageFilter);
 
   static constexpr unsigned int ImageDimension = Superclass::ImageDimension;
@@ -304,13 +282,9 @@ public:
     }
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<typename TOutputImage::PixelType>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, typename TOutputImage::PixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   MultiphaseSparseFiniteDifferenceImageFilter();
@@ -330,10 +304,10 @@ protected:
   struct SparseDataStruct
   {
     SparseDataStruct(const IdCellType & index)
+      : m_LayerNodeStore(LayerNodeStorageType::New())
+      , m_Index(index)
     {
-      m_LayerNodeStore = LayerNodeStorageType::New();
       m_LayerNodeStore->SetGrowthStrategyToExponential();
-      m_Index = index;
     }
 
     /** An array which contains all of the layers needed in the sparse

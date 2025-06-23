@@ -18,9 +18,7 @@
 #include "itkMaximumRatioDecisionRule.h"
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 MaximumRatioDecisionRule::MaximumRatioDecisionRule() = default;
 
@@ -61,9 +59,8 @@ MaximumRatioDecisionRule::SetPriorProbabilities(const PriorProbabilityVectorType
   }
   else
   {
-    PriorProbabilityVectorType::const_iterator pit, it;
-
-    for (pit = p.begin(), it = m_PriorProbabilities.begin(); pit != p.end(); ++pit, ++it)
+    auto pit = p.begin();
+    for (auto it = m_PriorProbabilities.begin(); pit != p.end(); ++pit, ++it)
     {
       if (itk::Math::abs(*pit - *it) > itk::Math::eps)
       {
@@ -93,9 +90,9 @@ MaximumRatioDecisionRule::Evaluate(const MembershipVectorType & discriminantScor
   if (uniformPrior)
   {
     // find the maximum discriminant score. if list is empty, return 0.
-    ClassIdentifierType i, besti = 0;
+    ClassIdentifierType besti = 0;
     MembershipValueType best = NumericTraits<MembershipValueType>::NonpositiveMin();
-    for (i = 0; i < discriminantScores.size(); ++i)
+    for (ClassIdentifierType i = 0; i < discriminantScores.size(); ++i)
     {
       if (discriminantScores[i] > best)
       {
@@ -108,13 +105,11 @@ MaximumRatioDecisionRule::Evaluate(const MembershipVectorType & discriminantScor
 
   // Non-uniform prior case
   // find the maximum p(x|i)*p(i)
-  ClassIdentifierType i, besti = 0;
+  ClassIdentifierType besti = 0;
   MembershipValueType best = NumericTraits<MembershipValueType>::NonpositiveMin();
-  MembershipValueType temp = NumericTraits<MembershipValueType>::NonpositiveMin();
-
-  for (i = 0; i < discriminantScores.size(); ++i)
+  for (ClassIdentifierType i = 0; i < discriminantScores.size(); ++i)
   {
-    temp = discriminantScores[i] * m_PriorProbabilities[i];
+    const MembershipValueType temp = discriminantScores[i] * m_PriorProbabilities[i];
     if (temp > best)
     {
       best = temp;
@@ -123,5 +118,4 @@ MaximumRatioDecisionRule::Evaluate(const MembershipVectorType & discriminantScor
   }
   return besti;
 }
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics

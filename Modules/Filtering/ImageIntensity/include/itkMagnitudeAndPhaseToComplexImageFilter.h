@@ -46,7 +46,7 @@ namespace itk
  * and do not necessarily represent the official view of NCRR or NIH.
  *
  * This class was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/128
+ * https://doi.org/10.54294/h4j7t7
  *
  * \sa ComposeImageFilter
  *
@@ -103,16 +103,12 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MagnitudeAndPhaseToComplexImageFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(Input1ConvertibleToDoubleCheck, (Concept::Convertible<InputPixel1Type, double>));
   itkConceptMacro(Input2ConvertibleToDoubleCheck, (Concept::Convertible<InputPixel2Type, double>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   MagnitudeAndPhaseToComplexImageFilter()

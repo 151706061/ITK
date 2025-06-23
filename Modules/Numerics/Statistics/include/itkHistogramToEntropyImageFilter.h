@@ -38,7 +38,7 @@ namespace itk
  *  where  \f$q_I\f$ is the frequency of measurement vector, I.
  *
  * \f$p\f$ is the frequency of a measurement vector by the sum of all frequencies =
- * Probability of the the measurement vector
+ * Probability of the measurement vector
  *
  * The output image is of type double.
  *
@@ -74,11 +74,9 @@ public:
       const double p = static_cast<OutputPixelType>(A) / static_cast<OutputPixelType>(m_TotalFrequency);
       return static_cast<OutputPixelType>((-1) * p * std::log(p) / std::log(2.0));
     }
-    else
-    {
-      const double p = static_cast<OutputPixelType>(A + 1) / static_cast<OutputPixelType>(m_TotalFrequency);
-      return static_cast<OutputPixelType>((-1) * p * std::log(p) / std::log(2.0));
-    }
+
+    const double p = static_cast<OutputPixelType>(A + 1) / static_cast<OutputPixelType>(m_TotalFrequency);
+    return static_cast<OutputPixelType>((-1) * p * std::log(p) / std::log(2.0));
   }
 
   void
@@ -87,7 +85,7 @@ public:
     m_TotalFrequency = n;
   }
 
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetTotalFrequency() const
   {
     return m_TotalFrequency;
@@ -119,7 +117,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HistogramToEntropyImageFilter);
 
   /** Method for creation through the object factory. */

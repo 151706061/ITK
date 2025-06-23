@@ -22,9 +22,7 @@
 #include "itkArray.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class MeanSampleFilter
@@ -58,10 +56,11 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using SampleType = TSample;
 
-  /**Standard Macros */
+  /** Standard Macros */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(MeanSampleFilter);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Type of each measurement vector in sample */
   using MeasurementVectorType = typename SampleType::MeasurementVectorType;
 
@@ -118,8 +117,7 @@ protected:
   void
   GenerateData() override;
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkMeanSampleFilter.hxx"

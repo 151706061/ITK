@@ -125,7 +125,7 @@ public:
   using PointType = typename MeshType::PointType;
   using CellType = typename MeshType::CellType;
   using MeshPointer = typename MeshType::Pointer;
-  using CoordinateType = typename PointType::CoordRepType;
+  using CoordinateType = typename PointType::CoordinateType;
   using CellAutoPointer = typename CellType::CellAutoPointer;
 
   /** Different kinds of cells. */
@@ -154,7 +154,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AutomaticTopologyMeshSource);
 
   /** Add the point p0 if it's not already there, and return its ID. */
@@ -384,8 +384,8 @@ public:
     {
       using IdType = IdentifierType;
 
-      IdType size1 = identifierArray1.Size();
-      IdType size2 = identifierArray2.Size();
+      const IdType size1 = identifierArray1.Size();
+      const IdType size2 = identifierArray2.Size();
 
       if (size1 != size2)
       {

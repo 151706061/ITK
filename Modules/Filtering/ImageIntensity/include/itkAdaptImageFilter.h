@@ -33,6 +33,10 @@ namespace Functor
  * allows an accessor to be used as functor in a UnaryFunctorImageFilter,
  * BinaryFunctorImageFilter, TernaryFunctorImageFilter, or
  * NaryFunctionImageFilter.
+ *
+ * \note AccessorFunctor does not have any user-declared "special member function", following the C++ Rule of Zero: the
+ * compiler will just generate any of them when necessary.
+ *
  * \ingroup ITKImageIntensity
  */
 template <typename TInput, typename TAccessor>
@@ -42,12 +46,6 @@ public:
   /** Standard class type aliases. */
   using Self = AccessorFunctor;
   using AccessorType = TAccessor;
-
-  /** Constructor and destructor. */
-  AccessorFunctor()
-    : m_Accessor()
-  {}
-  ~AccessorFunctor() = default;
 
   /** operator().  This is the "call" method of the functor. */
   using OutputType = typename TAccessor::ExternalType;
@@ -62,14 +60,6 @@ public:
   GetAccessor()
   {
     return m_Accessor;
-  }
-
-  /** Assignment operator */
-  AccessorFunctor &
-  operator=(const AccessorFunctor & functor)
-  {
-    m_Accessor = functor.m_Accessor;
-    return *this;
   }
 
   /** Set the accessor object. This replaces the current accessor with
@@ -93,7 +83,7 @@ public:
   ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(Self);
 
 private:
-  AccessorType m_Accessor;
+  AccessorType m_Accessor{};
 };
 } // namespace Functor
 
@@ -151,7 +141,7 @@ public:
   /** Typedef for the accessor type */
   using AccessorType = TAccessor;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AdaptImageFilter);
 
   /** Get the accessor. This is a convenience method so the user */
@@ -165,9 +155,7 @@ public:
   void
   SetAccessor(AccessorType & accessor)
   {
-    FunctorType functor;
-
-    functor = this->GetFunctor();
+    FunctorType functor = this->GetFunctor();
     if (accessor != functor.GetAccessor())
     {
       functor.SetAccessor(accessor);

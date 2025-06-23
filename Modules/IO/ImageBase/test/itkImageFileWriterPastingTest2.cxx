@@ -31,9 +31,9 @@ using ImagePointer = ImageType::Pointer;
 bool
 SameImage(ImagePointer testImage, ImagePointer baselineImage)
 {
-  PixelType     intensityTolerance = 0;
-  int           radiusTolerance = 0;
-  unsigned long numberOfPixelTolerance = 0;
+  constexpr PixelType     intensityTolerance = 0;
+  constexpr int           radiusTolerance = 0;
+  constexpr unsigned long numberOfPixelTolerance = 0;
 
   using DiffType = itk::Testing::ComparisonImageFilter<ImageType, ImageType>;
   auto diff = DiffType::New();
@@ -43,7 +43,7 @@ SameImage(ImagePointer testImage, ImagePointer baselineImage)
   diff->SetToleranceRadius(radiusTolerance);
   diff->UpdateLargestPossibleRegion();
 
-  unsigned long status = diff->GetNumberOfPixelsWithDifferences();
+  const unsigned long status = diff->GetNumberOfPixelsWithDifferences();
 
   if (status > numberOfPixelTolerance)
   {
@@ -87,8 +87,7 @@ itkImageFileWriterPastingTest2(int argc, char * argv[])
   // The image is read slice by slice
   reader->UpdateOutputInformation();
 
-  ImageType::RegionType largestRegion;
-  largestRegion = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
+  const ImageType::RegionType largestRegion = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
 
   ImageType::IndexType pasteIndex;
   pasteIndex[0] = largestRegion.GetIndex()[0] + largestRegion.GetSize()[0] / 3;
@@ -98,7 +97,7 @@ itkImageFileWriterPastingTest2(int argc, char * argv[])
   pasteSize[0] = largestRegion.GetSize()[0] / 3;
   pasteSize[1] = largestRegion.GetSize()[1] / 3;
   pasteSize[2] = largestRegion.GetSize()[2] / 3;
-  ImageType::RegionType pasteRegion(pasteIndex, pasteSize);
+  const ImageType::RegionType pasteRegion(pasteIndex, pasteSize);
 
   using MonitorFilter = itk::PipelineMonitorImageFilter<ImageType>;
   auto monitor = MonitorFilter::New();
@@ -109,7 +108,7 @@ itkImageFileWriterPastingTest2(int argc, char * argv[])
   writer->SetFileName(argv[2]);
   writer->SetInput(monitor->GetOutput());
 
-  // create a vaild region from the largest
+  // create a valid region from the largest
   itk::ImageIORegion            ioregion(3);
   itk::ImageIORegion::IndexType index;
 

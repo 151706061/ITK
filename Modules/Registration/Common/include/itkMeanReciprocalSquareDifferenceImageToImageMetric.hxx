@@ -26,10 +26,9 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage>
 MeanReciprocalSquareDifferenceImageToImageMetric<TFixedImage,
                                                  TMovingImage>::MeanReciprocalSquareDifferenceImageToImageMetric()
-{
-  m_Lambda = 1.0;
-  m_Delta = 0.00011;
-}
+  : m_Lambda(1.0)
+  , m_Delta(0.00011)
+{}
 
 template <typename TFixedImage, typename TMovingImage>
 void
@@ -47,16 +46,12 @@ auto
 MeanReciprocalSquareDifferenceImageToImageMetric<TFixedImage, TMovingImage>::GetValue(
   const TransformParametersType & parameters) const -> MeasureType
 {
-  FixedImageConstPointer fixedImage = this->m_FixedImage;
+  const FixedImageConstPointer fixedImage = this->m_FixedImage;
 
   if (!fixedImage)
   {
     itkExceptionMacro("Fixed image has not been assigned");
   }
-
-  double MovingValue;
-  double FixedValue;
-
   using FixedIteratorType = itk::ImageRegionConstIteratorWithIndex<FixedImageType>;
 
   FixedIteratorType ti(fixedImage, this->GetFixedImageRegion());
@@ -82,8 +77,8 @@ MeanReciprocalSquareDifferenceImageToImageMetric<TFixedImage, TMovingImage>::Get
       continue;
     }
 
-    TransformType const * transform = this->m_Transform;
-    OutputPointType       transformedPoint = transform->TransformPoint(inputPoint);
+    const TransformType * transform = this->m_Transform;
+    const OutputPointType transformedPoint = transform->TransformPoint(inputPoint);
 
     if (this->m_MovingImageMask && !this->m_MovingImageMask->IsInsideInWorldSpace(transformedPoint))
     {
@@ -93,8 +88,8 @@ MeanReciprocalSquareDifferenceImageToImageMetric<TFixedImage, TMovingImage>::Get
 
     if (this->m_Interpolator->IsInsideBuffer(transformedPoint))
     {
-      MovingValue = this->m_Interpolator->Evaluate(transformedPoint);
-      FixedValue = ti.Get();
+      double MovingValue = this->m_Interpolator->Evaluate(transformedPoint);
+      double FixedValue = ti.Get();
       this->m_NumberOfPixelsCounted++;
       const double diff = MovingValue - FixedValue;
       measure += 1.0f / (1.0f + m_Lambda * (diff * diff));
@@ -112,9 +107,7 @@ MeanReciprocalSquareDifferenceImageToImageMetric<TFixedImage, TMovingImage>::Get
   const TransformParametersType & parameters,
   DerivativeType &                derivative) const
 {
-  TransformParametersType testPoint;
-
-  testPoint = parameters;
+  TransformParametersType testPoint = parameters;
 
   const unsigned int numberOfParameters = this->GetNumberOfParameters();
   derivative = DerivativeType(numberOfParameters);

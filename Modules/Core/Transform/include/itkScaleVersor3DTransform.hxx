@@ -37,6 +37,7 @@ ScaleVersor3DTransform<TParametersValueType>::ScaleVersor3DTransform(unsigned in
   m_Scale.Fill(1.0);
 }
 
+#if !defined(ITK_LEGACY_REMOVE)
 // Constructor with arguments
 template <typename TParametersValueType>
 ScaleVersor3DTransform<TParametersValueType>::ScaleVersor3DTransform(const MatrixType &       matrix,
@@ -45,6 +46,7 @@ ScaleVersor3DTransform<TParametersValueType>::ScaleVersor3DTransform(const Matri
 {
   this->ComputeMatrixParameters();
 }
+#endif
 
 // Directly set the matrix
 template <typename TParametersValueType>
@@ -94,7 +96,7 @@ ScaleVersor3DTransform<TParametersValueType>::SetParameters(const ParametersType
     norm = std::sqrt(norm);
   }
 
-  const double epsilon = 1e-10;
+  constexpr double epsilon = 1e-10;
   if (norm >= 1.0 - epsilon)
   {
     axis = axis / (norm + epsilon * norm);

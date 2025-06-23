@@ -32,7 +32,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetDomainPartitionBaseHelper);
 
   itkNewMacro(Self);
@@ -58,7 +58,7 @@ itkLevelSetDomainPartitionBaseTest(int, char *[])
 
   using DomainPartitionBaseHelperType = itk::LevelSetDomainPartitionBaseHelper<ImageType>;
 
-  itk::IdentifierType count = 2;
+  constexpr itk::IdentifierType count = 2;
 
   auto function = DomainPartitionBaseHelperType::New();
   function->SetNumberOfLevelSetFunctions(count);

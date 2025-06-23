@@ -43,7 +43,7 @@ namespace itk
  * boundaries in a single call. By default, the filter does not crop anything.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -63,7 +63,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CropLabelMapFilter);
 
   /** Standard New method. */
@@ -96,11 +96,12 @@ public:
   static constexpr unsigned int ImageDimension = TOutputImage::ImageDimension;
 
   /** Set/Get the cropping sizes for the upper and lower boundaries. */
+  /** @ITKStartGrouping */
   itkSetMacro(UpperBoundaryCropSize, SizeType);
   itkGetMacro(UpperBoundaryCropSize, SizeType);
   itkSetMacro(LowerBoundaryCropSize, SizeType);
   itkGetMacro(LowerBoundaryCropSize, SizeType);
-
+  /** @ITKEndGrouping */
   void
   SetCropSize(const SizeType & size)
   {

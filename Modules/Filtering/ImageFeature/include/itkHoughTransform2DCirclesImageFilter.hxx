@@ -57,7 +57,7 @@ HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPix
   Superclass::GenerateInputRequestedRegion();
   if (this->GetInput())
   {
-    InputImagePointer image = const_cast<InputImageType *>(this->GetInput());
+    const InputImagePointer image = const_cast<InputImageType *>(this->GetInput());
     image->SetRequestedRegionToLargestPossibleRegion();
   }
 }
@@ -65,8 +65,7 @@ HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPix
 
 template <typename TInputPixelType, typename TOutputPixelType, typename TRadiusPixelType>
 void
-HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPixelType>::VerifyPreconditions()
-  ITKv5_CONST
+HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPixelType>::VerifyPreconditions() const
 {
   Superclass::VerifyPreconditions();
 
@@ -130,7 +129,7 @@ HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPix
         for (double angle = -m_SweepAngle; angle <= m_SweepAngle; angle += 0.05)
         {
           double i = m_MinimumRadius;
-          double distance;
+          double distance = 0.0;
 
           do
           {
@@ -214,8 +213,9 @@ HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPix
     gaussianFilter->Update();
     const InternalImageType::Pointer postProcessImage = gaussianFilter->GetOutput();
 
-    const auto                             minMaxCalculator = MinimumMaximumImageCalculator<InternalImageType>::New();
-    ImageRegionIterator<InternalImageType> it_input(postProcessImage, postProcessImage->GetLargestPossibleRegion());
+    const auto minMaxCalculator = MinimumMaximumImageCalculator<InternalImageType>::New();
+    const ImageRegionIterator<InternalImageType> it_input(postProcessImage,
+                                                          postProcessImage->GetLargestPossibleRegion());
 
     CirclesListSizeType circles = 0;
 
@@ -293,7 +293,7 @@ HoughTransform2DCirclesImageFilter<TInputPixelType, TOutputPixelType, TRadiusPix
   os << indent << "Disc Radius Ratio: " << m_DiscRadiusRatio << std::endl;
   os << indent << "Accumulator blur variance: " << m_Variance << std::endl;
   os << indent << "Sweep angle : " << m_SweepAngle << std::endl;
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
 
   itkPrintSelfObjectMacro(RadiusImage);
 

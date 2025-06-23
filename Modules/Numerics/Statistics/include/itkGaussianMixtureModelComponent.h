@@ -23,9 +23,7 @@
 #include "itkWeightedMeanSampleFilter.h"
 #include "itkWeightedCovarianceSampleFilter.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class GaussianMixtureModelComponent
@@ -57,10 +55,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /**Standard Macros */
+  /** Standard Macros */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(GaussianMixtureModelComponent);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Typedefs from the superclass */
   using typename Superclass::MeasurementVectorType;
   using typename Superclass::MeasurementVectorSizeType;
@@ -116,8 +115,7 @@ private:
 
   typename CovarianceEstimatorType::Pointer m_CovarianceEstimator{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkGaussianMixtureModelComponent.hxx"

@@ -87,24 +87,27 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ParametricBlindLeastSquaresDeconvolutionImageFilter);
 
   /** Set/get the parametric kernel source. */
+  /** @ITKStartGrouping */
   void
   SetKernelSource(KernelSourceType * kernelSource);
   itkGetModifiableObjectMacro(KernelSource, KernelSourceType);
-
+  /** @ITKEndGrouping */
   /** Set/get the scale factor (also known as learning rate) for the
    * image intensity gradient descent. */
+  /** @ITKStartGrouping */
   itkSetMacro(Alpha, double);
   itkGetMacro(Alpha, double);
-
+  /** @ITKEndGrouping */
   /** Set/get the scale factor (also known as learning rate) for the
    * parameter gradient descent. */
+  /** @ITKStartGrouping */
   itkSetMacro(Beta, double);
   itkGetMacro(Beta, double);
-
+  /** @ITKEndGrouping */
 protected:
   ParametricBlindLeastSquaresDeconvolutionImageFilter();
   ~ParametricBlindLeastSquaresDeconvolutionImageFilter() override = default;

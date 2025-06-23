@@ -34,12 +34,9 @@ GetTestImage(int d1, int d2, int d3, int d4)
   sizeND[2] = d3;
   sizeND[3] = d4;
 
-  itk::Index<4> origND;
-  origND.Fill(0);
+  constexpr itk::Index<4> origND{};
 
-  itk::ImageRegion<4> RegionND;
-  RegionND.SetSize(sizeND);
-  RegionND.SetIndex(origND);
+  const itk::ImageRegion<4> RegionND{ origND, sizeND };
 
   auto imageND = TestImageType::New();
   imageND->SetRegions(RegionND);
@@ -53,7 +50,7 @@ GetTestImage(int d1, int d2, int d3, int d4)
 int
 itkConstNeighborhoodIteratorTest(int, char *[])
 {
-  TestImageType::Pointer                                   img = GetTestImage(10, 10, 5, 3);
+  const TestImageType::Pointer                             img = GetTestImage(10, 10, 5, 3);
   itk::ConstNeighborhoodIterator<TestImageType>::IndexType loc;
   loc[0] = 4;
   loc[1] = 4;
@@ -179,7 +176,7 @@ itkConstNeighborhoodIteratorTest(int, char *[])
 
   println("Testing random access iteration");
 
-  TestImageType::Pointer ra_img = GetTestImage(10, 10, 5, 3);
+  const TestImageType::Pointer ra_img = GetTestImage(10, 10, 5, 3);
   loc[0] = 4;
   loc[1] = 4;
   loc[2] = 2;
@@ -195,8 +192,7 @@ itkConstNeighborhoodIteratorTest(int, char *[])
   printnb<itk::ConstNeighborhoodIterator<TestImageType>>(ra_it, false);
 
   println("Adding [1, 1, 1, 1]");
-  OffsetType a_off;
-  a_off.Fill(1);
+  auto a_off = itk::MakeFilled<OffsetType>(1);
   ra_it += a_off;
   printnb<itk::ConstNeighborhoodIterator<TestImageType>>(ra_it, false);
 
@@ -228,8 +224,8 @@ itkConstNeighborhoodIteratorTest(int, char *[])
   // Test IndexInBounds
   //
   println("Testing IndexInBounds");
-  int                    dims[4] = { 13, 11, 9, 7 };
-  TestImageType::Pointer iib_img = GetTestImage(dims[0], dims[1], dims[2], dims[3]);
+  constexpr int                dims[4] = { 13, 11, 9, 7 };
+  const TestImageType::Pointer iib_img = GetTestImage(dims[0], dims[1], dims[2], dims[3]);
   radius[0] = 4;
   radius[1] = 3;
   radius[2] = 2;
@@ -320,13 +316,11 @@ itkConstNeighborhoodIteratorTest(int, char *[])
   {
     // Create an image
     using ChangeRegionTestImageType = itk::Image<int, 2>;
-    ChangeRegionTestImageType::IndexType imageCorner;
-    imageCorner.Fill(0);
+    constexpr ChangeRegionTestImageType::IndexType imageCorner{};
 
-    ChangeRegionTestImageType::SizeType imageSize;
-    imageSize.Fill(4);
+    auto imageSize = ChangeRegionTestImageType::SizeType::Filled(4);
 
-    ChangeRegionTestImageType::RegionType imageRegion(imageCorner, imageSize);
+    const ChangeRegionTestImageType::RegionType imageRegion(imageCorner, imageSize);
 
     auto image = ChangeRegionTestImageType::New();
     image->SetRegions(imageRegion);
@@ -350,17 +344,14 @@ itkConstNeighborhoodIteratorTest(int, char *[])
     }
 
     // Setup and iterate over the first region
-    ChangeRegionTestImageType::IndexType region1Start;
-    region1Start.Fill(1);
+    auto region1Start = ChangeRegionTestImageType::IndexType::Filled(1);
 
-    ChangeRegionTestImageType::SizeType regionSize;
-    regionSize.Fill(1);
+    auto regionSize = ChangeRegionTestImageType::SizeType::Filled(1);
 
-    ChangeRegionTestImageType::RegionType region1(region1Start, regionSize);
+    const ChangeRegionTestImageType::RegionType region1(region1Start, regionSize);
 
     // Create the radius (a 3x3 region)
-    ChangeRegionTestImageType::SizeType neighborhoodRadius;
-    neighborhoodRadius.Fill(1);
+    auto neighborhoodRadius = ChangeRegionTestImageType::SizeType::Filled(1);
 
     using NeighborhoodIteratorType = itk::ConstNeighborhoodIterator<ChangeRegionTestImageType>;
     NeighborhoodIteratorType neighborhoodIterator(neighborhoodRadius, image, region1);
@@ -389,10 +380,9 @@ itkConstNeighborhoodIteratorTest(int, char *[])
     }
 
     // Change iteration region
-    ChangeRegionTestImageType::IndexType region2start;
-    region2start.Fill(2);
+    auto region2start = ChangeRegionTestImageType::IndexType::Filled(2);
 
-    ChangeRegionTestImageType::RegionType region2(region2start, regionSize);
+    const ChangeRegionTestImageType::RegionType region2(region2start, regionSize);
 
     neighborhoodIterator.SetRegion(region2);
     neighborhoodIterator.GoToBegin();

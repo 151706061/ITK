@@ -79,7 +79,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToVideoFilter);
 
   /** Set the input Image for this process object */
@@ -88,7 +88,7 @@ public:
   SetInput(const InputImageType * image);
 
   virtual void
-  SetInput(unsigned int idx, const InputImageType * videoStream);
+  SetInput(unsigned int idx, const InputImageType * image);
 
   /** Get the input Image for this process object */
   const InputImageType *
@@ -99,9 +99,10 @@ public:
 
   /** Allow the user to specify the axis in the input image that will
    *  correspond to the temporal axis in the output temporal object. */
+  /** @ITKStartGrouping */
   itkGetMacro(FrameAxis, IndexValueType);
   itkSetMacro(FrameAxis, IndexValueType);
-
+  /** @ITKEndGrouping */
 protected:
   ImageToVideoFilter();
   ~ImageToVideoFilter() override = default;

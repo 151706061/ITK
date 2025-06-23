@@ -103,7 +103,7 @@ itkMultiplyImageFilterTest(int, char *[])
 
 
   // Get the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
 
   // Create an iterator for going through the image output
@@ -111,8 +111,8 @@ itkMultiplyImageFilterTest(int, char *[])
 
   // Check the content of the result image
   //
-  const auto                       expectedValue = static_cast<OutputImageType::PixelType>(valueA * valueB);
-  const OutputImageType::PixelType epsilon = 1e-6;
+  constexpr auto                       expectedValue = static_cast<OutputImageType::PixelType>(valueA * valueB);
+  constexpr OutputImageType::PixelType epsilon = 1e-6;
   while (!oIt.IsAtEnd())
   {
     if (!itk::Math::FloatAlmostEqual(oIt.Get(), expectedValue, 10, epsilon))

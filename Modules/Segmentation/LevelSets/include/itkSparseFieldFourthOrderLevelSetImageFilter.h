@@ -162,7 +162,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SparseFieldFourthOrderLevelSetImageFilter);
 
   /** Standard image dimension macro. */
@@ -227,7 +227,7 @@ public:
   /** Compute the number of layers that must be used in
       SparseFieldLevelSetImageFilter to accommodate the desired normal
       processing band. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetMinimumNumberOfLayers() const
   {
     return static_cast<int>(std::ceil(m_CurvatureBandWidth + Self::ImageDimension));
@@ -238,7 +238,7 @@ public:
   void
   SetNumberOfLayers(const unsigned int n) override
   {
-    unsigned int nm = std::max(this->GetMinimumNumberOfLayers(), n);
+    const unsigned int nm = std::max(this->GetMinimumNumberOfLayers(), n);
 
     if (nm != this->GetNumberOfLayers())
     {
@@ -253,7 +253,7 @@ public:
   InitializeIteration() override
   {
     Superclass::InitializeIteration();
-    ValueType rmschange = this->GetRMSChange();
+    const ValueType rmschange = this->GetRMSChange();
 
     if ((this->GetElapsedIterations() == 0) || (m_RefitIteration == m_MaxRefitIteration) ||
         (rmschange <= m_RMSChangeNormalProcessTrigger) || (this->ActiveLayerCheckBand()))
@@ -271,11 +271,7 @@ public:
     ++m_RefitIteration;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<ValueType>));
-  // End concept checking
-#endif
 
 protected:
   SparseFieldFourthOrderLevelSetImageFilter();
@@ -302,7 +298,7 @@ protected:
    * the band where curvature from the processed normal vectors has been
    * computed. This is one of the conditions for triggering the ProcessNormals
    * method. */
-  bool
+  [[nodiscard]] bool
   ActiveLayerCheckBand() const;
 
 private:

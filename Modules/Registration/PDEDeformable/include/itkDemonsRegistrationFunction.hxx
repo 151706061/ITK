@@ -27,10 +27,9 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
 DemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::DemonsRegistrationFunction()
 {
-  RadiusType   r;
-  unsigned int j;
+  RadiusType r;
 
-  for (j = 0; j < ImageDimension; ++j)
+  for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     r[j] = 0;
   }
@@ -125,7 +124,7 @@ DemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Initi
   {
     m_Normalizer += fixedImageSpacing[k] * fixedImageSpacing[k];
   }
-  m_Normalizer /= static_cast<double>(ImageDimension);
+  m_Normalizer /= double{ ImageDimension };
 
   // setup gradient calculator
   m_FixedImageGradientCalculator->SetInputImage(this->GetFixedImage());
@@ -162,7 +161,7 @@ DemonsRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::Compu
     mappedPoint[j] += it.GetCenterPixel()[j];
   }
 
-  double movingValue;
+  double movingValue = NAN;
   if (m_MovingImageInterpolator->IsInsideBuffer(mappedPoint))
   {
     movingValue = m_MovingImageInterpolator->Evaluate(mappedPoint);

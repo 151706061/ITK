@@ -49,8 +49,8 @@ itkQuadEdgeMeshIteratorTest(int, char *[])
 #define NumPoints 6
 #define NumEdges 6
   MeshType::PixelType       a = std::sqrt(3.0) / 2.0;
-  MeshType::PixelType       points[NumPoints][3] = { { 1.0, 0.0, 0.0 },  { 0.5, a, 0.0 },   { -0.5, a, 0.0 },
-                                               { -1.0, 0.0, 0.0 }, { -0.5, -a, 0.0 }, { 0.5, -a, 0.0 } };
+  const MeshType::PixelType points[NumPoints][3] = { { 1.0, 0.0, 0.0 },  { 0.5, a, 0.0 },   { -0.5, a, 0.0 },
+                                                     { -1.0, 0.0, 0.0 }, { -0.5, -a, 0.0 }, { 0.5, -a, 0.0 } };
   MeshType::PointType       pnts[NumPoints];
   MeshType::PointIdentifier pids[NumPoints];
   for (int i = 0; i < NumPoints; ++i)
@@ -135,15 +135,12 @@ itkQuadEdgeMeshIteratorTest(int, char *[])
   for (IteratorGeom itDnext = foundEdges[0]->BeginGeomDnext(); itDnext != foundEdges[0]->EndGeomDnext();
        itDnext++, edgeNumber++)
   {
-    MeshType::QEPrimal * expectedEdge;
+    MeshType::QEPrimal * expectedEdge = foundEdges[edgeNumber];
     if (edgeNumber)
     {
       expectedEdge = foundEdges[edgeNumber]->GetSym();
     }
-    else
-    {
-      expectedEdge = foundEdges[edgeNumber];
-    }
+
     MeshType::QEPrimal * currentEdge = itDnext.Value();
     if (currentEdge != expectedEdge)
     {

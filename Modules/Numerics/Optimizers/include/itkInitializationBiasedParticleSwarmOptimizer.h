@@ -28,11 +28,7 @@ namespace itk
  * \brief Implementation of a biased/regularized Particle Swarm Optimization
  *        (PSO) algorithm.
  *
- * This PSO algorithm was originally described in:
- * M. P. Wachowiak, R. Smolikova, Y. Zheng, J. M. Zurada, A. S. Elmaghraby,
- * "An approach to multimodal biomedical image registration utilizing particle
- * swarm optimization", IEEE Transactions on Evolutionary Computing,
- * vol. 8(3): 289-301, 2004.
+ * This PSO algorithm was originally described in \cite wachowiak2004.
  *
  * The algorithm uses a stochastic optimization approach. Optimization
  * is performed by maintaining a swarm (flock) of
@@ -86,7 +82,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InitializationBiasedParticleSwarmOptimizer);
 
   /** The Particle swarm optimizer uses the following update formula:
@@ -105,6 +101,7 @@ public:
    * \f$p_g\f$ - parameters yielding the best function value obtained by all particles
    * \f$x_{init}\f$ - initial parameter values provided by user
    */
+  /** @ITKStartGrouping */
   itkSetMacro(InertiaCoefficient, CoefficientType);
   itkGetMacro(InertiaCoefficient, CoefficientType);
   itkSetMacro(PersonalCoefficient, CoefficientType);
@@ -113,7 +110,7 @@ public:
   itkGetMacro(GlobalCoefficient, CoefficientType);
   itkSetMacro(InitializationCoefficient, CoefficientType);
   itkGetMacro(InitializationCoefficient, CoefficientType);
-
+  /** @ITKEndGrouping */
 protected:
   InitializationBiasedParticleSwarmOptimizer();
   ~InitializationBiasedParticleSwarmOptimizer() override = default;

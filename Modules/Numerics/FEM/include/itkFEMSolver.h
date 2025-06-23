@@ -27,9 +27,7 @@
 
 #include "itkImage.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class Solver
@@ -83,7 +81,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Solver);
 
   static constexpr unsigned int FEMDimension = VDimension;
@@ -141,7 +139,8 @@ public:
    * \param dt New time step.
    */
   virtual void
-  SetTimeStep(Float dt);
+  SetTimeStep(Float itkNotUsed(dt))
+  {}
 
   /** Returns the Solution for the specified nodal point. */
   Float
@@ -228,9 +227,7 @@ public:
   void
   InitializeInterpolationGrid(const InterpolationGridSizeType & size)
   {
-    InterpolationGridPointType bb1;
-
-    bb1.Fill(0.0);
+    InterpolationGridPointType bb1{};
 
     InterpolationGridPointType bb2;
     for (unsigned int i = 0; i < FEMDimension; ++i)
@@ -384,7 +381,8 @@ protected:
 
   /** Decompose matrix using svd, qr, etc. if needed. */
   void
-  DecomposeK();
+  DecomposeK()
+  {}
 
   /** Solve for the displacement vector u. May be overridden in derived
    * classes. */
@@ -440,8 +438,7 @@ private:
   InterpolationGridSpacingType   m_Spacing{};
   InterpolationGridDirectionType m_Direction{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMSolver.hxx"

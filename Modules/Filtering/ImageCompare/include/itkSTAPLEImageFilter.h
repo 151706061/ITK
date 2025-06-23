@@ -38,12 +38,7 @@ namespace itk
  * and one that indicate probability of each pixel being in the object targeted
  * by the segmentation.
  *
- * The STAPLE algorithm is described in
- *
- * S. Warfield, K. Zou, W. Wells, "Validation of image segmentation and expert
- * quality with an expectation-maximization algorithm" in MICCAI 2002: Fifth
- * International Conference on Medical Image Computing and Computer-Assisted
- * Intervention, Springer-Verlag, Heidelberg, Germany, 2002, pp. 298-306
+ * The STAPLE algorithm is described in \cite warfield2002.
  *
  * \par INPUTS
  * Input volumes to the STAPLE filter must be binary segmentations of an image,
@@ -84,7 +79,7 @@ namespace itk
  * ConfidenceWeight should be left to the default of 1.0.
  *
  * You must provide a foreground value using SetForegroundValue that the STAPLE
- * algorithm will use to identify positively classified pixels in the the input
+ * algorithm will use to identify positively classified pixels in the input
  * images.  All other values in the image will be treated as background values.
  * For example, if your input segmentations consist of 1's everywhere inside
  * the segmented region, then use SetForegroundValue(1).
@@ -133,7 +128,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(STAPLEImageFilter);
 
   /** Extract some information from the image types.  Dimensionality
@@ -156,13 +151,15 @@ public:
   using typename Superclass::OutputImageRegionType;
 
   /** Set get the binary ON value of the input image. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, InputPixelType);
   itkGetConstMacro(ForegroundValue, InputPixelType);
+  /** @ITKEndGrouping */
 
   /** After the filter is updated, this method returns a std::vector<double> of
    *  all Specificity (true negative fraction, q) values for the expert
    *  input volumes. */
-  const std::vector<double> &
+  [[nodiscard]] const std::vector<double> &
   GetSpecificity() const
   {
     return m_Specificity;
@@ -171,7 +168,7 @@ public:
   /** After the filter is updated, this method returns a std::vector<double> of
    * all Sensitivity (true positive fraction, p) values for the expert input
    * volumes. */
-  const std::vector<double> &
+  [[nodiscard]] const std::vector<double> &
   GetSensitivity() const
   {
     return m_Sensitivity;
@@ -204,8 +201,10 @@ public:
   /** Set/Get the maximum number of iterations after which the STAPLE algorithm
    *  will be considered to have converged.  In general this SHOULD NOT be set and
    *  the algorithm should be allowed to converge on its own. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(MaximumIterations, unsigned int, 1, NumericTraits<unsigned int>::max());
   itkGetConstMacro(MaximumIterations, unsigned int);
+  /** @ITKEndGrouping */
 
   /** Scales the estimated prior probability that a pixel will be inside the
    *  targeted object of segmentation.  The default prior probability g_t is
@@ -214,26 +213,22 @@ public:
    *  ConfidenceWeight will scale this default value as g_t = g_t *
    *  ConfidenceWeight.  In general, ConfidenceWeight should be left to the
    *  default of 1.0. */
+  /** @ITKStartGrouping */
   itkSetMacro(ConfidenceWeight, double);
   itkGetConstMacro(ConfidenceWeight, double);
+  /** @ITKEndGrouping */
 
   /** Get the number of elapsed iterations of the iterative E-M algorithm. */
   itkGetConstMacro(ElapsedIterations, unsigned int);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   STAPLEImageFilter()
-  {
-    m_ForegroundValue = NumericTraits<InputPixelType>::OneValue();
-    m_MaximumIterations = NumericTraits<unsigned int>::max();
-    m_ElapsedIterations = 0;
-    m_ConfidenceWeight = 1.0;
-  }
+    : m_ForegroundValue(NumericTraits<InputPixelType>::OneValue())
+    , m_MaximumIterations(NumericTraits<unsigned int>::max())
+    , m_ConfidenceWeight(1.0)
+  {}
 
   ~STAPLEImageFilter() override = default;
   void

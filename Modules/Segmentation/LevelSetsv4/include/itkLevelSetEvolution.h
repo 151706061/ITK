@@ -45,8 +45,7 @@ namespace itk
  *   \ingroup ITKLevelSetsv4
  */
 template <typename TEquationContainer, typename TLevelSet>
-class ITK_TEMPLATE_EXPORT LevelSetEvolution
-{};
+class ITK_TEMPLATE_EXPORT LevelSetEvolution{};
 
 template <typename TEquationContainer, typename TImage>
 class ITK_TEMPLATE_EXPORT LevelSetEvolution<TEquationContainer, LevelSetDenseImage<TImage>>
@@ -65,7 +64,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEvolution);
 
   using typename Superclass::EquationContainerType;
@@ -120,7 +119,7 @@ public:
   void
   SetNumberOfWorkUnits(const ThreadIdType numberOfThreads);
   /** Set the maximum number of threads to be used. */
-  ThreadIdType
+  [[nodiscard]] ThreadIdType
   GetNumberOfWorkUnits() const;
 
   ~LevelSetEvolution() override = default;
@@ -202,7 +201,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEvolution);
 
   using typename Superclass::EquationContainerType;
@@ -252,9 +251,9 @@ public:
 
   /** Set the maximum number of threads to be used. */
   void
-  SetNumberOfWorkUnits(const ThreadIdType numberOfThreads);
+  SetNumberOfWorkUnits(const ThreadIdType numberOfWorkUnits);
   /** Set the maximum number of threads to be used. */
-  ThreadIdType
+  [[nodiscard]] ThreadIdType
   GetNumberOfWorkUnits() const;
 
 protected:
@@ -313,7 +312,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEvolution);
 
   using typename Superclass::EquationContainerType;
@@ -391,7 +390,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEvolution);
 
   using typename Superclass::EquationContainerType;

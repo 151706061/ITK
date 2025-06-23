@@ -32,7 +32,6 @@ class ConvolutionImageFilterBaseEnums
 {
 public:
   /**
-   * \class ConvolutionImageFilterOutputRegion
    * \ingroup ITKConvolution
    * Output region mode type enumeration
    */
@@ -42,9 +41,10 @@ public:
     VALID
   };
 };
+
 /** Define how to print enumerations */
 extern ITKConvolution_EXPORT std::ostream &
-                             operator<<(std::ostream & out, const ConvolutionImageFilterBaseEnums::ConvolutionImageFilterOutputRegion value);
+operator<<(std::ostream & out, const ConvolutionImageFilterBaseEnums::ConvolutionImageFilterOutputRegion value);
 
 /**
  * \class ConvolutionImageFilterBase
@@ -64,7 +64,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information ( and related methods ) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConvolutionImageFilterBase);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -89,23 +89,29 @@ public:
 
   /** Typedef to describe the boundary condition. */
   using BoundaryConditionType = ImageBoundaryCondition<TInputImage>;
-  using BoundaryConditionPointerType = BoundaryConditionType *;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using BoundaryConditionPointerType [[deprecated("Please just use `BoundaryConditionType *` instead!")]] =
+    BoundaryConditionType *;
+#endif
   using DefaultBoundaryConditionType = ZeroFluxNeumannBoundaryCondition<TInputImage>;
 
   /** Set/get the boundary condition. */
-  itkSetMacro(BoundaryCondition, BoundaryConditionPointerType);
-  itkGetConstMacro(BoundaryCondition, BoundaryConditionPointerType);
-
+  /** @ITKStartGrouping */
+  itkSetMacro(BoundaryCondition, BoundaryConditionType *);
+  itkGetConstMacro(BoundaryCondition, BoundaryConditionType *);
+  /** @ITKEndGrouping */
   /** Set/get the image kernel. */
+  /** @ITKStartGrouping */
   itkSetInputMacro(KernelImage, KernelImageType);
   itkGetInputMacro(KernelImage, KernelImageType);
-
+  /** @ITKEndGrouping */
   /** Normalize the output image by the sum of the kernel
    * components. Defaults to off. */
+  /** @ITKStartGrouping */
   itkSetMacro(Normalize, bool);
   itkGetConstMacro(Normalize, bool);
   itkBooleanMacro(Normalize);
-
+  /** @ITKEndGrouping */
   /** Reverse compatibility for enumerations */
   using OutputRegionModeEnum = ConvolutionImageFilterBaseEnums::ConvolutionImageFilterOutputRegion;
 #if !defined(ITK_LEGACY_REMOVE)
@@ -125,13 +131,14 @@ public:
    * (no extrapolated contributions from the boundary condition are
    * needed). The output is therefore smaller than the input
    * region. Default output region mode is SAME. */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(OutputRegionMode, OutputRegionModeEnum);
   itkGetEnumMacro(OutputRegionMode, OutputRegionModeEnum);
   virtual void
   SetOutputRegionModeToSame();
   virtual void
   SetOutputRegionModeToValid();
-
+  /** @ITKEndGrouping */
 protected:
   ConvolutionImageFilterBase();
   ~ConvolutionImageFilterBase() override = default;
@@ -151,13 +158,14 @@ protected:
   /** Default superclass implementation ensures that input images
    * occupy same physical space. This is not needed for this filter. */
   void
-  VerifyInputInformation() ITKv5_CONST override{};
+  VerifyInputInformation() const override
+  {}
 
 private:
   bool m_Normalize{ false };
 
   DefaultBoundaryConditionType m_DefaultBoundaryCondition{};
-  BoundaryConditionPointerType m_BoundaryCondition{};
+  BoundaryConditionType *      m_BoundaryCondition{};
 
   OutputRegionModeEnum m_OutputRegionMode{ ConvolutionImageFilterBaseEnums::ConvolutionImageFilterOutputRegion::SAME };
 };

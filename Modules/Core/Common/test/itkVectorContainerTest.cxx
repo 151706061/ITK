@@ -19,7 +19,7 @@
 #include "itkVectorContainer.h"
 #include "itkTestingMacros.h"
 
-using ContainerType = itk::VectorContainer<size_t, double>;
+using ContainerType = itk::VectorContainer<double>;
 
 int
 itkVectorContainerTest(int, char *[])
@@ -33,10 +33,9 @@ itkVectorContainerTest(int, char *[])
 
   // Iterator
   {
-    [[maybe_unused]] ContainerType::Iterator p_null;
-    ContainerType::Iterator                  p = container->Begin();
-    ContainerType::Iterator                  p_copy(p);
-    ContainerType::Iterator                  p_assign = p;
+    ContainerType::Iterator p = container->Begin();
+    ContainerType::Iterator p_copy(p);
+    ContainerType::Iterator p_assign = p;
 
     while (p != container->End())
     {
@@ -51,10 +50,9 @@ itkVectorContainerTest(int, char *[])
 
   // ConstIterator
   {
-    [[maybe_unused]] ContainerType::ConstIterator p_null;
-    ContainerType::ConstIterator                  p = container->Begin();
-    ContainerType::ConstIterator                  p_copy(p);
-    ContainerType::ConstIterator                  p_assign = p;
+    ContainerType::ConstIterator p = container->Begin();
+    ContainerType::ConstIterator p_copy(p);
+    ContainerType::ConstIterator p_assign = p;
 
     while (p != container->End())
     {

@@ -32,15 +32,11 @@ itkPolyLineParametricPathTest(int, char *[])
 
   bool passed = true;
 
-  InputType  input;
-  OffsetType offset;
-  VertexType v;
-
   auto path = PathType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(path, PolyLineParametricPath, ParametricPath);
 
-  v.Fill(1);
+  auto v = itk::MakeFilled<VertexType>(1);
   path->AddVertex(v);
   v[0] = 2;
   v[1] = 3;
@@ -74,8 +70,8 @@ itkPolyLineParametricPathTest(int, char *[])
     passed = false;
   }
 
-  input = 0;
-  offset = path->IncrementInput(input);
+  InputType  input = 0;
+  OffsetType offset = path->IncrementInput(input);
   std::cout << "Incrementing the input from 0 to " << input << ": " << offset << std::endl;
 
   input = 0.5;
@@ -98,8 +94,7 @@ itkPolyLineParametricPathTest(int, char *[])
   path2->AddVertex(v);
   PathType::InputType path2Input = path2->StartOfInput();
 
-  PathType::OffsetType zeroOffset;
-  zeroOffset.Fill(0);
+  constexpr PathType::OffsetType zeroOffset{};
 
   std::cout << "Starting degenerate path test" << std::endl;
   while (true)
@@ -116,9 +111,7 @@ itkPolyLineParametricPathTest(int, char *[])
     std::cout << "Test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed" << std::endl;
+  return EXIT_FAILURE;
 }

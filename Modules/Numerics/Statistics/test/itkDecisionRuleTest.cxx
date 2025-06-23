@@ -18,13 +18,8 @@
 
 #include "itkDecisionRule.h"
 
-namespace itk
+namespace itk::Statistics::DecisionRuleTest
 {
-namespace Statistics
-{
-namespace DecisionRuleTest
-{
-
 class MyDecisionRule : public DecisionRule
 {
 public:
@@ -34,7 +29,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MyDecisionRule);
 
   /** Method for creation through the object factory. */
@@ -54,8 +49,7 @@ public:
     double max = scoreVector[0];
 
     unsigned int maxIndex = 0;
-    unsigned int i;
-    for (i = 1; i < scoreVector.size(); ++i)
+    for (unsigned int i = 1; i < scoreVector.size(); ++i)
     {
       if (scoreVector[i] > max)
       {
@@ -66,10 +60,8 @@ public:
     return maxIndex;
   }
 };
+} // namespace itk::Statistics::DecisionRuleTest
 
-} // namespace DecisionRuleTest
-} // namespace Statistics
-} // namespace itk
 int
 itkDecisionRuleTest(int, char *[])
 {
@@ -86,16 +78,13 @@ itkDecisionRuleTest(int, char *[])
 
   MembershipVectorType membershipScoreVector;
 
-  double membershipScore1;
-  membershipScore1 = 0.1;
+  constexpr double membershipScore1 = 0.1;
   membershipScoreVector.push_back(membershipScore1);
 
-  double membershipScore2;
-  membershipScore2 = 0.5;
+  constexpr double membershipScore2 = 0.5;
   membershipScoreVector.push_back(membershipScore2);
 
-  double membershipScore3;
-  membershipScore3 = 1.9;
+  constexpr double membershipScore3 = 1.9;
   membershipScoreVector.push_back(membershipScore3);
 
   // the maximum score is the third component. The decision rule should

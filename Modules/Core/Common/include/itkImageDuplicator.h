@@ -65,7 +65,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageDuplicator);
 
   /** Type definitions for the input image. */
@@ -86,6 +86,7 @@ public:
    * by returning a non-const pointer
    * for the generated Object.
    */
+  /** @ITKStartGrouping */
   // NOTE:  The m_DuplicateImage is only
   //       exposed via the Source generation interface
   //       by the GetOutput() method that mimics
@@ -100,7 +101,7 @@ public:
   {
     return this->m_DuplicateImage.GetPointer();
   }
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_LEGACY_REMOVE)
   // This interface was exposed in ITKv4 when the itkGetModifiableObjectMacro was used
   virtual ImageType *

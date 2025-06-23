@@ -26,10 +26,9 @@ namespace itk
 
 template <typename TInputImage>
 BinaryReconstructionByErosionImageFilter<TInputImage>::BinaryReconstructionByErosionImageFilter()
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_ForegroundValue(NumericTraits<OutputImagePixelType>::max())
 {
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ForegroundValue = NumericTraits<OutputImagePixelType>::max();
-  m_FullyConnected = false;
   this->SetPrimaryInputName("MarkerImage");
   this->AddRequiredInputName("MaskImage", 1);
 }
@@ -132,7 +131,7 @@ BinaryReconstructionByErosionImageFilter<TInputImage>::PrintSelf(std::ostream & 
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent
      << "BackgroundValue: " << static_cast<typename NumericTraits<OutputImagePixelType>::PrintType>(m_BackgroundValue)
      << std::endl;

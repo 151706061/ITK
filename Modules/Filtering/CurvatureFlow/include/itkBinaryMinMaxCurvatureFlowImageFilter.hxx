@@ -25,11 +25,9 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 BinaryMinMaxCurvatureFlowImageFilter<TInputImage, TOutputImage>::BinaryMinMaxCurvatureFlowImageFilter()
-{
-  m_Threshold = 0.0;
 
-  typename BinaryMinMaxCurvatureFlowFunctionType::Pointer cffp;
-  cffp = BinaryMinMaxCurvatureFlowFunctionType::New();
+{
+  auto cffp = BinaryMinMaxCurvatureFlowFunctionType::New();
 
   this->SetDifferenceFunction(static_cast<FiniteDifferenceFunctionType *>(cffp.GetPointer()));
 }

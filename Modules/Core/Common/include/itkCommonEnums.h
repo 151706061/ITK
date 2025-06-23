@@ -22,6 +22,7 @@
 
 #include "itkIntTypes.h"
 #include <ostream>
+#include <type_traits>
 
 namespace itk
 {
@@ -40,7 +41,6 @@ class CommonEnums
 public:
   // Used in Input/Output for Images/Mesh/Transform types
   /**
-   * \class IOPixel
    * \ingroup ITKCommon
    * Enums used to manipulate the point/cell pixel type. The pixel type provides
    * context for automatic data conversions (for instance, RGB to
@@ -67,12 +67,13 @@ public:
   };
 
   /**
-   * \class IOComponent
    * \ingroup ITKCommon
    * Enums used to manipulate the component type. The component type
    * refers to the actual storage class associated with either a
    * SCALAR pixel type or elements of a compound pixel.
    */
+  ITK_CLANG_PRAGMA_PUSH
+  ITK_CLANG_SUPPRESS_Wduplicate_enum
   enum class IOComponent : uint8_t
   {
     UNKNOWNCOMPONENTTYPE,
@@ -88,11 +89,21 @@ public:
     ULONGLONG,
     FLOAT,
     DOUBLE,
-    LDOUBLE
+    LDOUBLE,
+    UINT8 = UCHAR,
+    INT8 = CHAR,
+    UINT16 = USHORT,
+    INT16 = SHORT,
+    UINT32 = std::is_same_v<uint32_t, unsigned long> ? ULONG : UINT,
+    INT32 = std::is_same_v<int32_t, long> ? LONG : INT,
+    UINT64 = std::is_same_v<uint64_t, unsigned long> ? ULONG : ULONGLONG,
+    INT64 = std::is_same_v<int64_t, long> ? LONG : LONGLONG,
+    FLOAT32 = FLOAT,
+    FLOAT64 = DOUBLE
   };
+  ITK_CLANG_PRAGMA_POP
 
   /**
-   * \class IOFile
    * \ingroup ITKCommon
    * Enums used to specify write style: whether binary or ASCII. Some
    * subclasses use this, some ignore it.
@@ -108,7 +119,6 @@ public:
   };
 
   /**
-   * \class IOFileMode
    * \ingroup ITKCommon
    * Mode in which the files is intended to be used
    */
@@ -119,7 +129,6 @@ public:
   };
 
   /**
-   * \class IOByteOrder
    * \ingroup ITKCommon
    * Enums used to specify byte order; whether Big Endian or Little Endian.
    * Some subclasses use this, some ignore it.
@@ -132,7 +141,6 @@ public:
   };
 
   /**
-   * \class CellGeometry
    * \ingroup ITKCommon
    * Enums used to specify cell type */
   enum class CellGeometry : uint8_t
@@ -170,6 +178,7 @@ using IOFileModeType = CommonEnums::IOFileMode;
 using IOByteOrderType = CommonEnums::IOByteOrder;
 using CellGeometryType = CommonEnums::CellGeometry;
 #endif
+
 // Define how to print enumeration
 extern ITKCommon_EXPORT std::ostream &
                         operator<<(std::ostream & out, IOPixelEnum value);
@@ -190,7 +199,7 @@ extern ITKCommon_EXPORT std::ostream &
 class MeshEnums
 {
 public:
-  /** \class MeshClassCellsAllocationMethod
+  /**
    * \ingroup ITKCommon
    * Enum defining the possible methods used to allocate memory for
    * the Cells */
@@ -204,27 +213,28 @@ public:
 };
 extern ITKCommon_EXPORT std::ostream &
                         operator<<(std::ostream & out, MeshEnums::MeshClassCellsAllocationMethod value);
-/** \class OctreeEnums
- * \brief
+/**
+ * \class OctreeEnums
  * \ingroup ITKCommon
  */
 class OctreeEnums
 {
 public:
   /**
-   * \class Octree
    * \ingroup ITKCommon
    * The enumeration to define the planar orientation of the octree
    */
   enum class Octree : uint8_t
   {
-    UNKNOWN_PLANE,   ///< The plane is Unknown
-    SAGITAL_PLANE,   ///< The plane is Sagittal
+    UNKNOWN_PLANE,  ///< The plane is Unknown
+    SAGITTAL_PLANE, ///< The plane is Sagittal
+#if !defined(ITK_LEGACY_REMOVE)
+    SAGITAL_PLANE [[deprecated("Use SAGITTAL_PLANE instead")]] = SAGITTAL_PLANE, ///< Support misspelling
+#endif
     CORONAL_PLANE,   ///< The plane is Coronal
     TRANSVERSE_PLANE ///< The plane is Transverse
   };
-  /***
-   * \class LeafIdentifier
+  /**
    * \ingroup ITKCommon
    */
   enum class LeafIdentifier : uint8_t
@@ -251,7 +261,7 @@ extern ITKCommon_EXPORT std::ostream &
 class ObjectEnums
 {
 public:
-  /** \class RegionEnum
+  /**
    * \ingroup ITKCommon
    * Enums used to describe the extent types. */
   enum class RegionEnum : uint8_t
@@ -270,10 +280,9 @@ extern ITKCommon_EXPORT std::ostream &
 class ObjectFactoryEnums
 {
 public:
-  /** \class InsertionPosition
-   *  \ingroup ITKCommon
-   *  Position at which the new factory will be registered in the
-   *  internal factory container.
+  /** \ingroup ITKCommon
+   * Position at which the new factory will be registered in the
+   * internal factory container.
    */
   enum class InsertionPosition : uint8_t
   {

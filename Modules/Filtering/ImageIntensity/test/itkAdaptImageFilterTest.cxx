@@ -72,9 +72,7 @@ itkAdaptImageFilterTest(int, char *[])
   index[0] = 0;
   index[1] = 0;
 
-  myRGBImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const myRGBImageType::RegionType region{ index, size };
 
   auto myImage = myRGBImageType::New();
 
@@ -114,9 +112,9 @@ itkAdaptImageFilterTest(int, char *[])
   bool passed = true;
 
   // Convert to a red image
-  itk::AdaptImageFilter<myRGBImageType, myImageType, myRedAccessorType>::Pointer adaptImageToRed =
+  const itk::AdaptImageFilter<myRGBImageType, myImageType, myRedAccessorType>::Pointer adaptImageToRed =
     itk::AdaptImageFilter<myRGBImageType, myImageType, myRedAccessorType>::New();
-  itk::SimpleFilterWatcher redWatcher(adaptImageToRed, "Red");
+  const itk::SimpleFilterWatcher redWatcher(adaptImageToRed, "Red");
   adaptImageToRed->SetInput(myImage);
   adaptImageToRed->UpdateLargestPossibleRegion();
 
@@ -139,9 +137,9 @@ itkAdaptImageFilterTest(int, char *[])
   }
 
   // Convert to a green image
-  itk::AdaptImageFilter<myRGBImageType, myImageType, myGreenAccessorType>::Pointer adaptImageToGreen =
+  const itk::AdaptImageFilter<myRGBImageType, myImageType, myGreenAccessorType>::Pointer adaptImageToGreen =
     itk::AdaptImageFilter<myRGBImageType, myImageType, myGreenAccessorType>::New();
-  itk::SimpleFilterWatcher greenWatcher(adaptImageToGreen, "Green");
+  const itk::SimpleFilterWatcher greenWatcher(adaptImageToGreen, "Green");
 
   adaptImageToGreen->SetInput(myImage);
   adaptImageToGreen->UpdateLargestPossibleRegion();
@@ -165,9 +163,9 @@ itkAdaptImageFilterTest(int, char *[])
   }
 
   // Convert to a blue image
-  itk::AdaptImageFilter<myRGBImageType, myImageType, myBlueAccessorType>::Pointer adaptImageToBlue =
+  const itk::AdaptImageFilter<myRGBImageType, myImageType, myBlueAccessorType>::Pointer adaptImageToBlue =
     itk::AdaptImageFilter<myRGBImageType, myImageType, myBlueAccessorType>::New();
-  itk::SimpleFilterWatcher blueWatcher(adaptImageToBlue, "Blue");
+  const itk::SimpleFilterWatcher blueWatcher(adaptImageToBlue, "Blue");
 
   adaptImageToBlue->SetInput(myImage);
   adaptImageToBlue->UpdateLargestPossibleRegion();
@@ -196,9 +194,6 @@ itkAdaptImageFilterTest(int, char *[])
     std::cout << "AdaptImageFilterTest passed." << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cerr << "AdaptImageFilterTest failed." << std::endl;
-    return EXIT_FAILURE;
-  }
+  std::cerr << "AdaptImageFilterTest failed." << std::endl;
+  return EXIT_FAILURE;
 }

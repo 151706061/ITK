@@ -21,9 +21,7 @@
 #include "itkSubsample.h"
 #include "itkProcessObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class SampleToSubsampleFilter
  * \brief Base class of filters intended to select subsamples from samples.
@@ -54,7 +52,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SampleToSubsampleFilter);
 
   /** Typedefs for Measurement vector, measurement, Instance Identifier,
@@ -92,13 +90,14 @@ protected:
    * called.
    * \sa ProcessObject
    */
+  /** @ITKStartGrouping */
   using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
   using Superclass::MakeOutput;
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
+  /** @ITKEndGrouping */
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkSampleToSubsampleFilter.hxx"

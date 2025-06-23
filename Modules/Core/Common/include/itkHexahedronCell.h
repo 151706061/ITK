@@ -31,11 +31,6 @@ namespace itk
  *
  * HexahedronCell represents a hexahedron, more precisely, a cuboid, for a Mesh.
  *
- * \tparam TPixelType The type associated with a point, cell, or boundary
- * for use in storing its data.
- *
- * \tparam TCellTraits Type information of mesh containing cell.
- *
  * \todo When reviewing this class, the documentation of the  template
  * parameters MUST be fixed.
  *
@@ -55,10 +50,11 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(HexahedronCell);
 
   /** Standard class type aliases. */
+  /** @ITKStartGrouping */
   itkCellCommonTypedefs(HexahedronCell);
   itkCellInheritedTypedefs(TCellInterface);
-
-  /** Standard part of every itk Object. */
+  /** @ITKEndGrouping */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HexahedronCell);
 
   /** The type of boundary for this triangle's vertices. */
@@ -87,19 +83,21 @@ public:
    */
   static constexpr unsigned int CellDimension3D = 3;
   static constexpr unsigned int PointDimension3D = 3;
+
   /** Implement the standard CellInterface. */
-  CellGeometryEnum
+  /** @ITKStartGrouping */
+  [[nodiscard]] CellGeometryEnum
   GetType() const override
   {
     return CellGeometryEnum::HEXAHEDRON_CELL;
   }
   void
   MakeCopy(CellAutoPointer &) const override;
-
-  unsigned int
+  /** @ITKEndGrouping */
+  [[nodiscard]] unsigned int
   GetDimension() const override;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoints() const override;
 
   CellFeatureCount
@@ -146,10 +144,10 @@ public:
 
   /** Evaluate the position inside the cell */
   bool
-  EvaluatePosition(CoordRepType *,
+  EvaluatePosition(CoordinateType *,
                    PointsContainer *,
-                   CoordRepType *,
-                   CoordRepType[],
+                   CoordinateType *,
+                   CoordinateType[],
                    double *,
                    InterpolationWeightType *) override;
 
@@ -162,15 +160,15 @@ protected:
     NumericTraits<PointIdentifier>::max()) };
 
   void
-  InterpolationDerivs(CoordRepType pcoords[Self::CellDimension],
-                      CoordRepType derivs[Self::CellDimension * Self::NumberOfPoints]);
+  InterpolationDerivs(CoordinateType pcoords[Self::CellDimension],
+                      CoordinateType derivs[Self::CellDimension * Self::NumberOfPoints]);
   void
-  InterpolationFunctions(CoordRepType pcoords[Self::CellDimension], InterpolationWeightType sf[Self::NumberOfPoints]);
+  InterpolationFunctions(CoordinateType pcoords[Self::CellDimension], InterpolationWeightType sf[Self::NumberOfPoints]);
   void
   EvaluateLocation(int &                     itkNotUsed(subId),
                    PointsContainer *         points,
-                   CoordRepType              pcoords[Self::CellDimension],
-                   CoordRepType              x[Self::CellDimension],
+                   CoordinateType            pcoords[Self::CellDimension],
+                   CoordinateType            x[Self::CellDimension],
                    InterpolationWeightType * weights);
 
 public:

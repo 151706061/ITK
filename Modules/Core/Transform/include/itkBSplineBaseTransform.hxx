@@ -121,7 +121,7 @@ BSplineBaseTransform<TParametersValueType, VDimension, VSplineOrder>::UpdateTran
   const DerivativeType & update,
   TParametersValueType   factor)
 {
-  NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
+  const NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
 
   if (update.Size() != numberOfParameters)
   {
@@ -300,7 +300,7 @@ BSplineBaseTransform<TParametersValueType, VDimension, VSplineOrder>::TransformP
   WeightsType             weights;
   ParameterIndexArrayType indices;
   OutputPointType         outputPoint;
-  bool                    inside;
+  bool                    inside = false;
 
   this->TransformPoint(point, outputPoint, weights, indices, inside);
 

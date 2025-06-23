@@ -54,7 +54,7 @@ template <typename TInputMesh, typename TOutputMesh, typename TSolverTraits>
 void
 LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMesh, TSolverTraits>::SetLocalLambda(
   OutputPointIdentifier vId,
-  OutputCoordRepType    iL)
+  OutputCoordinateType  iL)
 {
   m_LocalLambdaSquare[vId] = iL * iL;
 }
@@ -70,8 +70,8 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
 {
   OutputMeshType * output = this->GetOutput();
 
-  OutputMapPointIdentifierConstIterator it = this->m_InternalMap.begin();
-  OutputMapPointIdentifierConstIterator end = this->m_InternalMap.end();
+  auto       it = this->m_InternalMap.begin();
+  const auto end = this->m_InternalMap.end();
 
   while (it != end)
   {
@@ -79,15 +79,15 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
     const auto                  internalId1 = static_cast<unsigned int>(it->second);
 
     RowType row;
-    this->FillMatrixRow(vId1, this->m_Order, NumericTraits<OutputCoordRepType>::OneValue(), row);
+    this->FillMatrixRow(vId1, this->m_Order, NumericTraits<OutputCoordinateType>::OneValue(), row);
 
-    RowConstIterator rIt = row.begin();
-    RowConstIterator rEnd = row.end();
+    auto       rIt = row.begin();
+    const auto rEnd = row.end();
 
     while (rIt != rEnd)
     {
       const OutputPointIdentifier vId2 = rIt->first;
-      const OutputCoordRepType    weight = rIt->second;
+      const OutputCoordinateType  weight = rIt->second;
 
       const OutputPointType p = output->GetPoint(vId2);
       iBx[internalId1] += weight * p[0];
@@ -135,18 +135,20 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
 
     this->FillMatrix(M, Bx, By, Bz);
 
-    MatrixType Mt(M.transpose());
+    const MatrixType Mt(M.transpose());
 
     MatrixType A(Mt * M);
 
-    VectorType Cx, Cy, Cz;
+    VectorType Cx;
     Mt.mult(Bx, Cx);
+    VectorType Cy;
     Mt.mult(By, Cy);
+    VectorType Cz;
     Mt.mult(Bz, Cz);
 
     typename OutputMeshType::PointsContainer * points = output->GetPoints();
 
-    for (ConstraintMapConstIterator cIt = this->m_Constraints.begin(); cIt != this->m_Constraints.end(); ++cIt)
+    for (auto cIt = this->m_Constraints.begin(); cIt != this->m_Constraints.end(); ++cIt)
     {
       const OutputPointIdentifier vId = cIt->first;
       OutputPointType             p = points->GetElement(vId);
@@ -154,10 +156,9 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
 
       const OutputPointIdentifier index = this->m_InternalMap[vId];
 
-      OutputCoordRepType l2 = m_LambdaSquare;
+      OutputCoordinateType l2 = m_LambdaSquare;
 
-      typename std::unordered_map<OutputPointIdentifier, OutputCoordRepType>::const_iterator lambdaIt =
-        this->m_LocalLambdaSquare.find(vId);
+      const auto lambdaIt = this->m_LocalLambdaSquare.find(vId);
       if (lambdaIt != this->m_LocalLambdaSquare.end())
       {
         l2 = lambdaIt->second;
@@ -181,8 +182,8 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
 
     this->SolveLinearSystems(A, Cx, Cy, Cz, X, Y, Z);
 
-    OutputMapPointIdentifierConstIterator it = this->m_InternalMap.begin();
-    OutputMapPointIdentifierConstIterator end = this->m_InternalMap.end();
+    auto       it = this->m_InternalMap.begin();
+    const auto end = this->m_InternalMap.end();
 
     while (it != end)
     {
@@ -191,13 +192,13 @@ LaplacianDeformationQuadEdgeMeshFilterWithSoftConstraints<TInputMesh, TOutputMes
 
       OutputPointType & p = points->ElementAt(vId);
 
-      auto x = static_cast<OutputCoordRepType>(X[internalId]);
+      auto x = static_cast<OutputCoordinateType>(X[internalId]);
       p[0] = x;
 
-      auto y = static_cast<OutputCoordRepType>(Y[internalId]);
+      auto y = static_cast<OutputCoordinateType>(Y[internalId]);
       p[1] = y;
 
-      auto z = static_cast<OutputCoordRepType>(Z[internalId]);
+      auto z = static_cast<OutputCoordinateType>(Z[internalId]);
       p[2] = z;
 
       ++it;

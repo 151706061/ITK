@@ -38,8 +38,8 @@ InPlaceImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inde
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "InPlace: " << (m_InPlace ? "On" : "Off") << std::endl;
-  os << indent << "RunningInPlace: " << (m_RunningInPlace ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(InPlace);
+  itkPrintSelfBooleanMacro(RunningInPlace);
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -57,10 +57,9 @@ InPlaceImageFilter<TInputImage, TOutputImage>::InternalAllocateOutputs()
   // additionally the buffered and requested regions of the input and
   // output must match.
   bool rMatch = true;
-  if (inputPtr != nullptr &&
-      static_cast<unsigned int>(InputImageDimension) == static_cast<unsigned int>(OutputImageDimension))
+  if (inputPtr != nullptr && InputImageDimension == OutputImageDimension)
   {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(InputImageDimension); ++i)
+    for (unsigned int i = 0; i < InputImageDimension; ++i)
     {
       if (inputPtr->GetBufferedRegion().GetIndex(i) != outputPtr->GetRequestedRegion().GetIndex(i))
       {
@@ -98,7 +97,8 @@ InPlaceImageFilter<TInputImage, TOutputImage>::InternalAllocateOutputs()
       // method since it returns the input as a pointer to a
       // DataObject as opposed to the subclass version which
       // static_casts the input to an TInputImage).
-      typename ImageBaseType::Pointer nthOutputPtr = dynamic_cast<ImageBaseType *>(this->ProcessObject::GetOutput(i));
+      const typename ImageBaseType::Pointer nthOutputPtr =
+        dynamic_cast<ImageBaseType *>(this->ProcessObject::GetOutput(i));
 
       if (nthOutputPtr)
       {

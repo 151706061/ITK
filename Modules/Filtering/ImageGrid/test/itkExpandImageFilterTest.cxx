@@ -33,8 +33,9 @@ public:
   using IndexType = itk::Index<VDimension>;
 
   ImagePattern()
+
   {
-    m_Offset = 0.0;
+
     for (int j = 0; j < VDimension; ++j)
     {
       m_Coeff[j] = 0.0;
@@ -53,7 +54,7 @@ public:
   }
 
   double m_Coeff[VDimension];
-  double m_Offset;
+  double m_Offset{ 0.0 };
 };
 
 // The following three classes are used to support callbacks
@@ -82,8 +83,8 @@ itkExpandImageFilterTest(int, char *[])
   int testPassed = EXIT_SUCCESS;
 
   std::cout << "Create the input image pattern." << std::endl;
-  ImageType::RegionType region;
-  ImageType::SizeType   size = { { 64, 64 } };
+  ImageType::RegionType         region;
+  constexpr ImageType::SizeType size = { { 64, 64 } };
   region.SetSize(size);
 
   auto input = ImageType::New();
@@ -93,9 +94,9 @@ itkExpandImageFilterTest(int, char *[])
 
   ImagePattern<ImageDimension> pattern;
   pattern.m_Offset = 64;
-  for (unsigned int j = 0; j < ImageDimension; ++j)
+  for (double & it : pattern.m_Coeff)
   {
-    pattern.m_Coeff[j] = 1.0;
+    it = 1.0;
   }
 
   using Iterator = itk::ImageRegionIteratorWithIndex<ImageType>;
@@ -119,16 +120,16 @@ itkExpandImageFilterTest(int, char *[])
 
   expander->SetExpandFactors(5);
 
-  unsigned int         factors[ImageDimension] = { 2, 3 };
-  ImageType::PixelType padValue = 4.0;
+  unsigned int                   factors[ImageDimension] = { 2, 3 };
+  constexpr ImageType::PixelType padValue = 4.0;
   expander->SetInput(input);
   expander->SetExpandFactors(factors);
   // TEST_RMV20100728   expander->SetEdgePaddingValue( padValue );
 
 
-  ShowProgressObject                                    progressWatch(expander);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(expander);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   expander->AddObserver(itk::ProgressEvent(), command);
 
@@ -139,8 +140,8 @@ itkExpandImageFilterTest(int, char *[])
   Iterator outIter(expander->GetOutput(), expander->GetOutput()->GetBufferedRegion());
 
   // compute non-padded output region
-  ImageType::RegionType validRegion = expander->GetOutput()->GetLargestPossibleRegion();
-  ImageType::SizeType   validSize = validRegion.GetSize();
+  ImageType::RegionType     validRegion = expander->GetOutput()->GetLargestPossibleRegion();
+  const ImageType::SizeType validSize = validRegion.GetSize();
 
   validRegion.SetSize(validSize);
 
@@ -148,18 +149,18 @@ itkExpandImageFilterTest(int, char *[])
 
   while (!outIter.IsAtEnd())
   {
-    ImageType::IndexType index = outIter.GetIndex();
-    double               value = outIter.Get();
+    const ImageType::IndexType index = outIter.GetIndex();
+    const double               value = outIter.Get();
 
     if (validRegion.IsInside(index))
     {
 
       ImageType::PointType point;
       expanderOutput->TransformIndexToPhysicalPoint(outIter.GetIndex(), point);
-      ImageType::IndexType inputIndex = input->TransformPhysicalPointToIndex(point);
-      double               trueValue = pattern.Evaluate(inputIndex);
+      const ImageType::IndexType inputIndex = input->TransformPhysicalPointToIndex(point);
+      const double               trueValue = pattern.Evaluate(inputIndex);
 
-      double epsilon = 1e-4;
+      constexpr double epsilon = 1e-4;
       if (itk::Math::abs(trueValue - value) > epsilon)
       {
         std::cerr.precision(static_cast<int>(itk::Math::abs(std::log10(epsilon))));

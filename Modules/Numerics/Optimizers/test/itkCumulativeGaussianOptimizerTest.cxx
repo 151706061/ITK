@@ -34,13 +34,13 @@
 int
 itkCumulativeGaussianOptimizerTest(int, char *[])
 {
-  double mean = 3;                    // Mean of the Cumulative Gaussian.
-                                      // Ranges from 0 to N-1, where N is numberOfSamples.
-  double standardDeviation = 2;       // Standard deviation of the Cumulative Gaussian.
-  double lowerAsymptote = -10;        // Lower asymptotic value of the Cumulative Gaussian.
-  int    numberOfSamples = 9;         // Number of data samples.
-  double upperAsymptote = 10;         // Upper asymptotic value of the Cumulative Gaussian.
-  double differenceTolerance = 1e-20; // Tolerance allowed for the difference between Gaussian iterations.
+  constexpr double mean = 3;                    // Mean of the Cumulative Gaussian.
+                                                // Ranges from 0 to N-1, where N is numberOfSamples.
+  constexpr double standardDeviation = 2;       // Standard deviation of the Cumulative Gaussian.
+  constexpr double lowerAsymptote = -10;        // Lower asymptotic value of the Cumulative Gaussian.
+  constexpr int    numberOfSamples = 9;         // Number of data samples.
+  constexpr double upperAsymptote = 10;         // Upper asymptotic value of the Cumulative Gaussian.
+  constexpr double differenceTolerance = 1e-20; // Tolerance allowed for the difference between Gaussian iterations.
 
   // Typedef and initialization for the Cumulative Gaussian Optimizer.
   using CumulativeGaussianOptimizerType = itk::CumulativeGaussianOptimizer;
@@ -86,7 +86,7 @@ itkCumulativeGaussianOptimizerTest(int, char *[])
   ITK_TEST_SET_GET_VALUE(differenceTolerance, optimizer->GetDifferenceTolerance());
 
   // Print results after each iteration.
-  bool verbose = true;
+  constexpr bool verbose = true;
   ITK_TEST_SET_GET_BOOLEAN(optimizer, Verbose, verbose);
 
   // Set the data array.
@@ -117,16 +117,14 @@ itkCumulativeGaussianOptimizerTest(int, char *[])
     std::cout << "[TEST DONE]" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cerr << std::endl << "Test Failed with a Fit Error of " << optimizer->GetFitError() << std::endl << std::endl;
 
-    // Print out the resulting parameters.
-    std::cerr << "Fitted mean = " << optimizer->GetComputedMean() << std::endl;
-    std::cerr << "Fitted standard deviation = " << optimizer->GetComputedStandardDeviation() << std::endl;
-    std::cerr << "Fitted upper asymptote = " << optimizer->GetUpperAsymptote() << std::endl;
-    std::cerr << "Fitted lower asymptote = " << optimizer->GetLowerAsymptote() << std::endl;
+  std::cerr << std::endl << "Test Failed with a Fit Error of " << optimizer->GetFitError() << std::endl << std::endl;
 
-    return EXIT_FAILURE;
-  }
+  // Print out the resulting parameters.
+  std::cerr << "Fitted mean = " << optimizer->GetComputedMean() << std::endl;
+  std::cerr << "Fitted standard deviation = " << optimizer->GetComputedStandardDeviation() << std::endl;
+  std::cerr << "Fitted upper asymptote = " << optimizer->GetUpperAsymptote() << std::endl;
+  std::cerr << "Fitted lower asymptote = " << optimizer->GetLowerAsymptote() << std::endl;
+
+  return EXIT_FAILURE;
 }

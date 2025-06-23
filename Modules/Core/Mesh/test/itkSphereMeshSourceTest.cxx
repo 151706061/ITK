@@ -31,20 +31,19 @@ itkSphereMeshSourceTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(mySphereMeshSource, SphereMeshSource, MeshSource);
 
 
-  fPointType center;
-  center.Fill(0);
-  fPointType::ValueType scaleInit[3] = { 1, 1, 1 };
-  fPointType            scale = scaleInit;
+  constexpr fPointType            center{};
+  constexpr fPointType::ValueType scaleInit[3] = { 1, 1, 1 };
+  const fPointType                scale = scaleInit;
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetResolutionX(1);
   mySphereMeshSource->SetResolutionY(10);
   mySphereMeshSource->SetScale(scale);
 
-  double squareness1 = 1.0;
+  constexpr double squareness1 = 1.0;
   mySphereMeshSource->SetSquareness1(squareness1);
 
-  double squareness2 = 1.0;
+  constexpr double squareness2 = 1.0;
   mySphereMeshSource->SetSquareness2(squareness2);
 
   mySphereMeshSource->Modified();
@@ -54,10 +53,8 @@ itkSphereMeshSourceTest(int, char *[])
   //  itk::Mesh<float>::PointsContainerPointer      myoutput = mySphereMeshSource->GetOutput()->GetPoints();
   //  itk::Mesh<float>::PointsContainer::Iterator   m_output = myoutput->Begin();
 
-  IPT * pt_ptr;
-  IPT   pt;
-  pt.Fill(0.0);
-  pt_ptr = &pt;
+  IPT   pt{};
+  IPT * pt_ptr = &pt;
 
   for (int i = 0; i < 12; ++i)
   {

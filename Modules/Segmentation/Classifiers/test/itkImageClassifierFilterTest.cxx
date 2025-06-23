@@ -63,17 +63,17 @@ itkImageClassifierFilterTest(int argc, char * argv[])
   start.Fill(0);
   size.Fill(512);
 
-  InputImageType::RegionType region(start, size);
+  const InputImageType::RegionType region(start, size);
   image->SetRegions(region);
   image->Allocate();
 
   // Fill the first half of the input image with pixel intensities
-  // gnerated from a normal distribution defined by the following parameters
-  double mean = 10.5;
-  double standardDeviation = 5.0;
+  // generated from a normal distribution defined by the following parameters
+  constexpr double mean = 10.5;
+  constexpr double standardDeviation = 5.0;
 
   InputImageType::IndexType index;
-  unsigned int              halfSize = size[1] / 2;
+  const unsigned int        halfSize = size[1] / 2;
 
   for (unsigned int y = 0; y < halfSize; ++y)
   {
@@ -89,8 +89,8 @@ itkImageClassifierFilterTest(int argc, char * argv[])
   }
 
   // Pixel intensities generated from the second normal distribution
-  double mean2 = 200.5;
-  double standardDeviation2 = 20.0;
+  constexpr double mean2 = 200.5;
+  constexpr double standardDeviation2 = 20.0;
 
   for (unsigned int y = halfSize; y < size[1]; ++y)
   {
@@ -141,7 +141,7 @@ itkImageClassifierFilterTest(int argc, char * argv[])
   auto estimator = EstimatorType::New();
   estimator->SetSample(sample);
 
-  int maximumIteration = 200;
+  constexpr int maximumIteration = 200;
   estimator->SetMaximumIteration(maximumIteration);
 
   itk::Array<double> initialProportions(numberOfClasses);
@@ -181,10 +181,10 @@ itkImageClassifierFilterTest(int argc, char * argv[])
 
   using ClassLabelType = ImageClassifierFilterType::ClassLabelType;
 
-  ClassLabelType class1 = 0;
+  constexpr ClassLabelType class1 = 0;
   classLabelVector.push_back(class1);
 
-  ClassLabelType class2 = 255;
+  constexpr ClassLabelType class2 = 255;
   classLabelVector.push_back(class2);
 
   // Set a decision rule type
@@ -203,16 +203,14 @@ itkImageClassifierFilterTest(int argc, char * argv[])
 
   auto end = membershipFunctions.end();
 
-  ImageClassifierFilterType::MembershipFunctionVectorType::const_iterator functionIter;
-
-  functionIter = begin;
+  auto functionIter = begin;
 
   unsigned int counter = 1;
   std::cout << "Estimator membership function output " << std::endl;
   while (functionIter != end)
   {
-    ImageClassifierFilterType::MembershipFunctionPointer membershipFunction = *functionIter;
-    const auto *                                         gaussianMemberShpFunction =
+    const ImageClassifierFilterType::MembershipFunctionPointer membershipFunction = *functionIter;
+    const auto *                                               gaussianMemberShpFunction =
       dynamic_cast<const EstimatorType::GaussianMembershipFunctionType *>(membershipFunction.GetPointer());
     std::cout << "\tMembership function:\t " << counter << std::endl;
     std::cout << "\t\tMean=" << gaussianMemberShpFunction->GetMean() << std::endl;

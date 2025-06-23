@@ -261,7 +261,8 @@ main(int argc, char * argv[])
   //
   spatialObject->SetSizeInObjectSpace(boxSize);
 
-  ImageType::RegionType region = movingImage->GetLargestPossibleRegion();
+  const ImageType::RegionType region =
+    movingImage->GetLargestPossibleRegion();
 
   ImageType::SizeType imageSize = region.GetSize();
 
@@ -336,7 +337,7 @@ main(int argc, char * argv[])
 
   OptimizerScalesType optimizerScales(transform->GetNumberOfParameters());
 
-  const double translationScale = 1.0 / 1000.0;
+  constexpr double translationScale = 1.0 / 1000.0;
 
   optimizerScales[0] = 1.0;
   optimizerScales[1] = translationScale;
@@ -360,11 +361,11 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  ParametersType transformParameters =
+  const ParametersType transformParameters =
     registrationMethod->GetLastTransformParameters();
 
 
-  TransformType::OutputPointType center = transform->GetCenter();
+  const TransformType::OutputPointType center = transform->GetCenter();
 
   std::cout << "Registration parameter = " << std::endl;
   std::cout << "Rotation center = " << center << std::endl;

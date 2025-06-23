@@ -114,25 +114,27 @@ public:
   /** Returns a vector of keys to the key/value entries in the
    * dictionary.  Iterate through the dictionary using these keys.
    */
-  std::vector<std::string>
+  [[nodiscard]] std::vector<std::string>
   GetKeys() const;
 
   // Implement map's api. On some Microsoft compilers, stl containers
   // cannot be exported. This causes problems when building DLL's.
   // Here we inherit privately from std::map and provide a simple
   // API. The implementation will be in the DLL.
-  MetaDataObjectBase::Pointer & operator[](const std::string &);
+  MetaDataObjectBase::Pointer &
+  operator[](const std::string &);
 
   // \brief Get a constant point to a DataObject
   //
   // If the key does not exist then nullptr is returned.
-  const MetaDataObjectBase * operator[](const std::string &) const;
-
   const MetaDataObjectBase *
+  operator[](const std::string &) const;
+
+  [[nodiscard]] const MetaDataObjectBase *
   Get(const std::string &) const;
   void
   Set(const std::string &, MetaDataObjectBase *);
-  bool
+  [[nodiscard]] bool
   HasKey(const std::string &) const;
 
   bool
@@ -143,26 +145,28 @@ public:
    * context cannot be dereferenced safely */
 
   /** Returns an iterator to the beginning of the map */
+  /** @ITKStartGrouping */
   // Blacklisted by igenerator.py
   Iterator
   Begin();
   // Blacklisted by igenerator.py
-  ConstIterator
+  [[nodiscard]] ConstIterator
   Begin() const;
-
+  /** @ITKEndGrouping */
   /** Returns an iterator to the end of the map */
+  /** @ITKStartGrouping */
   // Blacklisted by igenerator.py
   Iterator
   End();
   // Blacklisted by igenerator.py
-  ConstIterator
+  [[nodiscard]] ConstIterator
   End() const;
-
+  /** @ITKEndGrouping */
   /** Returns an iterator matching the string key */
   Iterator
   Find(const std::string & key);
 
-  ConstIterator
+  [[nodiscard]] ConstIterator
   Find(const std::string & key) const;
 
   /** remove all MetaObjects from dictionary */
@@ -180,7 +184,7 @@ private:
 };
 
 inline void
-swap(MetaDataDictionary & a, MetaDataDictionary & b)
+swap(MetaDataDictionary & a, MetaDataDictionary & b) noexcept
 {
   a.Swap(b);
 }

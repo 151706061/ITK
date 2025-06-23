@@ -32,9 +32,9 @@ MakeOnes3x3Image()
 {
   typename ImageType::Pointer onesImage = ImageType::New();
   {
-    typename ImageType::SizeType   smallest_size{ { 3, 3 } };
-    typename ImageType::IndexType  start_index{ { 0, 0 } };
-    typename ImageType::RegionType my_region(start_index, smallest_size);
+    const typename ImageType::SizeType   smallest_size{ { 3, 3 } };
+    const typename ImageType::IndexType  start_index{ { 0, 0 } };
+    const typename ImageType::RegionType my_region(start_index, smallest_size);
     onesImage->SetRegions(my_region);
   }
   onesImage->Allocate();
@@ -58,8 +58,7 @@ DoConvolution(typename ImageType::Pointer inputImage, unsigned long int directio
 
   sobelOperator.SetDirection(direction);
 
-  itk::Size<Dimension> radius;
-  radius.Fill(1);
+  auto radius = itk::Size<Dimension>::Filled(1);
   sobelOperator.CreateToRadius(radius);
 
   NeighborhoodIteratorType it(radius, inputImage, inputImage->GetRequestedRegion());
@@ -68,8 +67,8 @@ DoConvolution(typename ImageType::Pointer inputImage, unsigned long int directio
   outputImage->SetRegions(inputImage->GetRequestedRegion());
   outputImage->AllocateInitialized();
 
-  IteratorType                             out(outputImage, inputImage->GetRequestedRegion());
-  itk::NeighborhoodInnerProduct<ImageType> innerProduct;
+  IteratorType                                   out(outputImage, inputImage->GetRequestedRegion());
+  const itk::NeighborhoodInnerProduct<ImageType> innerProduct;
   for (it.GoToBegin(), out.GoToBegin(); !it.IsAtEnd(); ++it, ++out)
   {
     const auto pixelValue = innerProduct(it, sobelOperator);
@@ -84,11 +83,11 @@ DoSimpleConvolutionTest(unsigned long direction, const std::string & pixelType)
 {
   using ImageType = typename itk::Image<PixelType, Dimension>;
 
-  typename ImageType::Pointer smallestOnesImage = MakeOnes3x3Image<ImageType>();
-  typename ImageType::Pointer output3x3Image = DoConvolution<ImageType>(smallestOnesImage, direction);
+  const typename ImageType::Pointer smallestOnesImage = MakeOnes3x3Image<ImageType>();
+  const typename ImageType::Pointer output3x3Image = DoConvolution<ImageType>(smallestOnesImage, direction);
 
-  typename ImageType::IndexType center_index{ { 1, 1 } };
-  typename ImageType::PixelType center_value = output3x3Image->GetPixel(center_index);
+  const typename ImageType::IndexType center_index{ { 1, 1 } };
+  const typename ImageType::PixelType center_value = output3x3Image->GetPixel(center_index);
   if (center_value != 0)
   {
     std::cout << "ERROR: Constant image convolution with SobelOperator should return 0, "
@@ -130,7 +129,8 @@ itkSobelOperatorImageConvolutionTest(int argc, char * argv[])
     /*
      * Demonstrate that signed types do work with SobelOperator
      */
-    return_status += DoSimpleConvolutionTest<char, 2>(direction, "char");
+    // Note: `char` can be unsigned on some platforms.
+    return_status += DoSimpleConvolutionTest<signed char, 2>(direction, "signed char");
     return_status += DoSimpleConvolutionTest<short, 2>(direction, "short");
     return_status += DoSimpleConvolutionTest<int, 2>(direction, "int");
     return_status += DoSimpleConvolutionTest<long, 2>(direction, "long");
@@ -152,7 +152,7 @@ itkSobelOperatorImageConvolutionTest(int argc, char * argv[])
     // to be stored in uint8_t have an implied 0 at about pixel value 128.  Many web based viewers
     // for the difference images in the testing outputs render better in this positive png range.
     using RescaleIntensityType = itk::RescaleIntensityImageFilter<ImageType, OutputImageType>;
-    RescaleIntensityType::Pointer rescalerForVisualization = RescaleIntensityType::New();
+    const RescaleIntensityType::Pointer rescalerForVisualization = RescaleIntensityType::New();
     rescalerForVisualization->SetInput(signedSobelImage);
     rescalerForVisualization->SetOutputMinimum(0);
     rescalerForVisualization->SetOutputMaximum(255);

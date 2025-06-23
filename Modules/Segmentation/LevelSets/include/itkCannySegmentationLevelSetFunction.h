@@ -48,7 +48,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CannySegmentationLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -62,6 +62,7 @@ public:
   static constexpr unsigned int ImageDimension = Superclass::ImageDimension;
 
   /** */
+  /** @ITKStartGrouping */
   void
   SetThreshold(ScalarValueType v)
   {
@@ -72,18 +73,21 @@ public:
   {
     return m_Threshold;
   }
+  /** @ITKEndGrouping */
 
   /** */
+  /** @ITKStartGrouping */
   void
   SetVariance(double v)
   {
     m_Variance = v;
   }
-  double
+  [[nodiscard]] double
   GetVariance() const
   {
     return m_Variance;
   }
+  /** @ITKEndGrouping */
 
   /** Compute the Speed Image. The Speed Image is the distance to the
       canny edges. */
@@ -118,13 +122,12 @@ public:
 
 protected:
   CannySegmentationLevelSetFunction()
-  {
-    m_Variance = 0.0;
-    m_Threshold = ScalarValueType{};
-    m_Caster = CastImageFilter<FeatureImageType, ImageType>::New();
-    m_Canny = CannyEdgeDetectionImageFilter<ImageType, ImageType>::New();
-    m_Distance = DanielssonDistanceMapImageFilter<ImageType, ImageType>::New();
-  }
+    : m_Variance(0.0)
+    , m_Threshold(ScalarValueType{})
+    , m_Canny(CannyEdgeDetectionImageFilter<ImageType, ImageType>::New())
+    , m_Distance(DanielssonDistanceMapImageFilter<ImageType, ImageType>::New())
+    , m_Caster(CastImageFilter<FeatureImageType, ImageType>::New())
+  {}
 
   ~CannySegmentationLevelSetFunction() override = default;
 
@@ -148,6 +151,7 @@ private:
     m_Caster->SetInput(feature);
     m_Canny->SetInput(m_Caster->GetOutput());
   }
+
   /** If FeatureImageType == ImageType,
    *  assign directly to the Canny filter
    */

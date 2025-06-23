@@ -53,7 +53,7 @@ namespace itk
 class MultiThreaderBaseEnums
 {
 public:
-  /** \class Threader
+  /**
    * \ingroup ITKCommon
    * Currently supported types of multi-threader implementations.
    * Last will change with additional implementations.
@@ -68,7 +68,7 @@ public:
     Unknown = -1
   };
 
-  /** \class ThreadExitCode
+  /**
    * \ingroup ITKCommon
    */
   enum class ThreadExitCode : uint8_t
@@ -118,23 +118,25 @@ public:
   static Pointer
   New();
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiThreaderBase);
 
   /** Get/Set the number of threads to use. It will be clamped to the range
    * [ 1, m_GlobalMaximumNumberOfThreads ], so the caller of this method should
    * check that the requested number of threads was accepted. */
+  /** @ITKStartGrouping */
   virtual void
   SetMaximumNumberOfThreads(ThreadIdType numberOfThreads);
   itkGetConstMacro(MaximumNumberOfThreads, ThreadIdType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the number of work units to create. It might be clamped to the range
    * [ 1, SomeMaximumNumber ], so the caller of this method should
    * check that the requested number of work units was accepted. */
+  /** @ITKStartGrouping */
   virtual void
   SetNumberOfWorkUnits(ThreadIdType numberOfWorkUnits);
   itkGetConstMacro(NumberOfWorkUnits, ThreadIdType);
-
+  /** @ITKEndGrouping */
   virtual void
   SetUpdateProgress(bool updates);
   itkGetConstMacro(UpdateProgress, bool);
@@ -144,19 +146,21 @@ public:
    * are already statically allocated using the ITK_MAX_THREADS number.
    * Therefore the caller of this method should check that the requested number
    * of threads was accepted. */
+  /** @ITKStartGrouping */
   static void
   SetGlobalMaximumNumberOfThreads(ThreadIdType val);
   static ThreadIdType
   GetGlobalMaximumNumberOfThreads();
-
+  /** @ITKEndGrouping */
   /** Set/Get whether to use the to use the thread pool
    * implementation or the spawning implementation of
    * starting threads.
    *
    * Deprecated: use Get/Set GlobalDefaultThreader. */
-  itkLegacyMacro(static void SetGlobalDefaultUseThreadPool(const bool GlobalDefaultUseThreadPool));
-  itkLegacyMacro(static bool GetGlobalDefaultUseThreadPool());
-
+  /** @ITKStartGrouping */
+  itkLegacyMacro(static void SetGlobalDefaultUseThreadPool(const bool GlobalDefaultUseThreadPool);)
+  itkLegacyMacro(static bool GetGlobalDefaultUseThreadPool();)
+  /** @ITKEndGrouping */
   using ThreaderEnum = MultiThreaderBaseEnums::Threader;
 #if !defined(ITK_LEGACY_REMOVE)
   using ThreaderType = ThreaderEnum;
@@ -201,30 +205,36 @@ public:
    *
    * If the SetGlobalDefaultThreaderType API is ever used by the developer,
    * the developer's choice is respected over the environment variables. */
+  /** @ITKStartGrouping */
   static void
   SetGlobalDefaultThreader(ThreaderEnum threaderType);
   static ThreaderEnum
   GetGlobalDefaultThreader();
-
+  /** @ITKEndGrouping */
   /** Set/Get the value which is used to initialize the NumberOfThreads in the
    * constructor.  It will be clamped to the range [1, m_GlobalMaximumNumberOfThreads ].
    * Therefore the caller of this method should check that the requested number
    * of threads was accepted. */
+  /** @ITKStartGrouping */
   static void
   SetGlobalDefaultNumberOfThreads(ThreadIdType val);
   static ThreadIdType
   GetGlobalDefaultNumberOfThreads();
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_LEGACY_REMOVE)
   /** Get/Set the number of threads to use.
    * DEPRECATED! Use WorkUnits and MaximumNumberOfThreads instead. */
+  /** @ITKStartGrouping */
   itkLegacyMacro(virtual void SetNumberOfThreads(ThreadIdType numberOfThreads))
   {
     this->SetMaximumNumberOfThreads(numberOfThreads);
     this->SetNumberOfWorkUnits(this->GetMaximumNumberOfThreads()); // Might be clamped
   }
-  itkLegacyMacro(virtual ThreadIdType GetNumberOfThreads()) { return this->GetNumberOfWorkUnits(); }
-
+  itkLegacyMacro(virtual ThreadIdType GetNumberOfThreads())
+  {
+    return this->GetNumberOfWorkUnits();
+  }
+  /** @ITKEndGrouping */
   /** This is the structure that is passed to the thread that is
    * created from the SingleMethodExecute. It is passed in as a void *,
    * and it is up to the method to cast correctly and extract the information.
@@ -233,21 +243,19 @@ public:
    * (void *)arg passed into the SetSingleMethod.
    *
    * DEPRECATED! Use WorkUnitInfo instead. */
+  /** @ITKStartGrouping */
   // clang-format off
 ITK_GCC_PRAGMA_DIAG_PUSH()
 ITK_GCC_PRAGMA_DIAG(ignored "-Wattributes")
 INTEL_PRAGMA_WARN_PUSH
 INTEL_SUPPRESS_warning_1292
-CLANG_PRAGMA_PUSH
-CLANG_SUPPRESS_Wcpp14_extensions
   // clang-format on
 #  ifdef ITK_LEGACY_SILENT
-    struct ThreadInfoStruct
+  struct ThreadInfoStruct
 #  else
-    struct [[deprecated("Use WorkUnitInfo, ThreadInfoStruct is deprecated since ITK 5.0")]] ThreadInfoStruct
+  struct [[deprecated("Use WorkUnitInfo, ThreadInfoStruct is deprecated since ITK 5.0")]] ThreadInfoStruct
 #  endif
-      // clang-format off
-CLANG_PRAGMA_POP
+    // clang-format off
 INTEL_PRAGMA_WARN_POP
   // clang-format on
   {
@@ -267,6 +275,7 @@ INTEL_PRAGMA_WARN_POP
   // clang-format off
 ITK_GCC_PRAGMA_DIAG_POP()
   // clang-format on
+  /** @ITKEndGrouping */
 #endif // ITK_LEGACY_REMOVE
 
   /** This is the structure that is passed to the thread that is
@@ -371,7 +380,7 @@ ITK_GCC_PRAGMA_DIAG_POP()
     if constexpr (VDimension <= 1) // Cannot split, no parallelization
     {
 
-      ProgressReporter progress(filter, 0, requestedRegion.GetNumberOfPixels());
+      const ProgressReporter progress(filter, 0, requestedRegion.GetNumberOfPixels());
       funcP(requestedRegion);
     }
     else // Can split, parallelize!

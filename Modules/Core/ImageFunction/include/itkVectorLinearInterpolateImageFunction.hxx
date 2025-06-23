@@ -25,14 +25,14 @@
 namespace itk
 {
 
-template <typename TInputImage, typename TCoordRep>
-const unsigned long VectorLinearInterpolateImageFunction<TInputImage, TCoordRep>::m_Neighbors =
+template <typename TInputImage, typename TCoordinate>
+const unsigned long VectorLinearInterpolateImageFunction<TInputImage, TCoordinate>::m_Neighbors =
   1 << TInputImage::ImageDimension;
 
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 auto
-VectorLinearInterpolateImageFunction<TInputImage, TCoordRep>::EvaluateAtContinuousIndex(
+VectorLinearInterpolateImageFunction<TInputImage, TCoordinate>::EvaluateAtContinuousIndex(
   const ContinuousIndexType & index) const -> OutputType
 {
   //
@@ -53,8 +53,7 @@ VectorLinearInterpolateImageFunction<TInputImage, TCoordRep>::EvaluateAtContinuo
    * neighbors. The weight for each neighbor is the fraction overlap
    * of the neighbor pixel with respect to a pixel centered on point.
    */
-  OutputType output;
-  output.Fill(0.0);
+  OutputType output{};
 
   using ScalarRealType = typename NumericTraits<PixelType>::ScalarRealType;
   ScalarRealType totalOverlap{};

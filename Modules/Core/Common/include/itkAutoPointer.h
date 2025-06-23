@@ -57,23 +57,25 @@ public:
 
   /** Copy constructor.  */
   explicit AutoPointer(AutoPointer & p)
-  {
-    m_IsOwner = p.IsOwner();          // Ownership can only be taken from
-                                      // another owner
-    m_Pointer = p.ReleaseOwnership(); // release ownership if appropriate
-  }
+    : m_IsOwner(p.IsOwner())
+    , m_Pointer(p.ReleaseOwnership())
+  {}
 
   /** Constructor to pointer p.  */
   explicit AutoPointer(ObjectType * p, bool takeOwnership)
-    : m_Pointer(p)
-    , m_IsOwner(takeOwnership)
+    : m_IsOwner(takeOwnership)
+    , m_Pointer(p)
   {}
 
   /** Destructor.  */
   ~AutoPointer() { this->Reset(); }
 
   /** Overload operator ->.  */
-  ObjectType * operator->() const { return m_Pointer; }
+  ObjectType *
+  operator->() const
+  {
+    return m_Pointer;
+  }
 
   /** Clear the AutoPointer. If it had a pointer the object
       is deleted and the pointer is set to null. */
@@ -120,7 +122,7 @@ public:
   }
 
   /** Query for the ownership */
-  bool
+  [[nodiscard]] bool
   IsOwner() const
   {
     return m_IsOwner;
@@ -146,7 +148,7 @@ public:
   }
 
   /** Access function to pointer. */
-  ObjectType *
+  [[nodiscard]] ObjectType *
   GetPointer() const
   {
     return m_Pointer;
@@ -156,7 +158,7 @@ public:
   bool
   operator==(const AutoPointer & r) const
   {
-    return (void *)m_Pointer == (void *)r.m_Pointer;
+    return m_Pointer == r.m_Pointer;
   }
 
   ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(Self);
@@ -165,28 +167,28 @@ public:
   bool
   operator<(const AutoPointer & r) const
   {
-    return (void *)m_Pointer < (void *)r.m_Pointer;
+    return m_Pointer < r.m_Pointer;
   }
 
   /** Comparison of pointers. Greater than comparison.  */
   bool
   operator>(const AutoPointer & r) const
   {
-    return (void *)m_Pointer > (void *)r.m_Pointer;
+    return m_Pointer > r.m_Pointer;
   }
 
   /** Comparison of pointers. Less than or equal to comparison.  */
   bool
   operator<=(const AutoPointer & r) const
   {
-    return (void *)m_Pointer <= (void *)r.m_Pointer;
+    return m_Pointer <= r.m_Pointer;
   }
 
   /** Comparison of pointers. Greater than or equal to comparison.  */
   bool
   operator>=(const AutoPointer & r) const
   {
-    return (void *)m_Pointer >= (void *)r.m_Pointer;
+    return m_Pointer >= r.m_Pointer;
   }
 
   /** Overload operator assignment.  */
@@ -223,8 +225,8 @@ private:
   }
 
   /** The pointer to the object referred to by this smart pointer. */
-  ObjectType * m_Pointer;
   bool         m_IsOwner{ false };
+  ObjectType * m_Pointer;
 };
 
 template <typename T>
@@ -250,6 +252,7 @@ TransferAutoPointer(TAutoPointerBase & pa, TAutoPointerDerived & pb)
     pb.ReleaseOwnership(); // pb Release Ownership and clears
   }
 }
+
 } // end namespace itk
 
 #endif

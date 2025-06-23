@@ -23,9 +23,7 @@
 #include "itkSubsample.h"
 #include "itkKdTreeGenerator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class WeightedCentroidKdTreeGenerator
@@ -75,7 +73,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WeightedCentroidKdTreeGenerator);
 
   /** Method for creation through the object factory. */
@@ -112,8 +110,7 @@ private:
   MeasurementVectorType m_TempUpperBound{};
   MeasurementVectorType m_TempMean{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWeightedCentroidKdTreeGenerator.hxx"

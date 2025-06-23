@@ -18,6 +18,7 @@
 #ifndef itkCorrelationCoefficientHistogramImageToImageMetric_hxx
 #define itkCorrelationCoefficientHistogramImageToImageMetric_hxx
 
+#include "itkMath.h"
 
 namespace itk
 {
@@ -42,8 +43,8 @@ CorrelationCoefficientHistogramImageToImageMetric<TFixedImage, TMovingImage>::Me
 
   for (unsigned int i = 0; i < this->m_HistogramSize[0]; ++i)
   {
-    MeasureType            valX = histogram.GetMeasurement(i, 0);
-    HistogramFrequencyType freq = histogram.GetFrequency(i, 0);
+    const MeasureType            valX = histogram.GetMeasurement(i, 0);
+    const HistogramFrequencyType freq = histogram.GetFrequency(i, 0);
     meanX += valX * freq;
   }
 
@@ -61,8 +62,8 @@ CorrelationCoefficientHistogramImageToImageMetric<TFixedImage, TMovingImage>::Me
 
   for (unsigned int i = 0; i < this->m_HistogramSize[1]; ++i)
   {
-    MeasureType            valY = histogram.GetMeasurement(i, 1);
-    HistogramFrequencyType freq = histogram.GetFrequency(i, 1);
+    const MeasureType            valY = histogram.GetMeasurement(i, 1);
+    const HistogramFrequencyType freq = histogram.GetFrequency(i, 1);
     meanY += valY * freq;
   }
 
@@ -81,10 +82,10 @@ CorrelationCoefficientHistogramImageToImageMetric<TFixedImage, TMovingImage>::Va
   for (unsigned int i = 0; i < this->m_HistogramSize[0]; ++i)
   {
     varX += static_cast<double>(histogram.GetFrequency(i, 0)) / histogram.GetTotalFrequency() *
-            std::pow(histogram.GetMeasurement(i, 0), 2);
+            Math::sqr(histogram.GetMeasurement(i, 0));
   }
 
-  return varX - std::pow(MeanX(histogram), 2);
+  return varX - Math::sqr(MeanX(histogram));
 }
 
 template <typename TFixedImage, typename TMovingImage>
@@ -97,10 +98,10 @@ CorrelationCoefficientHistogramImageToImageMetric<TFixedImage, TMovingImage>::Va
   for (unsigned int i = 0; i < this->m_HistogramSize[1]; ++i)
   {
     varY += static_cast<double>(histogram.GetFrequency(i, 1)) / histogram.GetTotalFrequency() *
-            std::pow(histogram.GetMeasurement(i, 1), 2);
+            Math::sqr(histogram.GetMeasurement(i, 1));
   }
 
-  return varY - std::pow(MeanY(histogram), 2);
+  return varY - Math::sqr(MeanY(histogram));
 }
 
 template <typename TFixedImage, typename TMovingImage>
@@ -108,9 +109,9 @@ auto
 CorrelationCoefficientHistogramImageToImageMetric<TFixedImage, TMovingImage>::Covariance(
   HistogramType & histogram) const -> MeasureType
 {
-  MeasureType var{};
-  MeasureType meanX = MeanX(histogram);
-  MeasureType meanY = MeanY(histogram);
+  MeasureType       var{};
+  const MeasureType meanX = MeanX(histogram);
+  const MeasureType meanY = MeanY(histogram);
 
   for (unsigned int j = 0; j < this->m_HistogramSize[1]; ++j)
   {

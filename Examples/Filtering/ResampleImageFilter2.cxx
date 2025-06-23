@@ -68,12 +68,7 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  int exampleAction = 0;
-
-  if (argc >= 4)
-  {
-    exampleAction = std::stoi(argv[3]);
-  }
+  int exampleAction = std::stoi(argv[3]);
 
   constexpr unsigned int Dimension = 2;
   using InputPixelType = unsigned char;
@@ -131,7 +126,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // pixel spacing in millimeters along X & Y
-    const double spacing[Dimension] = { 1.0, 1.0 };
+    constexpr double spacing[Dimension] = { 1.0, 1.0 };
     filter->SetOutputSpacing(spacing);
     // Software Guide : EndCodeSnippet
   }
@@ -163,7 +158,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // space coordinate of origin
-    const double origin[Dimension] = { 30.0, 40.0 };
+    constexpr double origin[Dimension] = { 30.0, 40.0 };
     filter->SetOutputOrigin(origin);
     // Software Guide : EndCodeSnippet
   }
@@ -248,7 +243,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // space coordinate of origin
-    const double origin[Dimension] = { 60.0, 30.0 };
+    constexpr double origin[Dimension] = { 60.0, 30.0 };
     filter->SetOutputOrigin(origin);
     // Software Guide : EndCodeSnippet
   }
@@ -325,7 +320,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // space coordinate of origin
-    const double origin[Dimension] = { 0.0, 0.0 };
+    constexpr double origin[Dimension] = { 0.0, 0.0 };
     filter->SetOutputOrigin(origin);
     // Software Guide : EndCodeSnippet
   }
@@ -341,7 +336,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // pixel spacing in millimeters
-    const double spacing[Dimension] = { 2.0, 3.0 };
+    constexpr double spacing[Dimension] = { 2.0, 3.0 };
     filter->SetOutputSpacing(spacing);
     // Software Guide : EndCodeSnippet
   }
@@ -462,7 +457,7 @@ main(int argc, char * argv[])
   {
     // Software Guide : BeginCodeSnippet
     // space coordinate of origin
-    const double origin[Dimension] = { 25.0, 35.0 };
+    constexpr double origin[Dimension] = { 25.0, 35.0 };
     filter->SetOutputOrigin(origin);
     // Software Guide : EndCodeSnippet
   }
@@ -491,7 +486,7 @@ main(int argc, char * argv[])
 
   {
     // Software Guide : BeginCodeSnippet
-    const double spacing[Dimension] = { 4.0, 4.5 };
+    constexpr double spacing[Dimension] = { 4.0, 4.5 };
     filter->SetOutputSpacing(spacing);
     // Software Guide : EndCodeSnippet
   }

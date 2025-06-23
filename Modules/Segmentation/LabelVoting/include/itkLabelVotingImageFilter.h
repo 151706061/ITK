@@ -35,10 +35,7 @@ namespace itk
  * commonly used as a way of boosting segmentation performance.
  *
  * The use of label voting for combination of multiple segmentations is
- * described in
- *
- * T. Rohlfing and C. R. Maurer, Jr., "Multi-classifier framework for
- * atlas-based image segmentation," Pattern Recognition Letters, 2005.
+ * described in \cite rohlfing2005.
  *
  * \par INPUTS
  * All input volumes to this filter must be segmentations of an image,
@@ -87,7 +84,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelVotingImageFilter);
 
   /** Extract some information from the image types. Dimensionality
@@ -144,8 +141,6 @@ public:
     }
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputPixelType, OutputPixelType>));
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputPixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ImageDimension>));
@@ -154,8 +149,6 @@ public:
   itkConceptMacro(InputPlusIntCheck, (Concept::AdditiveOperators<InputPixelType, int>));
   itkConceptMacro(InputIncrementDecrementOperatorsCheck, (Concept::IncrementDecrementOperators<InputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   LabelVotingImageFilter();

@@ -46,10 +46,8 @@ namespace itk
  * domain, origin, direction, spacing).  The output of the filter is the sampled
  * B-spline object.
  *
- * This code was contributed in the Insight Journal paper:
- * "N-D C^k B-Spline Scattered Data Approximation"
- * by Nicholas J. Tustison, James C. Gee
- * https://www.insight-journal.org/browse/publication/57
+ * This code was contributed in the Insight Journal paper
+ * \cite Tustison_2005.
  *
  * \author Nicholas J. Tustison
  * \ingroup ITKImageGrid
@@ -69,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineControlPointImageFilter);
 
   /** Extract dimension from input image. */
@@ -146,27 +144,31 @@ public:
    * they were also located at the end of the domain. The number of points to
    * be reused will depend on the spline order. As a user, you don't need to
    * replicate the points, the filter will do this for you. */
+  /** @ITKStartGrouping */
   itkSetMacro(CloseDimension, ArrayType);
   itkGetConstReferenceMacro(CloseDimension, ArrayType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the parametric spacing of the B-spline object domain.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Spacing, SpacingType);
   itkGetConstMacro(Spacing, SpacingType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the parametric origin of the B-spline object domain.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Origin, OriginType);
   itkGetConstMacro(Origin, OriginType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the parametric size of the B-spline object domain.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Size, SizeType);
   itkGetConstMacro(Size, SizeType);
-
+  /** @ITKEndGrouping */
   /**
    * Set the sampled object direction.  Note that this is not used in any of the
    * calculations in this class.  The only reason why it is included is due

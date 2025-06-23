@@ -62,10 +62,11 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ModulusImageFilter);
 
   /** Set/Get the dividend */
+  /** @ITKStartGrouping */
   virtual void
   SetDividend(InputPixelType _arg)
   {
@@ -76,13 +77,9 @@ public:
   {
     return this->GetConstant2();
   }
+  /** @ITKEndGrouping */
 
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ModulusImageFilter();

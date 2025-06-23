@@ -107,12 +107,12 @@ class VectorMorphologicalGradientHistogram
 {
 public:
   VectorMorphologicalGradientHistogram()
+    : m_Min(NumericTraits<TInputPixel>::max())
+    , m_Max(NumericTraits<TInputPixel>::NonpositiveMin())
+
   {
     // initialize members need for the vector based algorithm
     m_Vector.resize(NumericTraits<TInputPixel>::max() - NumericTraits<TInputPixel>::NonpositiveMin() + 1, 0);
-    m_Max = NumericTraits<TInputPixel>::NonpositiveMin();
-    m_Min = NumericTraits<TInputPixel>::max();
-    m_Count = 0;
   }
 
   ~VectorMorphologicalGradientHistogram() = default;
@@ -177,10 +177,8 @@ public:
     {
       return m_Max - m_Min;
     }
-    else
-    {
-      return TInputPixel{};
-    }
+
+    return TInputPixel{};
   }
 
   static bool
@@ -192,7 +190,7 @@ public:
   std::vector<SizeValueType> m_Vector;
   TInputPixel                m_Min;
   TInputPixel                m_Max;
-  SizeValueType              m_Count;
+  SizeValueType              m_Count{ 0 };
 };
 
 /// \cond HIDE_SPECIALIZATION_DOCUMENTATION
@@ -221,9 +219,7 @@ class ITK_TEMPLATE_EXPORT MorphologicalGradientHistogram<bool> : public VectorMo
  * \brief Morphological gradients enhance the variation of pixel
  * intensity in a given neighborhood.
  *
- * Morphological gradient is described in Chapter 3.8.1 of Pierre
- * Soille's book  "Morphological Image Analysis: Principles and
- * Applications", Second Edition, Springer, 2003.
+ * Morphological gradient is described in \cite soille2004a.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -255,7 +251,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MovingHistogramMorphologicalGradientImageFilter);
 
   /** Image related type alias. */

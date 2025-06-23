@@ -22,10 +22,7 @@
 namespace itk
 {
 template <typename TInputPix, typename TCompare>
-AnchorErodeDilateLine<TInputPix, TCompare>::AnchorErodeDilateLine()
-{
-  m_Size = 2;
-}
+AnchorErodeDilateLine<TInputPix, TCompare>::AnchorErodeDilateLine() = default;
 
 template <typename TInputPix, typename TCompare>
 void
@@ -62,17 +59,18 @@ AnchorErodeDilateLine<TInputPix, TCompare>::DoLine(std::vector<TInputPix> & buff
     return;
   }
 
-  int middle = static_cast<int>(m_Size) / 2;
+  const int middle = static_cast<int>(m_Size) / 2;
 
-  int                 outLeftP = 0, outRightP = static_cast<int>(bufflength) - 1;
-  int                 inLeftP = 0, inRightP = static_cast<int>(bufflength) - 1;
-  InputImagePixelType Extreme;
-  HistogramType       histo;
+  int           outLeftP = 0;
+  int           outRightP = static_cast<int>(bufflength) - 1;
+  int           inLeftP = 0;
+  int           inRightP = static_cast<int>(bufflength) - 1;
+  HistogramType histo;
   if (bufflength <= m_Size)
   {
     // basically a standard histogram method
     // Left border, first half of structuring element
-    Extreme = inbuffer[inLeftP];
+    InputImagePixelType Extreme = inbuffer[inLeftP];
     histo.AddPixel(Extreme);
     for (int i = 0; (i < middle); ++i)
     {
@@ -113,7 +111,7 @@ AnchorErodeDilateLine<TInputPix, TCompare>::DoLine(std::vector<TInputPix> & buff
   }
 
   // Left border, first half of structuring element
-  Extreme = inbuffer[inLeftP];
+  InputImagePixelType Extreme = inbuffer[inLeftP];
   histo.AddPixel(Extreme);
   for (int i = 0; (i < middle); ++i)
   {
@@ -172,7 +170,7 @@ AnchorErodeDilateLine<TInputPix, TCompare>::StartLine(std::vector<TInputPix> & b
   // This returns true to indicate return to startLine label in pseudo
   // code, and false to indicate finishLine
   int currentP = inLeftP + 1;
-  int sentinel;
+  int sentinel = 0;
 
   while ((currentP < inRightP) && Compare(inbuffer[currentP], Extreme))
   {
@@ -220,19 +218,17 @@ AnchorErodeDilateLine<TInputPix, TCompare>::StartLine(std::vector<TInputPix> & b
     inLeftP = currentP;
     return (true);
   }
-  else
+
+  // Now we need a histogram
+  // Initialise it
+  ++outLeftP;
+  ++inLeftP;
+  for (int aux = inLeftP; aux <= currentP; ++aux)
   {
-    // Now we need a histogram
-    // Initialise it
-    ++outLeftP;
-    ++inLeftP;
-    for (int aux = inLeftP; aux <= currentP; ++aux)
-    {
-      histo.AddPixel(inbuffer[aux]);
-    }
-    Extreme = histo.GetValue();
-    buffer[outLeftP] = Extreme;
+    histo.AddPixel(inbuffer[aux]);
   }
+  Extreme = histo.GetValue();
+  buffer[outLeftP] = Extreme;
 
   while (currentP < inRightP)
   {
@@ -246,17 +242,15 @@ AnchorErodeDilateLine<TInputPix, TCompare>::StartLine(std::vector<TInputPix> & b
       inLeftP = currentP;
       return (true);
     }
-    else
-    {
-      // update histogram
-      histo.AddPixel(inbuffer[currentP]);
-      histo.RemovePixel(inbuffer[inLeftP]);
-      // find extreme
-      Extreme = histo.GetValue();
-      ++inLeftP;
-      ++outLeftP;
-      buffer[outLeftP] = Extreme;
-    }
+
+    // update histogram
+    histo.AddPixel(inbuffer[currentP]);
+    histo.RemovePixel(inbuffer[inLeftP]);
+    // find extreme
+    Extreme = histo.GetValue();
+    ++inLeftP;
+    ++outLeftP;
+    buffer[outLeftP] = Extreme;
   }
   return (false);
 }

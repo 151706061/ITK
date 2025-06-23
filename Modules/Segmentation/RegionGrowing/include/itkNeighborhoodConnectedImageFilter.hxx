@@ -28,10 +28,10 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 NeighborhoodConnectedImageFilter<TInputImage, TOutputImage>::NeighborhoodConnectedImageFilter()
+  : m_Lower(NumericTraits<InputImagePixelType>::NonpositiveMin())
+  , m_Upper(NumericTraits<InputImagePixelType>::max())
+  , m_ReplaceValue(NumericTraits<OutputImagePixelType>::OneValue())
 {
-  m_Lower = NumericTraits<InputImagePixelType>::NonpositiveMin();
-  m_Upper = NumericTraits<InputImagePixelType>::max();
-  m_ReplaceValue = NumericTraits<OutputImagePixelType>::OneValue();
   m_Radius.Fill(1);
 }
 
@@ -88,7 +88,7 @@ NeighborhoodConnectedImageFilter<TInputImage, TOutputImage>::GenerateInputReques
   Superclass::GenerateInputRequestedRegion();
   if (this->GetInput())
   {
-    InputImagePointer image = const_cast<InputImageType *>(this->GetInput());
+    const InputImagePointer image = const_cast<InputImageType *>(this->GetInput());
     image->SetRequestedRegionToLargestPossibleRegion();
   }
 }
@@ -105,8 +105,8 @@ template <typename TInputImage, typename TOutputImage>
 void
 NeighborhoodConnectedImageFilter<TInputImage, TOutputImage>::GenerateData()
 {
-  typename Superclass::InputImageConstPointer inputImage = this->GetInput();
-  typename Superclass::OutputImagePointer     outputImage = this->GetOutput();
+  const typename Superclass::InputImageConstPointer inputImage = this->GetInput();
+  const typename Superclass::OutputImagePointer     outputImage = this->GetOutput();
 
   // Zero the output
   outputImage->SetBufferedRegion(outputImage->GetRequestedRegion());

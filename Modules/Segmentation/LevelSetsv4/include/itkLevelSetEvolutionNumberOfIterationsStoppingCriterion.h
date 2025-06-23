@@ -43,7 +43,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEvolutionNumberOfIterationsStoppingCriterion);
 
   using LevelSetContainerType = TLevelSetContainer;
@@ -62,10 +62,10 @@ public:
   using HeavisideType = typename LevelSetContainerType::HeavisideType;
   using HeavisidePointer = typename LevelSetContainerType::HeavisideType;
 
-  bool
+  [[nodiscard]] bool
   IsSatisfied() const override;
 
-  std::string
+  [[nodiscard]] std::string
   GetDescription() const override;
 
 protected:

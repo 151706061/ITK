@@ -29,10 +29,8 @@ namespace itk
  * \brief Computes the Huang's threshold for an image.
  *
  * This calculator computes the Huang's fuzzy threshold which separates an image
- * into foreground and background components. Uses Shannon's entropy
+ * into foreground and background components \cite huang1995. Uses Shannon's entropy
  * function (one can also use Yager's entropy function)
- * Huang L.-K. and Wang M.-J.J. (1995) "Image Thresholding by Minimizing
- * the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51
  * Reimplemented (to handle 16-bit efficiently) by Johannes Schindelin Jan 31, 2011
  *
  * This class is templated over the input histogram type.
@@ -43,7 +41,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/811
+ * https://doi.org/10.54294/efycla
  *
  * \ingroup Operators
  * \ingroup ITKThresholding
@@ -63,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HuangThresholdCalculator);
 
   /** Type definition for the input image. */
@@ -72,11 +70,10 @@ public:
 
 protected:
   HuangThresholdCalculator()
-  {
-    m_FirstBin = 0;
-    m_LastBin = 0;
-    m_Size = 0;
-  }
+    : m_FirstBin(0)
+    , m_LastBin(0)
+    , m_Size(0)
+  {}
   ~HuangThresholdCalculator() override = default;
   void
   GenerateData() override;

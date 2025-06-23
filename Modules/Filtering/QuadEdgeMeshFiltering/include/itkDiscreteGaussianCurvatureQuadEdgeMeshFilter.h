@@ -63,17 +63,13 @@ public:
   using typename Superclass::OutputCurvatureType;
   using typename Superclass::TriangleType;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DiscreteGaussianCurvatureQuadEdgeMeshFilter);
 
   /** New macro for creation of through a Smart Pointer   */
   itkNewMacro(Self);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputCurvatureType>));
-  // End concept checking
-#endif
 
 protected:
   DiscreteGaussianCurvatureQuadEdgeMeshFilter() = default;
@@ -82,16 +78,13 @@ protected:
   OutputCurvatureType
   EstimateCurvature(const OutputPointType & iP) override
   {
-    OutputMeshPointer output = this->GetOutput();
+    const OutputMeshPointer output = this->GetOutput();
 
     OutputQEType * qe = iP.GetEdge();
 
     if (qe != nullptr)
     {
       OutputQEType * qe_it = qe;
-      OutputQEType * qe_it2;
-
-      OutputPointType q0, q1;
 
       OutputCurvatureType sum_theta = 0.;
       OutputCurvatureType area = 0.;
@@ -99,9 +92,9 @@ protected:
       do
       {
         // cell_id = qe_it->GetLeft();
-        qe_it2 = qe_it->GetOnext();
-        q0 = output->GetPoint(qe_it->GetDestination());
-        q1 = output->GetPoint(qe_it2->GetDestination());
+        OutputQEType *        qe_it2 = qe_it->GetOnext();
+        const OutputPointType q0 = output->GetPoint(qe_it->GetDestination());
+        const OutputPointType q1 = output->GetPoint(qe_it2->GetDestination());
 
         // Compute Angle;
         sum_theta += static_cast<OutputCurvatureType>(TriangleType::ComputeAngle(q0, iP, q1));

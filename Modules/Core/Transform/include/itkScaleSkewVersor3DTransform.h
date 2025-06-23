@@ -46,7 +46,7 @@ namespace itk
  * where \f$\textbf{R}_v\f$ is the rotation matrix given the versor,
  * \f$S=\left( \begin{array}{ccc}s_0-1 & 0 & 0 \\ 0 & s_1-1 & 0 \\ 0 & 0 & s_2-1 \end{array} \right) \f$
  * , and
- * \f$K=\left( \begin{array}{ccc}0 & k_0 & k_1 \\ k_2 & 0 & k_3 \\ k_4 & k_5 & 0 \end{array} \right)\ \f$.
+ * \f$K=\left( \begin{array}{ccc}0 & k_0 & k_1 \\ k_2 & 0 & k_3 \\ k_4 & k_5 & 0 \end{array} \right) \f$.
  *
  * \ingroup ITKTransform
  */
@@ -65,7 +65,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScaleSkewVersor3DTransform);
 
   /** Dimension of parameters. */
@@ -114,11 +114,12 @@ public:
    * Orthogonality testing is bypassed in this case.
    *
    * \sa MatrixOffsetTransformBase::SetMatrix() */
+  /** @ITKStartGrouping */
   void
   SetMatrix(const MatrixType & matrix) override;
   void
   SetMatrix(const MatrixType & matrix, const TParametersValueType tolerance) override;
-
+  /** @ITKEndGrouping */
   /** Set the transformation from a container of parameters
    * This is typically used by optimizers.
    * There are 15 parameters:
@@ -155,7 +156,10 @@ public:
 
 protected:
   ScaleSkewVersor3DTransform();
-  ScaleSkewVersor3DTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] ScaleSkewVersor3DTransform(const MatrixType &       matrix,
+                                                                          const OutputVectorType & offset);
+#endif
   ScaleSkewVersor3DTransform(unsigned int parametersDimension);
   ~ScaleSkewVersor3DTransform() override = default;
 

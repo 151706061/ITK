@@ -481,7 +481,7 @@ MIRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::ComputeUp
         derivative[i] += (fixedGradientsB[bsamples][i] - fixedGradientsA[asamples][i]) * weight;
       }
     } // end of sample A loop
-  }   // end of sample B loop
+  } // end of sample B loop
 
   const double threshold = -0.1 * nsamp * std::log(m_MinProbability);
   if (dLogSumMoving > threshold || dLogSumFixed > threshold || dLogSumJoint > threshold)
@@ -541,15 +541,7 @@ MIRegistrationFunction<TFixedImage, TMovingImage, TDisplacementField>::PrintSelf
   os << indent << "NumberOfSamples: " << m_NumberOfSamples << std::endl;
   os << indent << "NumberOfBins: " << m_NumberOfBins << std::endl;
   os << indent << "Minnorm: " << m_Minnorm << std::endl;
-
-  if (m_DoInverse)
-  {
-    os << indent << "DoInverse: On" << std::endl;
-  }
-  else
-  {
-    os << indent << "DoInverse: Off" << std::endl;
-  }
+  itkPrintSelfBooleanMacro(DoInverse);
 }
 } // end namespace itk
 

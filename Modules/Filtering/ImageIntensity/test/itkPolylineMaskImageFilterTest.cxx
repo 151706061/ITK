@@ -49,18 +49,14 @@ itkPolylineMaskImageFilterTest(int argc, char * argv[])
   using inputVectorType = itk::Vector<double, iDimension>;
   using inputPolylineType = itk::PolyLineParametricPath<pDimension>;
 
-  // Create up and viewing direction vectors
-  inputVectorType inputUpVector, inputViewVector;
-
   // Create polyline
   auto inputPolyline = inputPolylineType::New();
   std::cout << "Generating the synthetic object..." << std::endl;
 
   // Generate a synthetic ellipse image
   using EllipseType = itk::EllipseSpatialObject<2>;
-  auto                   ellipse = EllipseType::New();
-  EllipseType::PointType center;
-  center.Fill(20);
+  auto ellipse = EllipseType::New();
+  auto center = itk::MakeFilled<EllipseType::PointType>(20);
   ellipse->SetCenterInObjectSpace(center);
   ellipse->SetRadiusInObjectSpace(10);
   ellipse->Update();
@@ -70,13 +66,12 @@ itkPolylineMaskImageFilterTest(int argc, char * argv[])
   using SpatialObjectToImageFilterType = itk::SpatialObjectToImageFilter<EllipseType, inputImageType>;
   auto imageGenerationFilter = SpatialObjectToImageFilterType::New();
 
-  inputImageType::SizeType  size;
   inputImageType::PointType origin;
-
   origin[0] = 0.0;
   origin[1] = 0.0;
   origin[2] = 20.0;
 
+  inputImageType::SizeType size;
   size[0] = 40;
   size[1] = 40;
   size[2] = 35;
@@ -121,11 +116,13 @@ itkPolylineMaskImageFilterTest(int argc, char * argv[])
   std::cout << "Generating the view vector... " << std::endl;
 
   // View vector
+  inputVectorType inputViewVector;
   inputViewVector[0] = 0;
   inputViewVector[1] = 0;
   inputViewVector[2] = -1;
 
   // Up vector
+  inputVectorType inputUpVector;
   inputUpVector[0] = 1;
   inputUpVector[1] = 0;
   inputUpVector[2] = 0;
@@ -172,7 +169,7 @@ itkPolylineMaskImageFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(cameraCenterPoint, polylineMaskFilter->GetCameraCenterPoint());
 
   // Set the camera focal distance
-  double focalDistance = 30.0;
+  constexpr double focalDistance = 30.0;
   polylineMaskFilter->SetFocalDistance(focalDistance);
 
   ITK_TEST_SET_GET_VALUE(focalDistance, polylineMaskFilter->GetFocalDistance());

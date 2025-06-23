@@ -29,10 +29,10 @@ itkFrustumSpatialFunctionTest(int, char *[])
   constexpr unsigned int PointDimension = 3;
 
   // Define the point coordinate representation type
-  using PointCoordRepType = float;
+  using PointCoordinateType = float;
 
   // Define the point type
-  using PointType = itk::Point<PointCoordRepType, PointDimension>;
+  using PointType = itk::Point<PointCoordinateType, PointDimension>;
 
   // Define the type for the frustum spatial function
   using FrustumSpatialFunctionType = itk::FrustumSpatialFunction<PointDimension, PointType>;
@@ -43,8 +43,7 @@ itkFrustumSpatialFunctionTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(frustrumSpatialFunction, FrustumSpatialFunction, InteriorExteriorSpatialFunction);
 
   // Set the frustum properties
-  FrustumSpatialFunctionType::InputType apex;
-  apex.Fill(1.1);
+  auto apex = itk::MakeFilled<FrustumSpatialFunctionType::InputType>(1.1);
 
   frustrumSpatialFunction->SetApex(apex);
   ITK_TEST_SET_GET_VALUE(apex, frustrumSpatialFunction->GetApex());
@@ -57,15 +56,15 @@ itkFrustumSpatialFunctionTest(int, char *[])
   frustrumSpatialFunction->SetBottomPlane(bottomPlane);
   ITK_TEST_SET_GET_VALUE(bottomPlane, frustrumSpatialFunction->GetBottomPlane());
 
-  double angleZ = 36;
+  constexpr double angleZ = 36;
   frustrumSpatialFunction->SetAngleZ(angleZ);
   ITK_TEST_SET_GET_VALUE(angleZ, frustrumSpatialFunction->GetAngleZ());
 
-  double apertureAngleX = 54;
+  constexpr double apertureAngleX = 54;
   frustrumSpatialFunction->SetApertureAngleX(apertureAngleX);
   ITK_TEST_SET_GET_VALUE(apertureAngleX, frustrumSpatialFunction->GetApertureAngleX());
 
-  double apertureAngleY = 120;
+  constexpr double apertureAngleY = 120;
   frustrumSpatialFunction->SetApertureAngleY(apertureAngleY);
   ITK_TEST_SET_GET_VALUE(apertureAngleY, frustrumSpatialFunction->GetApertureAngleY());
 

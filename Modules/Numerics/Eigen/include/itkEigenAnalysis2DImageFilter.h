@@ -52,7 +52,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EigenAnalysis2DImageFilter);
 
   /** Method for creation through the object factory. */
@@ -127,11 +127,7 @@ public:
   DataObject::Pointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(VectorComponentHasNumericTraitsCheck, (Concept::HasNumericTraits<VectorComponentType>));
-  // End concept checking
-#endif
 
 protected:
   EigenAnalysis2DImageFilter();

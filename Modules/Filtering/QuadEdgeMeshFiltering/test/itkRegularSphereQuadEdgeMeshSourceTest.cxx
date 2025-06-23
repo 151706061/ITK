@@ -41,11 +41,9 @@ itkRegularSphereQuadEdgeMeshSourceTest(int argc, char * argv[])
   using PointType = SphereMeshSourceType::PointType;
   using VectorType = SphereMeshSourceType::VectorType;
 
-  PointType center;
-  center.Fill(0.0);
+  const PointType center{};
 
-  VectorType scale;
-  scale.Fill(1.0);
+  auto scale = itk::MakeFilled<VectorType>(1.0);
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetResolution(1);
@@ -58,10 +56,9 @@ itkRegularSphereQuadEdgeMeshSourceTest(int argc, char * argv[])
 
   std::cout << "mySphereMeshSource: " << mySphereMeshSource;
 
-  MeshType::Pointer myMesh = mySphereMeshSource->GetOutput();
+  const MeshType::Pointer myMesh = mySphereMeshSource->GetOutput();
 
-  PointType pt;
-  pt.Fill(0.);
+  PointType pt{};
 
   for (unsigned int i = 0; i < myMesh->GetNumberOfPoints(); ++i)
   {

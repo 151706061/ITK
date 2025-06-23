@@ -35,8 +35,8 @@
 namespace itk
 {
 
-template <typename TImageType, typename TCoordRep>
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::GaussianInterpolateImageFunction()
+template <typename TImageType, typename TCoordinate>
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::GaussianInterpolateImageFunction()
   : m_Alpha(1.0)
 {
   this->m_Sigma.Fill(1.0);
@@ -47,19 +47,19 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::GaussianInterpolateImag
   this->m_CutOffDistance.Fill(1.0);
 }
 
-template <typename TImageType, typename TCoordRep>
+template <typename TImageType, typename TCoordinate>
 void
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::ComputeBoundingBox()
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::ComputeBoundingBox()
 {
   if (!this->GetInputImage())
   {
     return;
   }
 
-  typename InputImageType::ConstPointer input = this->GetInputImage();
-  typename InputImageType::SpacingType  spacing = input->GetSpacing();
-  typename InputImageType::IndexType    index = input->GetLargestPossibleRegion().GetIndex();
-  typename InputImageType::SizeType     size = input->GetLargestPossibleRegion().GetSize();
+  const typename InputImageType::ConstPointer input = this->GetInputImage();
+  typename InputImageType::SpacingType        spacing = input->GetSpacing();
+  typename InputImageType::IndexType          index = input->GetLargestPossibleRegion().GetIndex();
+  typename InputImageType::SizeType           size = input->GetLargestPossibleRegion().GetSize();
 
   for (unsigned int d = 0; d < ImageDimension; ++d)
   {
@@ -71,18 +71,18 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::ComputeBoundingBox()
 }
 
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 auto
-GaussianInterpolateImageFunction<TInputImage, TCoordRep>::ComputeInterpolationRegion(
+GaussianInterpolateImageFunction<TInputImage, TCoordinate>::ComputeInterpolationRegion(
   const ContinuousIndexType & cindex) const -> RegionType
 {
   RegionType region = this->GetInputImage()->GetBufferedRegion();
   for (unsigned int d = 0; d < ImageDimension; ++d)
   {
-    TCoordRep      cBegin = cindex[d] + 0.5 - this->m_CutOffDistance[d];
-    IndexValueType begin = std::max(region.GetIndex()[d], static_cast<IndexValueType>(std::floor(cBegin)));
-    TCoordRep      cEnd = cindex[d] + 0.5 + this->m_CutOffDistance[d];
-    SizeValueType  end =
+    TCoordinate          cBegin = cindex[d] + 0.5 - this->m_CutOffDistance[d];
+    const IndexValueType begin = std::max(region.GetIndex()[d], static_cast<IndexValueType>(std::floor(cBegin)));
+    TCoordinate          cEnd = cindex[d] + 0.5 + this->m_CutOffDistance[d];
+    const SizeValueType  end =
       std::min(region.GetIndex()[d] + region.GetSize()[d], static_cast<SizeValueType>(std::ceil(cEnd)));
     region.SetIndex(d, begin);
     region.SetSize(d, end - begin);
@@ -90,16 +90,16 @@ GaussianInterpolateImageFunction<TInputImage, TCoordRep>::ComputeInterpolationRe
   return region;
 }
 
-template <typename TImageType, typename TCoordRep>
+template <typename TImageType, typename TCoordinate>
 auto
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::EvaluateAtContinuousIndex(const ContinuousIndexType & cindex,
-                                                                                   OutputType * grad) const
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::EvaluateAtContinuousIndex(const ContinuousIndexType & cindex,
+                                                                                     OutputType * grad) const
   -> OutputType
 {
   vnl_vector<RealType> erfArray[ImageDimension];
   vnl_vector<RealType> gerfArray[ImageDimension];
 
-  RegionType region = this->ComputeInterpolationRegion(cindex);
+  const RegionType region = this->ComputeInterpolationRegion(cindex);
 
   // Compute the ERF difference arrays
   for (unsigned int d = 0; d < ImageDimension; ++d)
@@ -148,7 +148,7 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::EvaluateAtContinuousInd
         }
       }
     }
-    RealType V = It.Get();
+    const RealType V = It.Get();
     sum_me += V * w;
     sum_m += w;
     if (grad)
@@ -160,7 +160,7 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::EvaluateAtContinuousInd
       }
     }
   }
-  RealType rc = sum_me / sum_m;
+  const RealType rc = sum_me / sum_m;
 
   if (grad)
   {
@@ -174,14 +174,14 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::EvaluateAtContinuousInd
   return rc;
 }
 
-template <typename TImageType, typename TCoordRep>
+template <typename TImageType, typename TCoordinate>
 void
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::ComputeErrorFunctionArray(const RegionType &     region,
-                                                                                   unsigned int           dimension,
-                                                                                   RealType               cindex,
-                                                                                   vnl_vector<RealType> & erfArray,
-                                                                                   vnl_vector<RealType> & gerfArray,
-                                                                                   bool evaluateGradient) const
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::ComputeErrorFunctionArray(const RegionType &     region,
+                                                                                     unsigned int           dimension,
+                                                                                     RealType               cindex,
+                                                                                     vnl_vector<RealType> & erfArray,
+                                                                                     vnl_vector<RealType> & gerfArray,
+                                                                                     bool evaluateGradient) const
 {
   erfArray.set_size(region.GetSize()[dimension]);
   gerfArray.set_size(region.GetSize()[dimension]);
@@ -199,11 +199,11 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::ComputeErrorFunctionArr
   for (unsigned int i = 0; i < region.GetSize()[dimension]; ++i)
   {
     t += this->m_ScalingFactor[dimension];
-    RealType e_now = vnl_erf(t);
+    const RealType e_now = vnl_erf(t);
     erfArray[i] = e_now - e_last;
     if (evaluateGradient)
     {
-      RealType g_now = itk::Math::two_over_sqrtpi * std::exp(-itk::Math::sqr(t));
+      const RealType g_now = itk::Math::two_over_sqrtpi * std::exp(-itk::Math::sqr(t));
       gerfArray[i] = g_now - g_last;
       g_last = g_now;
     }
@@ -212,9 +212,9 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::ComputeErrorFunctionArr
 }
 
 
-template <typename TImageType, typename TCoordRep>
+template <typename TImageType, typename TCoordinate>
 auto
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::GetRadius() const -> SizeType
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::GetRadius() const -> SizeType
 {
   SizeType radius;
 
@@ -234,9 +234,9 @@ GaussianInterpolateImageFunction<TImageType, TCoordRep>::GetRadius() const -> Si
 }
 
 
-template <typename TImageType, typename TCoordRep>
+template <typename TImageType, typename TCoordinate>
 void
-GaussianInterpolateImageFunction<TImageType, TCoordRep>::PrintSelf(std::ostream & os, Indent indent) const
+GaussianInterpolateImageFunction<TImageType, TCoordinate>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 

@@ -33,8 +33,8 @@ itkSurfaceSpatialObjectTest(int, char *[])
   std::cout << "Testing SurfaceSpatialObject:" << std::endl << std::endl;
 
   SurfaceType::SurfacePointListType list;
-  unsigned int                      i;
-  for (i = 0; i < 10; ++i)
+
+  for (unsigned int i = 0; i < 10; ++i)
   {
     SurfacePointType p;
     p.SetPositionInObjectSpace(i, i + 1, i + 2);
@@ -53,7 +53,7 @@ itkSurfaceSpatialObjectTest(int, char *[])
   p.Print(std::cout);
 
   // Create a Surface Spatial Object
-  SurfacePointer Surface = SurfaceType::New();
+  const SurfacePointer Surface = SurfaceType::New();
   Surface->GetProperty().SetName("Surface 1");
   Surface->SetId(1);
   Surface->SetPoints(list);
@@ -69,17 +69,16 @@ itkSurfaceSpatialObjectTest(int, char *[])
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-  }
+
+  std::cout << "[PASSED]" << std::endl;
+
 
   // Point consistency
   std::cout << "Point consistency: ";
 
-  SurfaceType::SurfacePointListType::const_iterator it = Surface->GetPoints().begin();
+  auto it = Surface->GetPoints().begin();
 
-  i = 0;
+  unsigned int i = 0;
   while (it != Surface->GetPoints().end())
   {
     for (unsigned int d = 0; d < 3; ++d)
@@ -146,7 +145,7 @@ itkSurfaceSpatialObjectTest(int, char *[])
   // Testing IsEvaluableAt()
   std::cout << "ValueAt: ";
 
-  double value;
+  double value = NAN;
   if (!Surface->ValueAtInWorldSpace(in, value))
   {
     std::cout << "[FAILED]" << std::endl;
@@ -171,8 +170,7 @@ itkSurfaceSpatialObjectTest(int, char *[])
 
 
     // itk::SurfaceSpatialObjectPoint
-    VectorType normal;
-    normal.Fill(276);
+    auto normal = itk::MakeFilled<VectorType>(276);
     pOriginal.SetNormalInObjectSpace(normal);
 
     Surface->AddPoint(pOriginal);
@@ -194,9 +192,9 @@ itkSurfaceSpatialObjectTest(int, char *[])
     }
 
     // Copy
-    SurfacePointType pCopy(pOriginal);
+    const SurfacePointType pCopy(pOriginal);
     // Assign
-    SurfacePointType pAssign = pOriginal;
+    const SurfacePointType pAssign = pOriginal;
 
     std::vector<SurfacePointType> pointVector;
     pointVector.push_back(pCopy);

@@ -21,7 +21,8 @@ import sys
 from sys import stderr as system_error_stream
 
 # Required to work around weird import error with xarray
-from typing import Dict, Any, List, Optional, Sequence, Union
+from typing import Any, Optional, Union
+from collections.abc import Sequence
 
 import itkConfig
 from itkConfig import DefaultFactoryLoading as _DefaultFactoryLoading
@@ -189,9 +190,9 @@ def itk_load_swig_module(name: str, namespace=None):
                             f"instance for class {template_feature.get_cpp_class_name()}. "
                             f"Overwriting old value."
                         )
-                    namespace[
-                        template_feature.get_python_class_name()
-                    ] = template_container
+                    namespace[template_feature.get_python_class_name()] = (
+                        template_container
+                    )
             except Exception as e:
                 debug_print_error(
                     f"{template_feature.get_swig_class_name()} not loaded from module {name} because of "
@@ -259,7 +260,6 @@ def debug_print_error(error):
 
 
 class LibraryLoader:
-
     """Do all the work to set up the environment so that a SWIG-generated
     library can be properly loaded. This involves setting paths defined in
     itkConfig."""
@@ -416,7 +416,7 @@ class ITKModuleInfo:
             self._factories = content_info.factories
         else:
             self._factories = tuple()
-        self._template_feature_tuples: List[ITKTemplateFeatures] = [
+        self._template_feature_tuples: list[ITKTemplateFeatures] = [
             ITKTemplateFeatures(tfeat) for tfeat in _templates
         ]
 
@@ -429,9 +429,9 @@ class ITKModuleInfo:
             self._snake_case_functions: Sequence[str] = []
             return
         if hasattr(snake_content_info, "snake_case_functions"):
-            self._snake_case_functions: Sequence[
-                str
-            ] = snake_content_info.snake_case_functions
+            self._snake_case_functions: Sequence[str] = (
+                snake_content_info.snake_case_functions
+            )
         else:
             self._snake_case_functions: Sequence[str] = []
 
@@ -454,11 +454,13 @@ def _initialize(l_module_data):
     # files.
     candidate_config_path: str = os.path.join(itkConfig.path, "Configuration")
     if not os.path.isdir(candidate_config_path):
-        error_message: str = f"WARNING: Invalid configuration directory requested: {candidate_config_path}"
+        error_message: str = (
+            f"WARNING: Invalid configuration directory requested: {candidate_config_path}"
+        )
         raise RuntimeError(error_message)
 
     files = os.listdir(candidate_config_path)
-    known_modules: List[str] = sorted(f[:-9] for f in files if f.endswith("Config.py"))
+    known_modules: list[str] = sorted(f[:-9] for f in files if f.endswith("Config.py"))
     for module in known_modules:
         conf: str = f"{module}Config.py"
         snake_conf = f"{module}_snake_case.py"
@@ -466,7 +468,7 @@ def _initialize(l_module_data):
         l_module_data[module] = ITKModuleInfo(conf, snake_conf)
 
 
-itk_base_global_lazy_attributes: Dict[str, Any] = {}
-itk_base_global_module_data: Dict[str, ITKModuleInfo] = {}
+itk_base_global_lazy_attributes: dict[str, Any] = {}
+itk_base_global_module_data: dict[str, ITKModuleInfo] = {}
 _initialize(itk_base_global_module_data)
 del _initialize

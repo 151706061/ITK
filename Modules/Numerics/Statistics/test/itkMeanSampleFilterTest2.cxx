@@ -28,7 +28,6 @@ itkMeanSampleFilterTest2(int, char *[])
 
   constexpr unsigned int MeasurementVectorSize = 2;
   constexpr unsigned int numberOfMeasurementVectors = 2;
-  unsigned int           counter;
 
   using MeasurementVectorType = itk::FixedArray<int, MeasurementVectorSize>;
 
@@ -40,7 +39,7 @@ itkMeanSampleFilterTest2(int, char *[])
 
   MeasurementVectorType measure;
 
-  counter = 0;
+  unsigned int counter = 0;
 
   std::cout << "Input sample values " << std::endl;
   while (counter < numberOfMeasurementVectors)
@@ -81,7 +80,7 @@ itkMeanSampleFilterTest2(int, char *[])
             << std::endl;
 
   // FilterType::MeasurementVectorType::ValueType is an int in this case
-  FilterType::MeasurementVectorType::ValueType epsilon = 0;
+  constexpr FilterType::MeasurementVectorType::ValueType epsilon = 0;
 
   if ((itk::Math::abs(meanOutput[0] - expectedMean[0]) > epsilon) ||
       (itk::Math::abs(meanOutput[1] - expectedMean[1]) > epsilon))

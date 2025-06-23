@@ -39,9 +39,7 @@ namespace itk
  * For the output, the extended velocity is only valid for a distance
  * of OutputNarrowBandwidth / 2 of either side of the level set of interest.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * \ingroup LevelSetSegmentation
  * \ingroup ITKLevelSets
@@ -61,7 +59,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExtensionVelocitiesImageFilter);
 
   /** The type of level set and the pointer type. */
@@ -99,12 +97,8 @@ public:
   AuxImageType *
   GetOutputVelocityImage(unsigned int idx = 0);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(AuxValueHasNumericTraitsCheck, (Concept::HasNumericTraits<TAuxValue>));
   itkConceptMacro(LevelSetOStreamWritableCheck, (Concept::OStreamWritable<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ExtensionVelocitiesImageFilter();

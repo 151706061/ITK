@@ -34,9 +34,9 @@ bool
 SameImage(std::string output, std::string baseline)
 {
 
-  PixelType    intensityTolerance = 0;
-  unsigned int radiusTolerance = 0;
-  unsigned int numberOfPixelTolerance = 0;
+  constexpr PixelType    intensityTolerance = 0;
+  constexpr unsigned int radiusTolerance = 0;
+  constexpr unsigned int numberOfPixelTolerance = 0;
 
   auto testReader = ReaderType::New();
   auto baselineReader = ReaderType::New();
@@ -51,7 +51,7 @@ SameImage(std::string output, std::string baseline)
   diff->SetToleranceRadius(radiusTolerance);
   diff->UpdateLargestPossibleRegion();
 
-  unsigned long status = diff->GetNumberOfPixelsWithDifferences();
+  const unsigned long status = diff->GetNumberOfPixelsWithDifferences();
 
   if (status > numberOfPixelTolerance)
   {
@@ -79,7 +79,7 @@ itkImageFileWriterStreamingTest2(int argc, char * argv[])
   //
 
 
-  unsigned int numberOfDataPieces = 4;
+  constexpr unsigned int numberOfDataPieces = 4;
 
   auto reader = ReaderType::New();
   reader->SetFileName(argv[1]);
@@ -122,9 +122,8 @@ itkImageFileWriterStreamingTest2(int argc, char * argv[])
   reader->Modified();
   // get the size of the image
   reader->UpdateOutputInformation();
-  ImageType::RegionType largestRegion;
-  largestRegion = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
-  itk::ImageIORegion ioregion(3);
+  const ImageType::RegionType largestRegion = reader->GetOutput()->GetLargestPossibleRegion().GetSize();
+  itk::ImageIORegion          ioregion(3);
 
 
   ////////////////////////////////////////////////

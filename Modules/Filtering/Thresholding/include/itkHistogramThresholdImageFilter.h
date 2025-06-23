@@ -52,7 +52,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/811
+ * https://doi.org/10.54294/efycla
  *
  * \ingroup Multithreaded
  * \ingroup ITKThresholding
@@ -73,7 +73,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HistogramThresholdImageFilter);
 
   using InputImageType = TInputImage;
@@ -120,9 +120,10 @@ public:
   static constexpr unsigned int MaskImageDimension = MaskImageType::ImageDimension;
 
   /** Set and Get the mask image */
+  /** @ITKStartGrouping */
   itkSetInputMacro(MaskImage, TMaskImage);
   itkGetInputMacro(MaskImage, TMaskImage);
-
+  /** @ITKEndGrouping */
   /** Set the input image */
   void
   SetInput1(const TInputImage * input)
@@ -152,42 +153,43 @@ public:
   itkGetConstMacro(InsideValue, OutputPixelType);
 
   /** Set the number of histogram bins */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfHistogramBins, unsigned int);
   itkGetConstMacro(NumberOfHistogramBins, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Does histogram generator compute min and max from data?
    * Default is true for all but char types */
+  /** @ITKStartGrouping */
   itkSetMacro(AutoMinimumMaximum, bool);
   itkGetConstMacro(AutoMinimumMaximum, bool);
   itkBooleanMacro(AutoMinimumMaximum);
-
+  /** @ITKEndGrouping */
   /** Do you want the output to be masked by the mask used in
    * histogram construction. Only relevant if masking is in
    * use. Default is true. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaskOutput, bool);
   itkGetConstMacro(MaskOutput, bool);
   itkBooleanMacro(MaskOutput);
-
+  /** @ITKEndGrouping */
   /** The value in the mask image, if used, indicating voxels that
   should be included. Default is the max of pixel type, as in the
   MaskedImageToHistogramFilter */
+  /** @ITKStartGrouping */
   itkSetMacro(MaskValue, MaskPixelType);
   itkGetConstMacro(MaskValue, MaskPixelType);
-
+  /** @ITKEndGrouping */
   /** Get the computed threshold. */
   itkGetConstMacro(Threshold, InputPixelType);
 
   /** Set/Get the calculator to use to compute the threshold */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Calculator, CalculatorType);
   itkGetModifiableObjectMacro(Calculator, CalculatorType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputPixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   HistogramThresholdImageFilter();
@@ -201,7 +203,7 @@ protected:
   GenerateData() override;
 
   void
-  VerifyPreconditions() ITKv5_CONST override
+  VerifyPreconditions() const override
   {
     Superclass::VerifyPreconditions();
     if (m_Calculator.IsNull())

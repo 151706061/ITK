@@ -23,9 +23,7 @@
 #include "itkKdTree.h"
 #include "itkStatisticsAlgorithm.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class KdTreeGenerator
@@ -79,7 +77,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KdTreeGenerator);
 
   /** Method for creation through the object factory. */
@@ -111,16 +109,18 @@ public:
   using SubsamplePointer = typename SubsampleType::Pointer;
 
   /** Set/Get the input sample that provides the measurement vectors. */
+  /** @ITKStartGrouping */
   void
   SetSample(TSample * sample);
   itkGetConstMacro(SourceSample, TSample *);
-
+  /** @ITKEndGrouping */
   /** Sets the number of measurement vectors that can be stored in a
    * terminal node. */
+  /** @ITKStartGrouping */
   void
   SetBucketSize(unsigned int size);
   itkGetConstMacro(BucketSize, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Returns the pointer to the generated k-d tree. */
   OutputPointer
   GetOutput()
@@ -204,8 +204,7 @@ private:
   /** Length of a measurement vector */
   MeasurementVectorSizeType m_MeasurementVectorSize{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkKdTreeGenerator.hxx"

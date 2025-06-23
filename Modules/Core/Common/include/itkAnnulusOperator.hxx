@@ -30,9 +30,7 @@ template <typename TPixel, unsigned int TDimension, typename TAllocator>
 void
 AnnulusOperator<TPixel, TDimension, TAllocator>::CreateOperator()
 {
-  CoefficientVector coefficients;
-
-  coefficients = this->GenerateCoefficients();
+  const CoefficientVector coefficients = this->GenerateCoefficients();
 
   this->Fill(coefficients);
 }
@@ -61,34 +59,32 @@ auto
 AnnulusOperator<TPixel, TDimension, TAllocator>::GenerateCoefficients() -> CoefficientVector
 {
   // Determine the initial kernel values...
-  double interiorV, annulusV, exteriorV;
+  // values for a specified kernel
+  double interiorV = m_InteriorValue;
+  double annulusV = m_AnnulusValue;
+  double exteriorV = m_ExteriorValue;
 
   if (m_Normalize)
   {
-    double bright = (m_BrightCenter ? 1.0 : -1.0);
+    const double bright = (m_BrightCenter ? 1.0 : -1.0);
 
     // Initial values for a normalized kernel
     interiorV = bright;
     annulusV = -1.0 * bright;
     exteriorV = 0.0;
   }
-  else
-  {
-    // values for a specified kernel
-    interiorV = m_InteriorValue;
-    annulusV = m_AnnulusValue;
-    exteriorV = m_ExteriorValue;
-  }
 
   // Compute the size of the kernel in pixels
-  SizeType     r;
-  unsigned int i, j;
-  double       outerRadius = m_InnerRadius + m_Thickness;
-  for (i = 0; i < TDimension; ++i)
   {
-    r[i] = Math::Ceil<SizeValueType>(outerRadius / m_Spacing[i]);
+    SizeType r;
+
+    const double outerRadius = m_InnerRadius + m_Thickness;
+    for (unsigned int i = 0; i < TDimension; ++i)
+    {
+      r[i] = Math::Ceil<SizeValueType>(outerRadius / m_Spacing[i]);
+    }
+    this->SetRadius(r);
   }
-  this->SetRadius(r);
 
   // Use a couple of sphere spatial functions...
   using SphereType = SphereSpatialFunction<TDimension>;
@@ -111,13 +107,13 @@ AnnulusOperator<TPixel, TDimension, TAllocator>::GenerateCoefficients() -> Coeff
   OffsetType                     offset;
   typename SphereType::InputType point;
 
-  for (i = 0; i < w; ++i)
+  for (unsigned int i = 0; i < w; ++i)
   {
     // get the offset from the center pixel
     offset = this->GetOffset(i);
 
     // convert to a position
-    for (j = 0; j < TDimension; ++j)
+    for (unsigned int j = 0; j < TDimension; ++j)
     {
       point[j] = m_Spacing[j] * offset[j];
     }
@@ -158,22 +154,22 @@ AnnulusOperator<TPixel, TDimension, TAllocator>::GenerateCoefficients() -> Coeff
   {
     // Calculate the mean and standard deviation of kernel values NOT
     // the exterior
-    auto   num = static_cast<double>(countNotExterior);
-    double mean = sumNotExterior / num;
-    double var = (sumNotExteriorSq - (sumNotExterior * sumNotExterior / num)) / (num - 1.0);
-    double std = std::sqrt(var);
+    auto         num = static_cast<double>(countNotExterior);
+    const double mean = sumNotExterior / num;
+    const double var = (sumNotExteriorSq - (sumNotExterior * sumNotExterior / num)) / (num - 1.0);
+    const double std = std::sqrt(var);
 
     // convert std to a scaling factor k such that
     //
     //        || (coeffP - mean) / k || = 1.0
     //
-    double k = std * std::sqrt(num - 1.0);
+    const double k = std * std::sqrt(num - 1.0);
 
     // Run through the kernel again, shifting and normalizing the
     // elements that are not exterior to the annulus.  This forces the
     // kernel to have mean zero and norm 1 AND forces the region
     // outside the annulus to have no influence.
-    for (i = 0; i < w; ++i)
+    for (unsigned int i = 0; i < w; ++i)
     {
       // normalize the coefficient if it is inside the outer circle
       // (exterior to outer circle is already zero)

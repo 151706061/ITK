@@ -119,11 +119,9 @@ FreeSurferBinaryMeshIO::ReadMeshInformation()
   if (m_FileTypeIdentifier == (-2 & 0x00ffffff))
   {
     constexpr unsigned int numberOfCellPoints = 3;
-    // Read input commend
-    int byte;
-
+    // Read input comment
     //  Extract Comment, and ignore it.
-    byte = m_InputFile.get();
+    int byte = m_InputFile.get();
 
     std::string comment = "";
 
@@ -149,13 +147,13 @@ FreeSurferBinaryMeshIO::ReadMeshInformation()
     }
 
     // Read the number of points and number of cells
-    itk::uint32_t numberOfPoints;
-    m_InputFile.read((char *)(&numberOfPoints), sizeof(numberOfPoints));
+    itk::uint32_t numberOfPoints = 0;
+    m_InputFile.read(reinterpret_cast<char *>(&numberOfPoints), sizeof(numberOfPoints));
     itk::ByteSwapper<itk::uint32_t>::SwapFromSystemToBigEndian(&numberOfPoints);
     this->m_NumberOfPoints = static_cast<SizeValueType>(numberOfPoints);
 
-    itk::uint32_t numberOfCells;
-    m_InputFile.read((char *)(&numberOfCells), sizeof(numberOfCells));
+    itk::uint32_t numberOfCells = 0;
+    m_InputFile.read(reinterpret_cast<char *>(&numberOfCells), sizeof(numberOfCells));
     itk::ByteSwapper<itk::uint32_t>::SwapFromSystemToBigEndian(&numberOfCells);
     this->m_NumberOfCells = static_cast<SizeValueType>(numberOfCells);
 
@@ -192,26 +190,26 @@ FreeSurferBinaryMeshIO::ReadMeshInformation()
     this->m_UpdateCellData = false;
 
     // Read numberOfValuesPerPoint and numberOfPoints and numberOfCells
-    itk::uint32_t numberOfPoints;
-    m_InputFile.read((char *)(&numberOfPoints), sizeof(numberOfPoints));
+    itk::uint32_t numberOfPoints = 0;
+    m_InputFile.read(reinterpret_cast<char *>(&numberOfPoints), sizeof(numberOfPoints));
     itk::ByteSwapper<itk::uint32_t>::SwapFromSystemToBigEndian(&numberOfPoints);
     this->m_NumberOfPoints = static_cast<SizeValueType>(numberOfPoints);
     this->m_NumberOfPointPixels = this->m_NumberOfPoints;
 
-    itk::uint32_t numberOfCells;
-    m_InputFile.read((char *)(&numberOfCells), sizeof(numberOfCells));
+    itk::uint32_t numberOfCells = 0;
+    m_InputFile.read(reinterpret_cast<char *>(&numberOfCells), sizeof(numberOfCells));
     itk::ByteSwapper<itk::uint32_t>::SwapFromSystemToBigEndian(&numberOfCells);
     this->m_NumberOfCells = static_cast<SizeValueType>(numberOfCells);
 
-    itk::uint32_t numberOfValuesPerPoint;
-    m_InputFile.read((char *)(&numberOfValuesPerPoint), sizeof(numberOfValuesPerPoint));
+    itk::uint32_t numberOfValuesPerPoint = 0;
+    m_InputFile.read(reinterpret_cast<char *>(&numberOfValuesPerPoint), sizeof(numberOfValuesPerPoint));
     itk::ByteSwapper<itk::uint32_t>::SwapFromSystemToBigEndian(&numberOfValuesPerPoint);
 
     m_FilePosition = m_InputFile.tellg();
   }
   else
   {
-    itkExceptionMacro("Unvalid file type " << m_FileTypeIdentifier);
+    itkExceptionMacro("Invalid file type " << m_FileTypeIdentifier);
   }
 
   // Set default point pixel component and point pixel type
@@ -298,10 +296,10 @@ FreeSurferBinaryMeshIO::WriteMeshInformation()
   if (this->m_UpdatePoints && this->m_UpdateCells)
   {
     // MAGIC_NUMBER = 16777214 ( little endian )
-    const char buffer[3] = { static_cast<char>(255), static_cast<char>(255), static_cast<char>(254) };
+    constexpr char buffer[3] = { static_cast<char>(255), static_cast<char>(255), static_cast<char>(254) };
     outputFile.write(buffer, 3);
 
-    std::string creator = "Created by ITK  \n\n";
+    const std::string creator = "Created by ITK  \n\n";
     outputFile.write(const_cast<char *>(creator.c_str()), creator.size());
 
     auto numberOfPoints = static_cast<itk::uint32_t>(this->m_NumberOfPoints);
@@ -312,12 +310,12 @@ FreeSurferBinaryMeshIO::WriteMeshInformation()
   else if (this->m_UpdatePointData && (!this->m_UpdatePoints && !this->m_UpdateCells))
   {
     // MAGIC_NUMBER = 16777215 ( little endian )
-    const char buffer[3] = { static_cast<char>(255), static_cast<char>(255), static_cast<char>(255) };
+    constexpr char buffer[3] = { static_cast<char>(255), static_cast<char>(255), static_cast<char>(255) };
     outputFile.write(buffer, 3);
 
-    auto          numberOfPoints = static_cast<itk::uint32_t>(this->m_NumberOfPointPixels);
-    auto          numberOfCells = static_cast<itk::uint32_t>(this->m_NumberOfCells);
-    itk::uint32_t numberOfValuesPerPoint = 1;
+    auto                    numberOfPoints = static_cast<itk::uint32_t>(this->m_NumberOfPointPixels);
+    auto                    numberOfCells = static_cast<itk::uint32_t>(this->m_NumberOfCells);
+    constexpr itk::uint32_t numberOfValuesPerPoint = 1;
     itk::ByteSwapper<itk::uint32_t>::SwapWriteRangeFromSystemToBigEndian(&numberOfPoints, 1, &outputFile);
     itk::ByteSwapper<itk::uint32_t>::SwapWriteRangeFromSystemToBigEndian(&numberOfCells, 1, &outputFile);
     itk::ByteSwapper<itk::uint32_t>::SwapWriteRangeFromSystemToBigEndian(&numberOfValuesPerPoint, 1, &outputFile);

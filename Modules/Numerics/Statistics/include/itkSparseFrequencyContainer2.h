@@ -25,9 +25,7 @@
 #include "itkMeasurementVectorTraits.h"
 #include "ITKStatisticsExport.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class SparseFrequencyContainer2
@@ -50,10 +48,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(SparseFrequencyContainer2);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** instance identifier alias */
   using InstanceIdentifier = MeasurementVectorTraits::InstanceIdentifier;
 
@@ -114,7 +113,6 @@ private:
   FrequencyContainerType     m_FrequencyContainer{};
   TotalAbsoluteFrequencyType m_TotalFrequency{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

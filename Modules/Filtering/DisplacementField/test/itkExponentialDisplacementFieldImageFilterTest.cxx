@@ -71,8 +71,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   IteratorType it(inputImage, inputImage->GetBufferedRegion());
 
   // Initialize the content of Image A
-  PixelType vectorValue;
-  vectorValue.Fill(5.0); // FIXME: replace with something more interesting...
+  auto vectorValue = itk::MakeFilled<PixelType>(5.0); // FIXME: replace with something more interesting...
 
   it.GoToBegin();
   while (!it.IsAtEnd())
@@ -105,14 +104,14 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   filter->Update();
 
   // Get the Smart Pointer to the Filter Output
-  ImageType::Pointer outputImage = filter->GetOutput();
+  const ImageType::Pointer outputImage = filter->GetOutput();
 
   // Create an iterator for going through the image output
   IteratorType ot(outputImage, outputImage->GetRequestedRegion());
 
   //  Check the content of the result image
   std::cout << "Verification of the output " << std::endl;
-  const PixelType::ValueType epsilon = 1e-6;
+  constexpr PixelType::ValueType epsilon = 1e-6;
 
   bool testpassed = true;
 
@@ -120,8 +119,8 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   it.GoToBegin();
   while (!ot.IsAtEnd())
   {
-    PixelType input = it.Get();
-    PixelType output = ot.Get();
+    const PixelType input = it.Get();
+    const PixelType output = ot.Get();
     // The input is a constant field, its exponential
     // should be exactly equal
     testpassed &= ((input - output).GetNorm() < epsilon);
@@ -140,7 +139,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   filter->Update();
 
   // Get the Smart Pointer to the Filter Output
-  ImageType::Pointer outputImage2 = filter->GetOutput();
+  const ImageType::Pointer outputImage2 = filter->GetOutput();
 
   // Create an iterator for going through the image output
   IteratorType ot2(outputImage2, outputImage2->GetRequestedRegion());
@@ -152,8 +151,8 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   it.GoToBegin();
   while (!ot2.IsAtEnd())
   {
-    PixelType input = it.Get();
-    PixelType output = ot2.Get();
+    const PixelType input = it.Get();
+    const PixelType output = ot2.Get();
     // The input is a constant field, its inverse exponential
     // should be exactly equal to its opposite
     testpassed &= ((input + output).GetNorm() < epsilon);
@@ -174,7 +173,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   filter->Update();
 
   // Get the Smart Pointer to the Filter Output
-  ImageType::Pointer outputImage3 = filter->GetOutput();
+  const ImageType::Pointer outputImage3 = filter->GetOutput();
 
   // Create an iterator for going through the image output
   IteratorType ot3(outputImage3, outputImage3->GetRequestedRegion());
@@ -186,8 +185,8 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   it.GoToBegin();
   while (!ot3.IsAtEnd())
   {
-    PixelType input = it.Get();
-    PixelType output = ot3.Get();
+    const PixelType input = it.Get();
+    const PixelType output = ot3.Get();
     // The input is a constant field, its inverse exponential
     // should be exactly equal to its opposite
     testpassed &= ((input - output).GetNorm() < epsilon);
@@ -207,7 +206,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   filter->Update();
 
   // Get the Smart Pointer to the Filter Output
-  ImageType::Pointer outputImage4 = filter->GetOutput();
+  const ImageType::Pointer outputImage4 = filter->GetOutput();
 
   // Create an iterator for going through the image output
   IteratorType ot4(outputImage4, outputImage4->GetRequestedRegion());
@@ -219,8 +218,8 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   it.GoToBegin();
   while (!ot4.IsAtEnd())
   {
-    PixelType input = it.Get();
-    PixelType output = ot4.Get();
+    const PixelType input = it.Get();
+    const PixelType output = ot4.Get();
     // The input is a constant field, its inverse exponential
     // should be exactly equal to its opposite
     testpassed &= ((input + output).GetNorm() < epsilon);
@@ -262,7 +261,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   }
 
   filter->Update();
-  ImageType::Pointer outputImage5 = filter->GetOutput();
+  const ImageType::Pointer outputImage5 = filter->GetOutput();
   outputImage5->DisconnectPipeline();
 
   // Change the spacing
@@ -275,7 +274,7 @@ itkExponentialDisplacementFieldImageFilterTest(int, char *[])
   }
 
   filter->Update();
-  ImageType::Pointer outputImage6 = filter->GetOutput();
+  const ImageType::Pointer outputImage6 = filter->GetOutput();
 
   IteratorType ot5(outputImage5, outputImage5->GetRequestedRegion());
   IteratorType ot6(outputImage6, outputImage6->GetRequestedRegion());

@@ -50,7 +50,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PathToChainCodePathFilter);
 
   /** Some convenient type alias. */
@@ -64,10 +64,11 @@ public:
   using OffsetType = typename InputPathType::OffsetType;
 
   /** Set/Get the direction in which to reflect the data. Default is "Off". */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximallyConnected, bool);
   itkGetConstMacro(MaximallyConnected, bool);
   itkBooleanMacro(MaximallyConnected);
-
+  /** @ITKEndGrouping */
 protected:
   PathToChainCodePathFilter();
   ~PathToChainCodePathFilter() override = default;

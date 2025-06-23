@@ -37,8 +37,7 @@ itkLevelSetDomainPartitionImageTest(int, char *[])
   using ListImageIteratorType = itk::ImageRegionConstIteratorWithIndex<ListImageType>;
 
   // load binary mask
-  InputImageType::SizeType size;
-  size.Fill(50);
+  auto size = InputImageType::SizeType::Filled(50);
 
   InputImageType::PointType origin;
   origin[0] = 0.0;
@@ -48,12 +47,9 @@ itkLevelSetDomainPartitionImageTest(int, char *[])
   spacing[0] = 1.0;
   spacing[1] = 1.0;
 
-  InputImageType::IndexType index;
-  index.Fill(0);
+  constexpr InputImageType::IndexType index{};
 
-  InputImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const InputImageType::RegionType region{ index, size };
 
   // Binary initialization
   auto binary = InputImageType::New();
@@ -63,7 +59,7 @@ itkLevelSetDomainPartitionImageTest(int, char *[])
   binary->Allocate();
   binary->FillBuffer(InputPixelType{});
 
-  IdentifierType numberOfLevelSetFunctions = 2;
+  constexpr IdentifierType numberOfLevelSetFunctions = 2;
 
   LevelSetDomainRegionVectorType regionVector;
   regionVector.resize(numberOfLevelSetFunctions);
@@ -98,13 +94,12 @@ itkLevelSetDomainPartitionImageTest(int, char *[])
 
   bool flag = true;
 
-  ListType                    ll;
-  ListImageType::ConstPointer listImage = partitionSource->GetListDomain();
-  ListImageIteratorType       It(listImage, listImage->GetLargestPossibleRegion());
+  const ListImageType::ConstPointer listImage = partitionSource->GetListDomain();
+  ListImageIteratorType             It(listImage, listImage->GetLargestPossibleRegion());
   It.GoToBegin();
   while (!It.IsAtEnd())
   {
-    ll = It.Get();
+    ListType ll = It.Get();
     if (ll.size() != 2)
     {
       flag = false;

@@ -25,7 +25,7 @@
 
 
 /**
- * Function to convert image of double precison vector pixels to a
+ * Function to convert image of double precision vector pixels to a
  * representation of scalar values that are easy to view and test.
  * NOTE: Similar function in itkSymmetricEigenAnalysisImageFilterTest.cxx
  */
@@ -36,7 +36,7 @@ makeTestableScalarImage(typename InternalImageType::Pointer internalImage, std::
   using OutputPixelType = uint8_t;
   using OutputImageType = itk::Image<OutputPixelType, 2>;
 
-  OutputImageType::Pointer outputImage = OutputImageType::New();
+  const OutputImageType::Pointer outputImage = OutputImageType::New();
   outputImage->CopyInformation(internalImage);
   outputImage->SetRegions(internalImage->GetBufferedRegion());
   outputImage->AllocateInitialized();
@@ -144,8 +144,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest5(int argc, char * argv[])
   size[0] = 1000;
   size[1] = 100;
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
+  constexpr ImageType::PointType origin{};
 
   filter->SetSize(size);
   filter->SetOrigin(origin);
@@ -161,8 +160,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest5(int argc, char * argv[])
   filter->SetNumberOfLevels(4);
   filter->SetGenerateOutputImage(false);
 
-  FilterType::ArrayType close;
-  close.Fill(1);
+  auto close = itk::MakeFilled<FilterType::ArrayType>(1);
   filter->SetCloseDimension(close);
 
   ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());

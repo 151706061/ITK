@@ -22,53 +22,48 @@
 #include "itkMath.h"
 #include "itkTestingMacros.h"
 
-int
-itkReadWriteSpatialObjectTest(int argc, char * argv[])
+using TubeType = itk::TubeSpatialObject<3>;
+using TubePointer = TubeType::Pointer;
+using EllipseType = itk::EllipseSpatialObject<3>;
+using EllipsePointer = EllipseType::Pointer;
+using BlobType = itk::BlobSpatialObject<3>;
+using BlobPointer = BlobType::Pointer;
+using SurfaceType = itk::SurfaceSpatialObject<3>;
+using SurfacePointer = SurfaceType::Pointer;
+using LineType = itk::LineSpatialObject<3>;
+using LinePointer = LineType::Pointer;
+using GroupType = itk::GroupSpatialObject<3>;
+using GroupPointer = GroupType::Pointer;
+using LandmarkType = itk::LandmarkSpatialObject<3>;
+using LandmarkPointer = LandmarkType::Pointer;
+using VesselTubeType = itk::TubeSpatialObject<3>;
+using DTITubeType = itk::DTITubeSpatialObject<3>;
+using ContourType = itk::ContourSpatialObject<3>;
+
+
+using ImageType = itk::ImageSpatialObject<3, unsigned short>;
+using ImageMaskType = itk::ImageMaskSpatialObject<3>;
+
+using WriterType = itk::SpatialObjectWriter<3, unsigned short>;
+using ReaderType = itk::SpatialObjectReader<3, unsigned short>;
+
+using TubePointType = itk::TubeSpatialObjectPoint<3>;
+using VesselTubePointType = itk::TubeSpatialObjectPoint<3>;
+using DTITubePointType = itk::DTITubeSpatialObjectPoint<3>;
+using BlobPointType = itk::SpatialObjectPoint<3>;
+using SurfacePointType = itk::SurfaceSpatialObjectPoint<3>;
+using LinePointType = itk::LineSpatialObjectPoint<3>;
+
+void
+setup_obj(GroupPointer &    tubeN1,
+          GroupPointer &    tubeN2,
+          EllipsePointer &  ellipse,
+          BlobPointer &     blob,
+          SurfacePointer &  surface,
+          LinePointer &     line,
+          LandmarkPointer & landmark)
 {
-
-  using TubeType = itk::TubeSpatialObject<3>;
-  using TubePointer = TubeType::Pointer;
-  using EllipseType = itk::EllipseSpatialObject<3>;
-  using EllipsePointer = EllipseType::Pointer;
-  using BlobType = itk::BlobSpatialObject<3>;
-  using BlobPointer = BlobType::Pointer;
-  using SurfaceType = itk::SurfaceSpatialObject<3>;
-  using SurfacePointer = SurfaceType::Pointer;
-  using LineType = itk::LineSpatialObject<3>;
-  using LinePointer = LineType::Pointer;
-  using GroupType = itk::GroupSpatialObject<3>;
-  using GroupPointer = GroupType::Pointer;
-  using LandmarkType = itk::LandmarkSpatialObject<3>;
-  using LandmarkPointer = LandmarkType::Pointer;
-  using VesselTubeType = itk::TubeSpatialObject<3>;
-  using DTITubeType = itk::DTITubeSpatialObject<3>;
-  using ContourType = itk::ContourSpatialObject<3>;
-
-
-  using ImageType = itk::ImageSpatialObject<3, unsigned short>;
-  using ImageMaskType = itk::ImageMaskSpatialObject<3>;
-
-  using WriterType = itk::SpatialObjectWriter<3, unsigned short>;
-  using ReaderType = itk::SpatialObjectReader<3, unsigned short>;
-
-  using TubePointType = itk::TubeSpatialObjectPoint<3>;
-  using VesselTubePointType = itk::TubeSpatialObjectPoint<3>;
-  using DTITubePointType = itk::DTITubeSpatialObjectPoint<3>;
-  using BlobPointType = itk::SpatialObjectPoint<3>;
-  using SurfacePointType = itk::SurfaceSpatialObjectPoint<3>;
-  using LinePointType = itk::LineSpatialObjectPoint<3>;
-
-  // Tubes
-  std::cout << " --- Testing Read-Write SpatialObject ---" << std::endl;
-
-  TubeType::TubePointListType         list;
-  VesselTubeType::TubePointListType   list2;
-  DTITubeType::DTITubePointListType   list3;
-  BlobType::BlobPointListType         list4;
-  SurfaceType::SurfacePointListType   list5;
-  LineType::LinePointListType         list6;
-  LandmarkType::LandmarkPointListType list7;
-
+  TubeType::TubePointListType list;
   for (unsigned int i = 0; i < 10; ++i)
   {
     TubePointType p;
@@ -82,7 +77,15 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     p.SetTagScalarValue("var2", i);
     list.push_back(p);
   }
+  /** Create a Tube  composed of 3 tubes */
+  const TubePointer tube1 = TubeType::New();
+  tube1->GetProperty().SetName("Tube 1");
+  tube1->SetId(1);
+  tube1->SetPoints(list);
+  tube1->Update();
 
+
+  VesselTubeType::TubePointListType list2;
   for (unsigned int i = 0; i < 5; ++i)
   {
     VesselTubePointType p;
@@ -102,7 +105,14 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     p.SetTagScalarValue("var2", i * 2);
     list2.push_back(p);
   }
+  auto tube2 = VesselTubeType::New();
+  tube2->SetTypeName("VesselTubeSpatialObject");
+  tube2->GetProperty().SetName("Tube 2");
+  tube2->SetId(2);
+  tube2->SetPoints(list2);
+  tube2->Update();
 
+  DTITubeType::DTITubePointListType list3;
   for (unsigned int i = 0; i < 7; ++i)
   {
     DTITubePointType p;
@@ -130,8 +140,31 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     p.SetTensorMatrix(v);
     list3.push_back(p);
   }
+  auto tube3 = DTITubeType::New();
+  tube3->GetProperty().SetName("Tube 3");
+  tube3->SetId(3);
+  tube3->SetPoints(list3);
+  tube3->Update();
+
+  tubeN1->GetProperty().SetName("tube network 1");
+  tubeN1->SetId(0);
+  tubeN1->AddChild(tube1);
+  tubeN1->AddChild(tube2);
+  tubeN1->Update();
+
+  tubeN2->SetId(5);
+  tubeN2->GetProperty().SetName("tube network 2");
+  tubeN2->AddChild(tube3);
+  tubeN2->Update();
+
+
+  ellipse->SetRadiusInObjectSpace(9);
+  ellipse->GetProperty().SetName("ellipse 1");
+  ellipse->Update();
+
 
   // Blob point list
+  BlobType::BlobPointListType list4;
   for (unsigned int i = 0; i < 3; ++i)
   {
     BlobPointType p;
@@ -143,7 +176,11 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     list4.push_back(p);
   }
 
+  blob->SetPoints(list4);
+  blob->GetProperty().SetName("Blob 1");
+  blob->Update();
 
+  SurfaceType::SurfacePointListType list5;
   // Surface point list
   for (unsigned int i = 0; i < 3; ++i)
   {
@@ -162,7 +199,12 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     list5.push_back(p);
   }
 
+  surface->SetPoints(list5);
+  surface->GetProperty().SetName("Surface 1");
+  surface->Update();
+
   // Line point list
+  LineType::LinePointListType list6;
   for (unsigned int i = 0; i < 3; ++i)
   {
     LinePointType p;
@@ -183,7 +225,13 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     list6.push_back(p);
   }
 
+  line->SetPoints(list6);
+  line->GetProperty().SetName("Line 1");
+  line->Update();
+
+
   // Landmark point list
+  LandmarkType::LandmarkPointListType list7;
   for (unsigned int i = 0; i < 3; ++i)
   {
     LinePointType p;
@@ -192,77 +240,38 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     list7.push_back(p);
   }
 
-  /** Create a Tube  composed of 3 tubes */
-  TubePointer tube1 = TubeType::New();
-  tube1->GetProperty().SetName("Tube 1");
-  tube1->SetId(1);
-  tube1->SetPoints(list);
-  tube1->Update();
-
-  auto tube2 = VesselTubeType::New();
-  tube2->SetTypeName("VesselTubeSpatialObject");
-  tube2->GetProperty().SetName("Tube 2");
-  tube2->SetId(2);
-  tube2->SetPoints(list2);
-  tube2->Update();
-
-  auto tube3 = DTITubeType::New();
-  tube3->GetProperty().SetName("Tube 3");
-  tube3->SetId(3);
-  tube3->SetPoints(list3);
-  tube3->Update();
-
-  GroupPointer tubeN1 = GroupType::New();
-  tubeN1->GetProperty().SetName("tube network 1");
-  tubeN1->SetId(0);
-  tubeN1->AddChild(tube1);
-  tubeN1->AddChild(tube2);
-  tubeN1->Update();
-
-
-  GroupPointer tubeN2 = GroupType::New();
-  tubeN2->SetId(5);
-  tubeN2->GetProperty().SetName("tube network 2");
-  tubeN2->AddChild(tube3);
-  tubeN2->Update();
-
-  EllipsePointer ellipse = EllipseType::New();
-  ellipse->SetRadiusInObjectSpace(9);
-  ellipse->GetProperty().SetName("ellipse 1");
-  ellipse->Update();
-
-
-  BlobPointer blob = BlobType::New();
-  blob->SetPoints(list4);
-  blob->GetProperty().SetName("Blob 1");
-  blob->Update();
-
-  SurfacePointer surface = SurfaceType::New();
-  surface->SetPoints(list5);
-  surface->GetProperty().SetName("Surface 1");
-  surface->Update();
-
-  LinePointer line = LineType::New();
-  line->SetPoints(list6);
-  line->GetProperty().SetName("Line 1");
-  line->Update();
-
-  LandmarkPointer landmark = LandmarkType::New();
   landmark->SetPoints(list7);
   landmark->GetProperty().SetName("Landmark 1");
   landmark->Update();
+}
+int
+itkReadWriteSpatialObjectTest(int argc, char * argv[])
+{
+
+  // Tubes
+  std::cout << " --- Testing Read-Write SpatialObject ---" << std::endl;
+
+  GroupPointer    tubeN1 = GroupType::New();
+  GroupPointer    tubeN2 = GroupType::New();
+  EllipsePointer  ellipse = EllipseType::New();
+  BlobPointer     blob = BlobType::New();
+  SurfacePointer  surface = SurfaceType::New();
+  LinePointer     line = LineType::New();
+  LandmarkPointer landmark = LandmarkType::New();
+  setup_obj(tubeN1, tubeN2, ellipse, blob, surface, line, landmark);
+
 
   using itkImageType = ImageType::ImageType;
   using ImagePointer = itkImageType::Pointer;
   using SizeType = itkImageType::SizeType;
   using RegionType = itkImageType::RegionType;
 
-  ImagePointer itkImage = itkImageType::New();
+  const ImagePointer itkImage = itkImageType::New();
 
   SizeType size;
 
-  unsigned int dim = 3;
-  double       spacing[3];
+  constexpr unsigned int dim = 3;
+  double                 spacing[3];
 
   for (unsigned int i = 0; i < dim; ++i)
   {
@@ -272,8 +281,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   RegionType region;
   region.SetSize(size);
-  itk::Index<3> zeroIndex;
-  zeroIndex.Fill(0);
+  constexpr itk::Index<3> zeroIndex{};
   region.SetIndex(zeroIndex);
   itkImage->SetRegions(region);
   itkImage->SetSpacing(spacing);
@@ -297,7 +305,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
   using itkImageMaskType = ImageMaskType::ImageType;
   using ImageMaskPointer = itkImageMaskType::Pointer;
 
-  ImageMaskPointer itkImageMask = itkImageMaskType::New();
+  const ImageMaskPointer itkImageMask = itkImageMaskType::New();
 
   itkImageMask->SetRegions(region);
   itkImageMask->SetSpacing(spacing);
@@ -373,10 +381,9 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     std::cout << tubeN1->GetNumberOfChildren() << " instead of 9 [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-  }
+
+  std::cout << "[PASSED]" << std::endl;
+
 
   std::cout << "Testing Writing SceneSpatialObject: " << std::endl;
 
@@ -429,17 +436,16 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   reader->Update();
 
-  ReaderType::SpatialObjectPointer myScene = reader->GetOutput();
+  const ReaderType::SpatialObjectPointer myScene = reader->GetOutput();
 
   if (!myScene)
   {
     std::cout << "No Scene : [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [PASSED]" << std::endl;
-  }
+
+  std::cout << " [PASSED]" << std::endl;
+
 
   std::cout << "Testing Number of children:";
   if (myScene->GetNumberOfChildren(1) != 12)
@@ -448,28 +454,23 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
     std::cout << " [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [PASSED]" << std::endl;
-  }
+
+  std::cout << " [PASSED]" << std::endl;
+
 
   std::cout << "Testing CenterLine Position:";
 
-  TubeType::TubePointListType::const_iterator j;
-
   ReaderType::SpatialObjectType::ChildrenListType * mySceneChildren = myScene->GetChildren(TubeType::MaximumDepth);
 
-  ReaderType::SpatialObjectType::ChildrenListType::const_iterator obj;
-
   bool found = false;
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     std::cout << "obj = " << (*obj)->GetTypeName() << std::endl;
     if (!strcmp((*obj)->GetTypeName().c_str(), "TubeSpatialObject"))
     {
       found = true;
       unsigned int value = 0;
-      for (j = dynamic_cast<TubeType *>(obj->GetPointer())->GetPoints().begin();
+      for (auto j = dynamic_cast<TubeType *>(obj->GetPointer())->GetPoints().begin();
            j != dynamic_cast<TubeType *>(obj->GetPointer())->GetPoints().end();
            j++)
       {
@@ -552,15 +553,15 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
   // Testing VesselTubeSO
   found = false;
   std::cout << "Testing VesselTubeSpatialObject: ";
-  VesselTubeType::TubePointListType::const_iterator jv;
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     std::cout << "obj = " << (*obj)->GetTypeName() << std::endl;
     if (!strcmp((*obj)->GetTypeName().c_str(), "VesselTubeSpatialObject"))
     {
       found = true;
       unsigned int value = 0;
-      for (jv = dynamic_cast<VesselTubeType *>(obj->GetPointer())->GetPoints().begin();
+      for (auto jv = dynamic_cast<VesselTubeType *>(obj->GetPointer())->GetPoints().begin();
            jv != dynamic_cast<VesselTubeType *>(obj->GetPointer())->GetPoints().end();
            jv++)
       {
@@ -665,15 +666,14 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
   // Testing DTITubeSO
   found = false;
   std::cout << "Testing DTITubeSpatialObject: ";
-  DTITubeType::DTITubePointListType::const_iterator jdti;
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     std::cout << "obj = " << (*obj)->GetTypeName() << std::endl;
     if (!strcmp((*obj)->GetTypeName().c_str(), "DTITubeSpatialObject"))
     {
       found = true;
       unsigned int value = 0;
-      for (jdti = dynamic_cast<DTITubeType *>(obj->GetPointer())->GetPoints().begin();
+      for (auto jdti = dynamic_cast<DTITubeType *>(obj->GetPointer())->GetPoints().begin();
            jdti != dynamic_cast<DTITubeType *>(obj->GetPointer())->GetPoints().end();
            jdti++)
       {
@@ -761,8 +761,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
           delete mySceneChildren;
           return EXIT_FAILURE;
         }
-        int ind;
-        for (ind = 0; ind < 6; ++ind)
+        for (int ind = 0; ind < 6; ++ind)
         {
           if (itk::Math::NotExactlyEquals(jdti->GetTensorMatrix()[ind], ind))
           {
@@ -793,7 +792,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
   std::cout << "Testing Ellipse parameters:";
   bool gotEllipse = false;
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     if (!strcmp((*obj)->GetTypeName().c_str(), "EllipseSpatialObject"))
     {
@@ -821,7 +820,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << "Testing Image data validity:";
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     if (!strcmp((*obj)->GetTypeName().c_str(), "ImageSpatialObject"))
     {
@@ -850,12 +849,13 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
   std::cout << "Testing Image Mask validity:";
 
   bool maskFound = false;
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     if (!strcmp((*obj)->GetTypeName().c_str(), "ImageMaskSpatialObject"))
     {
       maskFound = true;
-      itkImageMaskType::ConstPointer constImage = dynamic_cast<const ImageMaskType *>(obj->GetPointer())->GetImage();
+      const itkImageMaskType::ConstPointer constImage =
+        dynamic_cast<const ImageMaskType *>(obj->GetPointer())->GetImage();
       itk::ImageRegionConstIteratorWithIndex<itkImageMaskType> it(constImage, constImage->GetLargestPossibleRegion());
       for (unsigned char i = 0; !it.IsAtEnd(); i++, ++it)
       {
@@ -882,52 +882,49 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << "Testing Blob validity:";
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
-    BlobType::BlobPointListType::const_iterator pit;
     if (!strcmp((*obj)->GetTypeName().c_str(), "BlobSpatialObject"))
     {
       unsigned int value = 0;
-      for (pit = dynamic_cast<BlobType *>(obj->GetPointer())->GetPoints().begin();
-           pit != dynamic_cast<BlobType *>(obj->GetPointer())->GetPoints().end();
-           pit++)
+      for (auto & point : dynamic_cast<BlobType *>(obj->GetPointer())->GetPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (itk::Math::NotExactlyEquals(pit->GetPositionInObjectSpace()[d], value))
+          if (itk::Math::NotExactlyEquals(point.GetPositionInObjectSpace()[d], value))
           {
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
           // Testing the color of the tube points
-          if (itk::Math::NotExactlyEquals(pit->GetRed(), value))
+          if (itk::Math::NotExactlyEquals(point.GetRed(), value))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << pit->GetRed() << " instead of " << value
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << point.GetRed() << " instead of " << value
                       << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetGreen(), value + 1))
+          if (itk::Math::NotExactlyEquals(point.GetGreen(), value + 1))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << pit->GetGreen() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << point.GetGreen() << " instead of "
                       << value + 1 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetBlue(), value + 2))
+          if (itk::Math::NotExactlyEquals(point.GetBlue(), value + 2))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << pit->GetBlue() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << point.GetBlue() << " instead of "
                       << value + 2 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetAlpha(), value + 3))
+          if (itk::Math::NotExactlyEquals(point.GetAlpha(), value + 3))
           {
-            std::cout << " [FAILED] : Alpha : found " << pit->GetAlpha() << " instead of " << value + 3 << std::endl;
+            std::cout << " [FAILED] : Alpha : found " << point.GetAlpha() << " instead of " << value + 3 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
@@ -942,62 +939,59 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << "Testing Surface validity:";
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
-    SurfaceType::SurfacePointListType::const_iterator pit;
     if (!strcmp((*obj)->GetTypeName().c_str(), "SurfaceSpatialObject"))
     {
       unsigned int value = 0;
-      for (pit = dynamic_cast<SurfaceType *>(obj->GetPointer())->GetPoints().begin();
-           pit != dynamic_cast<SurfaceType *>(obj->GetPointer())->GetPoints().end();
-           pit++)
+      for (auto & point : dynamic_cast<SurfaceType *>(obj->GetPointer())->GetPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (itk::Math::NotExactlyEquals(pit->GetPositionInObjectSpace()[d], value))
+          if (itk::Math::NotExactlyEquals(point.GetPositionInObjectSpace()[d], value))
           {
-            std::cout << pit->GetPositionInObjectSpace()[d] << "!=" << value << std::endl;
+            std::cout << point.GetPositionInObjectSpace()[d] << "!=" << value << std::endl;
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetNormalInObjectSpace()[d], d))
+          if (itk::Math::NotExactlyEquals(point.GetNormalInObjectSpace()[d], d))
           {
-            std::cout << "Normal : " << pit->GetNormalInObjectSpace()[d] << std::endl;
+            std::cout << "Normal : " << point.GetNormalInObjectSpace()[d] << std::endl;
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
           // Testing the color of the tube points
-          if (itk::Math::NotExactlyEquals(pit->GetRed(), value))
+          if (itk::Math::NotExactlyEquals(point.GetRed(), value))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << pit->GetRed() << " instead of " << value
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << point.GetRed() << " instead of " << value
                       << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetGreen(), value + 1))
+          if (itk::Math::NotExactlyEquals(point.GetGreen(), value + 1))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << pit->GetGreen() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << point.GetGreen() << " instead of "
                       << value + 1 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetBlue(), value + 2))
+          if (itk::Math::NotExactlyEquals(point.GetBlue(), value + 2))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << pit->GetBlue() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << point.GetBlue() << " instead of "
                       << value + 2 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetAlpha(), value + 3))
+          if (itk::Math::NotExactlyEquals(point.GetAlpha(), value + 3))
           {
-            std::cout << " [FAILED] : Alpha : found " << pit->GetAlpha() << " instead of " << value + 3 << std::endl;
+            std::cout << " [FAILED] : Alpha : found " << point.GetAlpha() << " instead of " << value + 3 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
@@ -1011,33 +1005,30 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << "Testing Line validity:";
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
-    LineType::LinePointListType::const_iterator pit;
     if (!strcmp((*obj)->GetTypeName().c_str(), "LineSpatialObject"))
     {
       unsigned int value = 0;
-      for (pit = dynamic_cast<LineType *>(obj->GetPointer())->GetPoints().begin();
-           pit != dynamic_cast<LineType *>(obj->GetPointer())->GetPoints().end();
-           pit++)
+      for (auto & point : dynamic_cast<LineType *>(obj->GetPointer())->GetPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (itk::Math::NotExactlyEquals(pit->GetPositionInObjectSpace()[d], value))
+          if (itk::Math::NotExactlyEquals(point.GetPositionInObjectSpace()[d], value))
           {
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals((pit->GetNormalInObjectSpace(0))[d], d))
+          if (itk::Math::NotExactlyEquals((point.GetNormalInObjectSpace(0))[d], d))
           {
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals((pit->GetNormalInObjectSpace(1))[d], 2 * d))
+          if (itk::Math::NotExactlyEquals((point.GetNormalInObjectSpace(1))[d], 2 * d))
           {
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
@@ -1045,33 +1036,33 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
           }
 
           // Testing the color of the tube points
-          if (itk::Math::NotExactlyEquals(pit->GetRed(), value))
+          if (itk::Math::NotExactlyEquals(point.GetRed(), value))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << pit->GetRed() << " instead of " << value
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Red : found " << point.GetRed() << " instead of " << value
                       << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetGreen(), value + 1))
+          if (itk::Math::NotExactlyEquals(point.GetGreen(), value + 1))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << pit->GetGreen() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Green : found " << point.GetGreen() << " instead of "
                       << value + 1 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetBlue(), value + 2))
+          if (itk::Math::NotExactlyEquals(point.GetBlue(), value + 2))
           {
-            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << pit->GetBlue() << " instead of "
+            std::cout << " [FAILED] : RGBColormapFilterEnum::Blue : found " << point.GetBlue() << " instead of "
                       << value + 2 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(pit->GetAlpha(), value + 3))
+          if (itk::Math::NotExactlyEquals(point.GetAlpha(), value + 3))
           {
-            std::cout << " [FAILED] : Alpha : found " << pit->GetAlpha() << " instead of " << value + 3 << std::endl;
+            std::cout << " [FAILED] : Alpha : found " << point.GetAlpha() << " instead of " << value + 3 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
@@ -1085,19 +1076,16 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << "Testing Landmark validity:";
 
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
-    LandmarkType::LandmarkPointListType::const_iterator pit;
     if (!strcmp((*obj)->GetTypeName().c_str(), "LandmarkSpatialObject"))
     {
       unsigned int value = 0;
-      for (pit = dynamic_cast<LandmarkType *>(obj->GetPointer())->GetPoints().begin();
-           pit != dynamic_cast<LandmarkType *>(obj->GetPointer())->GetPoints().end();
-           pit++)
+      for (auto & point : dynamic_cast<LandmarkType *>(obj->GetPointer())->GetPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (itk::Math::NotExactlyEquals(pit->GetPositionInObjectSpace()[d], value))
+          if (itk::Math::NotExactlyEquals(point.GetPositionInObjectSpace()[d], value))
           {
             std::cout << " [FAILED]" << std::endl;
             delete mySceneChildren;
@@ -1111,7 +1099,7 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
 
   std::cout << " [PASSED]" << std::endl;
   std::cout << "Testing Contour validity:";
-  for (obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
+  for (auto obj = mySceneChildren->begin(); obj != mySceneChildren->end(); ++obj)
   {
     if (!strcmp((*obj)->GetTypeName().c_str(), "ContourSpatialObject"))
     {
@@ -1139,42 +1127,38 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
         delete mySceneChildren;
         return EXIT_FAILURE;
       }
-      ContourType::ContourPointListType::const_iterator ctrl;
-      int                                               value = 0;
-
-      for (ctrl = dynamic_cast<ContourType *>(obj->GetPointer())->GetControlPoints().begin();
-           ctrl != dynamic_cast<ContourType *>(obj->GetPointer())->GetControlPoints().end();
-           ctrl++)
+      int value = 0;
+      for (auto & ctrl : dynamic_cast<ContourType *>(obj->GetPointer())->GetControlPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (ctrl->GetId() != value)
+          if (ctrl.GetId() != value)
           {
-            std::cout << "Control ID [FAILED]" << ctrl->GetId() << " v.s. " << value << std::endl;
+            std::cout << "Control ID [FAILED]" << ctrl.GetId() << " v.s. " << value << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if ((d != 2 && itk::Math::NotExactlyEquals(ctrl->GetPositionInObjectSpace()[d], value)) ||
-              (d == 2 && itk::Math::NotExactlyEquals(ctrl->GetPositionInObjectSpace()[d], value) &&
-               itk::Math::NotExactlyEquals(ctrl->GetPositionInObjectSpace()[d], 0)))
+          if ((d != 2 && itk::Math::NotExactlyEquals(ctrl.GetPositionInObjectSpace()[d], value)) ||
+              (d == 2 && itk::Math::NotExactlyEquals(ctrl.GetPositionInObjectSpace()[d], value) &&
+               itk::Math::NotExactlyEquals(ctrl.GetPositionInObjectSpace()[d], 0)))
           {
             std::cout << "Control Position [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if ((d != 2 && itk::Math::NotExactlyEquals(ctrl->GetPickedPointInObjectSpace()[d], -value)) ||
-              (d == 2 && itk::Math::NotExactlyEquals(ctrl->GetPickedPointInObjectSpace()[d], -value) &&
-               itk::Math::NotExactlyEquals(ctrl->GetPickedPointInObjectSpace()[d], 0)))
+          if ((d != 2 && itk::Math::NotExactlyEquals(ctrl.GetPickedPointInObjectSpace()[d], -value)) ||
+              (d == 2 && itk::Math::NotExactlyEquals(ctrl.GetPickedPointInObjectSpace()[d], -value) &&
+               itk::Math::NotExactlyEquals(ctrl.GetPickedPointInObjectSpace()[d], 0)))
           {
-            std::cout << "Picked Point [FAILED]" << ctrl->GetPickedPointInObjectSpace() << " v.s. " << -value
+            std::cout << "Picked Point [FAILED]" << ctrl.GetPickedPointInObjectSpace() << " v.s. " << -value
                       << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals((ctrl->GetNormalInObjectSpace())[d], value))
+          if (itk::Math::NotExactlyEquals((ctrl.GetNormalInObjectSpace())[d], value))
           {
             std::cout << "Normal [FAILED]" << std::endl;
             delete mySceneChildren;
@@ -1182,30 +1166,30 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
           }
 
           // Testing the color of the tube points
-          if (itk::Math::NotExactlyEquals(ctrl->GetRed(), value))
+          if (itk::Math::NotExactlyEquals(ctrl.GetRed(), value))
           {
-            std::cout << " [FAILED] : CRed : found " << ctrl->GetRed() << " instead of " << value << std::endl;
+            std::cout << " [FAILED] : CRed : found " << ctrl.GetRed() << " instead of " << value << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(ctrl->GetGreen(), value + 1))
+          if (itk::Math::NotExactlyEquals(ctrl.GetGreen(), value + 1))
           {
-            std::cout << " [FAILED] : CGreen : found " << ctrl->GetGreen() << " instead of " << value + 1 << std::endl;
+            std::cout << " [FAILED] : CGreen : found " << ctrl.GetGreen() << " instead of " << value + 1 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(ctrl->GetBlue(), value + 2))
+          if (itk::Math::NotExactlyEquals(ctrl.GetBlue(), value + 2))
           {
-            std::cout << " [FAILED] : CBlue : found " << ctrl->GetBlue() << " instead of " << value + 2 << std::endl;
+            std::cout << " [FAILED] : CBlue : found " << ctrl.GetBlue() << " instead of " << value + 2 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(ctrl->GetAlpha(), value + 3))
+          if (itk::Math::NotExactlyEquals(ctrl.GetAlpha(), value + 3))
           {
-            std::cout << " [FAILED] : CAlpha : found " << ctrl->GetAlpha() << " instead of " << value + 3 << std::endl;
+            std::cout << " [FAILED] : CAlpha : found " << ctrl.GetAlpha() << " instead of " << value + 3 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
@@ -1213,24 +1197,21 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
         value++;
       }
 
-      ContourType::ContourPointListType::const_iterator inter;
       value = 0;
-      for (inter = dynamic_cast<ContourType *>(obj->GetPointer())->GetPoints().begin();
-           inter != dynamic_cast<ContourType *>(obj->GetPointer())->GetPoints().end();
-           inter++)
+      for (auto & inter : dynamic_cast<ContourType *>(obj->GetPointer())->GetPoints())
       {
         for (unsigned int d = 0; d < 3; ++d)
         {
-          if (inter->GetId() != value)
+          if (inter.GetId() != value)
           {
             std::cout << "Interpolated ID [FAILED]" << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if ((d != 2 && itk::Math::NotExactlyEquals(inter->GetPositionInObjectSpace()[d], value)) ||
-              (d == 2 && itk::Math::NotExactlyEquals(inter->GetPositionInObjectSpace()[d], 0) &&
-               itk::Math::NotExactlyEquals(inter->GetPositionInObjectSpace()[d], value)))
+          if ((d != 2 && itk::Math::NotExactlyEquals(inter.GetPositionInObjectSpace()[d], value)) ||
+              (d == 2 && itk::Math::NotExactlyEquals(inter.GetPositionInObjectSpace()[d], 0) &&
+               itk::Math::NotExactlyEquals(inter.GetPositionInObjectSpace()[d], value)))
           {
             std::cout << "Interpolated Position [FAILED]" << std::endl;
             delete mySceneChildren;
@@ -1238,30 +1219,30 @@ itkReadWriteSpatialObjectTest(int argc, char * argv[])
           }
 
           // Testing the color of the tube points
-          if (itk::Math::NotExactlyEquals(inter->GetRed(), value))
+          if (itk::Math::NotExactlyEquals(inter.GetRed(), value))
           {
-            std::cout << " [FAILED] : IRed : found " << inter->GetRed() << " instead of " << value << std::endl;
+            std::cout << " [FAILED] : IRed : found " << inter.GetRed() << " instead of " << value << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(inter->GetGreen(), value + 1))
+          if (itk::Math::NotExactlyEquals(inter.GetGreen(), value + 1))
           {
-            std::cout << " [FAILED] : IGreen : found " << inter->GetGreen() << " instead of " << value + 1 << std::endl;
+            std::cout << " [FAILED] : IGreen : found " << inter.GetGreen() << " instead of " << value + 1 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(inter->GetBlue(), value + 2))
+          if (itk::Math::NotExactlyEquals(inter.GetBlue(), value + 2))
           {
-            std::cout << " [FAILED] : IBlue : found " << inter->GetBlue() << " instead of " << value + 2 << std::endl;
+            std::cout << " [FAILED] : IBlue : found " << inter.GetBlue() << " instead of " << value + 2 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }
 
-          if (itk::Math::NotExactlyEquals(inter->GetAlpha(), value + 3))
+          if (itk::Math::NotExactlyEquals(inter.GetAlpha(), value + 3))
           {
-            std::cout << " [FAILED] : IAlpha : found " << inter->GetAlpha() << " instead of " << value + 3 << std::endl;
+            std::cout << " [FAILED] : IAlpha : found " << inter.GetAlpha() << " instead of " << value + 3 << std::endl;
             delete mySceneChildren;
             return EXIT_FAILURE;
           }

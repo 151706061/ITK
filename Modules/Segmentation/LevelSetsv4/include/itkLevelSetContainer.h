@@ -143,8 +143,8 @@ public:
   void
   CopyInformationAndAllocate(const Self * iOther, const bool iAllocate)
   {
-    LevelSetContainerType              internalContainer = iOther->GetContainer();
-    LevelSetContainerConstIteratorType it = internalContainer.begin();
+    LevelSetContainerType internalContainer = iOther->GetContainer();
+    auto                  it = internalContainer.begin();
 
     LevelSetContainerType newContainer;
 
@@ -152,10 +152,10 @@ public:
     {
       if (iAllocate)
       {
-        LevelSetPointer temp_ls = LevelSetType::New();
+        const LevelSetPointer temp_ls = LevelSetType::New();
 
-        LevelSetImagePointer      image = LevelSetImageType::New();
-        const LevelSetImageType * otherImage = (it->second)->GetImage();
+        const LevelSetImagePointer image = LevelSetImageType::New();
+        const LevelSetImageType *  otherImage = (it->second)->GetImage();
 
         image->CopyInformation(otherImage);
         image->SetBufferedRegion(otherImage->GetBufferedRegion());
@@ -169,7 +169,7 @@ public:
       }
       else
       {
-        LevelSetPointer temp_ls;
+        const LevelSetPointer temp_ls;
         newContainer[it->first] = temp_ls;
       }
       ++it;

@@ -51,7 +51,7 @@ itkKdTreeGeneratorTest(int, char *[])
     treeGenerator->SetSample(sample);
     ITK_TEST_SET_GET_VALUE(sample, treeGenerator->GetSourceSample());
 
-    unsigned int bucketSize = 16;
+    constexpr unsigned int bucketSize = 16;
     treeGenerator->SetBucketSize(bucketSize);
     ITK_TEST_SET_GET_VALUE(bucketSize, treeGenerator->GetBucketSize());
 
@@ -60,7 +60,7 @@ itkKdTreeGeneratorTest(int, char *[])
     using TreeType = TreeGeneratorType::KdTreeType;
     using NodeType = TreeType::KdTreeNodeType;
 
-    TreeType::Pointer tree = treeGenerator->GetOutput();
+    const TreeType::Pointer tree = treeGenerator->GetOutput();
 
     NodeType * root = tree->GetRoot();
 
@@ -73,8 +73,8 @@ itkKdTreeGeneratorTest(int, char *[])
       std::cout << "Root node is not a terminal node." << std::endl;
     }
 
-    unsigned int partitionDimension;
-    float        partitionValue;
+    unsigned int partitionDimension = 0;
+    float        partitionValue = NAN;
     root->GetParameters(partitionDimension, partitionValue);
     std::cout << "Dimension chosen to split the space = " << partitionDimension << std::endl;
     std::cout << "Split point on the partition dimension = " << partitionValue << std::endl;
@@ -96,7 +96,7 @@ itkKdTreeGeneratorTest(int, char *[])
     }
     distanceMetric->SetOrigin(origin);
 
-    unsigned int                           numberOfNeighbors = 3;
+    constexpr unsigned int                 numberOfNeighbors = 3;
     TreeType::InstanceIdentifierVectorType neighbors;
     tree->Search(queryPoint, numberOfNeighbors, neighbors);
 
@@ -110,7 +110,7 @@ itkKdTreeGeneratorTest(int, char *[])
                 << "] : " << distanceMetric->Evaluate(tree->GetMeasurementVector(neighbors[i])) << std::endl;
     }
 
-    double radius = 437.0;
+    constexpr double radius = 437.0;
 
     tree->Search(queryPoint, radius, neighbors);
 
@@ -151,7 +151,7 @@ itkKdTreeGeneratorTest(int, char *[])
     using TreeType = TreeGeneratorType::KdTreeType;
     using NodeType = TreeType::KdTreeNodeType;
 
-    TreeType::Pointer tree = treeGenerator->GetOutput();
+    const TreeType::Pointer tree = treeGenerator->GetOutput();
 
     NodeType * root = tree->GetRoot();
 
@@ -164,8 +164,8 @@ itkKdTreeGeneratorTest(int, char *[])
       std::cout << "Root node is not a terminal node." << std::endl;
     }
 
-    unsigned int partitionDimension;
-    float        partitionValue;
+    unsigned int partitionDimension = 0;
+    float        partitionValue = NAN;
     root->GetParameters(partitionDimension, partitionValue);
     std::cout << "Dimension chosen to split the space = " << partitionDimension << std::endl;
     std::cout << "Split point on the partition dimension = " << partitionValue << std::endl;
@@ -187,7 +187,7 @@ itkKdTreeGeneratorTest(int, char *[])
     }
     distanceMetric->SetOrigin(origin);
 
-    unsigned int                           numberOfNeighbors = 3;
+    constexpr unsigned int                 numberOfNeighbors = 3;
     TreeType::InstanceIdentifierVectorType neighbors;
     tree->Search(queryPoint, numberOfNeighbors, neighbors);
 
@@ -201,7 +201,7 @@ itkKdTreeGeneratorTest(int, char *[])
                 << "] : " << distanceMetric->Evaluate(tree->GetMeasurementVector(neighbors[i])) << std::endl;
     }
 
-    double radius = 437.0;
+    constexpr double radius = 437.0;
 
     tree->Search(queryPoint, radius, neighbors);
 

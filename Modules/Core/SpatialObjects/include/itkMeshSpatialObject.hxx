@@ -54,12 +54,12 @@ MeshSpatialObject<TMesh>::IsInsideInObjectSpace(const PointType & point) const
 {
   if (this->GetMyBoundingBoxInObjectSpace()->IsInside(point))
   {
-    typename MeshType::CellsContainerPointer         cells = m_Mesh->GetCells();
+    const typename MeshType::CellsContainerPointer   cells = m_Mesh->GetCells();
     typename MeshType::CellsContainer::ConstIterator it = cells->Begin();
     while (it != cells->End())
     {
-      using CoordRepType = typename MeshType::CoordRepType;
-      CoordRepType position[Dimension];
+      using CoordinateType = typename MeshType::CoordinateType;
+      CoordinateType position[Dimension];
       for (unsigned int i = 0; i < Dimension; ++i)
       {
         position[i] = point[i];
@@ -141,7 +141,7 @@ MeshSpatialObject<TMesh>::InternalClone() const
   // this to new transform.
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");

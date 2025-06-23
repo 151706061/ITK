@@ -21,9 +21,7 @@
 #include "itkWatershedSegmentTree.h"
 #include "itkWatershedSegmenter.h"
 
-namespace itk
-{
-namespace watershed
+namespace itk::watershed
 {
 /**
  * \class Relabeler
@@ -72,9 +70,10 @@ public:
   using ConstPointer = SmartPointer<const Self>;
 
   /** Method for creation through the object factory. */
+  /** @ITKStartGrouping */
   itkNewMacro(Self);
   itkOverrideGetNameOfClassMacro(Relabeler);
-
+  /** @ITKEndGrouping */
   /** Expose the ImageDimension template parameter at run time */
   static constexpr unsigned int ImageDimension = TImageDimension;
 
@@ -136,9 +135,10 @@ public:
 
   /** Set/Get the percentage of the maximum saliency level
    * to merge to. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(FloodLevel, double, 0.0, 1.0);
   itkGetConstMacro(FloodLevel, double);
-
+  /** @ITKEndGrouping */
   /** Standard ProcessObject method used in implementing mini-pipelines */
   void
   GraftOutput(ImageType * graft);
@@ -163,8 +163,7 @@ protected:
   void
   GenerateInputRequestedRegion() override;
 };
-} // end namespace watershed
-} // end namespace itk
+} // namespace itk::watershed
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWatershedRelabeler.hxx"

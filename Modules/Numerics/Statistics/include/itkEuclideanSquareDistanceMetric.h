@@ -20,9 +20,7 @@
 
 #include "itkDistanceMetric.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class EuclideanSquareDistanceMetric
@@ -46,7 +44,7 @@ public:
   using typename Superclass::MeasurementVectorSizeType;
   using typename Superclass::MeasurementVectorType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EuclideanSquareDistanceMetric);
 
   /** Method for creation through the object factory. */
@@ -64,8 +62,7 @@ protected:
   EuclideanSquareDistanceMetric() = default;
   ~EuclideanSquareDistanceMetric() override = default;
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkEuclideanSquareDistanceMetric.hxx"

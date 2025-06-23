@@ -35,7 +35,7 @@ namespace itk
  * This class was contributed to the Insight Journal by
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction,
  * INRA de Jouy-en-Josas, France.
- * https://www.insight-journal.org/browse/publication/65
+ * https://doi.org/10.54294/hva3gz
  *
  * \sa RegionalMaximaImageFilter
  * \sa ValuedRegionalMinimaImageFilter
@@ -79,7 +79,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegionalMinimaImageFilter);
 
   /**
@@ -88,38 +88,38 @@ public:
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the value in the output image to consider as "foreground".
    * Defaults to maximum value of PixelType.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, OutputImagePixelType);
   itkGetConstMacro(ForegroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the value used as "background" in the output image.
    * Defaults to NumericTraits<PixelType>::NonpositiveMin().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether a flat image must be considered as a minima or not.
    * Defaults to true.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FlatIsMinima, bool);
   itkGetConstMacro(FlatIsMinima, bool);
   itkBooleanMacro(FlatIsMinima);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputHasPixelTraitsCheck, (Concept::HasPixelTraits<InputImagePixelType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   RegionalMinimaImageFilter();

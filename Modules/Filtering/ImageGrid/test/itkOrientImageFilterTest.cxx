@@ -26,12 +26,10 @@ using ImageType = itk::Image<unsigned int, 3>;
 ImageType::Pointer
 CreateRandomImage()
 {
-  const ImageType::SizeType  imageSize = { { 4, 4, 4 } };
-  const ImageType::IndexType imageIndex = { { 0, 0, 0 } };
-  ImageType::RegionType      region;
-  region.SetSize(imageSize);
-  region.SetIndex(imageIndex);
-  auto img = ImageType::New();
+  constexpr ImageType::SizeType  imageSize = { { 4, 4, 4 } };
+  constexpr ImageType::IndexType imageIndex = { { 0, 0, 0 } };
+  const ImageType::RegionType    region{ imageIndex, imageSize };
+  auto                           img = ImageType::New();
   img->SetRegions(region);
   img->Allocate();
   itk::ImageRegionIterator<ImageType> ri(img, region);
@@ -72,7 +70,7 @@ itkOrientImageFilterTest(int argc, char * argv[])
   }
 
   itk::MultiThreaderBase::SetGlobalMaximumNumberOfThreads(1);
-  ImageType::Pointer randImage = CreateRandomImage();
+  const ImageType::Pointer randImage = CreateRandomImage();
   std::cerr << "Original" << std::endl;
   PrintImg(randImage);
 
@@ -84,22 +82,20 @@ itkOrientImageFilterTest(int argc, char * argv[])
   auto useImageDirection = static_cast<bool>(std::stoi(argv[1]));
   ITK_TEST_SET_GET_BOOLEAN(orienter, UseImageDirection, useImageDirection);
 
-  orienter->SetGivenCoordinateOrientation(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP);
+  orienter->SetGivenCoordinateOrientation(itk::AnatomicalOrientation::PositiveEnum::LSA);
   orienter->SetInput(randImage);
 
   // Try permuting axes
-  orienter->SetDesiredCoordinateOrientation(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_IRP);
+  orienter->SetDesiredCoordinateOrientation(itk::AnatomicalOrientation::PositiveEnum::SLA);
   orienter->Update();
-  ImageType::Pointer IRP = orienter->GetOutput();
-  std::cerr << "IRP" << std::endl;
-  PrintImg(IRP);
+  const ImageType::Pointer SLA = orienter->GetOutput();
+  std::cerr << "SLA" << std::endl;
+  PrintImg(SLA);
 
   ImageType::RegionType::SizeType originalSize = randImage->GetLargestPossibleRegion().GetSize();
-  ImageType::RegionType::SizeType transformedSize = IRP->GetLargestPossibleRegion().GetSize();
-  ImageType::IndexType            originalIndex, transformedIndex;
 
+  ImageType::IndexType originalIndex;
+  ImageType::IndexType transformedIndex;
   for (originalIndex[2] = transformedIndex[2] = 0;
        originalIndex[2] < static_cast<ImageType::IndexType::IndexValueType>(originalSize[2]);
        originalIndex[2]++, transformedIndex[2]++)
@@ -112,8 +108,8 @@ itkOrientImageFilterTest(int argc, char * argv[])
            originalIndex[0] < static_cast<ImageType::IndexType::IndexValueType>(originalSize[0]);
            originalIndex[0]++, transformedIndex[1]++)
       {
-        ImageType::PixelType orig = randImage->GetPixel(originalIndex);
-        ImageType::PixelType xfrm = IRP->GetPixel(transformedIndex);
+        const ImageType::PixelType orig = randImage->GetPixel(originalIndex);
+        const ImageType::PixelType xfrm = SLA->GetPixel(transformedIndex);
         if (orig != xfrm)
         {
           return EXIT_FAILURE;
@@ -125,15 +121,13 @@ itkOrientImageFilterTest(int argc, char * argv[])
   // Go to LIP to check flipping an axis
   orienter = itk::OrientImageFilter<ImageType, ImageType>::New();
   orienter->SetInput(randImage);
-  orienter->SetGivenCoordinateOrientation(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP);
-  orienter->SetDesiredCoordinateOrientation(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_LIP);
+  orienter->SetGivenCoordinateOrientation(itk::AnatomicalOrientation::NegativeEnum::RIP);
+  orienter->SetDesiredCoordinateOrientation(itk::AnatomicalOrientation::NegativeEnum::LIP);
   orienter->Update();
-  ImageType::Pointer LIP = orienter->GetOutput();
+  const ImageType::Pointer LIP = orienter->GetOutput();
   std::cerr << "LIP" << std::endl;
   PrintImg(LIP);
-  transformedSize = LIP->GetLargestPossibleRegion().GetSize();
+  ImageType::RegionType::SizeType transformedSize = LIP->GetLargestPossibleRegion().GetSize();
 
   for (originalIndex[2] = transformedIndex[2] = 0;
        originalIndex[2] < static_cast<ImageType::IndexType::IndexValueType>(originalSize[2]);
@@ -147,8 +141,8 @@ itkOrientImageFilterTest(int argc, char * argv[])
            originalIndex[0] < static_cast<ImageType::IndexType::IndexValueType>(originalSize[0]);
            originalIndex[0]++, transformedIndex[0]--)
       {
-        ImageType::PixelType orig = randImage->GetPixel(originalIndex);
-        ImageType::PixelType xfrm = LIP->GetPixel(transformedIndex);
+        const ImageType::PixelType orig = randImage->GetPixel(originalIndex);
+        const ImageType::PixelType xfrm = LIP->GetPixel(transformedIndex);
         if (orig != xfrm)
         {
           return EXIT_FAILURE;

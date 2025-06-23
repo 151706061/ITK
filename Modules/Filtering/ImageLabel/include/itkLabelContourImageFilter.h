@@ -37,7 +37,7 @@ namespace itk
  * The connectivity can be changed to minimum or maximum connectivity with
  * SetFullyConnected(). Full connectivity produces thicker contours.
  *
- * https://www.insight-journal.org/browse/publication/217
+ * https://doi.org/10.54294/c7d3gv
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -106,17 +106,19 @@ public:
    * FullyConnectedOff.
    * \note For objects that are 1 pixel wide, use FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the background value used to identify the objects and mark the
    * pixels not on the border of the objects.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
 protected:
   LabelContourImageFilter();
   ~LabelContourImageFilter() override = default;

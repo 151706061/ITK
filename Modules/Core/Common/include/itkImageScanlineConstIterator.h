@@ -78,6 +78,7 @@ public:
    * Index type alias support While these were already typedef'ed in the superclass,
    * they need to be redone here for this subclass to compile properly with gcc.
    */
+
   /** Types inherited from the Superclass */
   using typename Superclass::IndexType;
   using typename Superclass::SizeType;
@@ -90,25 +91,21 @@ public:
   using typename Superclass::PixelType;
   using typename Superclass::AccessorType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageScanlineConstIterator);
 
   /** Default constructor. Needed since we provide a cast constructor. */
   ImageScanlineConstIterator()
     : ImageConstIterator<TImage>()
-  {
-    m_SpanBeginOffset = 0;
-    m_SpanEndOffset = 0;
-  }
+  {}
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageScanlineConstIterator(const TImage * ptr, const RegionType & region)
     : ImageConstIterator<TImage>(ptr, region)
-  {
-    m_SpanBeginOffset = this->m_BeginOffset;
-    m_SpanEndOffset = this->m_BeginOffset + static_cast<OffsetValueType>(this->m_Region.GetSize()[0]);
-  }
+    , m_SpanBeginOffset(this->m_BeginOffset)
+    , m_SpanEndOffset(this->m_BeginOffset + static_cast<OffsetValueType>(this->m_Region.GetSize()[0]))
+  {}
 
   /** Constructor that can be used to cast from an ImageIterator to an
    * ImageScanlineConstIterator. Many routines return an ImageIterator, but for a
@@ -198,7 +195,7 @@ public:
 
   /** Test if the index is at the end of line
    */
-  inline bool
+  [[nodiscard]] inline bool
   IsAtEndOfLine() const
   {
     return this->m_Offset >= m_SpanEndOffset;
@@ -256,7 +253,6 @@ public:
     return *this;
   }
 
-
 protected:
   OffsetValueType m_SpanBeginOffset{}; // one pixel the beginning of the scanline
   OffsetValueType m_SpanEndOffset{};   // one pixel past the end of the scanline
@@ -265,7 +261,7 @@ protected:
 // Deduction guide for class template argument deduction (CTAD).
 template <typename TImage>
 ImageScanlineConstIterator(SmartPointer<TImage>, const typename TImage::RegionType &)
-  ->ImageScanlineConstIterator<std::remove_const_t<TImage>>;
+  -> ImageScanlineConstIterator<std::remove_const_t<TImage>>;
 
 } // end namespace itk
 

@@ -57,7 +57,7 @@ public:
   /** Method for creation through the object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TransformFileReaderTemplate);
 
   /** Set the filename  */
@@ -79,12 +79,14 @@ public:
   {
     return &m_TransformList;
   }
+
 #else
   const TransformListType *
   GetTransformList()
   {
     return &m_TransformList;
   }
+
 #endif
   TransformListType *
   GetModifiableTransformList()
@@ -93,9 +95,10 @@ public:
   }
 
   /** Set/Get the TransformIO class used internally to read to transform. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(TransformIO, TransformIOType);
   itkGetConstObjectMacro(TransformIO, TransformIOType);
-
+  /** @ITKEndGrouping */
 protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;

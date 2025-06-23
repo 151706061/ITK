@@ -18,10 +18,7 @@
 #ifndef itkListSample_hxx
 #define itkListSample_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TMeasurementVector>
 void
@@ -108,10 +105,8 @@ ListSample<TMeasurementVector>::GetFrequency(InstanceIdentifier instanceId) cons
   {
     return 1;
   }
-  else
-  {
-    return 0;
-  }
+
+  return 0;
 }
 
 template <typename TMeasurementVector>
@@ -136,7 +131,6 @@ ListSample<TMeasurementVector>::PrintSelf(std::ostream & os, Indent indent) cons
 
   os << indent << "InternalContainer: " << &m_InternalContainer << std::endl;
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

@@ -32,7 +32,7 @@ namespace itk
  * equivalent to multiplying the Fourier transform of the two images,
  * the inverse filter consists of inverting the multiplication. In
  * other words, this filter computes the following:
- * \f[ hat{F}(\omega) =
+ * \f[ \hat{F}(\omega) =
  *       \begin{cases}
  *         G(\omega) / H(\omega) & \text{if $|H(\omega)| \geq \epsilon$} \\
  *         0                     & \text{otherwise}
@@ -70,7 +70,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information ( and related methods ) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InverseDeconvolutionImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -103,9 +103,10 @@ public:
   /** Set/get the threshold value used to determine whether a
    * frequency of the Fourier transform of the blurring kernel is
    * considered to be zero. Default value is 1.0e-4. */
+  /** @ITKStartGrouping */
   itkSetMacro(KernelZeroMagnitudeThreshold, double);
   itkGetConstMacro(KernelZeroMagnitudeThreshold, double);
-
+  /** @ITKEndGrouping */
 protected:
   InverseDeconvolutionImageFilter();
   ~InverseDeconvolutionImageFilter() override = default;
@@ -127,7 +128,7 @@ template <typename TInput1, typename TInput2, typename TOutput>
 class ITK_TEMPLATE_EXPORT InverseDeconvolutionFunctor
 {
 public:
-  InverseDeconvolutionFunctor() { m_KernelZeroMagnitudeThreshold = 0.0; }
+  InverseDeconvolutionFunctor() = default;
   ~InverseDeconvolutionFunctor() = default;
 
   bool
@@ -152,19 +153,20 @@ public:
 
   /** Set/get the threshold value below which complex magnitudes are considered
    * to be zero. */
+  /** @ITKStartGrouping */
   void
   SetKernelZeroMagnitudeThreshold(double mu)
   {
     m_KernelZeroMagnitudeThreshold = mu;
   }
-  double
+  [[nodiscard]] double
   GetKernelZeroMagnitudeThreshold() const
   {
     return m_KernelZeroMagnitudeThreshold;
   }
-
+  /** @ITKEndGrouping */
 private:
-  double m_KernelZeroMagnitudeThreshold;
+  double m_KernelZeroMagnitudeThreshold{ 0.0 };
 };
 } // namespace Functor
 

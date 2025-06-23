@@ -49,10 +49,11 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(JPEGImageIO);
 
   /** Set/Get the level of quality for the output images. */
+  /** @ITKStartGrouping */
   virtual void
   SetQuality(int _JPEGQuality)
   {
@@ -63,17 +64,19 @@ public:
   {
     return this->GetCompressionLevel();
   }
-
+  /** @ITKEndGrouping */
   /**  */
+  /** @ITKStartGrouping */
   itkSetMacro(Progressive, bool);
   itkGetConstMacro(Progressive, bool);
   itkBooleanMacro(Progressive);
-
+  /** @ITKEndGrouping */
   /** Convert to RGB if out_color_space is CMYK, default is true */
+  /** @ITKStartGrouping */
   itkSetMacro(CMYKtoRGB, bool);
   itkGetConstMacro(CMYKtoRGB, bool);
   itkBooleanMacro(CMYKtoRGB);
-
+  /** @ITKEndGrouping */
   /*-------- This part of the interface deals with reading data. ------ */
 
   /** Determine the file type. Returns true if this ImageIO can read the
@@ -117,7 +120,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   void
-  WriteSlice(std::string & fileName, const void * const buffer);
+  WriteSlice(const std::string & fileName, const void * const buffer);
 
   bool m_Progressive{ true };
 

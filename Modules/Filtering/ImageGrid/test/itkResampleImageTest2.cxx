@@ -33,24 +33,24 @@
 namespace
 {
 
-template <typename TCoordRepType, unsigned int VDimension>
-class NonlinearAffineTransform : public itk::AffineTransform<TCoordRepType, VDimension>
+template <typename TCoordinateType, unsigned int VDimension>
+class NonlinearAffineTransform : public itk::AffineTransform<TCoordinateType, VDimension>
 {
 public:
   /** Standard class type aliases.   */
   using Self = NonlinearAffineTransform;
-  using Superclass = itk::AffineTransform<TCoordRepType, VDimension>;
+  using Superclass = itk::AffineTransform<TCoordinateType, VDimension>;
   using Pointer = itk::SmartPointer<Self>;
   using ConstPointer = itk::SmartPointer<const Self>;
 
   /** New macro for creation of through a smart pointer. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NonlinearAffineTransform);
 
   /** Override this. See test below. */
-  bool
+  [[nodiscard]] bool
   IsLinear() const override
   {
     return false;
@@ -81,12 +81,12 @@ itkResampleImageTest2(int argc, char * argv[])
 
   using PixelType = unsigned char;
   using ImageType = itk::Image<PixelType, VDimension>;
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
-  using NonlinearAffineTransformType = NonlinearAffineTransform<CoordRepType, VDimension>;
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
-  using ExtrapolatorType = itk::NearestNeighborExtrapolateImageFunction<ImageType, CoordRepType>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
+  using NonlinearAffineTransformType = NonlinearAffineTransform<CoordinateType, VDimension>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
+  using ExtrapolatorType = itk::NearestNeighborExtrapolateImageFunction<ImageType, CoordinateType>;
 
   using ReaderType = itk::ImageFileReader<ImageType>;
   using WriterType = itk::ImageFileWriter<ImageType>;
@@ -135,7 +135,7 @@ itkResampleImageTest2(int argc, char * argv[])
   resample->SetInterpolator(interpolator);
   ITK_TEST_SET_GET_VALUE(interpolator, resample->GetInterpolator());
 
-  bool useReferenceImage = std::stoi(argv[7]);
+  const bool useReferenceImage = std::stoi(argv[7]);
   ITK_TEST_SET_GET_BOOLEAN(resample, UseReferenceImage, useReferenceImage);
 
 
@@ -177,9 +177,9 @@ itkResampleImageTest2(int argc, char * argv[])
         itk::Math::Ceil<SizeValueType>(static_cast<double>(inputSize[i]) * inputSpacing[i] / outputSpacing[i]);
     }
 
-    typename ImageType::DirectionType outputDirection = resample->GetInput()->GetDirection();
+    const typename ImageType::DirectionType outputDirection = resample->GetInput()->GetDirection();
 
-    typename ImageType::PointType outputOrigin = resample->GetInput()->GetOrigin();
+    const typename ImageType::PointType outputOrigin = resample->GetInput()->GetOrigin();
 
     resample->SetOutputSpacing(outputSpacing);
     ITK_TEST_SET_GET_VALUE(outputSpacing, resample->GetOutputSpacing());

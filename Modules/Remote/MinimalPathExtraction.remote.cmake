@@ -44,10 +44,10 @@
 # Contact: Arnaud Gelas <arnaudgelas@gmail.com>
 itk_fetch_module(
   MinimalPathExtraction
-  "https://www.insight-journal.org/browse/publication/213
+  "https://doi.org/10.54294/z5zwhh
 "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKMinimalPathExtraction.git
-  GIT_TAG 35dd8e83b7df2059876e6835a5741eb3d45973bf
+  GIT_TAG c5ea9a1da2486df25346fe4db9115664ac5e9fd9
   )
 # Release v1.2.6

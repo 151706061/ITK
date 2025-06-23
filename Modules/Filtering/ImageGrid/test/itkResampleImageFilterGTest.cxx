@@ -81,7 +81,7 @@ TestThrowErrorOnEmptyResampleSpace(const TPixel inputPixel, const bool setUseRef
     filter->UseReferenceImageOn();
   }
   filter->Update();
-  typename ImageType::ConstPointer filterOutputImage = filter->GetOutput();
+  const typename ImageType::ConstPointer filterOutputImage = filter->GetOutput();
   if (filterOutputImage->GetLargestPossibleRegion().GetNumberOfPixels() == 0)
   {
     return itk::NumericTraits<TPixel>::max();
@@ -144,7 +144,7 @@ TEST(ResampleImageFilter, FilterPreservesAnyDoublePixelValueByDefault)
   std::default_random_engine randomEngine;
 
   // The number of iterations is arbitrarily chosen.
-  const size_t numberOfIterations = 11;
+  constexpr size_t numberOfIterations = 11;
 
   for (size_t i = 0; i < numberOfIterations; ++i)
   {

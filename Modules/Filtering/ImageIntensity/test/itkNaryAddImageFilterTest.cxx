@@ -29,18 +29,14 @@ template <typename ImageType>
 void
 InitializeImage(ImageType * image, const typename ImageType::PixelType & value)
 {
-  typename ImageType::Pointer inputImage(image);
+  const typename ImageType::Pointer inputImage(image);
 
   // Define their size, and start index
-  typename ImageType::SizeType size;
-  size.Fill(2);
+  auto size = ImageType::SizeType::Filled(2);
 
-  typename ImageType::IndexType start;
-  start.Fill(0);
+  const typename ImageType::IndexType start{};
 
-  typename ImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const typename ImageType::RegionType region{ start, size };
 
   inputImage->SetRegions(region);
   inputImage->Allocate();
@@ -74,7 +70,7 @@ itkNaryAddImageFilterTest(int, char *[])
   InitializeImage<InputImageType>(inputImageA, valueA);
   constexpr InputImageType::PixelType valueB = 17;
   InitializeImage<InputImageType>(inputImageB, valueB);
-  const InputImageType::PixelType valueC = -4;
+  constexpr InputImageType::PixelType valueC = -4;
   InitializeImage<InputImageType>(inputImageC, valueC);
 
 
@@ -98,7 +94,7 @@ itkNaryAddImageFilterTest(int, char *[])
 
 
   // Get the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
   // Test the validity of the output
   using InputImageIteratorType = itk::ImageRegionConstIterator<InputImageType>;
@@ -109,8 +105,8 @@ itkNaryAddImageFilterTest(int, char *[])
   InputImageIteratorType  iterC(inputImageC, inputImageA->GetRequestedRegion());
   OutputImageIteratorType oIt(outputImage, inputImageA->GetRequestedRegion());
 
-  const OutputImageType::PixelType epsilon = 1e-9;
-  unsigned int                     failures = 0;
+  constexpr OutputImageType::PixelType epsilon = 1e-9;
+  unsigned int                         failures = 0;
   while (!oIt.IsAtEnd())
   {
     auto expectedValue = static_cast<OutputImageType::PixelType>(iterA.Get() + iterB.Get() + iterC.Get());
@@ -177,24 +173,21 @@ itkNaryAddImageFilterTest(int, char *[])
   auto vectorImageB = VectorImageType::New();
   auto vectorImageC = VectorImageType::New();
 
-  VectorPixelType vectorImageValueA, vectorImageValueB, vectorImageValueC;
-
   constexpr VectorImageType::PixelType::ValueType vectorValueA = 12;
-  vectorImageValueA.Fill(vectorValueA);
+  auto                                            vectorImageValueA = itk::MakeFilled<VectorPixelType>(vectorValueA);
   vectorImageValueA[0] = 5;
 
   constexpr VectorImageType::PixelType::ValueType vectorValueB = 17;
-  vectorImageValueB.Fill(vectorValueB);
+  auto                                            vectorImageValueB = itk::MakeFilled<VectorPixelType>(vectorValueB);
   vectorImageValueB[0] = 9;
 
-  const VectorImageType::PixelType::ValueType vectorValueC = -4;
-  vectorImageValueC.Fill(vectorValueC);
+  constexpr VectorImageType::PixelType::ValueType vectorValueC = -4;
+  auto                                            vectorImageValueC = itk::MakeFilled<VectorPixelType>(vectorValueC);
   vectorImageValueC[0] = -80;
 
   InitializeImage<VectorImageType>(vectorImageA, vectorImageValueA);
   InitializeImage<VectorImageType>(vectorImageB, vectorImageValueB);
   InitializeImage<VectorImageType>(vectorImageC, vectorImageValueC);
-
 
   // Create an ADD Filter
   using VectorAdderType = itk::NaryAddImageFilter<VectorImageType, VectorImageType>;
@@ -210,7 +203,7 @@ itkNaryAddImageFilterTest(int, char *[])
   vectorFilter->SetInput(2, vectorImageC);
 
   // Get the filter output
-  VectorImageType::Pointer vectorOutputImage = vectorFilter->GetOutput();
+  const VectorImageType::Pointer vectorOutputImage = vectorFilter->GetOutput();
 
 
   // Execute the filter

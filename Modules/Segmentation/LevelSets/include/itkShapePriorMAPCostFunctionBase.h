@@ -28,18 +28,14 @@ namespace itk
  * \brief Represents the base class of maximum aprior (MAP) cost function used
  * ShapePriorSegmentationLevelSetImageFilter to estimate the shape parameters.
  *
- * This class follows the shape and pose parameters estimation developed in [1].
+ * This class follows the shape and pose parameters estimation
+ * developed in \cite leventon2000.
  *
  * This class has two template parameters, the feature image type representing the
  * edge potential map and the pixel type used to
  * represent the output level set in the ShapePriorSegmentationLevelSetImageFilter.
  *
  * \sa ShapePriorSegmentationLevelSetImageFilter
- *
- * \par REFERENCES
- * \par
- * [1] Leventon, M.E. et al. "Statistical Shape Influence in Geodesic Active Contours", CVPR 2000.
- *
  *
  * \ingroup Numerics Optimizers
  * \ingroup ITKLevelSets
@@ -56,7 +52,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapePriorMAPCostFunctionBase);
 
   /**  MeasureType type alias.
@@ -93,17 +89,20 @@ public:
   using ShapeFunctionPointer = typename ShapeFunctionType::Pointer;
 
   /** Set/Get the shape distance function. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(ShapeFunction, ShapeFunctionType);
   itkGetModifiableObjectMacro(ShapeFunction, ShapeFunctionType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the active region. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(ActiveRegion, NodeContainerType);
   itkGetConstObjectMacro(ActiveRegion, NodeContainerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the feature image. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(FeatureImage, FeatureImageType);
   itkGetConstObjectMacro(FeatureImage, FeatureImageType);
-
+  /** @ITKEndGrouping */
   /** This method returns the value of the cost function corresponding
    * to the specified parameters.    */
   MeasureType

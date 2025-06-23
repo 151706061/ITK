@@ -17,7 +17,7 @@
 # ==========================================================================*/
 
 import builtins
-from typing import Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import itk.support.types as itkt
 
@@ -34,7 +34,9 @@ __all__ = [
 ]
 
 
-def xarray_from_image(l_image: "itkt.ImageOrImageSource", view:bool=False) -> "xr.DataArray":
+def xarray_from_image(
+    l_image: "itkt.ImageOrImageSource", view: bool = False
+) -> "xr.DataArray":
     """Convert an itk.Image to an xarray.DataArray.
 
     Origin and spacing metadata is preserved in the xarray's coords. The
@@ -64,7 +66,7 @@ def xarray_from_image(l_image: "itkt.ImageOrImageSource", view:bool=False) -> "x
     direction = np.flip(itk.array_from_matrix(l_image.GetDirection()))
     image_dimension = l_image.GetImageDimension()
 
-    image_dims: Tuple[str, str, str, str] = ("x", "y", "z", "t")
+    image_dims: tuple[str, str, str, str] = ("x", "y", "z", "t")
     coords = {}
     for l_index, dim in enumerate(image_dims[:image_dimension]):
         coords[dim] = np.linspace(
@@ -90,9 +92,7 @@ def xarray_from_image(l_image: "itkt.ImageOrImageSource", view:bool=False) -> "x
     name = "image"
     if l_image.GetObjectName():
         name = l_image.GetObjectName()
-    data_array = xr.DataArray(
-        array, name=name, dims=dims, coords=coords, attrs=attrs
-    )
+    data_array = xr.DataArray(array, name=name, dims=dims, coords=coords, attrs=attrs)
     return data_array
 
 

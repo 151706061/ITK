@@ -33,16 +33,16 @@
 namespace itk
 {
 
-template <typename TInputImage, typename TCoordRep, typename TPixelCompare>
+template <typename TInputImage, typename TCoordinate, typename TPixelCompare>
 auto
-LabelImageGaussianInterpolateImageFunction<TInputImage, TCoordRep, TPixelCompare>::EvaluateAtContinuousIndex(
+LabelImageGaussianInterpolateImageFunction<TInputImage, TCoordinate, TPixelCompare>::EvaluateAtContinuousIndex(
   const ContinuousIndexType & cindex,
   OutputType *                itkNotUsed(grad)) const -> OutputType
 {
   vnl_vector<RealType> erfArray[ImageDimension];
   vnl_vector<RealType> gerfArray[ImageDimension];
 
-  typename Superclass::RegionType region = this->ComputeInterpolationRegion(cindex);
+  const typename Superclass::RegionType region = this->ComputeInterpolationRegion(cindex);
 
   // Compute the ERF difference arrays
   for (unsigned int d = 0; d < ImageDimension; ++d)
@@ -71,19 +71,12 @@ LabelImageGaussianInterpolateImageFunction<TInputImage, TCoordRep, TPixelCompare
     }
 
     const OutputType V = It.Get();
-    auto             it = weightMap.find(V);
-    RealType         wtest = 0.0;
-
-    if (it != weightMap.end())
+    auto [it, inserted] = weightMap.try_emplace(V, w);
+    if (!inserted)
     {
       it->second += w;
-      wtest = it->second;
     }
-    else
-    {
-      weightMap.insert(std::make_pair(V, w));
-      wtest = w;
-    }
+    RealType wtest = it->second;
 
     // Keep track of the max value
     if (wtest > wmax)

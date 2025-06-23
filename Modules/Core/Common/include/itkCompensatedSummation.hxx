@@ -23,9 +23,9 @@ namespace itk
 {
 
 void ITKCommon_EXPORT
-     CompensatedSummationAddElement(float & compensation, float & sum, const float element);
+CompensatedSummationAddElement(float & compensation, float & sum, const float element);
 void ITKCommon_EXPORT
-     CompensatedSummationAddElement(double & compensation, double & sum, const double element);
+CompensatedSummationAddElement(double & compensation, double & sum, const double element);
 
 #ifndef itkCompensatedSummation_cxx
 // We try the looser pragma guards if we don't have an explicit instantiation.
@@ -63,25 +63,6 @@ CompensatedSummation<TFloat>::CompensatedSummation(const TFloat value)
   : m_Sum(value)
   , m_Compensation(AccumulateType{})
 {}
-
-template <typename TFloat>
-CompensatedSummation<TFloat>::CompensatedSummation(const Self & rhs)
-{
-  this->m_Sum = rhs.m_Sum;
-  this->m_Compensation = rhs.m_Compensation;
-}
-
-template <typename TFloat>
-auto
-CompensatedSummation<TFloat>::operator=(const Self & rhs) -> Self &
-{
-  if (this != &rhs)
-  {
-    this->m_Sum = rhs.m_Sum;
-    this->m_Compensation = rhs.m_Compensation;
-  }
-  return *this;
-}
 
 template <typename TFloat>
 void

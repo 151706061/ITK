@@ -107,13 +107,13 @@ itkRGBToLuminanceImageFilterAndAdaptorTest(int, char *[])
   filter->Update();
 
   // Get the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
   // Create an iterator for going through the image output
   OutputIteratorType ot(outputImage, outputImage->GetRequestedRegion());
 
   // Check the content of the result image
-  const OutputImageType::PixelType epsilon = 1e-6;
+  constexpr OutputImageType::PixelType epsilon = 1e-6;
 
   ot.GoToBegin();
   it.GoToBegin();
@@ -158,7 +158,7 @@ itkRGBToLuminanceImageFilterAndAdaptorTest(int, char *[])
   diffFilter->Update();
 
   // Get the filter output
-  OutputImageType::Pointer diffImage = diffFilter->GetOutput();
+  const OutputImageType::Pointer diffImage = diffFilter->GetOutput();
 
   // Check the content of the diff image
   //

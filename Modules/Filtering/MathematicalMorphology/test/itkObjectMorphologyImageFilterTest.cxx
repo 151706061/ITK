@@ -65,9 +65,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
   index[1] = 0;
   index[2] = 0;
 
-  myRegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  myRegionType region{ index, size };
 
   // Initialize Image
   inputImage->SetRegions(region);
@@ -155,7 +153,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
 
   end = clock();
 
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
 
   // Print the content of the result image
   std::cout << "  Success: " << std::endl;
@@ -176,7 +174,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
 
   end = clock();
 
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
 
   // Print the content of the result image
   std::cout << "  Success: " << std::endl;
@@ -216,7 +214,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
     ++count;
   }
   end = clock();
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
   std::cout << "  Success: " << std::endl;
   std::cout << "    Time = " << elapsedTime << std::endl;
 
@@ -243,7 +241,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
 
   end = clock();
 
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
 
   // Print the content of the result image
   std::cout << "  Success: " << std::endl;
@@ -264,7 +262,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
 
   end = clock();
 
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
 
   // Print the content of the result image
   std::cout << "  Success: " << std::endl;
@@ -304,7 +302,7 @@ itkObjectMorphologyImageFilterTest(int, char *[])
     ++count;
   }
   end = clock();
-  elapsedTime = (end - start) / static_cast<double>(CLOCKS_PER_SEC);
+  elapsedTime = (end - start) / double{ CLOCKS_PER_SEC };
   std::cout << "  Success: " << std::endl;
   std::cout << "    Time = " << elapsedTime << std::endl;
 

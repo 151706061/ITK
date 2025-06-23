@@ -37,7 +37,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa ShapeLabelObject, BinaryShapeOpeningImageFilter, LabelStatisticsOpeningImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
@@ -84,44 +84,44 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelShapeOpeningImageFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputImagePixelType>));
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputImagePixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputImagePixelType>));
-  // End concept checking
-#endif
 
   /**
    * Set/Get the value used as "background" in the output image.
    * Defaults to NumericTraits<PixelType>::NonpositiveMin().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the threshold used to keep or remove the objects.
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Lambda, double);
   itkSetMacro(Lambda, double);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the ordering of the objects. By default, the objects with
    * an attribute value smaller than Lamba are removed. Turning ReverseOrdering
    * to true make this filter remove the object with an attribute value greater
    * than Lambda instead.
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(ReverseOrdering, bool);
   itkSetMacro(ReverseOrdering, bool);
   itkBooleanMacro(ReverseOrdering);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the attribute to use to select the object to remove. The default
    * is "Size".
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Attribute, AttributeType);
   itkSetMacro(Attribute, AttributeType);
   void
@@ -129,7 +129,7 @@ public:
   {
     this->SetAttribute(LabelObjectType::GetAttributeFromName(s));
   }
-
+  /** @ITKEndGrouping */
 protected:
   LabelShapeOpeningImageFilter();
   ~LabelShapeOpeningImageFilter() override = default;

@@ -49,7 +49,7 @@ namespace itk
    \code
        itk::MyObjectType::Pointer output_object;
        const char* input_xml_file_name = ...
-       itk::MyObjectDOMReader::Pointer reader = itk::MyObjectDOMReader::New();
+       auto reader = itk::MyObjectDOMReader::New();
        reader->SetFileName( input_xml_file_name );
        reader->Update();
        output_object = reader->GetOutput();
@@ -136,14 +136,16 @@ protected:
 
 private:
   /** Get/Set the intermediate DOM object. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(IntermediateDOM, DOMNodeType);
   itkGetModifiableObjectMacro(IntermediateDOM, DOMNodeType);
-
+  /** @ITKEndGrouping */
   /** Variable to hold the input XML file name. */
   std::string m_FileName{};
 
   /** Variable to hold the output object, created internally or supplied by the user. */
   OutputType * m_Output{};
+
   /** Variable to hold the output object if it is a smart object. */
   typename LightObject::Pointer m_OutputHolder{};
 

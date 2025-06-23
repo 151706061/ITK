@@ -61,18 +61,9 @@ namespace itk
  * by Martin Styner, Univ. of North Carolina at Chapel Hill, and his
  * colleagues.
  *
- * \note For more details. refer to the following articles.
- * "Parametric estimate of intensity inhomogeneities applied to MRI"
- * Martin Styner, G. Gerig, Christian Brechbuehler, Gabor Szekely,
- * IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165, 2000,
- * (https://www.cs.unc.edu/~styner/docs/tmi99.pdf)
- *
- * "Evaluation of 2D/3D bias correction with 1+1ES-optimization"
- * Martin Styner, Prof. Dr. G. Gerig (IKT, BIWI, ETH Zuerich), TR-197
- * (https://www.cs.unc.edu/~styner/docs/StynerTR97.pdf)
+ * \note For more details refer to \cite styner2000 and \cite styner1997.
  * \ingroup ITKPolynomials
  */
-
 class ITKPolynomials_EXPORT MultivariateLegendrePolynomial
 {
 public:
@@ -95,18 +86,19 @@ public:
 
   /** Constructor. */
   MultivariateLegendrePolynomial(unsigned int dimension, unsigned int degree, const DomainSizeType & domainSize);
+
   /** Destructor. */
   virtual ~MultivariateLegendrePolynomial();
 
   /** Gets the dimension. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetDimension() const
   {
     return m_Dimension;
   }
 
   /** Gets the degree (the degree of Legendre polynomials). */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetDegree() const
   {
     return m_Degree;
@@ -118,14 +110,14 @@ public:
    *  size, an exception is thrown otherwise
    *  \sa SetCoefficients
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfCoefficients() const
   {
     return m_NumberOfCoefficients;
   }
 
   /** Gets each dimension's size. */
-  const DomainSizeType &
+  [[nodiscard]] const DomainSizeType &
   GetDomainSize() const
   {
     return m_DomainSize;
@@ -159,7 +151,7 @@ public:
   SetCoefficients(const ParametersType & coefficients);
 
   /** \brief Gets Legendre polynomials' coefficients. */
-  const CoefficientArrayType &
+  [[nodiscard]] const CoefficientArrayType &
   GetCoefficients() const;
 
   /** In the case which the bias field is 2D, it returns bias value at
@@ -172,22 +164,22 @@ public:
       if (index[1] != m_PrevY)
       {
         // normalized y [-1, 1]
-        double norm_y = m_NormFactor[1] * static_cast<double>(index[1] - 1);
+        const double norm_y = m_NormFactor[1] * static_cast<double>(index[1] - 1);
         this->CalculateXCoef(norm_y, m_CoefficientArray);
         m_PrevY = index[1];
       }
 
       // normalized x [-1, 1]
-      double norm_x = m_NormFactor[0] * static_cast<double>(index[0] - 1);
+      const double norm_x = m_NormFactor[0] * static_cast<double>(index[0] - 1);
 
       return LegendreSum(norm_x, m_Degree, m_CachedXCoef);
     }
-    else if (m_Dimension == 3)
+    if (m_Dimension == 3)
     {
       if (index[2] != m_PrevZ)
       {
         // normalized z [-1, 1]
-        double norm_z = m_NormFactor[2] * static_cast<double>(index[2] - 1);
+        const double norm_z = m_NormFactor[2] * static_cast<double>(index[2] - 1);
         this->CalculateYCoef(norm_z, m_CoefficientArray);
         m_PrevZ = index[2];
       }
@@ -195,13 +187,13 @@ public:
       if (index[1] != m_PrevY)
       {
         // normalized y [-1, 1]
-        double norm_y = m_NormFactor[1] * static_cast<double>(index[1] - 1);
+        const double norm_y = m_NormFactor[1] * static_cast<double>(index[1] - 1);
         this->CalculateXCoef(norm_y, m_CachedYCoef);
         m_PrevY = index[1];
       }
 
       // normalized x [-1, 1]
-      double norm_x = m_NormFactor[0] * static_cast<double>(index[0] - 1);
+      const double norm_x = m_NormFactor[0] * static_cast<double>(index[0] - 1);
       return this->LegendreSum(norm_x, m_Degree, m_CachedXCoef);
     }
     return 0;
@@ -225,7 +217,7 @@ public:
       : m_MultivariateLegendrePolynomial(polynomial)
       , m_Dimension(m_MultivariateLegendrePolynomial->GetDimension())
       , m_DomainSize(m_MultivariateLegendrePolynomial->GetDomainSize())
-      , m_IsAtEnd(false)
+
     {
       m_Index.resize(m_Dimension);
       std::fill(m_Index.begin(), m_Index.end(), 0);
@@ -241,7 +233,7 @@ public:
       }
     }
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       return m_IsAtEnd;
@@ -257,17 +249,15 @@ public:
           m_Index[dim] += 1;
           return *this;
         }
+
+        if (dim == m_Dimension - 1)
+        {
+          m_IsAtEnd = true;
+          break;
+        }
         else
         {
-          if (dim == m_Dimension - 1)
-          {
-            m_IsAtEnd = true;
-            break;
-          }
-          else
-          {
-            m_Index[dim] = 0;
-          }
+          m_Index[dim] = 0;
         }
       }
       return *this;
@@ -284,7 +274,7 @@ public:
     unsigned int                     m_Dimension;
     DomainSizeType                   m_DomainSize;
     IndexType                        m_Index;
-    bool                             m_IsAtEnd;
+    bool                             m_IsAtEnd{ false };
   }; // end of class Iterator
 
   void

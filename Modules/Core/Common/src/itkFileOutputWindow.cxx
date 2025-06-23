@@ -23,18 +23,10 @@ namespace itk
  * Prompting off by default
  */
 FileOutputWindow::FileOutputWindow()
-{
-  m_Flush = false;
-  m_Append = false;
-  m_Stream = nullptr;
-  m_FileName = "";
-}
+  : m_FileName("")
+{}
 
-FileOutputWindow::~FileOutputWindow()
-{
-  delete m_Stream;
-  m_Stream = nullptr;
-}
+FileOutputWindow::~FileOutputWindow() { delete m_Stream; }
 
 void
 FileOutputWindow::PrintSelf(std::ostream & os, Indent indent) const

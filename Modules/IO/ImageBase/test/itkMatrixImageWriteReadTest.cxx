@@ -36,15 +36,11 @@ itkMatrixImageWriteReadTest(int argc, char * argv[])
 
   auto matrixImage1 = MatrixImageType::New();
 
-  MatrixImageType::SizeType size;
-  size.Fill(10);
+  constexpr auto size = MatrixImageType::SizeType::Filled(10);
 
-  MatrixImageType::IndexType start;
-  start.Fill(0);
+  constexpr MatrixImageType::IndexType start{};
 
-  MatrixImageType::RegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const MatrixImageType::RegionType region{ start, size };
 
   matrixImage1->SetRegions(region);
   matrixImage1->Allocate();
@@ -114,10 +110,10 @@ itkMatrixImageWriteReadTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  MatrixImageType::ConstPointer matrixImage2 = matrixReader->GetOutput();
+  const MatrixImageType::ConstPointer matrixImage2 = matrixReader->GetOutput();
 
   // Compare the read values to the original values
-  const float tolerance = 1e-5;
+  constexpr float tolerance = 1e-5;
 
   itk::ImageRegionConstIterator<MatrixImageType> tItr(matrixImage2, region);
   itk::ImageRegionConstIterator<MatrixImageType> mItr(matrixImage1, region);

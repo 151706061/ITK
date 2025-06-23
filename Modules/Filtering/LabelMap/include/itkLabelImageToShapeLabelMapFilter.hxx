@@ -24,12 +24,9 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 LabelImageToShapeLabelMapFilter<TInputImage, TOutputImage>::LabelImageToShapeLabelMapFilter()
-{
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ComputeFeretDiameter = false;
-  m_ComputePerimeter = true;
-  m_ComputeOrientedBoundingBox = false;
-}
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_ComputePerimeter(true)
+{}
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -39,7 +36,7 @@ LabelImageToShapeLabelMapFilter<TInputImage, TOutputImage>::GenerateInputRequest
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the inputs
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());

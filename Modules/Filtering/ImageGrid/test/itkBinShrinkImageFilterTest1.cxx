@@ -34,9 +34,7 @@ itkBinShrinkImageFilterTest1(int, char *[])
   // fill in an image
   InputImageType::IndexType  index = { { 100, 100 } };
   InputImageType::SizeType   size = { { 12, 20 } };
-  InputImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  InputImageType::RegionType region{ index, size };
   sourceImage->SetRegions(region);
   sourceImage->Allocate();
 
@@ -308,7 +306,7 @@ itkBinShrinkImageFilterTest1(int, char *[])
           bool lfailed = false;
           for (inIt.GoToBegin(); !inIt.IsAtEnd(); ++inIt)
           {
-            int expectedValue = inIt.GetIndex()[0] * 10;
+            const int expectedValue = inIt.GetIndex()[0] * 10;
             if (inIt.Get() != expectedValue)
             {
               if (!lfailed)

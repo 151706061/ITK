@@ -98,8 +98,8 @@ CovariantVector<T, VVectorDimension>::operator-(const Self & vec) const -> Self
 }
 
 template <typename T, unsigned int VVectorDimension>
-typename CovariantVector<T, VVectorDimension>::ValueType CovariantVector<T, VVectorDimension>::operator*(
-  const Self & other) const
+typename CovariantVector<T, VVectorDimension>::ValueType
+CovariantVector<T, VVectorDimension>::operator*(const Self & other) const
 {
   typename NumericTraits<T>::AccumulateType value = T{};
   for (unsigned int i = 0; i < VVectorDimension; ++i)
@@ -110,10 +110,10 @@ typename CovariantVector<T, VVectorDimension>::ValueType CovariantVector<T, VVec
 }
 
 template <typename T, unsigned int VVectorDimension>
-typename CovariantVector<T, VVectorDimension>::ValueType CovariantVector<T, VVectorDimension>::operator*(
-  const Vector<T, VVectorDimension> & other) const
+typename CovariantVector<T, VVectorDimension>::ValueType
+CovariantVector<T, VVectorDimension>::operator*(const Vector<T, VVectorDimension> & other) const
 {
-  typename NumericTraits<T>::AccumulateType value = T{};
+  typename NumericTraits<T>::AccumulateType value{};
   for (unsigned int i = 0; i < VVectorDimension; ++i)
   {
     value += (*this)[i] * other[i];

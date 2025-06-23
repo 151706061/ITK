@@ -54,8 +54,8 @@ ImageClassifierBase<TInputImage, TClassifiedImage>::Classify()
   }
 
   // Set the iterators and the pixel type definition for the input image
-  InputImageConstPointer  inputImage = this->GetInputImage();
-  InputImageConstIterator inIt(inputImage, inputImage->GetBufferedRegion());
+  const InputImageConstPointer inputImage = this->GetInputImage();
+  InputImageConstIterator      inIt(inputImage, inputImage->GetBufferedRegion());
 
   // Set the iterators and the pixel type definition for the classified image
   classifiedImage = this->GetClassifiedImage();
@@ -68,16 +68,14 @@ ImageClassifierBase<TInputImage, TClassifiedImage>::Classify()
 
   // Set up the storage containers to record the probability
   // measures for each class.
-  unsigned int numberOfClasses = this->GetNumberOfMembershipFunctions();
+  const unsigned int numberOfClasses = this->GetNumberOfMembershipFunctions();
 
   std::vector<double> discriminantScores;
   discriminantScores.resize(numberOfClasses);
-  unsigned int classLabel;
-  unsigned int classIndex;
 
   // support progress methods/callbacks
-  SizeValueType totalPixels = inputImage->GetBufferedRegion().GetNumberOfPixels();
-  SizeValueType updateVisits = totalPixels / 10;
+  const SizeValueType totalPixels = inputImage->GetBufferedRegion().GetNumberOfPixels();
+  SizeValueType       updateVisits = totalPixels / 10;
   if (updateVisits < 1)
   {
     updateVisits = 1;
@@ -93,12 +91,12 @@ ImageClassifierBase<TInputImage, TClassifiedImage>::Classify()
 
     // Read the input vector
     inputImagePixel = inIt.Get();
-    for (classIndex = 0; classIndex < numberOfClasses; ++classIndex)
+    for (unsigned int classIndex = 0; classIndex < numberOfClasses; ++classIndex)
     {
       discriminantScores[classIndex] = (this->GetMembershipFunction(classIndex))->Evaluate(inputImagePixel);
     }
 
-    classLabel = static_cast<unsigned int>(this->GetDecisionRule()->Evaluate(discriminantScores));
+    auto classLabel = static_cast<unsigned int>(this->GetDecisionRule()->Evaluate(discriminantScores));
 
     outputClassifiedLabel = ClassifiedImagePixelType(classLabel);
     classifiedIt.Set(outputClassifiedLabel);
@@ -109,11 +107,11 @@ template <typename TInputImage, typename TClassifiedImage>
 void
 ImageClassifierBase<TInputImage, TClassifiedImage>::Allocate()
 {
-  InputImageConstPointer inputImage = this->GetInputImage();
+  const InputImageConstPointer inputImage = this->GetInputImage();
 
-  InputImageSizeType inputImageSize = inputImage->GetBufferedRegion().GetSize();
+  const InputImageSizeType inputImageSize = inputImage->GetBufferedRegion().GetSize();
 
-  ClassifiedImagePointer classifiedImage = TClassifiedImage::New();
+  const ClassifiedImagePointer classifiedImage = TClassifiedImage::New();
 
   this->SetClassifiedImage(classifiedImage);
 
@@ -128,7 +126,7 @@ template <typename TInputImage, typename TClassifiedImage>
 std::vector<double>
 ImageClassifierBase<TInputImage, TClassifiedImage>::GetPixelMembershipValue(const InputImagePixelType inputImagePixel)
 {
-  unsigned int        numberOfClasses = this->GetNumberOfClasses();
+  const unsigned int  numberOfClasses = this->GetNumberOfClasses();
   std::vector<double> pixelMembershipValue(numberOfClasses);
 
   for (unsigned int classIndex = 0; classIndex < numberOfClasses; ++classIndex)

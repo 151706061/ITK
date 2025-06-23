@@ -25,17 +25,13 @@
 namespace itk
 {
 // Constructor with default arguments
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::PCAShapeSignedDistanceFunction()
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::PCAShapeSignedDistanceFunction()
+  : m_MeanImage(nullptr)
+  , m_Transform(TranslationTransform<TCoordinate, SpaceDimension>::New())
 {
-  m_NumberOfPrincipalComponents = 0;
-  m_NumberOfTransformParameters = 0;
-
-  m_MeanImage = nullptr;
   m_PrincipalComponentImages.resize(0);
   m_PrincipalComponentStandardDeviations.SetSize(0);
-
-  m_Transform = TranslationTransform<TCoordRep, SpaceDimension>::New();
   m_Interpolators.resize(0);
   m_Extrapolators.resize(0);
 
@@ -45,9 +41,9 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::PCAShapeSign
 }
 
 // Set the number of principal components
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
 void
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::SetNumberOfPrincipalComponents(unsigned int n)
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::SetNumberOfPrincipalComponents(unsigned int n)
 {
   m_NumberOfPrincipalComponents = n;
 
@@ -59,15 +55,14 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::SetNumberOfP
 }
 
 // Set the parameters
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
 void
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::SetParameters(const ParametersType & parameters)
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::SetParameters(const ParametersType & parameters)
 {
   this->m_Parameters = parameters;
 
   // set the shape parameters
-  unsigned int i;
-  for (i = 0; i < m_NumberOfPrincipalComponents; ++i)
+  for (unsigned int i = 0; i < m_NumberOfPrincipalComponents; ++i)
   {
     m_WeightOfPrincipalComponents[i] = parameters[i];
   }
@@ -76,7 +71,7 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::SetParameter
   m_NumberOfTransformParameters = parameters.size() - m_NumberOfPrincipalComponents;
   m_TransformParameters.SetSize(m_NumberOfTransformParameters);
 
-  for (i = 0; i < m_NumberOfTransformParameters; ++i)
+  for (unsigned int i = 0; i < m_NumberOfTransformParameters; ++i)
   {
     m_TransformParameters[i] = parameters[m_NumberOfPrincipalComponents + i];
   }
@@ -86,9 +81,9 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::SetParameter
 }
 
 // Print self
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
 void
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::PrintSelf(std::ostream & os, Indent indent) const
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
@@ -103,9 +98,9 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::PrintSelf(st
 }
 
 // Initialize the function
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
 void
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::Initialize()
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::Initialize()
 {
   // verify mean image
   if (!m_MeanImage)
@@ -121,7 +116,7 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::Initialize()
   }
 
   // verify image buffered region
-  typename ImageType::RegionType meanImageRegion = m_MeanImage->GetBufferedRegion();
+  const typename ImageType::RegionType meanImageRegion = m_MeanImage->GetBufferedRegion();
 
   for (unsigned int i = 0; i < m_NumberOfPrincipalComponents; ++i)
   {
@@ -142,31 +137,31 @@ PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::Initialize()
   m_Extrapolators.resize(m_NumberOfPrincipalComponents + 1);
 
   // interpolator/extrapolator for mean image
-  m_Interpolators[0] = LinearInterpolateImageFunction<ImageType, CoordRepType>::New();
+  m_Interpolators[0] = LinearInterpolateImageFunction<ImageType, CoordinateType>::New();
   m_Interpolators[0]->SetInputImage(m_MeanImage);
 
-  m_Extrapolators[0] = NearestNeighborExtrapolateImageFunction<ImageType, CoordRepType>::New();
+  m_Extrapolators[0] = NearestNeighborExtrapolateImageFunction<ImageType, CoordinateType>::New();
   m_Extrapolators[0]->SetInputImage(m_MeanImage);
 
   // interpolators/extrapolators for pc images
   for (unsigned int k = 1; k <= m_NumberOfPrincipalComponents; ++k)
   {
-    m_Interpolators[k] = LinearInterpolateImageFunction<ImageType, CoordRepType>::New();
+    m_Interpolators[k] = LinearInterpolateImageFunction<ImageType, CoordinateType>::New();
     m_Interpolators[k]->SetInputImage(m_PrincipalComponentImages[k - 1]);
 
-    m_Extrapolators[k] = NearestNeighborExtrapolateImageFunction<ImageType, CoordRepType>::New();
+    m_Extrapolators[k] = NearestNeighborExtrapolateImageFunction<ImageType, CoordinateType>::New();
     m_Extrapolators[k]->SetInputImage(m_PrincipalComponentImages[k - 1]);
   }
 }
 
 // Evaluate the signed distance
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage>
 auto
-PCAShapeSignedDistanceFunction<TCoordRep, VSpaceDimension, TImage>::Evaluate(const PointType & point) const
+PCAShapeSignedDistanceFunction<TCoordinate, VSpaceDimension, TImage>::Evaluate(const PointType & point) const
   -> OutputType
 {
   // transform the point into the shape model space
-  PointType mappedPoint = m_Transform->TransformPoint(point);
+  const PointType mappedPoint = m_Transform->TransformPoint(point);
 
   itkDebugMacro("mappedPoint:" << mappedPoint);
 

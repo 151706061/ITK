@@ -76,30 +76,28 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DerivativeImageFilter);
 
   /** The output pixel type must be signed. */
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SignedOutputPixelType, (Concept::Signed<OutputPixelType>));
-  // End concept checking
-#endif
 
   /** Standard get/set macros for filter parameters. */
+  /** @ITKStartGrouping */
   itkSetMacro(Order, unsigned int);
   itkGetConstMacro(Order, unsigned int);
   itkSetMacro(Direction, unsigned int);
   itkGetConstMacro(Direction, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get whether or not the filter will use the spacing of the input
    * image in its calculations. Use On to compute the derivatives in physical
    * space; use Off to ignore the image spacing and to compute the derivatives
    * in isotropic voxel space. Default is On. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_FUTURE_LEGACY_REMOVE)
   /** Use the image spacing information in calculations. Use this option if you
    *  want derivatives in physical space. Default is UseImageSpacingOn. */
@@ -130,11 +128,9 @@ public:
 
 protected:
   DerivativeImageFilter()
-  {
-    m_Order = 1;
-    m_Direction = 0;
-    m_UseImageSpacing = true;
-  }
+    : m_Order(1)
+    , m_UseImageSpacing(true)
+  {}
 
   ~DerivativeImageFilter() override = default;
   void

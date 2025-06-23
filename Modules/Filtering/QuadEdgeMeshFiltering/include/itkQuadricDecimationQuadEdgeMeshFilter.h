@@ -40,7 +40,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = EdgeDecimationQuadEdgeMeshFilter<TInput, TOutput, TCriterion>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(QuadricDecimationQuadEdgeMeshFilter);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -53,7 +53,7 @@ public:
   using OutputMeshPointer = typename OutputMeshType::Pointer;
   using OutputPointIdentifier = typename OutputMeshType::PointIdentifier;
   using OutputPointType = typename OutputMeshType::PointType;
-  using OutputCoordType = typename OutputPointType::CoordRepType;
+  using OutputCoordType = typename OutputPointType::CoordinateType;
   using OutputQEType = typename OutputMeshType::QEType;
   using OutputEdgeCellType = typename OutputMeshType::EdgeCellType;
   using OutputCellsContainerIterator = typename OutputMeshType::CellsContainerIterator;
@@ -120,17 +120,17 @@ protected:
   MeasureType
   MeasureEdge(OutputQEType * iEdge) override
   {
-    OutputPointIdentifier id_org = iEdge->GetOrigin();
-    OutputPointIdentifier id_dest = iEdge->GetDestination();
-    QuadricElementType    Q = m_Quadric[id_org] + m_Quadric[id_dest];
+    const OutputPointIdentifier id_org = iEdge->GetOrigin();
+    const OutputPointIdentifier id_dest = iEdge->GetDestination();
+    QuadricElementType          Q = m_Quadric[id_org] + m_Quadric[id_dest];
 
-    OutputPointType org = this->m_OutputMesh->GetPoint(id_org);
-    OutputPointType dest = this->m_OutputMesh->GetPoint(id_dest);
+    const OutputPointType org = this->m_OutputMesh->GetPoint(id_org);
+    const OutputPointType dest = this->m_OutputMesh->GetPoint(id_dest);
 
     OutputPointType mid;
 
     mid.SetToMidPoint(org, dest);
-    OutputPointType p = Q.ComputeOptimalLocation(mid);
+    const OutputPointType p = Q.ComputeOptimalLocation(mid);
 
     return static_cast<MeasureType>(Q.ComputeError(p));
   }

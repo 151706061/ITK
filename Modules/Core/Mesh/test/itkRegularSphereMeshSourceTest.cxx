@@ -37,19 +37,17 @@ itkRegularSphereMeshSourceTest(int, char *[])
   using PointType = SphereMeshSourceType::PointType;
   using VectorType = SphereMeshSourceType::VectorType;
 
-  PointType center;
-  center.Fill(7.4);
+  auto center = itk::MakeFilled<PointType>(7.4);
 
   constexpr double radius = 1.5;
-  const double     tolerance = 1e-5;
+  constexpr double tolerance = 1e-5;
 
-  VectorType scale;
-  scale.Fill(radius);
+  auto scale = itk::MakeFilled<VectorType>(radius);
 
   mySphereMeshSource->SetCenter(center);
   ITK_TEST_SET_GET_VALUE(center, mySphereMeshSource->GetCenter());
 
-  unsigned int resolution = 1;
+  constexpr unsigned int resolution = 1;
   mySphereMeshSource->SetResolution(resolution);
   ITK_TEST_SET_GET_VALUE(resolution, mySphereMeshSource->GetResolution());
 
@@ -61,10 +59,9 @@ itkRegularSphereMeshSourceTest(int, char *[])
   ITK_TRY_EXPECT_NO_EXCEPTION(mySphereMeshSource->Update());
 
 
-  MeshType::Pointer myMesh = mySphereMeshSource->GetOutput();
+  const MeshType::Pointer myMesh = mySphereMeshSource->GetOutput();
 
-  PointType pt;
-  pt.Fill(0);
+  PointType pt{};
 
   bool testPassed = true;
 
@@ -86,7 +83,7 @@ itkRegularSphereMeshSourceTest(int, char *[])
   using CellsContainerPointer = MeshType::CellsContainerPointer;
   using CellType = MeshType::CellType;
 
-  CellsContainerPointer cells = myMesh->GetCells();
+  const CellsContainerPointer cells = myMesh->GetCells();
 
   unsigned int faceId = 0;
 

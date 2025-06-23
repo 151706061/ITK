@@ -33,12 +33,14 @@ VersorRigid3DTransform<TParametersValueType>::VersorRigid3DTransform(unsigned in
   : Superclass(paramDim)
 {}
 
+#if !defined(ITK_LEGACY_REMOVE)
 // Constructor with arguments
 template <typename TParametersValueType>
 VersorRigid3DTransform<TParametersValueType>::VersorRigid3DTransform(const MatrixType &       matrix,
                                                                      const OutputVectorType & offset)
   : Superclass(matrix, offset)
 {}
+#endif
 
 // Set Parameters
 template <typename TParametersValueType>
@@ -124,7 +126,7 @@ void
 VersorRigid3DTransform<TParametersValueType>::UpdateTransformParameters(const DerivativeType & update,
                                                                         TParametersValueType   factor)
 {
-  SizeValueType numberOfParameters = this->GetNumberOfParameters();
+  const SizeValueType numberOfParameters = this->GetNumberOfParameters();
 
   if (update.Size() != numberOfParameters)
   {
@@ -185,7 +187,7 @@ VersorRigid3DTransform<TParametersValueType>::UpdateTransformParameters(const De
   // Composing the currentRotation with the gradientRotation
   // produces the new Rotation versor
   //
-  VersorType newRotation = currentRotation * gradientRotation;
+  const VersorType newRotation = currentRotation * gradientRotation;
 
   ParametersType newParameters(numberOfParameters);
 

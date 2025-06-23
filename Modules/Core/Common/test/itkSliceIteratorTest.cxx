@@ -25,32 +25,33 @@ template <typename TPixelType, unsigned int VDimension>
 void
 FillRegionSequential(itk::SmartPointer<itk::Image<TPixelType, VDimension>> I)
 {
-  unsigned int          iDim, ArrayLength, i;
   itk::Size<VDimension> Index;
   unsigned long         Location[VDimension];
-  unsigned int          mult;
-  TPixelType            value;
+
 
   itk::ImageRegionIterator<itk::Image<TPixelType, VDimension>> data(I, I->GetRequestedRegion());
 
   Index = (I->GetRequestedRegion()).GetSize();
 
-  for (ArrayLength = 1, iDim = 0; iDim < VDimension; ++iDim)
+  unsigned int ArrayLength = 1;
+  for (unsigned int iDim = 0; iDim < VDimension; ++iDim)
   {
     Location[iDim] = 0;
     ArrayLength *= Index[iDim];
   }
 
-  for (i = 0; i < ArrayLength; ++i, ++data)
+  for (unsigned int i = 0; i < ArrayLength; ++i, ++data)
   {
-    for (iDim = 0, mult = 1, value = 0; iDim < VDimension; ++iDim, mult *= 10)
+    TPixelType   value = 0;
+    unsigned int mult = 1;
+    for (unsigned int iDim = 0; iDim < VDimension; ++iDim, mult *= 10)
     {
       value += mult * Location[VDimension - iDim - 1];
     }
     data.Set(value);
 
-    iDim = VDimension - 1;
-    bool done = false;
+    unsigned int iDim = VDimension - 1;
+    bool         done = false;
     while (!done)
     {
       ++Location[iDim];
@@ -78,16 +79,15 @@ template <typename TPixelType, unsigned int VDimension>
 void
 PrintRegion(itk::SmartPointer<itk::Image<TPixelType, VDimension>> I)
 {
-  unsigned int iDim;
-  long         rsz[VDimension];
-  long         Location[VDimension];
+  long rsz[VDimension];
+  long Location[VDimension];
 
   std::copy(I->GetRequestedRegion().GetSize().m_InternalArray,
             I->GetRequestedRegion().GetSize().m_InternalArray + VDimension,
             rsz);
   std::fill_n(Location, VDimension, 0);
 
-  for (iDim = 0; iDim < VDimension; ++iDim)
+  for (unsigned int iDim = 0; iDim < VDimension; ++iDim)
   {
     std::cout << "iDim = " << iDim << std::endl;
     std::cout << "\tRegionSize = " << I->GetRequestedRegion().GetSize().m_InternalArray[iDim] << std::endl;
@@ -100,8 +100,8 @@ PrintRegion(itk::SmartPointer<itk::Image<TPixelType, VDimension>> I)
   {
     std::cout << iter.Get() << ' ';
 
-    iDim = VDimension - 1;
-    bool done = false;
+    unsigned int iDim = VDimension - 1;
+    bool         done = false;
     while (!done)
     {
       ++Location[iDim];
@@ -128,12 +128,12 @@ PrintRegion(itk::SmartPointer<itk::Image<TPixelType, VDimension>> I)
 
 template <typename TContainer>
 void
-PrintSlice(TContainer s)
+PrintSlice(TContainer s_container)
 {
   std::cout << '[';
-  for (s = s.Begin(); s < s.End(); ++s)
+  for (auto iter = s_container.Begin(); iter < s_container.End(); ++iter)
   {
-    std::cout << *s << ' ';
+    std::cout << *iter << ' ';
   }
   std::cout << ']' << std::endl;
 }
@@ -156,13 +156,13 @@ itkSliceIteratorTest(int, char *[])
     reg.SetIndex(zeroIndex);
     reg.SetSize(imgSize);
 
-    std::slice                                              hslice(10, 5, 1); // slice through the horizontal center
-    std::slice                                              vslice(2, 5, 5);  // slice through the vertical center
-    itk::Neighborhood<int, 2>                               temp;
-    itk::SliceIterator<int, itk::Neighborhood<int, 2>>      hnsi(&temp, hslice);
-    itk::SliceIterator<int, itk::Neighborhood<int, 2>>      vnsi(&temp, vslice);
-    itk::ConstSliceIterator<int, itk::Neighborhood<int, 2>> hnsi2(&temp, hslice);
-    itk::ConstSliceIterator<int, itk::Neighborhood<int, 2>> vnsi2(&temp, vslice);
+    const std::slice                                         hslice(10, 5, 1); // slice through the horizontal center
+    const std::slice                                         vslice(2, 5, 5);  // slice through the vertical center
+    itk::Neighborhood<int, 2>                                temp;
+    const itk::SliceIterator<int, itk::Neighborhood<int, 2>> hnsi(&temp, hslice);
+    const itk::SliceIterator<int, itk::Neighborhood<int, 2>> vnsi(&temp, vslice);
+    const itk::ConstSliceIterator<int, itk::Neighborhood<int, 2>> hnsi2(&temp, hslice);
+    const itk::ConstSliceIterator<int, itk::Neighborhood<int, 2>> vnsi2(&temp, vslice);
 
     itk::Neighborhood<int, 2> op;
     op.SetRadius(hoodRadius);
@@ -170,7 +170,7 @@ itkSliceIteratorTest(int, char *[])
     itk::Index<2> idx;
     idx[0] = idx[1] = 0;
 
-    itk::Image<int, 2>::Pointer ip = itk::Image<int, 2>::New();
+    const itk::Image<int, 2>::Pointer ip = itk::Image<int, 2>::New();
     ip->SetRegions(reg);
     ip->Allocate();
 

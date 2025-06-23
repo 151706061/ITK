@@ -24,11 +24,10 @@
 namespace itk
 {
 SimplexMeshGeometry::SimplexMeshGeometry()
-{
-  double    c = 1.0 / 3.0;
-  PointType p;
 
-  p.Fill(0.0);
+{
+  constexpr double    c = 1.0 / 3.0;
+  constexpr PointType p{};
 
   pos.Fill(0);
   oldPos.Fill(0);
@@ -38,20 +37,11 @@ SimplexMeshGeometry::SimplexMeshGeometry()
   externalForce.Fill(0);
   internalForce.Fill(0);
   closestAttractor.Fill(0);
-  circleRadius = 0;
   circleCenter.Fill(0);
-  sphereRadius = 0;
-  distance = 0;
-  phi = 0;
-  multiplier = 0.0;
-  forceIndex = 0;
 
   neighborIndices.Fill(NumericTraits<IdentifierType>::max());
   neighbors.Fill(p);
   meanCurvature = c;
-
-  neighborSet = nullptr;
-  closestAttractorIndex = 0;
 }
 
 SimplexMeshGeometry::~SimplexMeshGeometry()
@@ -63,18 +53,19 @@ SimplexMeshGeometry::~SimplexMeshGeometry()
 void
 SimplexMeshGeometry::ComputeGeometry()
 {
-  VectorType b, c, cXb, tmp;
 
   // compute the circum circle (center and radius)
-  b = this->neighbors[2] - this->neighbors[0];
-  c = this->neighbors[1] - this->neighbors[0];
+  VectorType b = this->neighbors[2] - this->neighbors[0];
+  VectorType c = this->neighbors[1] - this->neighbors[0];
 
+  VectorType cXb;
   cXb.SetVnlVector(vnl_cross_3d<double>(c.GetVnlVector(), b.GetVnlVector()));
 
+  VectorType tmp;
   tmp.SetVnlVector(b.GetSquaredNorm() * vnl_cross_3d<double>(cXb.GetVnlVector(), c.GetVnlVector()) +
                    c.GetSquaredNorm() * vnl_cross_3d<double>(b.GetVnlVector(), cXb.GetVnlVector()));
 
-  double cXbSquaredNorm = 2 * cXb.GetSquaredNorm();
+  const double cXbSquaredNorm = 2 * cXb.GetSquaredNorm();
 
   circleRadius = tmp.GetNorm() / (cXbSquaredNorm);
   tmp[0] /= (cXbSquaredNorm);
@@ -83,12 +74,13 @@ SimplexMeshGeometry::ComputeGeometry()
   circleCenter = this->neighbors[0] + tmp;
 
   // Compute the circum sphere (center and radius) of a point
-  VectorType d, dXc, bXd, sphereTmp;
-
-  d = pos - this->neighbors[0];
+  VectorType d = pos - this->neighbors[0];
+  VectorType dXc;
   dXc.SetVnlVector(vnl_cross_3d<double>(d.GetVnlVector(), c.GetVnlVector()));
+  VectorType bXd;
   bXd.SetVnlVector(vnl_cross_3d<double>(b.GetVnlVector(), d.GetVnlVector()));
 
+  VectorType sphereTmp;
   sphereTmp.SetVnlVector(d.GetSquaredNorm() * cXb.GetVnlVector() + b.GetSquaredNorm() * dXc.GetVnlVector() +
                          c.GetSquaredNorm() * bXd.GetVnlVector());
 

@@ -32,6 +32,7 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TDisplacementField>
 WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::WarpImageFilter()
+
 {
   // #0 implicit "Primary" input required
   // #1 "DisplacementField" required
@@ -48,7 +49,6 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::WarpImageFilter(
   auto interp = DefaultInterpolatorType::New();
   m_Interpolator = static_cast<InterpolatorType *>(interp.GetPointer());
 
-  m_DefFieldSameInformation = false;
   this->DynamicMultiThreadingOn();
   this->ThreaderUpdateProgressOff();
 }
@@ -100,7 +100,7 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::SetOutputParamet
 
 template <typename TInputImage, typename TOutputImage, typename TDisplacementField>
 void
-WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::VerifyInputInformation() ITKv5_CONST
+WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::VerifyInputInformation() const
 {
   if (ImageDimension != GetDisplacementField()->GetNumberOfComponentsPerPixel())
   {
@@ -127,7 +127,7 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::BeforeThreadedGe
 
   if (numberOfComponents != this->GetInput()->GetNumberOfComponentsPerPixel())
   {
-    PixelComponentType zeroComponent = NumericTraits<PixelComponentType>::ZeroValue(PixelComponentType{});
+    const PixelComponentType zeroComponent = NumericTraits<PixelComponentType>::ZeroValue(PixelComponentType{});
     numberOfComponents = this->GetInput()->GetNumberOfComponentsPerPixel();
     NumericTraits<PixelType>::SetLength(m_EdgePaddingValue, numberOfComponents);
 
@@ -185,7 +185,6 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::EvaluateDisplace
 {
   const ContinuousIndex<double, ImageDimension> index =
     fieldPtr->template TransformPhysicalPointToContinuousIndex<double>(point);
-  unsigned int dim; // index over dimension
   /**
    * Compute base index = closest index below point
    * Compute distance from point to base index
@@ -194,7 +193,7 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::EvaluateDisplace
   IndexType neighIndex;
   double    distance[ImageDimension];
 
-  for (dim = 0; dim < ImageDimension; ++dim)
+  for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
     baseIndex[dim] = Math::Floor<IndexValueType>(index[dim]);
 
@@ -224,8 +223,8 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::EvaluateDisplace
    */
   output.Fill(0);
 
-  double       totalOverlap = 0.0;
-  unsigned int numNeighbors(1 << TInputImage::ImageDimension);
+  double             totalOverlap = 0.0;
+  const unsigned int numNeighbors(1 << TInputImage::ImageDimension);
 
   for (unsigned int counter = 0; counter < numNeighbors; ++counter)
   {
@@ -233,7 +232,7 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::EvaluateDisplace
     unsigned int upper = counter; // each bit indicates upper/lower neighbour
 
     // get neighbor index and overlap fraction
-    for (dim = 0; dim < ImageDimension; ++dim)
+    for (unsigned int dim = 0; dim < ImageDimension; ++dim)
     {
       if (upper & 1)
       {
@@ -284,9 +283,9 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::DynamicThreadedG
 
   // iterator for the output image
   ImageRegionIteratorWithIndex<OutputImageType> outputIt(outputPtr, outputRegionForThread);
-  IndexType                                     index;
-  PointType                                     point;
-  DisplacementType                              displacement;
+  IndexType                                     index{};
+  PointType                                     point{};
+  DisplacementType                              displacement{};
   NumericTraits<DisplacementType>::SetLength(displacement, ImageDimension);
   static_assert(PointType::Dimension == ImageDimension, "ERROR: Point type and ImageDimension must be the same!");
   if (this->m_DefFieldSameInformation)
@@ -401,7 +400,7 @@ WarpImageFilter<TInputImage, TOutputImage, TDisplacementField>::GenerateInputReq
       using TransformType =
         itk::Transform<SpacePrecisionType, OutputImageType::ImageDimension, OutputImageType::ImageDimension>;
 
-      DisplacementRegionType fieldRequestedRegion = ImageAlgorithm::EnlargeRegionOverBox(
+      const DisplacementRegionType fieldRequestedRegion = ImageAlgorithm::EnlargeRegionOverBox(
         outputPtr->GetRequestedRegion(), outputPtr, fieldPtr, static_cast<TransformType *>(nullptr));
       fieldPtr->SetRequestedRegion(fieldRequestedRegion);
     }

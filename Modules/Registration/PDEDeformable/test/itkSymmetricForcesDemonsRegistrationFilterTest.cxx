@@ -56,7 +56,7 @@ FillWithCircle(TImage *                   image,
   it.GoToBegin();
 
   typename TImage::IndexType index;
-  double                     r2 = itk::Math::sqr(radius);
+  const double               r2 = itk::Math::sqr(radius);
 
   while (!it.IsAtEnd())
   {
@@ -116,12 +116,9 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   SizeType                      size;
   size.SetSize(sizeArray);
 
-  IndexType index;
-  index.Fill(0);
+  constexpr IndexType index{};
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const RegionType region{ index, size };
 
   auto moving = ImageType::New();
   auto fixed = ImageType::New();
@@ -139,15 +136,14 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   initField->SetBufferedRegion(region);
   initField->Allocate();
 
-  double    center[ImageDimension];
-  double    radius;
-  PixelType fgnd = 250;
-  PixelType bgnd = 15;
+  double              center[ImageDimension];
+  constexpr PixelType fgnd = 250;
+  constexpr PixelType bgnd = 15;
 
   // fill moving with circle
   center[0] = 64;
   center[1] = 64;
-  radius = 30;
+  double radius = 30;
   FillWithCircle<ImageType>(moving, center, radius, fgnd, bgnd);
 
   // fill fixed with circle
@@ -157,8 +153,7 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   FillWithCircle<ImageType>(fixed, center, radius, fgnd, bgnd);
 
   // fill initial deformation with zero vectors
-  VectorType zeroVec;
-  zeroVec.Fill(0.0);
+  constexpr VectorType zeroVec{};
   initField->FillBuffer(zeroVec);
 
   std::cout << "Run registration and warp moving" << std::endl;
@@ -176,7 +171,7 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   registrator->SetStandardDeviations(2.0);
   registrator->SetStandardDeviations(1.0);
 
-  double intensityDifferenceThreshold = 0.001;
+  constexpr double intensityDifferenceThreshold = 0.001;
   registrator->SetIntensityDifferenceThreshold(intensityDifferenceThreshold);
   ITK_TEST_SET_GET_VALUE(intensityDifferenceThreshold, registrator->GetIntensityDifferenceThreshold());
 
@@ -199,9 +194,9 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   }
   registrator->SetStandardDeviations(v);
 
-  ShowProgressObject                                    progressWatch(registrator);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(registrator);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   registrator->AddObserver(itk::ProgressEvent(), command);
 
@@ -211,8 +206,8 @@ itkSymmetricForcesDemonsRegistrationFilterTest(int, char *[])
   using WarperType = itk::WarpImageFilter<ImageType, ImageType, FieldType>;
   auto warper = WarperType::New();
 
-  using CoordRepType = WarperType::CoordRepType;
-  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
+  using CoordinateType = WarperType::CoordinateType;
+  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
   auto interpolator = InterpolatorType::New();
 
 

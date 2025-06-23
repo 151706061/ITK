@@ -30,7 +30,7 @@
 #include "itkNiftiImageIO.h"
 #include "itkMetaDataObject.h"
 #include "itkIOCommon.h"
-#include "itkSpatialOrientationAdapter.h"
+#include "itkAnatomicalOrientation.h"
 #include "itkDiffusionTensor3D.h"
 #include "itkAffineTransform.h"
 #include "itkVector.h"
@@ -61,23 +61,21 @@ PreFillDirection();
 
 template <typename T>
 int
-MakeNiftiImage()
+MakeNiftiImage(const char * filename)
 {
   using ImageType = itk::Image<T, 3>;
-  const char * filename = "test.nii";
   // Allocate Images
   enum
   {
     ImageDimension = ImageType::ImageDimension
   };
-  const typename ImageType::SizeType size = { { 10, 10, 10 } };
-  typename ImageType::SpacingType    spacing;
-  spacing[0] = spacing[1] = spacing[2] = 1.0;
-
-  const typename ImageType::IndexType index = { { 0, 0, 0 } };
-  typename ImageType::RegionType      region(index, size);
+  const typename ImageType::SizeType   size = { { 10, 10, 10 } };
+  const typename ImageType::IndexType  index{};
+  const typename ImageType::RegionType region(index, size);
   {
-    typename ImageType::Pointer img = itk::IOTestHelper::AllocateImageFromRegionAndSpacing<ImageType>(region, spacing);
+    auto                              spacing = itk::MakeFilled<typename ImageType::SpacingType>(1.0);
+    const typename ImageType::Pointer img =
+      itk::IOTestHelper::AllocateImageFromRegionAndSpacing<ImageType>(region, spacing);
 
     { // Fill in entire image
       itk::ImageRegionIterator<ImageType> ri(img, region);
@@ -96,14 +94,11 @@ MakeNiftiImage()
       }
     }
 
-    typename ImageType::RegionType      RPIregion;
-    itk::ImageRegionIterator<ImageType> RPIiterator;
-
     { // Fill in left half
-      const typename ImageType::IndexType RPIindex = { { 0, 0, 0 } };
-      const typename ImageType::SizeType  RPIsize = { { 5, 10, 10 } };
-      RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
-      RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
+      const typename ImageType::IndexType  RPIindex = { { 0, 0, 0 } };
+      const typename ImageType::SizeType   RPIsize = { { 5, 10, 10 } };
+      const typename ImageType::RegionType RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
+      itk::ImageRegionIterator<ImageType>  RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
       while (!RPIiterator.IsAtEnd())
       {
         RPIiterator.Set(RPIiterator.Get() + LEFT);
@@ -111,10 +106,10 @@ MakeNiftiImage()
       }
     }
     { // Fill in anterior half
-      const typename ImageType::IndexType RPIindex = { { 0, 5, 0 } };
-      const typename ImageType::SizeType  RPIsize = { { 10, 5, 10 } };
-      RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
-      RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
+      const typename ImageType::IndexType  RPIindex = { { 0, 5, 0 } };
+      const typename ImageType::SizeType   RPIsize = { { 10, 5, 10 } };
+      const typename ImageType::RegionType RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
+      itk::ImageRegionIterator<ImageType>  RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
       while (!RPIiterator.IsAtEnd())
       {
         RPIiterator.Set(RPIiterator.Get() + ANTERIOR);
@@ -122,10 +117,10 @@ MakeNiftiImage()
       }
     }
     { // Fill in superior half
-      const typename ImageType::IndexType RPIindex = { { 0, 0, 5 } };
-      const typename ImageType::SizeType  RPIsize = { { 10, 10, 5 } };
-      RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
-      RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
+      const typename ImageType::IndexType  RPIindex = { { 0, 0, 5 } };
+      const typename ImageType::SizeType   RPIsize = { { 10, 10, 5 } };
+      const typename ImageType::RegionType RPIregion = typename ImageType::RegionType(RPIindex, RPIsize);
+      itk::ImageRegionIterator<ImageType>  RPIiterator = itk::ImageRegionIterator<ImageType>(img, RPIregion);
       while (!RPIiterator.IsAtEnd())
       {
         RPIiterator.Set(RPIiterator.Get() + SUPERIOR);
@@ -170,8 +165,7 @@ MakeNiftiImage()
     }
     catch (const itk::ExceptionObject & ex)
     {
-      std::string message;
-      message = "Problem found while writing image ";
+      std::string message = "Problem found while writing image ";
       message += filename;
       message += "\n";
       message += ex.GetLocation();
@@ -183,12 +177,11 @@ MakeNiftiImage()
     }
   } // End writing image test
 
-  typename ImageType::Pointer input;
   try
   {
-    input = itk::IOTestHelper::ReadImage<ImageType>(std::string(filename));
+    const typename ImageType::Pointer input = itk::IOTestHelper::ReadImage<ImageType>(std::string(filename));
     // Get the sform and qform codes from the image
-    itk::MetaDataDictionary & thisDic = input->GetMetaDataDictionary();
+    const itk::MetaDataDictionary & thisDic = input->GetMetaDataDictionary();
     // std::cout << "DICTIONARY:\n" << std::endl;
     // thisDic.Print( std::cout );
     std::string qform_temp = "";
@@ -229,8 +222,10 @@ template <typename ImageType>
 typename ImageType::DirectionType
 CORDirCosines()
 {
-  typename itk::SpatialOrientationAdapter::DirectionType CORdir = itk::SpatialOrientationAdapter().ToDirectionCosines(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP);
+  auto CORdir = itk::AnatomicalOrientation(itk::AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                                           itk::AnatomicalOrientation::CoordinateEnum::InferiorToSuperior,
+                                           itk::AnatomicalOrientation::CoordinateEnum::PosteriorToAnterior)
+                  .GetAsDirection();
   typename ImageType::DirectionType dir;
   for (unsigned int i = 0; i < ImageType::ImageDimension; ++i)
   {
@@ -248,7 +243,7 @@ CORDirCosines()
 
 /* common code for DTi and sym matrix tests
  *
- * Could probably be made to fo the image of vector test as well
+ * Could probably be made of the image of vector test as well
  */
 template <typename PixelType, unsigned int VDimension>
 int
@@ -262,13 +257,6 @@ TestImageOfSymMats(const std::string & fname)
   /** Deformation field type. */
   using DtiImageType = typename itk::Image<PixelType, VDimension>;
 
-  //
-  // swizzle up a random vector image.
-  typename DtiImageType::RegionType  imageRegion;
-  typename DtiImageType::SizeType    size;
-  typename DtiImageType::IndexType   index;
-  typename DtiImageType::SpacingType spacing;
-  typename DtiImageType::PointType   origin;
   // original test case was destined for failure.  NIfTI always writes out 3D
   // orientation.  The only sensible matrices you could pass in would be of the form
   // A B C 0
@@ -281,27 +269,22 @@ TestImageOfSymMats(const std::string & fname)
   //      direction matrix.
   const typename DtiImageType::DirectionType myDirection = PreFillDirection<VDimension>();
 
-  std::cout << " === Testing DtiImageType:  Image Dimension " << static_cast<int>(VDimension) << std::endl
+  std::cout << " === Testing DtiImageType:  Image Dimension " << int{ VDimension } << std::endl
             << "======================== Initialized Direction" << std::endl
             << myDirection << std::endl;
 
-  for (unsigned int i = 0; i < VDimension; ++i)
-  {
-    size[i] = dimsize;
-    index[i] = 0;
-    spacing[i] = 1.0;
-    origin[i] = 0;
-  }
+  //
+  // swizzle up a random vector image.
+  const auto                              size = itk::MakeFilled<typename DtiImageType::SizeType>(dimsize);
+  typename DtiImageType::IndexType        index{};
+  const typename DtiImageType::RegionType imageRegion{ index, size };
 
-  imageRegion.SetSize(size);
-  imageRegion.SetIndex(index);
-  typename DtiImageType::Pointer vi =
+  const auto                           spacing = itk::MakeFilled<typename DtiImageType::SpacingType>(1.0);
+  const typename DtiImageType::Pointer vi =
     itk::IOTestHelper::AllocateImageFromRegionAndSpacing<DtiImageType>(imageRegion, spacing);
-  vi->SetOrigin(origin);
   vi->SetDirection(myDirection);
 
   int dims[7];
-  int _index[7];
   for (unsigned int i = 0; i < VDimension; ++i)
   {
     dims[i] = size[i];
@@ -313,6 +296,7 @@ TestImageOfSymMats(const std::string & fname)
 
   int incr_value = 0;
   //  for(fillIt.GoToBegin(); !fillIt.IsAtEnd(); ++fillIt)
+  int _index[7];
   for (int l = 0; l < dims[6]; ++l)
   {
     _index[6] = l;
@@ -358,8 +342,7 @@ TestImageOfSymMats(const std::string & fname)
   }
   catch (const itk::ExceptionObject & ex)
   {
-    std::string message;
-    message = "Problem found while writing image ";
+    std::string message = "Problem found while writing image ";
     message += fname;
     message += "\n";
     message += ex.GetLocation();
@@ -378,8 +361,7 @@ TestImageOfSymMats(const std::string & fname)
   }
   catch (const itk::ExceptionObject & ex)
   {
-    std::string message;
-    message = "Problem found while reading image ";
+    std::string message = "Problem found while reading image ";
     message += fname;
     message += "\n";
     message += ex.GetLocation();
@@ -435,13 +417,12 @@ TestImageOfSymMats(const std::string & fname)
               for (int k = 0; k < dims[0]; ++k)
               {
                 _index[0] = k;
-                PixelType p1, p2;
                 for (unsigned int q = 0; q < VDimension; ++q)
                 {
                   index[q] = _index[q];
                 }
-                p1 = vi->GetPixel(index);
-                p2 = readback->GetPixel(index);
+                PixelType p1 = vi->GetPixel(index);
+                PixelType p2 = readback->GetPixel(index);
                 if (p1 != p2)
                 {
                   same = false;
@@ -485,10 +466,8 @@ RGBTest(int argc, char * argv[])
   {
     return EXIT_FAILURE;
   }
-  char * tmpImage = *++argv;
-  int    success(EXIT_SUCCESS);
+
   using RGBImageType = typename itk::Image<RGBPixelType, 3>;
-  typename RGBImageType::RegionType  imageRegion;
   typename RGBImageType::SizeType    size;
   typename RGBImageType::IndexType   index;
   typename RGBImageType::SpacingType spacing;
@@ -501,9 +480,10 @@ RGBTest(int argc, char * argv[])
     spacing[i] = 1.0;
     origin[i] = 0;
   }
+  typename RGBImageType::RegionType imageRegion;
   imageRegion.SetSize(size);
   imageRegion.SetIndex(index);
-  typename RGBImageType::Pointer im =
+  const typename RGBImageType::Pointer im =
     itk::IOTestHelper::AllocateImageFromRegionAndSpacing<RGBImageType>(imageRegion, spacing);
   vnl_random                             randgen(12345678);
   itk::ImageRegionIterator<RGBImageType> it(im, im->GetLargestPossibleRegion());
@@ -517,6 +497,7 @@ RGBTest(int argc, char * argv[])
     it.Set(pix);
   }
   typename RGBImageType::Pointer im2;
+  char *                         tmpImage = *++argv;
   try
   {
     itk::IOTestHelper::WriteImage<RGBImageType, itk::NiftiImageIO>(im, std::string(tmpImage));
@@ -527,6 +508,7 @@ RGBTest(int argc, char * argv[])
     std::cout << "itkNiftiImageIOTest9" << std::endl << "Exception Object caught: " << std::endl << err << std::endl;
     return EXIT_FAILURE;
   }
+  int                                    success(EXIT_SUCCESS);
   itk::ImageRegionIterator<RGBImageType> it2(im2, im2->GetLargestPossibleRegion());
   for (it.GoToBegin(), it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it, ++it2)
   {

@@ -48,7 +48,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PathToImageFilter);
 
   /** Some convenient type alias. */
@@ -88,16 +88,17 @@ public:
   virtual void
   SetSpacing(const float * spacing);
 
-  virtual const double *
+  [[nodiscard]] virtual const double *
   GetSpacing() const;
 
   /** Set/Get the value for pixels on and off the path.
    * By default, this filter will return a "0" image with path pixels set to 1 */
+  /** @ITKStartGrouping */
   itkSetMacro(PathValue, ValueType);
   itkGetConstMacro(PathValue, ValueType);
   itkSetMacro(BackgroundValue, ValueType);
   itkGetConstMacro(BackgroundValue, ValueType);
-
+  /** @ITKEndGrouping */
   /** The origin of the output image. The origin is the geometric
    * coordinates of the index (0,0,...,0).  It is stored internally
    * as double but may be set from float.
@@ -108,13 +109,14 @@ public:
   virtual void
   SetOrigin(const float * origin);
 
-  virtual const double *
+  [[nodiscard]] virtual const double *
   GetOrigin() const;
 
   /** Set/Get Size */
+  /** @ITKStartGrouping */
   itkSetMacro(Size, SizeType);
   itkGetConstMacro(Size, SizeType);
-
+  /** @ITKEndGrouping */
 protected:
   PathToImageFilter();
   ~PathToImageFilter() override = default;

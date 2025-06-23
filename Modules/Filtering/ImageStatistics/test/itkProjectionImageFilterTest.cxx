@@ -24,20 +24,14 @@
 #include "itkProjectionImageFilter.h"
 #include "itkTestingMacros.h"
 
-namespace itk
-{
-namespace ProjectionImageFilterNamespace
-{
-namespace Function
+namespace itk::ProjectionImageFilterNamespace::Function
 {
 
 template <typename TInputPixel, typename TOutputPixel>
 class BinaryAccumulator
 {
 public:
-  BinaryAccumulator(unsigned long)
-    : m_IsForeground(false)
-  {}
+  BinaryAccumulator(unsigned long) {}
   ~BinaryAccumulator() = default;
 
   inline void
@@ -62,18 +56,15 @@ public:
     {
       return 100;
     }
-    else
-    {
-      return 0;
-    }
+
+    return 0;
   }
 
-  bool m_IsForeground;
+  bool m_IsForeground{ false };
 };
-} // end namespace Function
+} // namespace itk::ProjectionImageFilterNamespace::Function
 
-} // end namespace ProjectionImageFilterNamespace
-} // end namespace itk
+// end namespace ProjectionImageFilterNamespace
 
 int
 itkProjectionImageFilterTest(int argc, char * argv[])
@@ -133,7 +124,7 @@ itkProjectionImageFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(projectionDimension, filter->GetProjectionDimension());
 
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  const itk::SimpleFilterWatcher watcher(filter, "filter");
 
   using WriterType = itk::ImageFileWriter<ImageType>;
   auto writer = WriterType::New();

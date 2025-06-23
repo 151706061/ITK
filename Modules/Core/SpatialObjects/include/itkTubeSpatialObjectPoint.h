@@ -39,6 +39,8 @@ template <unsigned int TPointDimension = 3>
 class ITK_TEMPLATE_EXPORT TubeSpatialObjectPoint : public SpatialObjectPoint<TPointDimension>
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(TubeSpatialObjectPoint);
+
   using Self = TubeSpatialObjectPoint;
   using Superclass = SpatialObjectPoint<TPointDimension>;
   using PointType = Point<double, TPointDimension>;
@@ -49,21 +51,18 @@ public:
    * TubeSpatialObjectPoint */
   TubeSpatialObjectPoint();
 
-  /** Copy Constructor */
-  TubeSpatialObjectPoint(const TubeSpatialObjectPoint & other);
-
   /** Default destructor. */
   ~TubeSpatialObjectPoint() override = default;
 
   /** Get the radius in object space. */
-  double
+  [[nodiscard]] double
   GetRadiusInObjectSpace() const
   {
     return m_RadiusInObjectSpace;
   }
 
   /** Get the radius in world space. */
-  double
+  [[nodiscard]] double
   GetRadiusInWorldSpace() const;
 
   /** Set the radius in object space. */
@@ -78,14 +77,14 @@ public:
   SetRadiusInWorldSpace(double newR);
 
   /** Get the tangent in object space. */
-  const VectorType &
+  [[nodiscard]] const VectorType &
   GetTangentInObjectSpace() const
   {
     return m_TangentInObjectSpace;
   }
 
   /** Get the tangent in world space. */
-  const VectorType
+  [[nodiscard]] const VectorType
   GetTangentInWorldSpace() const;
 
   /** Set the tangent in object space. */
@@ -100,14 +99,14 @@ public:
   SetTangentInWorldSpace(const VectorType & newT);
 
   /** Get V1 in Object space */
-  const CovariantVectorType &
+  [[nodiscard]] const CovariantVectorType &
   GetNormal1InObjectSpace() const
   {
     return m_Normal1InObjectSpace;
   }
 
   /** Get V1 in World space */
-  const CovariantVectorType
+  [[nodiscard]] const CovariantVectorType
   GetNormal1InWorldSpace() const;
 
   /** Set V1 */
@@ -122,14 +121,14 @@ public:
   SetNormal1InWorldSpace(const CovariantVectorType & newV1);
 
   /** Get V2 */
-  const CovariantVectorType &
+  [[nodiscard]] const CovariantVectorType &
   GetNormal2InObjectSpace() const
   {
     return m_Normal2InObjectSpace;
   }
 
   /** Get V2 */
-  const CovariantVectorType
+  [[nodiscard]] const CovariantVectorType
   GetNormal2InWorldSpace() const;
 
   /** Set V2 */
@@ -149,7 +148,7 @@ public:
     m_Ridgeness = ridgeness;
   }
 
-  double
+  [[nodiscard]] double
   GetRidgeness() const
   {
     return m_Ridgeness;
@@ -161,7 +160,7 @@ public:
     m_Curvature = curvature;
   }
 
-  double
+  [[nodiscard]] double
   GetCurvature() const
   {
     return m_Curvature;
@@ -173,7 +172,7 @@ public:
     m_Levelness = levelness;
   }
 
-  double
+  [[nodiscard]] double
   GetLevelness() const
   {
     return m_Levelness;
@@ -185,7 +184,7 @@ public:
     m_Roundness = roundness;
   }
 
-  double
+  [[nodiscard]] double
   GetRoundness() const
   {
     return m_Roundness;
@@ -197,7 +196,7 @@ public:
     m_Intensity = intensity;
   }
 
-  double
+  [[nodiscard]] double
   GetIntensity() const
   {
     return m_Intensity;
@@ -209,7 +208,7 @@ public:
     m_Medialness = medialness;
   }
 
-  double
+  [[nodiscard]] double
   GetMedialness() const
   {
     return m_Medialness;
@@ -221,7 +220,7 @@ public:
     m_Branchness = branchness;
   }
 
-  double
+  [[nodiscard]] double
   GetBranchness() const
   {
     return m_Branchness;
@@ -233,7 +232,7 @@ public:
     m_Alpha1 = alpha1;
   }
 
-  double
+  [[nodiscard]] double
   GetAlpha1() const
   {
     return m_Alpha1;
@@ -245,7 +244,7 @@ public:
     m_Alpha2 = alpha2;
   }
 
-  double
+  [[nodiscard]] double
   GetAlpha2() const
   {
     return m_Alpha2;
@@ -257,15 +256,11 @@ public:
     m_Alpha3 = alpha3;
   }
 
-  double
+  [[nodiscard]] double
   GetAlpha3() const
   {
     return m_Alpha3;
   }
-
-  /** Copy one TubeSpatialObjectPoint to another */
-  Self &
-  operator=(const TubeSpatialObjectPoint & rhs);
 
 protected:
   VectorType          m_TangentInObjectSpace{};

@@ -36,11 +36,11 @@
 #include <type_traits> // For conditional and integral_constant.
 #include <utility>     // For tuple_element and tuple_size.
 
-// Macro added to each `ImageRegion` member function that overrides a virtual member function of `Region`. In the
-// future, `ImageRegion` will no longer inherit from `Region`, so then those `ImageRegion` member functions will no
-// longer override.
-#ifdef ITK_FUTURE_LEGACY_REMOVE
-#  define itkRegionOverrideMacro // nothing (in the future)
+// Macro added to each `ImageRegion` member function that overrides a virtual member function of `Region`, when legacy
+// support is enabled. Without legacy support, `ImageRegion` will no longer inherit from `Region`, so then those
+// `ImageRegion` member functions will no longer override.
+#ifdef ITK_LEGACY_REMOVE
+#  define itkRegionOverrideMacro // nothing
 #else
 #  define itkRegionOverrideMacro override
 #endif
@@ -78,8 +78,8 @@ class ITK_TEMPLATE_EXPORT ImageBase;
  */
 template <unsigned int VImageDimension>
 class ITK_TEMPLATE_EXPORT ImageRegion final
-#ifndef ITK_FUTURE_LEGACY_REMOVE
-  // This inheritance is to be removed in the future.
+#ifndef ITK_LEGACY_REMOVE
+  // This inheritance is only there when legacy support is enabled.
   : public Region
 #endif
 {
@@ -87,12 +87,12 @@ public:
   /** Standard class type aliases. */
   using Self = ImageRegion;
 
-#ifndef ITK_FUTURE_LEGACY_REMOVE
+#ifndef ITK_LEGACY_REMOVE
   using Superclass = Region;
 #endif
 
   /** Standard part of all itk objects. */
-  const char *
+  [[nodiscard]] const char *
   GetNameOfClass() const itkRegionOverrideMacro
   {
     return "ImageRegion";
@@ -105,8 +105,8 @@ public:
       in which case the SliceDimension is also one dimensional. */
   static constexpr unsigned int SliceDimension = ImageDimension - (ImageDimension > 1);
 
-  /** Dimension of the image available at run time. */
-  static unsigned int
+  /** Dimension of the image available at compile-time and at run time. */
+  static constexpr unsigned int
   GetImageDimension()
   {
     return ImageDimension;
@@ -128,7 +128,7 @@ public:
   using SliceRegion = ImageRegion<Self::SliceDimension>;
 
   /** Return the region type. Images are described with structured regions. */
-  Region::RegionEnum
+  [[nodiscard]] Region::RegionEnum
   GetRegionType() const itkRegionOverrideMacro
   {
     return Region::RegionEnum::ITK_STRUCTURED_REGION;
@@ -184,7 +184,8 @@ public:
   }
 
   /** Get index defining the corner of the region. */
-  const IndexType &
+  /** @ITKStartGrouping */
+  [[nodiscard]] const IndexType &
   GetIndex() const
   {
     return m_Index;
@@ -194,7 +195,7 @@ public:
   {
     return m_Index;
   }
-
+  /** @ITKEndGrouping */
   /** Set the size of the region. This plus the index determines the
    * rectangular shape, or extent, of the region. */
   void
@@ -204,7 +205,8 @@ public:
   }
 
   /** Get the size of the region. */
-  const SizeType &
+  /** @ITKStartGrouping */
+  [[nodiscard]] const SizeType &
   GetSize() const
   {
     return m_Size;
@@ -214,35 +216,37 @@ public:
   {
     return m_Size;
   }
-
+  /** @ITKEndGrouping */
   /** Convenience methods to get and set the size of the particular dimension i.
    */
+  /** @ITKStartGrouping */
   void
   SetSize(unsigned int i, SizeValueType sze)
   {
     m_Size[i] = sze;
   }
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetSize(unsigned int i) const
   {
     return m_Size[i];
   }
-
+  /** @ITKEndGrouping */
   /** Convenience methods to get and set the index of the particular dimension
     i. */
+  /** @ITKStartGrouping */
   void
   SetIndex(unsigned int i, IndexValueType sze)
   {
     m_Index[i] = sze;
   }
-  IndexValueType
+  [[nodiscard]] IndexValueType
   GetIndex(unsigned int i) const
   {
     return m_Index[i];
   }
-
+  /** @ITKEndGrouping */
   /** Get index defining the upper corner of the region. */
-  IndexType
+  [[nodiscard]] IndexType
   GetUpperIndex() const;
 
   /** Modify the Size of the ImageRegion so that the provided index will be the upper corner index. */
@@ -263,7 +267,7 @@ public:
   ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(Self);
 
   /** Test if an index is inside */
-  bool
+  [[nodiscard]] bool
   IsInside(const IndexType & index) const
   {
     for (unsigned int i = 0; i < ImageDimension; ++i)
@@ -280,11 +284,11 @@ public:
    * We take into account the fact that each voxel has its
    * center at the integer coordinate and extends half way
    * to the next integer coordinate, inclusive on all sides. */
-  template <typename TCoordRepType>
-  bool
-  IsInside(const ContinuousIndex<TCoordRepType, VImageDimension> & index) const
+  template <typename TCoordinate>
+  [[nodiscard]] bool
+  IsInside(const ContinuousIndex<TCoordinate, VImageDimension> & index) const
   {
-    constexpr TCoordRepType half = 0.5;
+    constexpr TCoordinate half = 0.5;
     for (unsigned int i = 0; i < ImageDimension; ++i)
     {
       // Use negation of tests so that index[i]==NaN leads to returning false.
@@ -300,7 +304,7 @@ public:
    * the region that is passed as argument to this method, has a size of value
    * zero, then it will not be considered to be inside of the current region,
    * even its starting index is inside. */
-  bool
+  [[nodiscard]] bool
   IsInside(const Self & otherRegion) const
   {
     const auto & otherIndex = otherRegion.m_Index;
@@ -320,7 +324,7 @@ public:
 
   /** Get the number of pixels contained in this region. This just
    * multiplies the size components. */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfPixels() const;
 
   /** Pad an image region by the specified radius. Region can be padded
@@ -358,7 +362,7 @@ public:
   /** Slice a region, producing a region that is one dimension lower
    * than the current region. Parameter "dim" specifies which dimension
    * to remove. */
-  SliceRegion
+  [[nodiscard]] SliceRegion
   Slice(const unsigned int dim) const;
 
   /** Supports tuple-like access: `get<0>()` returns a reference to the index and `get<1>()` returns a reference to the
@@ -413,7 +417,7 @@ private:
 
 // Deduction guide to avoid compiler warnings (-wctad-maybe-unsupported) when using class template argument deduction.
 template <unsigned int VImageDimension>
-ImageRegion(const Index<VImageDimension> &, const Size<VImageDimension> &)->ImageRegion<VImageDimension>;
+ImageRegion(const Index<VImageDimension> &, const Size<VImageDimension> &) -> ImageRegion<VImageDimension>;
 
 
 template <unsigned int VImageDimension>
@@ -424,13 +428,6 @@ operator<<(std::ostream & os, const ImageRegion<VImageDimension> & region);
 
 namespace std
 {
-#if defined(__clang__)
-#  pragma GCC diagnostic push
-// Old Clang compiler versions (before Clang 7.0.0) produced some unimportant warnings, like: "warning: 'tuple_size'
-// defined as a struct template here but previously declared as a class template"
-#  pragma GCC diagnostic ignored "-Wmismatched-tags"
-#endif
-
 // NOLINTBEGIN(cert-dcl58-cpp)
 // Locally suppressed the following warning from Clang-Tidy (LLVM 17.0.1), as it appears undeserved.
 // > warning: modification of 'std' namespace can result in undefined behavior [cert-dcl58-cpp]
@@ -456,9 +453,6 @@ struct tuple_element<VTupleIndex, itk::ImageRegion<VImageDimension>>
 
 // NOLINTEND(cert-dcl58-cpp)
 
-#if defined(__clang__)
-#  pragma GCC diagnostic pop
-#endif
 } // namespace std
 
 #undef itkRegionOverrideMacro

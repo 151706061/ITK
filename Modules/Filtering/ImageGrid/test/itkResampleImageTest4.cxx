@@ -37,11 +37,11 @@ itkResampleImageTest4(int argc, char * argv[])
   using ImageRegionType = ImageType::RegionType;
   using ImageSizeType = ImageType::SizeType;
 
-  using CoordRepType = double;
+  using CoordinateType = double;
 
-  using AffineTransformType = itk::AffineTransform<CoordRepType, VDimension>;
+  using AffineTransformType = itk::AffineTransform<CoordinateType, VDimension>;
 
-  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
+  using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
 
 
   float scaling = 10.0;
@@ -51,12 +51,10 @@ itkResampleImageTest4(int argc, char * argv[])
   }
 
   // Create and configure an image
-  ImagePointerType image = ImageType::New();
-  ImageIndexType   index = { { 0, 0 } };
-  ImageSizeType    size = { { 64, 64 } };
-  ImageRegionType  region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const ImagePointerType image = ImageType::New();
+  ImageIndexType         index = { { 0, 0 } };
+  ImageSizeType          size = { { 64, 64 } };
+  const ImageRegionType  region{ index, size };
   image->SetRegions(region);
   image->Allocate();
 
@@ -69,11 +67,10 @@ itkResampleImageTest4(int argc, char * argv[])
 
   // Fill image with a ramp
   itk::ImageRegionIteratorWithIndex<ImageType> iter(image, region);
-  PixelType                                    value;
   for (iter.GoToBegin(); !iter.IsAtEnd(); ++iter)
   {
     index = iter.GetIndex();
-    value = index[0] + index[1];
+    const PixelType value = index[0] + index[1];
     iter.Set(value);
   }
 
@@ -86,7 +83,7 @@ itkResampleImageTest4(int argc, char * argv[])
   interp->SetInputImage(image);
 
   // Create and configure a resampling filter
-  itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
+  const itk::ResampleImageFilter<ImageType, ImageType>::Pointer resample =
     itk::ResampleImageFilter<ImageType, ImageType>::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(resample, ResampleImageFilter, ImageToImageFilter);
@@ -109,8 +106,7 @@ itkResampleImageTest4(int argc, char * argv[])
   resample->SetOutputStartIndex(index);
   ITK_TEST_SET_GET_VALUE(index, resample->GetOutputStartIndex());
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
+  constexpr ImageType::PointType origin{};
   resample->SetOutputOrigin(origin);
   ITK_TEST_SET_GET_VALUE(origin, resample->GetOutputOrigin());
 

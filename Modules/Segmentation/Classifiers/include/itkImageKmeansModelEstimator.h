@@ -32,10 +32,10 @@
 
 #include "itkImageModelEstimatorBase.h"
 
-#define ONEBAND 1
-#define GLA_CONVERGED 1
-#define GLA_NOT_CONVERGED 2
-#define LBG_COMPLETED 3
+constexpr int8_t ONEBAND = 1;
+constexpr int8_t GLA_CONVERGED = 1;
+constexpr int8_t GLA_NOT_CONVERGED = 2;
+constexpr int8_t LBG_COMPLETED = 3;
 
 namespace itk
 {
@@ -95,9 +95,7 @@ namespace itk
  * is a table containing all cluster centers.  The GLA produces results
  * that are equivalent to the K-means clustering algorithm.
  *
- * For more information about the algorithms, see A. Gersho and R. M. Gray,
- * {\em Vector Quantization and Signal Compression},
- * Kluwer Academic Publishers, Boston, MA, 1992.
+ * For more information about the algorithms, see \cite gersho1992.
  *
  * This object supports data handling of multiband images. The object
  * accepts the input image in vector format only, where each pixel is a
@@ -143,7 +141,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageKmeansModelEstimator);
 
   /** Type definition for the input image. */
@@ -187,21 +185,25 @@ public:
   }
 
   /** Set/Get the threshold parameter. */
+  /** @ITKStartGrouping */
   itkSetMacro(Threshold, double);
   itkGetConstMacro(Threshold, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the offset add parameter. */
+  /** @ITKStartGrouping */
   itkSetMacro(OffsetAdd, double);
   itkGetConstMacro(OffsetAdd, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the offset multiplication parameter. */
+  /** @ITKStartGrouping */
   itkSetMacro(OffsetMultiply, double);
   itkGetConstMacro(OffsetMultiply, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the maximum number of attempts to split a codeword. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaxSplitAttempts, int);
   itkGetConstMacro(MaxSplitAttempts, int);
-
+  /** @ITKEndGrouping */
   /** Return the codebook/cluster centers. */
   CodebookMatrixOfDoubleType
   GetKmeansResults()

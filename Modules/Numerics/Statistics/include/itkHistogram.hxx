@@ -22,9 +22,7 @@
 #include "itkMath.h"
 #include "itkPrintHelper.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TMeasurement, typename TFrequencyContainer>
 Histogram<TMeasurement, TFrequencyContainer>::Histogram()
@@ -179,15 +177,14 @@ Histogram<TMeasurement, TFrequencyContainer>::Initialize(const SizeType & size)
   m_NumberOfInstances = num;
 
   // adjust the sizes of min max value containers
-  unsigned int dim;
   m_Min.resize(this->GetMeasurementVectorSize());
-  for (dim = 0; dim < this->GetMeasurementVectorSize(); ++dim)
+  for (unsigned int dim = 0; dim < this->GetMeasurementVectorSize(); ++dim)
   {
     m_Min[dim].resize(m_Size[dim]);
   }
 
   m_Max.resize(this->GetMeasurementVectorSize());
-  for (dim = 0; dim < this->GetMeasurementVectorSize(); ++dim)
+  for (unsigned int dim = 0; dim < this->GetMeasurementVectorSize(); ++dim)
   {
     m_Max[dim].resize(m_Size[dim]);
   }
@@ -219,12 +216,13 @@ Histogram<TMeasurement, TFrequencyContainer>::Initialize(const SizeType &       
 {
   this->Initialize(size);
 
-  float interval;
+
   for (unsigned int i = 0; i < this->GetMeasurementVectorSize(); ++i)
   {
     if (size[i] > 0)
     {
-      interval = (static_cast<float>(upperBound[i]) - static_cast<float>(lowerBound[i])) / static_cast<float>(size[i]);
+      float interval =
+        (static_cast<float>(upperBound[i]) - static_cast<float>(lowerBound[i])) / static_cast<float>(size[i]);
 
       // Set the min vector and max vector
       for (unsigned int j = 0; j < static_cast<unsigned int>(size[i] - 1); ++j)
@@ -247,41 +245,33 @@ Histogram<TMeasurement, TFrequencyContainer>::GetIndex(const MeasurementVectorTy
 {
   // now using something similar to binary search to find
   // index.
-  unsigned int       dim;
   const unsigned int measurementVectorSize = this->GetMeasurementVectorSize();
   if (index.Size() != measurementVectorSize)
   {
     index.SetSize(measurementVectorSize);
   }
 
-  IndexValueType begin;
-  IndexValueType mid;
-  IndexValueType end;
 
-  MeasurementType median;
-  MeasurementType tempMeasurement;
-
-  for (dim = 0; dim < measurementVectorSize; ++dim)
+  for (unsigned int dim = 0; dim < measurementVectorSize; ++dim)
   {
-    tempMeasurement = measurement[dim];
-    begin = 0;
+    const MeasurementType tempMeasurement = measurement[dim];
+    IndexValueType        begin = 0;
     if (tempMeasurement < m_Min[dim][begin])
     {
       // one of measurement is below the minimum
       // its ok if we extend the bins to infinity.. not ok if we don't
       if (!m_ClipBinsAtEnds)
       {
-        index[dim] = (IndexValueType)0;
+        index[dim] = static_cast<IndexValueType>(0);
         continue;
       }
-      else
-      { // set an illegal value and return 0
-        index[dim] = (IndexValueType)m_Size[dim];
-        return false;
-      }
+
+      // set an illegal value and return 0
+      index[dim] = (IndexValueType)m_Size[dim];
+      return false;
     }
 
-    end = static_cast<IndexValueType>(m_Min[dim].size()) - 1;
+    IndexValueType end = static_cast<IndexValueType>(m_Min[dim].size()) - 1;
     if (tempMeasurement >= m_Max[dim][end])
     {
       // one of measurement is above the maximum
@@ -292,16 +282,15 @@ Histogram<TMeasurement, TFrequencyContainer>::GetIndex(const MeasurementVectorTy
         index[dim] = (IndexValueType)m_Size[dim] - 1;
         continue;
       }
-      else
-      { // set an illegal value and return 0
-        index[dim] = (IndexValueType)m_Size[dim];
-        return false;
-      }
+
+      // set an illegal value and return 0
+      index[dim] = (IndexValueType)m_Size[dim];
+      return false;
     }
 
     // Binary search for the bin where this measurement could be
-    mid = (end + 1) / 2;
-    median = m_Min[dim][mid];
+    IndexValueType  mid = (end + 1) / 2;
+    MeasurementType median = m_Min[dim][mid];
 
     while (true)
     {
@@ -329,7 +318,7 @@ Histogram<TMeasurement, TFrequencyContainer>::GetIndex(const MeasurementVectorTy
       mid = begin + (end - begin) / 2;
       median = m_Min[dim][mid];
     } // end of while
-  }   // end of for()
+  } // end of for()
   return true;
 }
 
@@ -476,7 +465,7 @@ Histogram<TMeasurement, TFrequencyContainer>::GetMeasurementVector(const IndexTy
   const unsigned int measurementVectorSize = this->GetMeasurementVectorSize();
   for (unsigned int i = 0; i < measurementVectorSize; ++i)
   {
-    MeasurementType value = (m_Min[i][index[i]] + m_Max[i][index[i]]);
+    const MeasurementType value = (m_Min[i][index[i]] + m_Max[i][index[i]]);
     m_TempMeasurementVector[i] = static_cast<MeasurementType>(value / 2.0);
   }
   return m_TempMeasurementVector;
@@ -494,8 +483,8 @@ template <typename TMeasurement, typename TFrequencyContainer>
 inline void
 Histogram<TMeasurement, TFrequencyContainer>::SetFrequency(const AbsoluteFrequencyType value)
 {
-  typename Self::Iterator iter = this->Begin();
-  typename Self::Iterator end = this->End();
+  typename Self::Iterator       iter = this->Begin();
+  const typename Self::Iterator end = this->End();
 
   while (iter != end)
   {
@@ -563,12 +552,12 @@ auto
 Histogram<TMeasurement, TFrequencyContainer>::GetFrequency(InstanceIdentifier n, unsigned int dimension) const
   -> AbsoluteFrequencyType
 {
-  InstanceIdentifier nextOffset = this->m_OffsetTable[dimension + 1];
-  InstanceIdentifier current = this->m_OffsetTable[dimension] * n;
-  InstanceIdentifier includeLength = this->m_OffsetTable[dimension];
-  InstanceIdentifier include;
-  InstanceIdentifier includeEnd;
-  InstanceIdentifier last = this->m_OffsetTable[this->GetMeasurementVectorSize()];
+  const InstanceIdentifier nextOffset = this->m_OffsetTable[dimension + 1];
+  InstanceIdentifier       current = this->m_OffsetTable[dimension] * n;
+  const InstanceIdentifier includeLength = this->m_OffsetTable[dimension];
+  InstanceIdentifier       include;
+  InstanceIdentifier       includeEnd;
+  const InstanceIdentifier last = this->m_OffsetTable[this->GetMeasurementVectorSize()];
 
   AbsoluteFrequencyType frequency = 0;
 
@@ -597,20 +586,18 @@ template <typename TMeasurement, typename TFrequencyContainer>
 double
 Histogram<TMeasurement, TFrequencyContainer>::Quantile(unsigned int dimension, double p) const
 {
-  InstanceIdentifier n;
   const unsigned int size = this->GetSize(dimension);
-  double             p_n_prev;
-  double             p_n;
-  double             f_n;
-  double             cumulated = 0;
-  auto               totalFrequency = static_cast<double>(this->GetTotalFrequency());
-  double             binProportion;
-  double             min, max, interval;
 
+  double cumulated = 0;
+  auto   totalFrequency = static_cast<double>(this->GetTotalFrequency());
+
+
+  double f_n = NAN;
+  double p_n_prev = NAN;
   if (p < 0.5)
   {
-    n = 0;
-    p_n = 0.0;
+    InstanceIdentifier n = 0;
+    double             p_n = 0.0;
     do
     {
       f_n = this->GetFrequency(n, dimension);
@@ -620,34 +607,32 @@ Histogram<TMeasurement, TFrequencyContainer>::Quantile(unsigned int dimension, d
       ++n;
     } while (n < size && p_n < p);
 
-    binProportion = f_n / totalFrequency;
+    const double binProportion = f_n / totalFrequency;
 
-    min = static_cast<double>(this->GetBinMin(dimension, n - 1));
-    max = static_cast<double>(this->GetBinMax(dimension, n - 1));
-    interval = max - min;
+    const auto   min = static_cast<double>(this->GetBinMin(dimension, n - 1));
+    const auto   max = static_cast<double>(this->GetBinMax(dimension, n - 1));
+    const double interval = max - min;
     return min + ((p - p_n_prev) / binProportion) * interval;
   }
-  else
-  {
-    n = size - 1;
-    InstanceIdentifier m{};
-    p_n = 1.0;
-    do
-    {
-      f_n = this->GetFrequency(n, dimension);
-      cumulated += f_n;
-      p_n_prev = p_n;
-      p_n = 1.0 - cumulated / totalFrequency;
-      --n;
-      ++m;
-    } while (m < size && p_n > p);
 
-    binProportion = f_n / totalFrequency;
-    min = static_cast<double>(this->GetBinMin(dimension, n + 1));
-    max = static_cast<double>(this->GetBinMax(dimension, n + 1));
-    interval = max - min;
-    return max - ((p_n_prev - p) / binProportion) * interval;
-  }
+  InstanceIdentifier n = size - 1;
+  InstanceIdentifier m{};
+  double             p_n = 1.0;
+  do
+  {
+    f_n = this->GetFrequency(n, dimension);
+    cumulated += f_n;
+    p_n_prev = p_n;
+    p_n = 1.0 - cumulated / totalFrequency;
+    --n;
+    ++m;
+  } while (m < size && p_n > p);
+
+  const double binProportion = f_n / totalFrequency;
+  const auto   min = static_cast<double>(this->GetBinMin(dimension, n + 1));
+  const auto   max = static_cast<double>(this->GetBinMax(dimension, n + 1));
+  const double interval = max - min;
+  return max - ((p_n_prev - p) / binProportion) * interval;
 }
 
 template <typename TMeasurement, typename TFrequencyContainer>
@@ -655,11 +640,11 @@ double
 Histogram<TMeasurement, TFrequencyContainer>::Mean(unsigned int dimension) const
 {
   const unsigned int size = this->GetSize(dimension);
-  double             totalFrequency = this->GetTotalFrequency();
+  const double       totalFrequency = this->GetTotalFrequency();
   double             sum = 0;
   for (unsigned int i = 0; i < size; ++i)
   {
-    double frequency = this->GetFrequency(i, dimension);
+    const double frequency = this->GetFrequency(i, dimension);
     sum += frequency * this->GetMeasurement(i, dimension);
   }
   return sum / totalFrequency;
@@ -706,7 +691,7 @@ Histogram<TMeasurement, TFrequencyContainer>::PrintSelf(std::ostream & os, Inden
 
   os << indent << "TempMeasurementVector: " << m_TempMeasurementVector << std::endl;
   os << indent << "TempIndex: " << static_cast<typename NumericTraits<IndexType>::PrintType>(m_TempIndex) << std::endl;
-  os << indent << "ClipBinsAtEnds: " << (m_ClipBinsAtEnds ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(ClipBinsAtEnds);
 }
 
 template <typename TMeasurement, typename TFrequencyContainer>
@@ -731,7 +716,6 @@ Histogram<TMeasurement, TFrequencyContainer>::Graft(const DataObject * thatObjec
   }
 }
 
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

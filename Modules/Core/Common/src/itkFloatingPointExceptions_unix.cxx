@@ -157,15 +157,13 @@ FloatingPointExceptions::Enable()
   itk_feenableexcept(FE_DIVBYZERO);
   itk_feenableexcept(FE_INVALID);
 #  if defined(ITK_FPE_USE_SIGNAL_HANDLER)
-  struct sigaction act;
-  memset(&act, 0, sizeof(struct sigaction));
+  struct sigaction act{};
   act.sa_sigaction = fhdl;
   sigemptyset(&act.sa_mask);
   act.sa_flags = SA_SIGINFO;
   sigaction(SIGFPE, &act, nullptr);
 #  endif
   FloatingPointExceptions::m_PimplGlobals->m_Enabled = true;
-  (void)itkFloatingPointExceptionsNotSupported; // avoid unused-function warning
 #else
   itkFloatingPointExceptionsNotSupported();
 #endif

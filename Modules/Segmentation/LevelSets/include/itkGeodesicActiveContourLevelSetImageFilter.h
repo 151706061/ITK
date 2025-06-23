@@ -87,12 +87,7 @@ namespace itk
  * See SparseFieldLevelSetImageFilter and
  * SegmentationLevelSetImageFilter for more information.
  *
- * \par REFERENCES
- * \par
- *    "Geodesic Active Contours",
- *    V. Caselles, R. Kimmel and G. Sapiro.
- *    International Journal on Computer Vision,
- *    Vol 22, No. 1, pp 61-97, 1997
+ * For algorithmic details see \cite caselles1997.
  *
  * \sa SegmentationLevelSetImageFilter
  * \sa GeodesicActiveContourLevelSetFunction
@@ -124,7 +119,7 @@ public:
   using GeodesicActiveContourFunctionType = GeodesicActiveContourLevelSetFunction<OutputImageType, FeatureImageType>;
   using GeodesicActiveContourFunctionPointer = typename GeodesicActiveContourFunctionType::Pointer;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GeodesicActiveContourLevelSetImageFilter);
 
   /** Method for creation through the object factory */
@@ -144,7 +139,7 @@ public:
 
   /** Get the value of sigma used to compute the edge potential map derivatives.
    */
-  float
+  [[nodiscard]] float
   GetDerivativeSigma() const
   {
     return m_GeodesicActiveContourFunction->GetDerivativeSigma();

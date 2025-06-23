@@ -38,23 +38,19 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
 
   auto inputImage = ImageType::New();
 
-  SizeType size;
-  size.Fill(21);
+  auto size = SizeType::Filled(21);
   size[0] = 401;
 
-  IndexType start;
-  start.Fill(0);
+  constexpr IndexType start{};
 
   RegionType region;
   region.SetIndex(start);
   region.SetSize(size);
 
-  PointType origin;
-  origin.Fill(-1.25);
+  auto origin = itk::MakeFilled<PointType>(-1.25);
   origin[0] = -20.0;
 
-  SpacingType spacing;
-  spacing.Fill(0.1);
+  auto spacing = itk::MakeFilled<SpacingType>(0.1);
 
   inputImage->SetOrigin(origin);
   inputImage->SetSpacing(spacing);
@@ -71,9 +67,9 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
   scales[2] = 3.0;
   scales[3] = 5.0;
 
-  // changing the size of the object with the the size of the
+  // changing the size of the object with the size of the
   // gaussian should produce the same results
-  for (double objectSize : scales)
+  for (const double objectSize : scales)
   {
     IteratorType it(inputImage, inputImage->GetRequestedRegion());
 
@@ -84,7 +80,7 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
     while (!it.IsAtEnd())
     {
       inputImage->TransformIndexToPhysicalPoint(it.GetIndex(), point);
-      double value = std::exp(-point[0] * point[0] / (2.0 * objectSize * objectSize));
+      const double value = std::exp(-point[0] * point[0] / (2.0 * objectSize * objectSize));
       it.Set(value);
       ++it;
     }
@@ -100,16 +96,15 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
     filter->SetNormalizeAcrossScale(true);
     filter->Update();
 
-    HessianImageType::Pointer outputImage = filter->GetOutput();
+    const HessianImageType::Pointer outputImage = filter->GetOutput();
 
     // Get the value at the center of the image, the location of the peak of the Gaussian
-    PointType center;
-    center.Fill(0.0);
+    constexpr PointType center{};
 
-    IndexType centerIndex = outputImage->TransformPhysicalPointToIndex(center);
+    const IndexType centerIndex = outputImage->TransformPhysicalPointToIndex(center);
 
     // Irrespective of the scale, the Hxx component should be the same
-    double centerHxx = outputImage->GetPixel(centerIndex)[0];
+    const double centerHxx = outputImage->GetPixel(centerIndex)[0];
 
     if (centerHxx > -0.3546 || centerHxx < -0.3547)
     {
@@ -121,12 +116,12 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
 
   // maintaining the size of the object and gaussian, in physical
   // size, should maintain the value, while the size of the image changes.
-  for (double scale : scales)
+  for (const double scale : scales)
   {
     IteratorType it(inputImage, inputImage->GetRequestedRegion());
 
-    PointType point;
-    double    objectSize = 5.0;
+    PointType        point;
+    constexpr double objectSize = 5.0;
 
     spacing.Fill(scale / 5.0);
 
@@ -139,7 +134,7 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
     while (!it.IsAtEnd())
     {
       inputImage->TransformIndexToPhysicalPoint(it.GetIndex(), point);
-      double value = std::exp(-point[0] * point[0] / (2.0 * objectSize * objectSize));
+      const double value = std::exp(-point[0] * point[0] / (2.0 * objectSize * objectSize));
       it.Set(value);
       ++it;
     }
@@ -155,16 +150,15 @@ itkHessianRecursiveGaussianFilterScaleSpaceTest(int, char *[])
     filter->SetNormalizeAcrossScale(true);
     filter->Update();
 
-    HessianImageType::Pointer outputImage = filter->GetOutput();
+    const HessianImageType::Pointer outputImage = filter->GetOutput();
 
     // Get the value at the center of the image, the location of the peak of the Gaussian
-    PointType center;
-    center.Fill(0.0);
+    constexpr PointType center{};
 
-    IndexType centerIndex = outputImage->TransformPhysicalPointToIndex(center);
+    const IndexType centerIndex = outputImage->TransformPhysicalPointToIndex(center);
 
     // Irrespective of the scale, the Hxx component should be the same
-    double centerHxx = outputImage->GetPixel(centerIndex)[0];
+    const double centerHxx = outputImage->GetPixel(centerIndex)[0];
 
     if (centerHxx > -0.354 || centerHxx < -0.355)
     {

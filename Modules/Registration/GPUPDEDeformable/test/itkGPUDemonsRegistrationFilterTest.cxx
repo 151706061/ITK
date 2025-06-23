@@ -254,7 +254,7 @@ itkGPUDemons(int, char * argv[])
   fixedImageCaster->SetInput(fixedImageReader->GetOutput());
   movingImageCaster->SetInput(movingImageReader->GetOutput());
 
-  // maching intensity histogram
+  // matching intensity histogram
   using MatchingFilterType = itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType>;
   auto matcher = MatchingFilterType::New();
 
@@ -276,8 +276,7 @@ itkGPUDemons(int, char * argv[])
   using ProgressType = ShowProgressObject<RegistrationFilterType>;
   ProgressType progressWatch(filter);
   progressWatch.DebugOn();
-  typename itk::SimpleMemberCommand<ProgressType>::Pointer command;
-  command = itk::SimpleMemberCommand<ProgressType>::New();
+  typename itk::SimpleMemberCommand<ProgressType>::Pointer command = itk::SimpleMemberCommand<ProgressType>::New();
   command->SetCallbackFunction(&progressWatch, &ProgressType::ShowProgress);
   filter->AddObserver(itk::ProgressEvent(), command);
 
@@ -369,7 +368,7 @@ itkCPUDemons(int, char * argv[])
   fixedImageCaster->SetInput(fixedImageReader->GetOutput());
   movingImageCaster->SetInput(movingImageReader->GetOutput());
 
-  // maching intensity histogram
+  // matching intensity histogram
   using MatchingFilterType = itk::HistogramMatchingImageFilter<InternalImageType, InternalImageType>;
   auto matcher = MatchingFilterType::New();
 
@@ -390,8 +389,7 @@ itkCPUDemons(int, char * argv[])
 
   using ProgressType = ShowProgressObject<RegistrationFilterType>;
   ProgressType                                             progressWatch(filter);
-  typename itk::SimpleMemberCommand<ProgressType>::Pointer command;
-  command = itk::SimpleMemberCommand<ProgressType>::New();
+  typename itk::SimpleMemberCommand<ProgressType>::Pointer command = itk::SimpleMemberCommand<ProgressType>::New();
   command->SetCallbackFunction(&progressWatch, &ProgressType::ShowProgress);
   filter->AddObserver(itk::ProgressEvent(), command);
 

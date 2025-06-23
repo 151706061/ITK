@@ -43,7 +43,7 @@ namespace itk
  * \sa StreamReadBufferAsBinary StreamWriteBufferAsBinary
  *
  * This implementation was taken from the Insight Journal:
- * https://www.insight-journal.org/browse/publication/729
+ * https://doi.org/10.54294/ufs19w
  *
  * \sa itk::ImageFileReader itk::ImageFileWriter
  * \ingroup IOFilters
@@ -59,7 +59,7 @@ public:
   using Superclass = ImageIOBase;
   using Pointer = SmartPointer<Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(StreamingImageIOBase);
 
   // see super class for documentation

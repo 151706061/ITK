@@ -36,10 +36,10 @@ itkGaussianMixtureModelComponentTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  char * dataFileName = argv[1];
-  int    dataSize = 2000;
+  char *        dataFileName = argv[1];
+  constexpr int dataSize = 2000;
   using ParametersType = itk::Array<double>;
-  unsigned int numberOfClasses = 2;
+  constexpr unsigned int numberOfClasses = 2;
 
   ParametersType params(6);
 
@@ -69,15 +69,14 @@ itkGaussianMixtureModelComponentTest(int argc, char * argv[])
   initialProportions[1] = 0.5;
 
   /* Loading point data */
-  auto                                 pointSet = PointSetType::New();
-  PointSetType::PointsContainerPointer pointsContainer = PointSetType::PointsContainer::New();
+  auto                                       pointSet = PointSetType::New();
+  const PointSetType::PointsContainerPointer pointsContainer = PointSetType::PointsContainer::New();
   pointsContainer->Reserve(dataSize);
   pointSet->SetPoints(pointsContainer);
 
   PointSetType::PointsContainerIterator p_iter = pointsContainer->Begin();
-  PointSetType::PointType               point;
-  double                                temp;
-  std::ifstream                         dataStream(dataFileName);
+
+  std::ifstream dataStream(dataFileName);
   if (!dataStream)
   {
     std::cout << "ERROR: fail to open the data file." << std::endl;
@@ -86,8 +85,10 @@ itkGaussianMixtureModelComponentTest(int argc, char * argv[])
 
   while (p_iter != pointsContainer->End())
   {
+    PointSetType::PointType point;
     for (unsigned int i = 0; i < PointSetType::PointDimension; ++i)
     {
+      double temp = NAN;
       dataStream >> temp;
       point[i] = temp;
     }
@@ -112,7 +113,7 @@ itkGaussianMixtureModelComponentTest(int argc, char * argv[])
     (components[i])->SetParameters(initialParameters[i]);
   }
 
-  ComponentPointer testComponent = ComponentType::New();
+  const ComponentPointer testComponent = ComponentType::New();
 
   std::cout << testComponent->GetNameOfClass() << std::endl;
   testComponent->Print(std::cout);

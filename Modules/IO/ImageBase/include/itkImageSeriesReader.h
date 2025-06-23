@@ -55,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageSeriesReader);
 
   /** The size of the output image. */
@@ -78,8 +78,9 @@ public:
 
   using FileNamesContainer = std::vector<std::string>;
 
-  /** Set the vector of strings that contains the file names. Files
+  /** Set/Get the vector of strings that contains the file names. Files
    * are processed in sequential order. */
+  /** @ITKStartGrouping */
   void
   SetFileNames(const FileNamesContainer & name)
   {
@@ -90,16 +91,17 @@ public:
     }
   }
 
-  const FileNamesContainer &
+  [[nodiscard]] const FileNamesContainer &
   GetFileNames() const
   {
     return m_FileNames;
   }
+  /** @ITKEndGrouping */
 
   /** Set the first file name to be processed. This deletes previous
    * filenames. */
   void
-  SetFileName(std::string const & name)
+  SetFileName(const std::string & name)
   {
     m_FileNames.clear();
     m_FileNames.push_back(name);
@@ -108,7 +110,7 @@ public:
 
   /** Add a single filename to the list of files. */
   void
-  AddFileName(std::string const & name)
+  AddFileName(const std::string & name)
   {
     m_FileNames.push_back(name);
     this->Modified();
@@ -116,22 +118,28 @@ public:
 
   /** ReverseOrderOn changes the order of traversal of the file names
    * from last to first */
+  /** @ITKStartGrouping */
   itkSetMacro(ReverseOrder, bool);
   itkGetConstMacro(ReverseOrder, bool);
   itkBooleanMacro(ReverseOrder);
+  /** @ITKEndGrouping */
 
   /** Do we want to force orthogonal direction cosines? On by default.
    * Turning it off enables proper reading of DICOM series with gantry tilt. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForceOrthogonalDirection, bool);
   itkGetConstMacro(ForceOrthogonalDirection, bool);
   itkBooleanMacro(ForceOrthogonalDirection);
+  /** @ITKEndGrouping */
 
   /** Set/Get the ImageIO helper class. By default, the
    * ImageSeriesReader uses the factory mechanism of the
    * ImageFileReader to determine the file type. This method can be
    * used to specify which IO to use. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(ImageIO, ImageIOBase);
   itkGetModifiableObjectMacro(ImageIO, ImageIOBase);
+  /** @ITKEndGrouping */
 
   /** \brief Set/Get MetaDataDictionaryArrayUpdate enables the updating of
    * the MetaDataDictionaryArray.
@@ -161,24 +169,27 @@ public:
 
   /** Get access to the Array of MetaDataDictionaries which are
    * updated in the GenerateData methods */
-  DictionaryArrayRawPointer
+  [[nodiscard]] DictionaryArrayRawPointer
   GetMetaDataDictionaryArray() const;
 
   /** Set the stream On or Off */
+  /** @ITKStartGrouping */
   itkSetMacro(UseStreaming, bool);
   itkGetConstReferenceMacro(UseStreaming, bool);
   itkBooleanMacro(UseStreaming);
+  /** @ITKEndGrouping */
 
   /** Set the relative threshold for issuing warnings about non-uniform sampling */
+  /** @ITKStartGrouping */
   itkSetMacro(SpacingWarningRelThreshold, double);
   itkGetConstMacro(SpacingWarningRelThreshold, double);
-
+  /** @ITKEndGrouping */
 protected:
   ImageSeriesReader()
     : m_ImageIO(nullptr)
 
   {}
-  ~ImageSeriesReader() override;
+  ~ImageSeriesReader() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
@@ -205,10 +216,6 @@ protected:
    */
   unsigned int m_NumberOfDimensionsInImage{ 0 };
 
-  /** Array of MetaDataDictionaries. This allows to hold information from the
-   * ImageIO objects after reading every sub image in the series */
-  DictionaryArrayType m_MetaDataDictionaryArray{};
-
   bool m_UseStreaming{ true };
 
   bool m_SpacingDefined{ false };
@@ -220,6 +227,13 @@ private:
 
   int
   ComputeMovingDimensionIndex(ReaderType * reader);
+
+  /** Array of MetaDataDictionaries. This allows to hold information from the
+   * ImageIO objects after reading every sub image in the series */
+  DictionaryArrayType m_MetaDataDictionaryArray{};
+
+  /** The internal storage of MetaDataDictionaries. */
+  std::vector<MetaDataDictionary> m_InternalMetaDataDictionaries{};
 
   /** Modified time of the MetaDataDictionaryArray */
   TimeStamp m_MetaDataDictionaryArrayMTime{};

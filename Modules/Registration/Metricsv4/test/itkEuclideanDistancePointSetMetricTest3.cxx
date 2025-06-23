@@ -33,21 +33,17 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
 {
   using PointSetType = itk::PointSet<float, Dimension>;
   using PointType = typename PointSetType::PointType;
-  using IdentifierType = itk::IdentifierType;
-  using PointsContainerType = itk::VectorContainer<IdentifierType, PointType>;
+  using PointsContainerType = itk::VectorContainer<PointType>;
   using PointsLocatorType = itk::PointsLocator<PointsContainerType>;
   auto pointsLocator = PointsLocatorType::New();
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
   // Create a few points and apply a small offset to make the moving points
   auto      pointMax = static_cast<float>(1.0);
-  PointType fixedPoint;
-  fixedPoint.Fill(0.0);
+  PointType fixedPoint{};
   fixedPoint[0] = 0.0;
   fixedPoint[1] = 0.0;
   fixedPoints->SetPoint(0, fixedPoint);
@@ -57,14 +53,14 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
   fixedPoint[0] = 0.0;
   fixedPoint[1] = pointMax;
   fixedPoints->SetPoint(2, fixedPoint);
-  if (Dimension == 3)
+  if constexpr (Dimension == 3)
   {
     fixedPoint[0] = 0.0;
     fixedPoint[1] = 0.0;
     fixedPoint[2] = pointMax;
     fixedPoints->SetPoint(3, fixedPoint);
   }
-  unsigned int numberOfPoints = fixedPoints->GetNumberOfPoints();
+  const unsigned int numberOfPoints = fixedPoints->GetNumberOfPoints();
 
   PointType movingPoint;
   for (unsigned int n = 0; n < numberOfPoints; ++n)
@@ -86,7 +82,7 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
       movingPoint[0] = fixedPoint[0] + 0.25;
       movingPoint[1] = fixedPoint[1];
     }
-    if (Dimension == 3)
+    if constexpr (Dimension == 3)
     {
       movingPoint[2] = fixedPoint[2] + 0.75;
     }
@@ -126,9 +122,12 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
   metric->Initialize();
 
   // test
-  typename PointSetMetricType::MeasureType    value = metric->GetValue(), value2;
-  typename PointSetMetricType::DerivativeType derivative, derivative2;
+  const typename PointSetMetricType::MeasureType value = metric->GetValue();
+  typename PointSetMetricType::DerivativeType    derivative;
   metric->GetDerivative(derivative);
+  typename PointSetMetricType::MeasureType    value2;
+  typename PointSetMetricType::DerivativeType derivative2;
+
   metric->GetValueAndDerivative(value2, derivative2);
 
   std::cout << "value: " << value << std::endl;
@@ -155,7 +154,7 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
     }
   }
 
-  double valueTest = distanceSum / numberOfPoints;
+  const double valueTest = distanceSum / numberOfPoints;
   if (itk::Math::NotExactlyEquals(valueTest, value2))
   {
     std::cerr << "Value calculation is wrong when used threshold : " << distanceThreshold << "valueTest: " << valueTest
@@ -178,7 +177,7 @@ itkEuclideanDistancePointSetMetricTest3Run(double distanceThreshold)
     {
       derivativeTest[0] = derivativeTest[0] + tempDerivative[0];
       derivativeTest[1] = derivativeTest[1] + tempDerivative[1];
-      if (Dimension == 3)
+      if constexpr (Dimension == 3)
       {
         derivativeTest[2] = derivativeTest[2] + tempDerivative[2];
       }
@@ -206,12 +205,12 @@ itkEuclideanDistancePointSetMetricTest3(int, char *[])
 {
   int result = EXIT_SUCCESS;
 
-  double distanceThresholdPositive = 0.5;
-  double distanceThresholdZero = 0.0;
-  double distanceThresholdNegative = -8.0;
+  constexpr double distanceThresholdPositive = 0.5;
+  constexpr double distanceThresholdZero = 0.0;
+  constexpr double distanceThresholdNegative = -8.0;
 
-  const unsigned int dimension2D = 2;
-  const unsigned int dimension3D = 3;
+  constexpr unsigned int dimension2D = 2;
+  constexpr unsigned int dimension3D = 3;
 
   // Test for positive distance threshold
   if (itkEuclideanDistancePointSetMetricTest3Run<dimension2D>(distanceThresholdPositive) == EXIT_FAILURE)

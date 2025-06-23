@@ -43,9 +43,9 @@ namespace itk
  * \ingroup ImageFunctions ImageInterpolators
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = double>
+template <typename TInputImage, typename TCoordinate = double>
 class ITK_TEMPLATE_EXPORT VectorInterpolateImageFunction
-  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>
+  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(VectorInterpolateImageFunction);
@@ -59,12 +59,12 @@ public:
   /** Standard class type aliases. */
   using Self = VectorInterpolateImageFunction;
   using Superclass =
-    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>;
+    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorInterpolateImageFunction);
 
   /** InputImageType type alias support */
@@ -86,7 +86,11 @@ public:
   using typename Superclass::OutputType;
 
   /** CoordRep type alias support */
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
 
   /** Returns the interpolated image intensity at a
    * specified point position. No bounds checking is done.
@@ -97,7 +101,7 @@ public:
   Evaluate(const PointType & point) const override
   {
     const ContinuousIndexType index =
-      this->GetInputImage()->template TransformPhysicalPointToContinuousIndex<TCoordRep>(point);
+      this->GetInputImage()->template TransformPhysicalPointToContinuousIndex<TCoordinate>(point);
     return (this->EvaluateAtContinuousIndex(index));
   }
 

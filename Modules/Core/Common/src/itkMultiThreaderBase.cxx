@@ -46,6 +46,10 @@
 #include <cctype>
 #include <utility> // For move.
 
+#if defined(ITK_HAS_SCHED_GETAFFINITY)
+#  include <sched.h>
+#endif
+
 #if defined(ITK_USE_TBB)
 #  include "itkTBBMultiThreader.h"
 #endif
@@ -143,7 +147,7 @@ MultiThreaderBase::GetGlobalDefaultThreaderPrivate()
     if (itksys::SystemTools::GetEnv("ITK_GLOBAL_DEFAULT_THREADER", envVar))
     {
       envVar = itksys::SystemTools::UpperCase(envVar);
-      ThreaderEnum threaderT = ThreaderTypeFromString(envVar);
+      const ThreaderEnum threaderT = ThreaderTypeFromString(envVar);
       if (threaderT != ThreaderEnum::Unknown)
       {
         MultiThreaderBase::SetGlobalDefaultThreaderPrivate(threaderT);
@@ -195,7 +199,7 @@ MultiThreaderBase::ThreaderTypeFromString(std::string threaderString)
   {
     return ThreaderEnum::Platform;
   }
-  else if (threaderString == "POOL")
+  if (threaderString == "POOL")
   {
     return ThreaderEnum::Pool;
   }
@@ -217,8 +221,8 @@ MultiThreaderBase::SetGlobalMaximumNumberOfThreads(ThreadIdType val)
   m_PimplGlobals->m_GlobalMaximumNumberOfThreads = std::clamp<ThreadIdType>(val, 1, ITK_MAX_THREADS);
 
   // If necessary reset the default to be used from now on.
-  m_PimplGlobals->m_GlobalDefaultNumberOfThreads =
-    std::min(m_PimplGlobals->m_GlobalDefaultNumberOfThreads, m_PimplGlobals->m_GlobalMaximumNumberOfThreads);
+  MultiThreaderBase::SetGlobalDefaultNumberOfThreads(
+    std::min(Self::GetGlobalDefaultNumberOfThreads(), Self::GetGlobalMaximumNumberOfThreads()));
 }
 
 ThreadIdType
@@ -334,29 +338,33 @@ MultiThreaderBase::GetGlobalDefaultNumberOfThreads()
 ThreadIdType
 MultiThreaderBase::GetGlobalDefaultNumberOfThreadsByPlatform()
 {
+#if defined(ITK_HAS_SCHED_GETAFFINITY)
+  cpu_set_t mask;
+  if (sched_getaffinity(0, sizeof(cpu_set_t), &mask) != -1)
+  {
+    return static_cast<ThreadIdType>(CPU_COUNT(&mask));
+  }
+#endif
+
 #if defined(ITK_LEGACY_REMOVE)
   return std::thread::hardware_concurrency();
 #endif
 
 #if defined(ITK_USE_PTHREADS)
-  ThreadIdType num;
 
-  // Default the number of threads to be the number of available
-  // processors if we are using pthreads()
+// Default the number of threads to be the number of available
+// processors if we are using pthreads()
 #  ifdef _SC_NPROCESSORS_ONLN
-  num = static_cast<ThreadIdType>(sysconf(_SC_NPROCESSORS_ONLN));
+  auto num = static_cast<ThreadIdType>(sysconf(_SC_NPROCESSORS_ONLN));
 #  elif defined(_SC_NPROC_ONLN)
-  num = static_cast<ThreadIdType>(sysconf(_SC_NPROC_ONLN));
+  ThreadIdType num = static_cast<ThreadIdType>(sysconf(_SC_NPROC_ONLN));
 #  else
-  num = 1;
-#  endif
-#  if defined(__SVR4) && defined(sun) && defined(PTHREAD_MUTEX_NORMAL)
-  pthread_setconcurrency(num);
+  ThreadIdType num = 1;
 #  endif
 
   itksys::SystemInformation mySys;
   mySys.RunCPUCheck();
-  int result = mySys.GetNumberOfPhysicalCPU(); // Avoid using hyperthreading cores.
+  const int result = mySys.GetNumberOfPhysicalCPU(); // Avoid using hyperthreading cores.
   if (result == -1)
   {
     num = 1;
@@ -371,7 +379,7 @@ MultiThreaderBase::GetGlobalDefaultNumberOfThreadsByPlatform()
 #else
   return 1;
 #endif
-}
+} // namespace itk
 
 MultiThreaderBase::Pointer
 MultiThreaderBase::New()
@@ -379,7 +387,7 @@ MultiThreaderBase::New()
   Pointer smartPtr = itk::ObjectFactory<MultiThreaderBase>::Create();
   if (smartPtr == nullptr)
   {
-    ThreaderEnum threaderType = GetGlobalDefaultThreader();
+    const ThreaderEnum threaderType = GetGlobalDefaultThreader();
     switch (threaderType)
     {
       case ThreaderEnum::Platform:
@@ -406,8 +414,8 @@ MultiThreaderBase::New()
 
 
 MultiThreaderBase::MultiThreaderBase()
+  : m_MaximumNumberOfThreads(MultiThreaderBase::GetGlobalDefaultNumberOfThreads())
 {
-  m_MaximumNumberOfThreads = MultiThreaderBase::GetGlobalDefaultNumberOfThreads();
   m_NumberOfWorkUnits = m_MaximumNumberOfThreads;
 }
 
@@ -468,14 +476,11 @@ MultiThreaderBase::ParallelizeArray(SizeValueType             firstIndex,
     filter = nullptr;
   }
   // Upon destruction, progress will be set to 1.0
-  ProgressReporter progress(filter, 0, 1);
+  const ProgressReporter progress(filter, 0, 1);
 
   if (firstIndex + 1 < lastIndexPlus1)
   {
-    struct ArrayCallback acParams
-    {
-      aFunc, firstIndex, lastIndexPlus1, filter
-    };
+    struct ArrayCallback acParams{ aFunc, firstIndex, lastIndexPlus1, filter };
     this->SetSingleMethodAndExecute(&MultiThreaderBase::ParallelizeArrayHelper, &acParams);
   }
   else if (firstIndex + 1 == lastIndexPlus1)
@@ -488,15 +493,15 @@ MultiThreaderBase::ParallelizeArray(SizeValueType             firstIndex,
 ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION
 MultiThreaderBase::ParallelizeArrayHelper(void * arg)
 {
-  auto *       workUnitInfo = static_cast<MultiThreaderBase::WorkUnitInfo *>(arg);
-  ThreadIdType workUnitID = workUnitInfo->WorkUnitID;
-  ThreadIdType workUnitCount = workUnitInfo->NumberOfWorkUnits;
-  auto *       acParams = static_cast<struct ArrayCallback *>(workUnitInfo->UserData);
+  auto *             workUnitInfo = static_cast<MultiThreaderBase::WorkUnitInfo *>(arg);
+  const ThreadIdType workUnitID = workUnitInfo->WorkUnitID;
+  const ThreadIdType workUnitCount = workUnitInfo->NumberOfWorkUnits;
+  auto *             acParams = static_cast<struct ArrayCallback *>(workUnitInfo->UserData);
 
-  SizeValueType range = acParams->lastIndexPlus1 - acParams->firstIndex;
-  double        fraction = static_cast<double>(range) / workUnitCount;
-  SizeValueType first = acParams->firstIndex + fraction * workUnitID;
-  SizeValueType afterLast = acParams->firstIndex + fraction * (workUnitID + 1);
+  const SizeValueType range = acParams->lastIndexPlus1 - acParams->firstIndex;
+  const double        fraction = static_cast<double>(range) / workUnitCount;
+  const SizeValueType first = acParams->firstIndex + fraction * workUnitID;
+  SizeValueType       afterLast = acParams->firstIndex + fraction * (workUnitID + 1);
   if (workUnitID == workUnitCount - 1) // last thread
   {
     // Avoid possible problems due to floating point arithmetic
@@ -529,22 +534,19 @@ MultiThreaderBase::ParallelizeImageRegion(unsigned int                          
   {
     filter = nullptr;
   }
-  ProgressReporter progress(filter, 0, 1);
+  const ProgressReporter progress(filter, 0, 1);
 
-  struct RegionAndCallback rnc
-  {
-    funcP, dimension, index, size, filter
-  };
+  struct RegionAndCallback rnc{ funcP, dimension, index, size, filter };
   this->SetSingleMethodAndExecute(&MultiThreaderBase::ParallelizeImageRegionHelper, &rnc);
 }
 
 ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION
 MultiThreaderBase::ParallelizeImageRegionHelper(void * arg)
 {
-  auto *       workUnitInfo = static_cast<MultiThreaderBase::WorkUnitInfo *>(arg);
-  ThreadIdType workUnitID = workUnitInfo->WorkUnitID;
-  ThreadIdType workUnitCount = workUnitInfo->NumberOfWorkUnits;
-  auto *       rnc = static_cast<struct RegionAndCallback *>(workUnitInfo->UserData);
+  auto *             workUnitInfo = static_cast<MultiThreaderBase::WorkUnitInfo *>(arg);
+  const ThreadIdType workUnitID = workUnitInfo->WorkUnitID;
+  const ThreadIdType workUnitCount = workUnitInfo->NumberOfWorkUnits;
+  auto *             rnc = static_cast<struct RegionAndCallback *>(workUnitInfo->UserData);
 
   const ImageRegionSplitterBase * splitter = ImageSourceCommon::GetGlobalDefaultSplitter();
   ImageIORegion                   region(rnc->dimension);
@@ -553,7 +555,7 @@ MultiThreaderBase::ParallelizeImageRegionHelper(void * arg)
     region.SetIndex(d, rnc->index[d]);
     region.SetSize(d, rnc->size[d]);
   }
-  ThreadIdType total = splitter->GetSplit(workUnitID, workUnitCount, region);
+  const ThreadIdType total = splitter->GetSplit(workUnitID, workUnitCount, region);
 
   TotalProgressReporter reporter(rnc->filter, 0);
 

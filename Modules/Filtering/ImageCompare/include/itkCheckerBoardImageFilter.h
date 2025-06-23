@@ -63,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CheckerBoardImageFilter);
 
   /** Number of dimensions. */
@@ -82,9 +82,10 @@ public:
 
   /** Set/Get the checker pattern array, i.e. the number of checker boxes
    * per image dimension. */
+  /** @ITKStartGrouping */
   itkSetMacro(CheckerPattern, PatternArrayType);
   itkGetConstReferenceMacro(CheckerPattern, PatternArrayType);
-
+  /** @ITKEndGrouping */
 protected:
   CheckerBoardImageFilter();
   ~CheckerBoardImageFilter() override = default;

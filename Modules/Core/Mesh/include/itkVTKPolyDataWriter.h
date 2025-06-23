@@ -57,7 +57,7 @@ public:
   /** Method for creation through the object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VTKPolyDataWriter);
 
   /** Write the Input mesh to the Output file.
@@ -97,9 +97,10 @@ public:
   SetInput(const InputMeshType * input);
 
   /** Set/Get the name of the file where data are written. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
-
+  /** @ITKEndGrouping */
 protected:
   VTKPolyDataWriter();
   ~VTKPolyDataWriter() override = default;

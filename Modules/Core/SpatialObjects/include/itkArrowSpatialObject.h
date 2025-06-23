@@ -52,7 +52,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Method for creation through the object factory. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ArrowSpatialObject);
 
   /** Reset the spatial object to its initial condition, yet preserves
@@ -89,7 +89,7 @@ public:
   GetPositionInWorldSpace() const;
   VectorType
   GetDirectionInWorldSpace() const;
-  double
+  [[nodiscard]] double
   GetLengthInWorldSpace() const;
 
 protected:
@@ -103,7 +103,7 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 private:

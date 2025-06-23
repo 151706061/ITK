@@ -66,7 +66,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToNeighborhoodSampleAdaptor);
 
   /** Method for creation through the object factory. */
@@ -85,6 +85,7 @@ public:
   using OffsetTableType = typename RegionType::OffsetTableType;
   using SizeType = typename ImageType::SizeType;
   using ImageIteratorType = ImageRegionIteratorWithIndex<TImage>;
+
   /** Neighborhood Iterator type alias support */
   using NeighborhoodIteratorType = ConstNeighborhoodIterator<TImage, TBoundaryCondition>;
   using NonConstNeighborhoodIteratorType = NeighborhoodIterator<TImage, TBoundaryCondition>;
@@ -169,18 +170,12 @@ public:
     ConstIterator(const ImageToNeighborhoodSampleAdaptor * adaptor) { *this = adaptor->Begin(); }
 
     ConstIterator(const ConstIterator & iter)
-    {
-      m_MeasurementVectorCache = iter.m_MeasurementVectorCache;
-      m_InstanceIdentifier = iter.m_InstanceIdentifier;
-    }
+      : m_MeasurementVectorCache(iter.m_MeasurementVectorCache)
+      , m_InstanceIdentifier(iter.m_InstanceIdentifier)
+    {}
 
     ConstIterator &
-    operator=(const ConstIterator & iter)
-    {
-      m_MeasurementVectorCache = iter.m_MeasurementVectorCache;
-      m_InstanceIdentifier = iter.m_InstanceIdentifier;
-      return *this;
-    }
+    operator=(const ConstIterator & iter) = default;
 
     AbsoluteFrequencyType
     GetFrequency() const
@@ -219,10 +214,10 @@ public:
   protected:
     // This method should only be available to the ListSample class
     ConstIterator(NeighborhoodIteratorType iter, InstanceIdentifier iid)
+      : m_InstanceIdentifier(iid)
     {
       this->m_MeasurementVectorCache.clear();
       this->m_MeasurementVectorCache.push_back(iter);
-      m_InstanceIdentifier = iid;
     }
 
   private:
@@ -275,7 +270,7 @@ public:
   {
     NeighborhoodIteratorType nIterator(m_Radius, m_Image, m_Region);
     nIterator.GoToBegin();
-    Iterator iter(nIterator, 0);
+    const Iterator iter(nIterator, 0);
     return iter;
   }
 
@@ -285,10 +280,9 @@ public:
   {
     NeighborhoodIteratorType nIterator(m_Radius, m_Image, m_Region);
     nIterator.GoToEnd();
-    Iterator iter(nIterator, m_Region.GetNumberOfPixels());
+    const Iterator iter(nIterator, m_Region.GetNumberOfPixels());
     return iter;
   }
-
 
   /** returns an iterator that points to the beginning of the container */
   ConstIterator

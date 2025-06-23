@@ -141,8 +141,8 @@ public:
     this->Init();
   }
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   FrequencyShiftedFFTLayoutImageRegionConstIteratorWithIndex(const TImage * ptr, const RegionType & region)
     : ImageRegionConstIteratorWithIndex<TImage>(ptr, region)
   {
@@ -166,12 +166,10 @@ public:
    * bin 0. It is a shift by -N/2 + 1, from [0, N-1] to [-N/2 + 1, N/2] If first index of the image is not zero, it
    * stills returns values in the same range.
    */
-  IndexType
+  [[nodiscard]] IndexType
   GetFrequencyBin() const
   {
-    IndexType freqInd;
-
-    freqInd.Fill(0);
+    IndexType freqInd{};
     for (unsigned int dim = 0; dim < TImage::ImageDimension; ++dim)
     {
       freqInd[dim] = this->m_PositionIndex[dim] - this->m_ZeroFrequencyIndex[dim];
@@ -189,7 +187,7 @@ public:
    * the range of frequencies (always around zero). If the spacing is = {{0.5}} we get a frequency range of [-1/4, 1/4]
    * or [-pi/2, pi/2].
    */
-  FrequencyType
+  [[nodiscard]] FrequencyType
   GetFrequency() const
   {
     FrequencyType freq;
@@ -202,7 +200,7 @@ public:
     return freq;
   }
 
-  FrequencyValueType
+  [[nodiscard]] FrequencyValueType
   GetFrequencyModuloSquare() const
   {
     FrequencyValueType w2(0);
@@ -222,6 +220,7 @@ public:
    * This is: N/2 if N even, (N - 1)/2 if N odd.
    */
   itkGetConstReferenceMacro(ZeroFrequencyIndex, IndexType);
+
   /** Origin of frequencies is zero for FFT output. */
   itkGetConstReferenceMacro(FrequencyOrigin, FrequencyType);
 
@@ -235,14 +234,15 @@ public:
 
   /** Does nothing. This member only affects HalfHermitianFrequencyIterator.
    * Provided for homogeneous interface between iterators. */
+  /** @ITKStartGrouping */
   void
   SetActualXDimensionIsOdd(bool value)
   {
     this->m_ActualXDimensionIsOdd = value;
-  };
+  }
   itkGetMacro(ActualXDimensionIsOdd, bool);
   itkBooleanMacro(ActualXDimensionIsOdd);
-
+  /** @ITKEndGrouping */
 private:
   /** Calculate m_ZeroFrequencyIndex, and frequency spacing/origin.
    * Called by constructors.  */

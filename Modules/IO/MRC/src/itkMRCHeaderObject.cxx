@@ -159,11 +159,12 @@ MRCHeaderObject::SetExtendedHeader(const void * buffer)
 
     if (this->m_BigEndianHeader)
     {
-      ByteSwapper<float>::SwapRangeFromSystemToBigEndian((float *)this->m_ExtendedHeader, this->m_ExtendedHeaderSize);
+      ByteSwapper<float>::SwapRangeFromSystemToBigEndian(static_cast<float *>(this->m_ExtendedHeader),
+                                                         this->m_ExtendedHeaderSize);
     }
     else
     {
-      ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float *)this->m_ExtendedHeader,
+      ByteSwapper<float>::SwapRangeFromSystemToLittleEndian(static_cast<float *>(this->m_ExtendedHeader),
                                                             this->m_ExtendedHeaderSize);
     }
   }
@@ -177,17 +178,10 @@ MRCHeaderObject::IsOriginalHeaderBigEndian() const
 }
 
 MRCHeaderObject::MRCHeaderObject()
+  : m_BigEndianHeader(ByteSwapper<void *>::SystemIsBE())
+{}
 
-
-{
-  memset(&this->m_Header, 0, sizeof(Header));
-  this->m_BigEndianHeader = ByteSwapper<void *>::SystemIsBE();
-}
-
-MRCHeaderObject::~MRCHeaderObject()
-{
-  delete[] static_cast<char *>(this->m_ExtendedHeader);
-}
+MRCHeaderObject::~MRCHeaderObject() { delete[] static_cast<char *>(this->m_ExtendedHeader); }
 
 void
 MRCHeaderObject::swapHeader(bool bigEndian)
@@ -196,7 +190,7 @@ MRCHeaderObject::swapHeader(bool bigEndian)
   using Int32Swapper = itk::ByteSwapper<int32_t>;
   using Int16Swapper = itk::ByteSwapper<int16_t>;
 
-  if (FloatSwapper::SystemIsBigEndian())
+  if constexpr (FloatSwapper::SystemIsBigEndian())
   {
     this->m_Header.stamp[0] = 17;
   }

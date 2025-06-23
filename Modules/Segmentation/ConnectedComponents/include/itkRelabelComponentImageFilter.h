@@ -153,9 +153,10 @@ public:
 
   /** Get/Set the number of objects enumerated and described when the
    * filter is printed. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfObjectsToPrint, SizeValueType);
   itkGetConstReferenceMacro(NumberOfObjectsToPrint, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set the minimum size in pixels for an object. All objects
    * smaller than this size will be discarded and will not appear
    * in the output label map. NumberOfObjects will count only the
@@ -173,16 +174,17 @@ public:
 
   /** Controls whether the object labels are sorted by size.
    * If false, initial order of labels is kept. */
+  /** @ITKStartGrouping */
   itkSetMacro(SortByObjectSize, bool);
   itkGetConstMacro(SortByObjectSize, bool);
   itkBooleanMacro(SortByObjectSize);
-
+  /** @ITKEndGrouping */
   /** Get the size of each object in pixels. This information is only
    * valid after the filter has executed.  Size of the background is
    * not calculated.  Size of object #1 is
    * GetSizeOfObjectsInPixels()[0]. Size of object #2 is
    * GetSizeOfObjectsInPixels()[1]. Etc. */
-  const ObjectSizeInPixelsContainerType &
+  [[nodiscard]] const ObjectSizeInPixelsContainerType &
   GetSizeOfObjectsInPixels() const
   {
     // The GetConstReferenceMacro can't be used here because this container
@@ -195,7 +197,7 @@ public:
    * executed. Size of the background is not calculated.  Size of
    * object #1 is GetSizeOfObjectsInPhysicalUnits()[0]. Size of object
    * #2 is GetSizeOfObjectsInPhysicalUnits()[1]. Etc. */
-  const ObjectSizeInPhysicalUnitsContainerType &
+  [[nodiscard]] const ObjectSizeInPhysicalUnitsContainerType &
   GetSizeOfObjectsInPhysicalUnits() const
   {
     // The GetConstReferenceMacro can't be used here because this container
@@ -209,14 +211,12 @@ public:
   ObjectSizeType
   GetSizeOfObjectInPixels(LabelType obj) const
   {
-    if (obj > 0 && obj <= m_NumberOfObjects)
+    if (obj > 0 && static_cast<SizeValueType>(obj) <= m_NumberOfObjects)
     {
       return m_SizeOfObjectsInPixels[obj - 1];
     }
-    else
-    {
-      return 0;
-    }
+
+    return 0;
   }
 
   /** Get the size of a particular object in physical space (in units of pixel
@@ -225,25 +225,19 @@ public:
   float
   GetSizeOfObjectInPhysicalUnits(LabelType obj) const
   {
-    if (obj > 0 && obj <= m_NumberOfObjects)
+    if (obj > 0 && static_cast<SizeValueType>(obj) <= m_NumberOfObjects)
     {
       return m_SizeOfObjectsInPhysicalUnits[obj - 1];
     }
-    else
-    {
-      return 0;
-    }
+
+    return 0;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputPixelType>));
   itkConceptMacro(UnsignedLongConvertibleToInputCheck, (Concept::Convertible<LabelType, InputPixelType>));
   itkConceptMacro(OutputLongConvertibleToUnsignedLongCheck, (Concept::Convertible<OutputPixelType, LabelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputPixelType, OutputPixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   RelabelComponentImageFilter();

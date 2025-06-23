@@ -44,7 +44,7 @@ itkArray2DTest(int, char *[])
     }
   }
 
-  const double tolerance = 1e-6;
+  constexpr double tolerance = 1e-6;
 
   // test copy constructor
   ArrayType b(a);
@@ -81,9 +81,8 @@ itkArray2DTest(int, char *[])
   }
 
   // test for assignment from Array2D
-  ArrayType e;
 
-  e = a;
+  ArrayType e = a;
 
   for (unsigned int r = 0; r < rows; ++r)
   {
@@ -100,9 +99,8 @@ itkArray2DTest(int, char *[])
   }
 
   // test for assignment from vnl_matrix
-  ArrayType f;
 
-  f = vm;
+  ArrayType f = vm;
 
   for (unsigned int r = 0; r < rows; ++r)
   {

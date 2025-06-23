@@ -40,14 +40,14 @@ test_FileListVideoIOFactory(const char * input, char * output, itk::SizeValueTyp
   // There's something strange going on here that makes the factories not be
   // registered by default because of the order in which the includes happen.
   // The real strangeness seems to be in ITK's system with the modularized
-  // framework since none of the factories get reigstered by default.
+  // framework since none of the factories get registered by default.
   itk::ObjectFactoryBase::RegisterFactory(itk::FileListVideoIOFactory::New());
 
   //////
   // Create the VideoIOBase for reading from a file
   //////
   std::cout << "Trying to create IO for reading from file..." << std::endl;
-  itk::VideoIOBase::Pointer ioReadFile =
+  const itk::VideoIOBase::Pointer ioReadFile =
     itk::VideoIOFactory::CreateVideoIO(itk::VideoIOFactory::IOModeEnum::ReadFileMode, input);
   if (!ioReadFile)
   {
@@ -59,7 +59,7 @@ test_FileListVideoIOFactory(const char * input, char * output, itk::SizeValueTyp
   // Create the VideoIOBase for writing to a file
   //////
   std::cout << "Trying to create IO for writing to file..." << std::endl;
-  itk::VideoIOBase::Pointer ioWrite =
+  const itk::VideoIOBase::Pointer ioWrite =
     itk::VideoIOFactory::CreateVideoIO(itk::VideoIOFactory::IOModeEnum::WriteMode, output);
   if (!ioWrite)
   {

@@ -85,9 +85,7 @@ main(int, char *[])
   using MeshSourceType = itk::AutomaticTopologyMeshSource<MeshType>;
   using IdentifierArrayType = MeshSourceType::IdentifierArrayType;
 
-  MeshSourceType::Pointer meshSource;
-
-  meshSource = MeshSourceType::New();
+  auto meshSource = MeshSourceType::New();
   // Software Guide : EndCodeSnippet
 
   //  Software Guide : BeginLatex
@@ -202,7 +200,7 @@ main(int, char *[])
   //
   //  Software Guide : EndLatex
 
-  MeshType::Pointer mesh = meshSource->GetOutput();
+  const MeshType::Pointer mesh = meshSource->GetOutput();
   std::cout << mesh << std::endl;
 
   //  Software Guide : BeginLatex

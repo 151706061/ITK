@@ -22,9 +22,7 @@
 #include "itkFEMException.h"
 #include "ITKFEMExport.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class ItpackSparseMatrix
@@ -179,7 +177,7 @@ public:
   /**
    * Get the order of the matrix
    */
-  integer
+  [[nodiscard]] integer
   GetOrder() const
   {
     return m_N;
@@ -188,7 +186,7 @@ public:
   /**
    * Get the maximum number of non-zero values allowed in the matrix
    */
-  integer
+  [[nodiscard]] integer
   GetMaxNonZeroValues() const
   {
     return m_NZ;
@@ -305,7 +303,7 @@ public:
    * must be provided: file, lineNumber, location and a detailed description
    * of the exception, and the invalid index
    */
-  FEMExceptionItpackSparseMatrixSbagn(const char * file,
+  FEMExceptionItpackSparseMatrixSbagn(std::string  file,
                                       unsigned int lineNumber,
                                       std::string  location,
                                       integer      errorCode);
@@ -313,7 +311,7 @@ public:
   /** Virtual destructor needed for subclasses. Has to have empty throw(). */
   ~FEMExceptionItpackSparseMatrixSbagn() noexcept override;
 
-  /** Type related information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FEMExceptionItpackSparseMatrixSbagn);
 };
 
@@ -336,7 +334,7 @@ public:
    * must be provided: file, lineNumber, location and a detailed description
    * of the exception, and the invalid index
    */
-  FEMExceptionItpackSparseMatrixSbsij(const char * file,
+  FEMExceptionItpackSparseMatrixSbsij(std::string  file,
                                       unsigned int lineNumber,
                                       std::string  location,
                                       integer      errorCode);
@@ -344,10 +342,9 @@ public:
   /** Virtual destructor needed for subclasses. Has to have empty throw(). */
   ~FEMExceptionItpackSparseMatrixSbsij() noexcept override;
 
-  /** Type related information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FEMExceptionItpackSparseMatrixSbsij);
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMItpackSparseMatrix_h

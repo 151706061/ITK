@@ -58,10 +58,8 @@ DOMNode::GetAttribute(const std::string & key) const
   {
     return "";
   }
-  else
-  {
-    return i->second;
-  }
+
+  return i->second;
 }
 
 /** Check whether has an attribute. */
@@ -265,7 +263,7 @@ DOMNode::AddChildAtEnd(DOMNode * node)
   }
 
   node->m_Parent = this;
-  this->m_Children.push_back(Pointer(node));
+  this->m_Children.emplace_back(node);
 }
 
 /** Replace a child (throw exception if not able to replace). */
@@ -315,10 +313,8 @@ DOMNode::GetChild(IdentifierType i)
   {
     return nullptr;
   }
-  else
-  {
-    return (DOMNode *)this->m_Children[i];
-  }
+
+  return (DOMNode *)this->m_Children[i];
 }
 
 /** Retrieve a child by index (return nullptr if out of range). */
@@ -395,8 +391,8 @@ DOMNode::GetSibling(OffsetType i)
     return nullptr;
   }
 
-  IdentifierType j;
-  for (j = 0; j < static_cast<IdentifierType>(parent->GetNumberOfChildren()); ++j)
+  IdentifierType j = 0;
+  for (; j < static_cast<IdentifierType>(parent->GetNumberOfChildren()); ++j)
   {
     if (parent->GetChild(j) == this)
     {
@@ -409,10 +405,8 @@ DOMNode::GetSibling(OffsetType i)
   {
     return nullptr;
   }
-  else
-  {
-    return parent->GetChild(j);
-  }
+
+  return parent->GetChild(j);
 }
 
 /** Retrieve an older or younger sibling by distance (return nullptr if no such sibling). */
@@ -434,10 +428,8 @@ DOMNode::GetRoot()
   {
     return this;
   }
-  else
-  {
-    return node->GetRoot();
-  }
+
+  return node->GetRoot();
 }
 
 /** Return the root node. */
@@ -478,7 +470,7 @@ DOMNode::Find(const std::string & path)
 
   std::string rpath;
   {
-    size_t pos = path.find_first_of('/');
+    const size_t pos = path.find_first_of('/');
     if (pos == std::string::npos)
     {
       s = path;
@@ -507,7 +499,7 @@ DOMNode::Find(const std::string & path)
     iss >> i;
     if (!iss.fail())
     {
-      node = this->GetChild(IdentifierType(i));
+      node = this->GetChild(static_cast<IdentifierType>(i));
     }
   }
 
@@ -522,7 +514,7 @@ DOMNode::Find(const std::string & path)
       iss >> i;
       if (!iss.fail())
       {
-        node = this->GetSibling(OffsetType(i));
+        node = this->GetSibling(static_cast<OffsetType>(i));
       }
     }
     else
@@ -542,7 +534,7 @@ DOMNode::Find(const std::string & path)
       iss >> i;
       if (!iss.fail())
       {
-        node = this->GetSibling(-OffsetType(i));
+        node = this->GetSibling(-static_cast<OffsetType>(i));
       }
     }
     else
@@ -573,11 +565,11 @@ DOMNode::Find(const std::string & path)
   // <tag>[:n]
   else
   {
-    size_t pos = s.find_first_of(':');
+    const size_t pos = s.find_first_of(':');
     if (pos != std::string::npos)
     {
-      std::string s2 = s.substr(pos + 1);
-      s = s.substr(0, pos);
+      const std::string s2 = s.substr(pos + 1);
+      s.resize(pos);
       std::istringstream iss(s2);
       IdentifierType     i = 0;
       iss >> i;
@@ -596,10 +588,8 @@ DOMNode::Find(const std::string & path)
   {
     return node;
   }
-  else
-  {
-    return node->Find(rpath);
-  }
+
+  return node->Find(rpath);
 }
 
 /**

@@ -30,7 +30,7 @@ namespace itk
  * shape model.
  *
  * This class extends the basic LevelSetFunction with a shape prior term
- * as developed in [1].
+ * as developed in \cite leventon2000.
  *
  * \f$ \zeta( \phi^{*} - \phi) \f$
  *
@@ -43,10 +43,6 @@ namespace itk
  * \sa LevelSetFunction
  * \sa SegmentationLevelSetImageFunction
  * \sa ShapeSignedDistanceFunction
- *
- * \par REFERENCES
- * \par
- * [1] Leventon, M.E. et al. "Statistical Shape Influence in Geodesic Active Contours", CVPR 2000.
  *
  * \ingroup FiniteDifferenceFunctions
  * \ingroup ITKLevelSets
@@ -68,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapePriorSegmentationLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -92,6 +88,7 @@ public:
   using ShapeFunctionPointer = typename ShapeFunctionType::ConstPointer;
 
   /** Zeta. The ShapePriorWeight scales the shape prior term values. */
+  /** @ITKStartGrouping */
   void
   SetShapePriorWeight(const ScalarValueType p)
   {
@@ -102,9 +99,10 @@ public:
   {
     return m_ShapePriorWeight;
   }
-
+  /** @ITKEndGrouping */
   /** The ShapeFunction encapsulates the signed distance to the shape used to
    * influence the evolution of the level set. */
+  /** @ITKStartGrouping */
   void
   SetShapeFunction(const ShapeFunctionType * ptr)
   {
@@ -115,7 +113,7 @@ public:
   {
     return m_ShapeFunction;
   }
-
+  /** @ITKEndGrouping */
   /** Compute the equation value with the additional shape prior term. */
   PixelType
   ComputeUpdate(const NeighborhoodType & neighborhood,
@@ -134,7 +132,7 @@ public:
   };
 
   /** Returns a pointer to a global data structure for computing time step. */
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     auto * ans = new ShapePriorGlobalDataStruct();

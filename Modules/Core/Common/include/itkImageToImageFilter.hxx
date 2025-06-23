@@ -116,7 +116,7 @@ ImageToImageFilter<TInputImage, TOutputImage>::CallCopyOutputRegionToInputRegion
   InputImageRegionType &        destRegion,
   const OutputImageRegionType & srcRegion)
 {
-  OutputToInputRegionCopierType regionCopier;
+  const OutputToInputRegionCopierType regionCopier;
 
   regionCopier(destRegion, srcRegion);
 }
@@ -127,7 +127,7 @@ void
 ImageToImageFilter<TInputImage, TOutputImage>::CallCopyInputRegionToOutputRegion(OutputImageRegionType & destRegion,
                                                                                  const InputImageRegionType & srcRegion)
 {
-  InputToOutputRegionCopierType regionCopier;
+  const InputToOutputRegionCopierType regionCopier;
 
   regionCopier(destRegion, srcRegion);
 }
@@ -145,7 +145,7 @@ ImageToImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inde
 
 template <typename TInputImage, typename TOutputImage>
 void
-ImageToImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() ITKv5_CONST
+ImageToImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() const
 {
 
   using ImageBaseType = const ImageBase<InputImageDimension>;
@@ -186,29 +186,31 @@ ImageToImageFilter<TInputImage, TOutputImage>::VerifyInputInformation() ITKv5_CO
 
       if (!inputPtr1->IsCongruentImageGeometry(inputPtrN, m_CoordinateTolerance, m_DirectionTolerance))
       {
-        std::ostringstream originString, spacingString, directionString;
+        std::ostringstream originString;
         if (!inputPtr1->GetOrigin().GetVnlVector().is_equal(inputPtrN->GetOrigin().GetVnlVector(), coordinateTol))
         {
           originString.setf(std::ios::scientific);
           originString.precision(7);
-          originString << "InputImage Origin: " << inputPtr1->GetOrigin() << ", InputImage" << it.GetName()
+          originString << "InputImage Origin: " << inputPtr1->GetOrigin() << ", InputImage " << it.GetName()
                        << " Origin: " << inputPtrN->GetOrigin() << std::endl;
           originString << "\tTolerance: " << coordinateTol << std::endl;
         }
+        std::ostringstream spacingString;
         if (!inputPtr1->GetSpacing().GetVnlVector().is_equal(inputPtrN->GetSpacing().GetVnlVector(), coordinateTol))
         {
           spacingString.setf(std::ios::scientific);
           spacingString.precision(7);
-          spacingString << "InputImage Spacing: " << inputPtr1->GetSpacing() << ", InputImage" << it.GetName()
+          spacingString << "InputImage Spacing: " << inputPtr1->GetSpacing() << ", InputImage " << it.GetName()
                         << " Spacing: " << inputPtrN->GetSpacing() << std::endl;
           spacingString << "\tTolerance: " << coordinateTol << std::endl;
         }
+        std::ostringstream directionString;
         if (!inputPtr1->GetDirection().GetVnlMatrix().is_equal(inputPtrN->GetDirection().GetVnlMatrix(),
                                                                this->m_DirectionTolerance))
         {
           directionString.setf(std::ios::scientific);
           directionString.precision(7);
-          directionString << "InputImage Direction: " << inputPtr1->GetDirection() << ", InputImage" << it.GetName()
+          directionString << "InputImage Direction: " << inputPtr1->GetDirection() << ", InputImage " << it.GetName()
                           << " Direction: " << inputPtrN->GetDirection() << std::endl;
           directionString << "\tTolerance: " << this->m_DirectionTolerance << std::endl;
         }

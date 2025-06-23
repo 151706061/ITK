@@ -24,13 +24,10 @@ namespace itk
 {
 template <typename TInputImage, typename TFeatureImage>
 BinaryStatisticsOpeningImageFilter<TInputImage, TFeatureImage>::BinaryStatisticsOpeningImageFilter()
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_ForegroundValue(NumericTraits<OutputImagePixelType>::max())
+  , m_Attribute(LabelObjectType::MEAN)
 {
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ForegroundValue = NumericTraits<OutputImagePixelType>::max();
-  m_FullyConnected = false;
-  m_ReverseOrdering = false;
-  m_Lambda = 0.0;
-  m_Attribute = LabelObjectType::MEAN;
   this->SetNumberOfRequiredInputs(2);
 }
 
@@ -42,7 +39,7 @@ BinaryStatisticsOpeningImageFilter<TInputImage, TFeatureImage>::GenerateInputReq
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -118,7 +115,7 @@ BinaryStatisticsOpeningImageFilter<TInputImage, TFeatureImage>::PrintSelf(std::o
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent
      << "BackgroundValue: " << static_cast<typename NumericTraits<OutputImagePixelType>::PrintType>(m_BackgroundValue)
      << std::endl;

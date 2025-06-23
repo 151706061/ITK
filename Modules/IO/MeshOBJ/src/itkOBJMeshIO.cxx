@@ -26,10 +26,7 @@
 
 namespace itk
 {
-OBJMeshIO::OBJMeshIO()
-{
-  this->AddSupportedWriteExtension(".obj");
-}
+OBJMeshIO::OBJMeshIO() { this->AddSupportedWriteExtension(".obj"); }
 
 OBJMeshIO::~OBJMeshIO() = default;
 
@@ -101,7 +98,7 @@ OBJMeshIO::CloseFile()
 bool
 OBJMeshIO::SplitLine(const std::string & line, std::string & type, std::string & content)
 {
-  std::locale                 loc;
+  const std::locale           loc;
   std::string::const_iterator start = line.begin();
 
   while (start != line.end() && std::isspace(*start, loc))
@@ -137,10 +134,10 @@ OBJMeshIO::ReadMeshInformation()
   this->m_NumberOfPoints = 0;
   this->m_NumberOfCells = 0;
   this->m_NumberOfPointPixels = 0;
-  std::string line;
-  std::string inputLine;
-  std::string type;
-  std::locale loc;
+  std::string       line;
+  std::string       inputLine;
+  std::string       type;
+  const std::locale loc;
   while (std::getline(m_InputFile, line, '\n'))
   {
     if (SplitLine(line, type, inputLine) && !inputLine.empty())
@@ -223,10 +220,10 @@ OBJMeshIO::ReadPoints(void * buffer)
   SizeValueType index = 0;
 
   // Read and analyze the first line in the file
-  std::string line;
-  std::string inputLine;
-  std::string type;
-  std::locale loc;
+  std::string       line;
+  std::string       inputLine;
+  std::string       type;
+  const std::locale loc;
   while (std::getline(m_InputFile, line, '\n'))
   {
     if (SplitLine(line, type, inputLine) && !inputLine.empty())
@@ -255,10 +252,10 @@ OBJMeshIO::ReadCells(void * buffer)
   const auto    data = make_unique_for_overwrite<long[]>(this->m_CellBufferSize - this->m_NumberOfCells);
   SizeValueType index = 0;
 
-  std::string line;
-  std::string inputLine;
-  std::string type;
-  std::locale loc;
+  std::string       line;
+  std::string       inputLine;
+  std::string       type;
+  const std::locale loc;
   while (std::getline(m_InputFile, line, '\n'))
   {
     if (SplitLine(line, type, inputLine) && !inputLine.empty())
@@ -270,7 +267,6 @@ OBJMeshIO::ReadCells(void * buffer)
         std::vector<long> idList;
         while (ss >> item)
         {
-          long                   id;
           std::string::size_type pos = item.find('/');
           while (pos != std::string::npos)
           {
@@ -279,13 +275,14 @@ OBJMeshIO::ReadCells(void * buffer)
           }
 
           std::stringstream st(item);
+          long              id = 0;
           st >> id;
 
           idList.push_back(id);
         }
 
         data[index++] = static_cast<long>(idList.size());
-        for (long it : idList)
+        for (const long it : idList)
         {
           data[index++] = (it - 1);
         }
@@ -312,10 +309,10 @@ OBJMeshIO::ReadPointData(void * buffer)
   SizeValueType index = 0;
 
   // Read and analyze the first line in the file
-  std::string line;
-  std::string inputLine;
-  std::string type;
-  std::locale loc;
+  std::string       line;
+  std::string       inputLine;
+  std::string       type;
+  const std::locale loc;
   while (std::getline(m_InputFile, line, '\n'))
   {
     if (SplitLine(line, type, inputLine) && !inputLine.empty())
@@ -351,7 +348,7 @@ OBJMeshIO::WriteMeshInformation()
   std::ofstream outputFile;
   outputFile.open(this->m_FileName.c_str());
 
-  // Test whether input file was opened successfuly
+  // Test whether input file was opened successfully
   if (!outputFile.is_open())
   {
     itkExceptionMacro("Unable to open file\n"
@@ -381,7 +378,7 @@ OBJMeshIO::WritePoints(void * buffer)
   std::ofstream outputFile;
   outputFile.open(this->m_FileName.c_str(), std::ios_base::app);
 
-  // Test whether input file was opened successfuly
+  // Test whether input file was opened successfully
   if (!outputFile.is_open())
   {
     itkExceptionMacro("Unable to open file\n"
@@ -491,7 +488,7 @@ OBJMeshIO::WriteCells(void * buffer)
   std::ofstream outputFile;
   outputFile.open(this->m_FileName.c_str(), std::ios_base::app);
 
-  // Test whether input file was opened successfuly
+  // Test whether input file was opened successfully
   if (!outputFile.is_open())
   {
     itkExceptionMacro("Unable to open file\n"
@@ -594,7 +591,7 @@ OBJMeshIO::WritePointData(void * buffer)
   std::ofstream outputFile;
   outputFile.open(this->m_FileName.c_str(), std::ios_base::app);
 
-  // Test whether input file was opened successfuly
+  // Test whether input file was opened successfully
   if (!outputFile.is_open())
   {
     itkExceptionMacro("Unable to open file\n"

@@ -74,7 +74,7 @@ itkComplexToPhaseFilterAndAdaptorTest(int, char *[])
   InputIteratorType it(inputImage, inputImage->GetBufferedRegion());
 
   // Initialize the content of Image A
-  InputPixelType value(13, 25);
+  constexpr InputPixelType value(13, 25);
   it.GoToBegin();
   while (!it.IsAtEnd())
   {
@@ -97,13 +97,13 @@ itkComplexToPhaseFilterAndAdaptorTest(int, char *[])
   filter->Update();
 
   // Get the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
   // Create an iterator for going through the image output
   OutputIteratorType ot(outputImage, outputImage->GetRequestedRegion());
 
   // Check the content of the result image
-  const OutputImageType::PixelType epsilon = 1e-6;
+  constexpr OutputImageType::PixelType epsilon = 1e-6;
   ot.GoToBegin();
   it.GoToBegin();
   while (!ot.IsAtEnd())
@@ -111,7 +111,7 @@ itkComplexToPhaseFilterAndAdaptorTest(int, char *[])
     const InputImageType::PixelType  input = it.Get();
     const OutputImageType::PixelType output = ot.Get();
 
-    double phased = std::atan2(input.imag(), input.real());
+    const double phased = std::atan2(input.imag(), input.real());
 
     const auto phase = static_cast<OutputImageType::PixelType>(phased);
 
@@ -150,7 +150,7 @@ itkComplexToPhaseFilterAndAdaptorTest(int, char *[])
   diffFilter->Update();
 
   // Get the filter output
-  OutputImageType::Pointer diffImage = diffFilter->GetOutput();
+  const OutputImageType::Pointer diffImage = diffFilter->GetOutput();
 
   // Check the content of the diff image
   //

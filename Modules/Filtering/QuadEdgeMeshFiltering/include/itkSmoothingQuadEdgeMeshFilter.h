@@ -33,7 +33,8 @@ namespace itk
  *
  * For one iteration the location of one vertex is computed as follows:
  * \f[
- * \boldsymbol{ v' }_i = v_i + m_RelaxationFactor \cdot \frac{ \sum_j w_{ij} ( \boldsymbol{ v_j } - \boldsymbol{ v_i } )
+ * \boldsymbol{ v' }_i = v_i + m_{RelaxationFactor} \cdot \frac{ \sum_j w_{ij} ( \boldsymbol{ v_j } - \boldsymbol{ v_i }
+ * )
  * }{ \sum_j w_{ij} } \f]
  *
  * where \f$ w_{ij} \f$ is computed by the means of the set functor
@@ -65,8 +66,9 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = QuadEdgeMeshToQuadEdgeMeshFilter<TInputMesh, TOutputMesh>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SmoothingQuadEdgeMeshFilter);
+
   /** New macro for creation of through a Smart Pointer   */
   itkNewMacro(Self);
 
@@ -81,7 +83,7 @@ public:
   using OutputPointIdentifier = typename OutputMeshType::PointIdentifier;
   using OutputPointType = typename OutputMeshType::PointType;
   using OutputVectorType = typename OutputPointType::VectorType;
-  using OutputCoordType = typename OutputPointType::CoordRepType;
+  using OutputCoordType = typename OutputPointType::CoordinateType;
   using OutputPointsContainer = typename OutputMeshType::PointsContainer;
   using OutputPointsContainerPointer = typename OutputMeshType::PointsContainerPointer;
   using OutputPointsContainerIterator = typename OutputMeshType::PointsContainerIterator;
@@ -96,18 +98,21 @@ public:
   SetCoefficientsMethod(CoefficientsComputation * iMethod);
 
   /** Set/Get the number of iterations */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetConstMacro(NumberOfIterations, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set/Get if DelaunayConformingQuadEdgeMeshFilter is used at the end of each iterations */
+  /** @ITKStartGrouping */
   itkBooleanMacro(DelaunayConforming);
   itkSetMacro(DelaunayConforming, bool);
   itkGetConstMacro(DelaunayConforming, bool);
-
+  /** @ITKEndGrouping */
   /** Set/Get relaxation factor applied for each iteration */
+  /** @ITKStartGrouping */
   itkSetMacro(RelaxationFactor, OutputCoordType);
   itkGetConstMacro(RelaxationFactor, OutputCoordType);
-
+  /** @ITKEndGrouping */
 protected:
   SmoothingQuadEdgeMeshFilter();
   ~SmoothingQuadEdgeMeshFilter() override;

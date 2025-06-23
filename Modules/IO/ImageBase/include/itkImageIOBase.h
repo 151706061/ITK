@@ -39,6 +39,7 @@
 
 #include <fstream>
 #include <string>
+#include <type_traits> // For is_same_v and is_signed_v.
 
 namespace itk
 {
@@ -85,12 +86,14 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageIOBase);
 
   /** Set/Get the name of the file to be read. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
+  /** @ITKEndGrouping */
 
   /** Types for managing image size and image index components. */
   using IndexValueType = itk::IndexValueType;
@@ -169,14 +172,16 @@ public:
   /** Set/Get the image dimensions in the x, y, z, etc. directions.
    * GetDimensions() is typically used after reading the data; the
    * SetDimensions() is used prior to writing the data. */
+  /** @ITKStartGrouping */
   virtual void
   SetDimensions(unsigned int i, SizeValueType dim);
-
   virtual SizeValueType
+
   GetDimensions(unsigned int i) const
   {
     return m_Dimensions[i];
   }
+  /** @ITKEndGrouping */
 
   /** Set/Get the image origin on a axis-by-axis basis. The SetOrigin() method
    * is required when writing the image. */
@@ -225,40 +230,52 @@ public:
    * vectors define the start (lower-left corner) and length of the
    * region within the image. Make sure that the IORegion lies within
    * the image. */
+  /** @ITKStartGrouping */
   itkSetMacro(IORegion, ImageIORegion);
   itkGetConstReferenceMacro(IORegion, ImageIORegion);
+  /** @ITKEndGrouping */
 
   /** Set/Get the type of the pixel. The PixelTypes provides context
    * to the IO mechanisms for data conversions.  PixelTypes can be
    * SCALAR, RGB, RGBA, VECTOR, COVARIANTVECTOR, POINT, INDEX. If
    * the PIXELTYPE is SCALAR, then the NumberOfComponents should be 1.
    * Any other of PIXELTYPE will have more than one component. */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(PixelType, itk::CommonEnums::IOPixel);
   itkGetEnumMacro(PixelType, itk::CommonEnums::IOPixel);
+  /** @ITKEndGrouping */
 
   /** Set/Get the component type of the image. This is always a native
    * type. */
   itkSetEnumMacro(ComponentType, IOComponentEnum);
   itkGetEnumMacro(ComponentType, IOComponentEnum);
+
+#ifndef ITK_LEGACY_REMOVE
   /** get the type_info for the current pixel component type.
    * This function is DEPRECATED and only provided for backwards
    * compatibility.  There is no use for this method that can't
    * be satisfied by calling GetComponentType.
+   *
+   * \deprecated This member function is intended to be removed from ITK 6.
    */
-  virtual const std::type_info &
-  GetComponentTypeInfo() const;
+  itkLegacyMacro(virtual const std::type_info & GetComponentTypeInfo() const);
+#endif
 
   /** Set/Get the number of components per pixel in the image. This may
    * be set by the reading process. For SCALAR pixel types,
    * NumberOfComponents will be 1.  For other pixel types,
    * NumberOfComponents will be greater than or equal to one. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfComponents, unsigned int);
   itkGetConstReferenceMacro(NumberOfComponents, unsigned int);
+  /** @ITKEndGrouping */
 
   /** Set/Get a boolean to use the compression or not. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseCompression, bool);
   itkGetConstMacro(UseCompression, bool);
   itkBooleanMacro(UseCompression);
+  /** @ITKEndGrouping */
 
   /** \brief Set/Get a compression level hint
    *
@@ -284,28 +301,36 @@ public:
   itkGetConstReferenceMacro(Compressor, std::string);
 
   /** Set/Get a boolean to use streaming while reading or not. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseStreamedReading, bool);
   itkGetConstMacro(UseStreamedReading, bool);
   itkBooleanMacro(UseStreamedReading);
+  /** @ITKEndGrouping */
 
   /** Set/Get a boolean to use streaming while writing or not. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseStreamedWriting, bool);
   itkGetConstMacro(UseStreamedWriting, bool);
   itkBooleanMacro(UseStreamedWriting);
+  /** @ITKEndGrouping */
 
   /** Set/Get a boolean to perform RGB palette expansion.
    * If true, palette image is read as RGB,
    * if false, palette image is read as Scalar+Palette.
    * A RGB image is always read as RGB.*/
+  /** @ITKStartGrouping */
   itkSetMacro(ExpandRGBPalette, bool);
   itkGetConstMacro(ExpandRGBPalette, bool);
   itkBooleanMacro(ExpandRGBPalette);
+  /** @ITKEndGrouping */
 
   /** Set/Get a boolean to include a color palette while writing
    * the image file. Applies only for scalar Pixels*/
+  /** @ITKStartGrouping */
   itkSetMacro(WritePalette, bool);
   itkGetConstMacro(WritePalette, bool);
   itkBooleanMacro(WritePalette);
+  /** @ITKEndGrouping */
 
   /** Determine whether a palletized image file has been read as a scalar image
    *  plus a color palette.
@@ -316,6 +341,27 @@ public:
   /** Convenience method returns the IOComponentEnum as a string. This can be
    * used for writing output files. */
   static std::string GetComponentTypeAsString(IOComponentEnum);
+
+  /** Tells whether or not the specified component type is a floating point type. */
+  static constexpr bool
+  IsComponentTypeFloatingPoint(const IOComponentEnum componentEnum)
+  {
+    return GetComponentTypeTraits(componentEnum).isFloatingPoint;
+  }
+
+  /** Tells whether or not the specified component type is an unsigned integer type. */
+  static constexpr bool
+  IsComponentTypeUnsigned(const IOComponentEnum componentEnum)
+  {
+    return GetComponentTypeTraits(componentEnum).isUnsigned;
+  }
+
+  /** Returns the number of bits of the specified component type. */
+  static constexpr size_t
+  GetNumberOfBitsOfComponentType(const IOComponentEnum componentEnum)
+  {
+    return GetComponentTypeTraits(componentEnum).sizeOfComponent * CHAR_BIT;
+  }
 
   /** Convenience method returns the IOComponentEnum corresponding to a string. */
   static IOComponentEnum
@@ -331,6 +377,7 @@ public:
 
   /** These methods control whether the file is written binary or ASCII.
    * Many file formats (i.e., subclasses) ignore this flag. */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(FileType, IOFileEnum);
   itkGetEnumMacro(FileType, IOFileEnum);
   void
@@ -338,6 +385,7 @@ public:
   {
     this->SetFileType(IOFileEnum::ASCII);
   }
+  /** @ITKEndGrouping */
 
   void
   SetFileTypeToBinary()
@@ -356,6 +404,7 @@ public:
    * a VAX or PC, SetByteOrderToLittleEndian() otherwise
    * SetByteOrderToBigEndian().  Some ImageIOBase subclasses
    * ignore these methods. */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(ByteOrder, IOByteOrderEnum);
   itkGetEnumMacro(ByteOrder, IOByteOrderEnum);
   void
@@ -363,6 +412,7 @@ public:
   {
     this->SetByteOrder(IOByteOrderEnum::BigEndian);
   }
+  /** @ITKEndGrouping */
 
   void
   SetByteOrderToLittleEndian()
@@ -489,8 +539,8 @@ public:
    * LargestPossibleRegion (unless it was dimensionally clipped) and
    * greater or equal to the RequestedRegion
    *
-   * the resulting IORegion may be a greater dimensions the the
-   * requested IORegion, if the the derived class is unable to read
+   * the resulting IORegion may be a greater dimensions the
+   * requested IORegion, if the derived class is unable to read
    * the requested region. For example if the file has a size of [ 10,
    * 10, 10] but the requested region is [10, 10] the return may be 3 dimensions.
    */
@@ -550,11 +600,27 @@ public:
   SetTypeInfo(const TPixel *);
 
   /** Map between C++ Pixel type and ImageIOBase ComponentType */
+  /** @ITKStartGrouping */
   template <typename TPixel>
   struct MapPixelType
   {
-    static constexpr IOComponentEnum CType = IOComponentEnum::UNKNOWNCOMPONENTTYPE;
+    static constexpr IOComponentEnum CType =
+      std::is_same_v<TPixel, char>          ? (std::is_signed_v<char> ? IOComponentEnum::CHAR : IOComponentEnum::UCHAR)
+      : std::is_same_v<TPixel, signed char> ? IOComponentEnum::CHAR
+      : std::is_same_v<TPixel, unsigned char>      ? IOComponentEnum::UCHAR
+      : std::is_same_v<TPixel, short>              ? IOComponentEnum::SHORT
+      : std::is_same_v<TPixel, unsigned short>     ? IOComponentEnum::USHORT
+      : std::is_same_v<TPixel, int>                ? IOComponentEnum::INT
+      : std::is_same_v<TPixel, unsigned int>       ? IOComponentEnum::UINT
+      : std::is_same_v<TPixel, long>               ? IOComponentEnum::LONG
+      : std::is_same_v<TPixel, unsigned long>      ? IOComponentEnum::ULONG
+      : std::is_same_v<TPixel, long long>          ? IOComponentEnum::LONGLONG
+      : std::is_same_v<TPixel, unsigned long long> ? IOComponentEnum::ULONGLONG
+      : std::is_same_v<TPixel, float>              ? IOComponentEnum::FLOAT
+      : std::is_same_v<TPixel, double>             ? IOComponentEnum::DOUBLE
+                                                   : IOComponentEnum::UNKNOWNCOMPONENTTYPE;
   };
+
   template <typename TPixel>
   void
   SetPixelTypeInfo(const TPixel *)
@@ -595,13 +661,13 @@ public:
     this->SetPixelType(IOPixelEnum::VECTOR);
     this->SetComponentType(MapPixelType<TPixel>::CType);
   }
-  template <typename TCoordRep, unsigned int VPointDimension>
+  template <typename TCoordinate, unsigned int VPointDimension>
   void
-  SetPixelTypeInfo(const Point<TCoordRep, VPointDimension> *)
+  SetPixelTypeInfo(const Point<TCoordinate, VPointDimension> *)
   {
     this->SetNumberOfComponents(VPointDimension);
     this->SetPixelType(IOPixelEnum::POINT);
-    this->SetComponentType(MapPixelType<TCoordRep>::CType);
+    this->SetComponentType(MapPixelType<TCoordinate>::CType);
   }
   template <typename TPixel, unsigned int VLength>
   void
@@ -675,7 +741,7 @@ public:
     this->SetPixelType(IOPixelEnum::VARIABLESIZEMATRIX);
     this->SetComponentType(MapPixelType<TValue>::CType);
   }
-
+  /** @ITKEndGrouping */
 
 protected:
   ImageIOBase();
@@ -690,10 +756,12 @@ protected:
    * extension list. If ignoreCase is true, the case of the characters
    * is ignored.
    */
+  /** @ITKStartGrouping */
   virtual bool
   HasSupportedReadExtension(const char * fileName, bool ignoreCase = true);
   virtual bool
   HasSupportedWriteExtension(const char * fileName, bool ignoreCase = true);
+  /** @ITKEndGrouping */
 
   /** Used internally to keep track of the type of the pixel. */
   IOPixelEnum m_PixelType{ IOPixelEnum::SCALAR };
@@ -729,9 +797,11 @@ protected:
   std::string m_Compressor{ "uninitialized" };
 
   /** Set/Get enforced maximum compression level value to limit range  */
+  /** @ITKStartGrouping */
   virtual void
   SetMaximumCompressionLevel(int);
   itkGetConstMacro(MaximumCompressionLevel, int);
+  /** @ITKEndGrouping */
 
   /** Called when the compressor changes value. The compressor string
    * is converted to uppercase for case insensitive comparisons.
@@ -888,6 +958,42 @@ protected:
                                          const ImageIORegion & pasteRegion) const;
 
 private:
+  struct ComponentTypeTraits
+  {
+    bool   isFloatingPoint;
+    bool   isUnsigned;
+    size_t sizeOfComponent;
+
+    template <typename... TComponent>
+    static constexpr ComponentTypeTraits
+    Get(const IOComponentEnum componentEnum)
+    {
+      ComponentTypeTraits result{};
+      return ((MapPixelType<TComponent>::CType == componentEnum
+                 ? result = { std::is_floating_point_v<TComponent>, std::is_unsigned_v<TComponent>, sizeof(TComponent) }
+                 : result),
+              ...);
+    }
+  };
+
+
+  static constexpr ComponentTypeTraits
+  GetComponentTypeTraits(const IOComponentEnum componentEnum)
+  {
+    return ComponentTypeTraits::Get<char,
+                                    unsigned char,
+                                    short,
+                                    unsigned short,
+                                    int,
+                                    unsigned int,
+                                    long,
+                                    unsigned long,
+                                    long long,
+                                    unsigned long long,
+                                    float,
+                                    double>(componentEnum);
+  }
+
   bool
   HasSupportedExtension(const char *, const ArrayOfExtensionsType &, bool ignoreCase = true);
 
@@ -910,29 +1016,6 @@ ReadRawBytesAfterSwapping(IOComponentEnum componentType,
                           void *          buffer,
                           IOByteOrderEnum byteOrder,
                           SizeValueType   numberOfComponents);
-
-#define IMAGEIOBASE_TYPEMAP(type, ctype)            \
-  template <>                                       \
-  struct ImageIOBase::MapPixelType<type>            \
-  {                                                 \
-    static constexpr IOComponentEnum CType = ctype; \
-  }
-
-// the following typemaps are not platform independent
-IMAGEIOBASE_TYPEMAP(signed char, IOComponentEnum::CHAR);
-IMAGEIOBASE_TYPEMAP(char, std::numeric_limits<char>::is_signed ? IOComponentEnum::CHAR : IOComponentEnum::UCHAR);
-IMAGEIOBASE_TYPEMAP(unsigned char, IOComponentEnum::UCHAR);
-IMAGEIOBASE_TYPEMAP(short, IOComponentEnum::SHORT);
-IMAGEIOBASE_TYPEMAP(unsigned short, IOComponentEnum::USHORT);
-IMAGEIOBASE_TYPEMAP(int, IOComponentEnum::INT);
-IMAGEIOBASE_TYPEMAP(unsigned int, IOComponentEnum::UINT);
-IMAGEIOBASE_TYPEMAP(long, IOComponentEnum::LONG);
-IMAGEIOBASE_TYPEMAP(unsigned long, IOComponentEnum::ULONG);
-IMAGEIOBASE_TYPEMAP(long long, IOComponentEnum::LONGLONG);
-IMAGEIOBASE_TYPEMAP(unsigned long long, IOComponentEnum::ULONGLONG);
-IMAGEIOBASE_TYPEMAP(float, IOComponentEnum::FLOAT);
-IMAGEIOBASE_TYPEMAP(double, IOComponentEnum::DOUBLE);
-#undef IMAGIOBASE_TYPEMAP
 
 } // end namespace itk
 

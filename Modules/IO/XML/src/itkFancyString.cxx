@@ -16,6 +16,8 @@
  *
  *=========================================================================*/
 
+#include <utility>
+
 #include "itkFancyString.h"
 #include "itkStringTools.h"
 
@@ -24,10 +26,9 @@ namespace itk
 
 FancyString::FancyString() = default; // : std::string()
 
-FancyString::FancyString(const std::string & str) // : std::string( str )
-{
-  this->m_Value = str;
-}
+FancyString::FancyString(std::string str)
+  : m_Value(std::move(str)) // : std::string( str )
+{}
 
 FancyString::FancyString(const char * s) // : std::string( s )
 {
@@ -49,16 +50,10 @@ FancyString::operator=(const char * s)
 }
 
 /** Function to cast this type to "const char *". */
-FancyString::operator const char *() const
-{
-  return this->m_Value.c_str();
-}
+FancyString::operator const char *() const { return this->m_Value.c_str(); }
 
 /** Function to convert this value to a "std::string". */
-FancyString::operator const std::string &() const
-{
-  return this->ToString();
-}
+FancyString::operator const std::string &() const { return this->ToString(); }
 
 /** Function to convert this value to a "std::string". */
 const std::string &
@@ -109,7 +104,7 @@ FancyString::TrimRight(const std::string & dislike)
   return *this;
 }
 
-/** Method to covert lower-case characters to upper cases in a string. */
+/** Method to convert lower-case characters to upper cases in a string. */
 FancyString &
 FancyString::ToUpperCase()
 {
@@ -117,7 +112,7 @@ FancyString::ToUpperCase()
   return *this;
 }
 
-/** Method to covert upper-case characters to lower cases in a string. */
+/** Method to convert upper-case characters to lower cases in a string. */
 FancyString &
 FancyString::ToLowerCase()
 {

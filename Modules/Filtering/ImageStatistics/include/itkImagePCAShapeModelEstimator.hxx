@@ -24,11 +24,10 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
 ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::ImagePCAShapeModelEstimator()
+
 {
   m_EigenVectors.set_size(0, 0);
   m_EigenValues.set_size(0);
-
-  m_NumberOfPrincipalComponentsRequired = 0;
   this->SetNumberOfPrincipalComponentsRequired(1);
 }
 
@@ -78,19 +77,18 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::GenerateInputRequestedRe
   if (this->GetInput(0))
   {
     // Set the requested region of the first input to largest possible region
-    InputImagePointer input = const_cast<TInputImage *>(this->GetInput(0));
+    const InputImagePointer input = const_cast<TInputImage *>(this->GetInput(0));
     input->SetRequestedRegionToLargestPossibleRegion();
 
     // Set the requested region of the remaining input to the largest possible
     // region of the first input
-    unsigned int idx;
-    for (idx = 1; idx < this->GetNumberOfIndexedInputs(); ++idx)
+    for (unsigned int idx = 1; idx < this->GetNumberOfIndexedInputs(); ++idx)
     {
       if (this->GetInput(idx))
       {
-        typename TInputImage::RegionType requestedRegion = this->GetInput(0)->GetLargestPossibleRegion();
+        const typename TInputImage::RegionType requestedRegion = this->GetInput(0)->GetLargestPossibleRegion();
 
-        typename TInputImage::RegionType largestRegion = this->GetInput(idx)->GetLargestPossibleRegion();
+        const typename TInputImage::RegionType largestRegion = this->GetInput(idx)->GetLargestPossibleRegion();
 
         if (!largestRegion.IsInside(requestedRegion))
         {
@@ -98,7 +96,7 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::GenerateInputRequestedRe
                             << idx << " is not a superset of the LargestPossibleRegion of input 0");
         }
 
-        InputImagePointer ptr = const_cast<TInputImage *>(this->GetInput(idx));
+        const InputImagePointer ptr = const_cast<TInputImage *>(this->GetInput(idx));
         ptr->SetRequestedRegion(requestedRegion);
       }
     }
@@ -114,11 +112,10 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::GenerateData()
   // Allocate memory for each output.
   auto numberOfOutputs = static_cast<unsigned int>(this->GetNumberOfIndexedOutputs());
 
-  InputImagePointer input = const_cast<TInputImage *>(this->GetInput(0));
-  unsigned int      j;
-  for (j = 0; j < numberOfOutputs; ++j)
+  const InputImagePointer input = const_cast<TInputImage *>(this->GetInput(0));
+  for (unsigned int j = 0; j < numberOfOutputs; ++j)
   {
-    OutputImagePointer output = this->GetOutput(j);
+    const OutputImagePointer output = this->GetOutput(j);
     output->SetBufferedRegion(output->GetRequestedRegion());
     output->Allocate();
   }
@@ -141,10 +138,10 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::GenerateData()
   }
 
   // Now fill the principal component outputs
-  unsigned int kthLargestPrincipalComp = m_NumberOfTrainingImages;
-  unsigned int numberOfValidOutputs = std::min(numberOfOutputs, m_NumberOfTrainingImages + 1);
-
-  for (j = 1; j < numberOfValidOutputs; ++j)
+  unsigned int       kthLargestPrincipalComp = m_NumberOfTrainingImages;
+  const unsigned int numberOfValidOutputs = std::min(numberOfOutputs, m_NumberOfTrainingImages + 1);
+  unsigned int       j = 1;
+  for (; j < numberOfValidOutputs; ++j)
   {
     // Extract one column vector at a time
     m_OneEigenVector = m_EigenVectors.get_column(kthLargestPrincipalComp - 1);
@@ -199,22 +196,20 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::SetNumberOfPrincipalComp
     // Modify the required number of outputs ( 1 extra for the mean image )
     this->SetNumberOfRequiredOutputs(m_NumberOfPrincipalComponentsRequired + 1);
 
-    auto         numberOfOutputs = static_cast<unsigned int>(this->GetNumberOfIndexedOutputs());
-    unsigned int idx;
-
+    auto numberOfOutputs = static_cast<unsigned int>(this->GetNumberOfIndexedOutputs());
     if (numberOfOutputs < m_NumberOfPrincipalComponentsRequired + 1)
     {
       // Make and add extra outputs
-      for (idx = numberOfOutputs; idx <= m_NumberOfPrincipalComponentsRequired; ++idx)
+      for (unsigned int idx = numberOfOutputs; idx <= m_NumberOfPrincipalComponentsRequired; ++idx)
       {
-        typename DataObject::Pointer output = this->MakeOutput(idx);
+        const typename DataObject::Pointer output = this->MakeOutput(idx);
         this->SetNthOutput(idx, output.GetPointer());
       }
     }
     else if (numberOfOutputs > m_NumberOfPrincipalComponentsRequired + 1)
     {
       // Remove the extra outputs
-      for (idx = numberOfOutputs - 1; idx >= m_NumberOfPrincipalComponentsRequired + 1; idx--)
+      for (unsigned int idx = numberOfOutputs - 1; idx >= m_NumberOfPrincipalComponentsRequired + 1; idx--)
       {
         this->RemoveOutput(idx);
       }
@@ -261,11 +256,11 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::CalculateInnerProduct()
 
   for (unsigned int i = 0; i < m_NumberOfTrainingImages; ++i)
   {
-    InputImageConstPointer inputImagePtr = dynamic_cast<const TInputImage *>(ProcessObject::GetInput(i));
+    const InputImageConstPointer inputImagePtr = dynamic_cast<const TInputImage *>(ProcessObject::GetInput(i));
 
     inputImagePointerArray[i] = inputImagePtr;
 
-    InputImageConstIterator inputImageIt(inputImagePtr, inputImagePtr->GetBufferedRegion());
+    const InputImageConstIterator inputImageIt(inputImagePtr, inputImagePtr->GetBufferedRegion());
 
     m_InputImageIteratorArray[i] = inputImageIt;
 
@@ -355,7 +350,7 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::EstimatePCAShapeModelPar
 
   identityMatrix.set_identity();
 
-  vnl_generalized_eigensystem eigenVectors_eigenValues(m_InnerProduct, identityMatrix);
+  const vnl_generalized_eigensystem eigenVectors_eigenValues(m_InnerProduct, identityMatrix);
 
   MatrixOfDoubleType eigenVectorsOfInnerProductMatrix = eigenVectors_eigenValues.V;
 
@@ -369,15 +364,13 @@ ImagePCAShapeModelEstimator<TInputImage, TOutputImage>::EstimatePCAShapeModelPar
   m_EigenVectors.set_size(m_NumberOfPixels, m_NumberOfTrainingImages);
   m_EigenVectors.fill(0);
 
-  double                  pix_value;
-  InputImageConstIterator tempImageItA;
 
   for (unsigned int img_number = 0; img_number < m_NumberOfTrainingImages; ++img_number)
   {
-    tempImageItA = m_InputImageIteratorArray[img_number];
+    InputImageConstIterator tempImageItA = m_InputImageIteratorArray[img_number];
     for (unsigned int pix_number = 0; pix_number < m_NumberOfPixels; ++pix_number)
     {
-      pix_value = tempImageItA.Get();
+      const double pix_value = tempImageItA.Get();
       for (unsigned int vec_number = 0; vec_number < m_NumberOfTrainingImages; ++vec_number)
       {
         m_EigenVectors[pix_number][vec_number] +=

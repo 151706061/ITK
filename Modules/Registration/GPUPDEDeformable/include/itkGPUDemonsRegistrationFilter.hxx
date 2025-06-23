@@ -25,9 +25,7 @@ template <typename TFixedImage, typename TMovingImage, typename TDisplacementFie
 GPUDemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField, TParentImageFilter>::
   GPUDemonsRegistrationFilter()
 {
-  typename GPUDemonsRegistrationFunctionType::Pointer drfp;
-
-  drfp = GPUDemonsRegistrationFunctionType::New();
+  auto drfp = GPUDemonsRegistrationFunctionType::New();
 
   this->SetDifferenceFunction(drfp);
 
@@ -42,7 +40,7 @@ GPUDemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField, TPare
 {
   GPUSuperclass::PrintSelf(os, indent);
 
-  os << indent << "UseMovingImageGradient: " << (m_UseMovingImageGradient ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseMovingImageGradient);
 }
 
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField, typename TParentImageFilter>

@@ -37,7 +37,7 @@ itkImageAdaptorPipeLineTest(int, char *[])
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope
   // scope.
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   //-------------------------------------------------------------
   //                        Typedefs
@@ -80,11 +80,9 @@ itkImageAdaptorPipeLineTest(int, char *[])
   start[1] = 0;
   start[2] = 0;
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const myRegionType region{ start, size };
 
-  const float spacing[3] = { 1.0, 1.0, 1.0 };
+  constexpr float spacing[3] = { 1.0, 1.0, 1.0 };
 
   //-------------------------------------------------------------
   //                 Create and Initialize the RGBPixel image
@@ -131,7 +129,7 @@ itkImageAdaptorPipeLineTest(int, char *[])
   }
 
 
-  std::cout << "RGBPixel Image Initializaed" << std::endl;
+  std::cout << "RGBPixel Image Initialized" << std::endl;
 
   //-------------------------------------------------------------
   //                 Create and Initialize the Float image
@@ -145,7 +143,7 @@ itkImageAdaptorPipeLineTest(int, char *[])
 
   myFloatIteratorType itf(myFloatImage, myFloatImage->GetRequestedRegion());
 
-  myFloatPixelType initialFloatValue = 5.0;
+  constexpr myFloatPixelType initialFloatValue = 5.0;
 
   while (!itf.IsAtEnd())
   {
@@ -170,7 +168,7 @@ itkImageAdaptorPipeLineTest(int, char *[])
     ++itf;
   }
 
-  std::cout << "Float Image Initializaed" << std::endl;
+  std::cout << "Float Image Initialized" << std::endl;
 
 
   //-------------------------------------------------------------
@@ -198,7 +196,7 @@ itkImageAdaptorPipeLineTest(int, char *[])
   myFloatImageType::Pointer myFloatOutputImage = filter->GetOutput();
   myFloatOutputImage->SetSpacing(spacing);
 
-  std::cout << "Float Output Image Initializaed" << std::endl;
+  std::cout << "Float Output Image Initialized" << std::endl;
 
   //-------------------------------------------------------------
   //         Force the execution of the filter

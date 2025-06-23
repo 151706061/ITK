@@ -25,10 +25,8 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 AccumulateImageFilter<TInputImage, TOutputImage>::AccumulateImageFilter()
-{
-  m_AccumulateDimension = InputImageDimension - 1;
-  m_Average = false;
-}
+  : m_AccumulateDimension(InputImageDimension - 1)
+{}
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -47,8 +45,8 @@ AccumulateImageFilter<TInputImage, TOutputImage>::GenerateOutputInformation()
   typename TOutputImage::PointType     outOrigin;
 
   // Get pointers to the input and output
-  typename Superclass::OutputImagePointer output = this->GetOutput();
-  typename Superclass::InputImagePointer  input = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::OutputImagePointer output = this->GetOutput();
+  const typename Superclass::InputImagePointer  input = const_cast<TInputImage *>(this->GetInput());
 
   if (!input || !output)
   {
@@ -104,9 +102,7 @@ AccumulateImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
     typename TInputImage::SizeType   inputLargSize;
     typename TInputImage::IndexType  inputLargIndex;
     typename TOutputImage::SizeType  outputSize;
-    typename TOutputImage::IndexType outputIndex;
-
-    outputIndex = this->GetOutput()->GetRequestedRegion().GetIndex();
+    typename TOutputImage::IndexType outputIndex = this->GetOutput()->GetRequestedRegion().GetIndex();
     outputSize = this->GetOutput()->GetRequestedRegion().GetSize();
     inputLargSize = this->GetInput()->GetLargestPossibleRegion().GetSize();
     inputLargIndex = this->GetInput()->GetLargestPossibleRegion().GetIndex();
@@ -126,7 +122,7 @@ AccumulateImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
     }
 
     const typename TInputImage::RegionType RequestedRegion(inputIndex, inputSize);
-    InputImagePointer                      input = const_cast<TInputImage *>(this->GetInput());
+    const InputImagePointer                input = const_cast<TInputImage *>(this->GetInput());
     input->SetRequestedRegion(RequestedRegion);
   }
 
@@ -146,8 +142,8 @@ AccumulateImageFilter<TInputImage, TOutputImage>::GenerateData()
   using OutputPixelType = typename TOutputImage::PixelType;
   using AccumulateType = typename NumericTraits<OutputPixelType>::AccumulateType;
 
-  typename Superclass::InputImageConstPointer inputImage = this->GetInput();
-  typename TOutputImage::Pointer              outputImage = this->GetOutput();
+  const typename Superclass::InputImageConstPointer inputImage = this->GetInput();
+  const typename TOutputImage::Pointer              outputImage = this->GetOutput();
   outputImage->SetBufferedRegion(outputImage->GetRequestedRegion());
   outputImage->Allocate();
 
@@ -160,9 +156,9 @@ AccumulateImageFilter<TInputImage, TOutputImage>::GenerateData()
   typename TInputImage::SizeType  AccumulatedSize = inputImage->GetLargestPossibleRegion().GetSize();
   typename TInputImage::IndexType AccumulatedIndex = inputImage->GetLargestPossibleRegion().GetIndex();
 
-  typename TInputImage::SizeValueType  SizeAccumulateDimension = AccumulatedSize[m_AccumulateDimension];
-  const auto                           sizeAccumulateDimensionDouble = static_cast<double>(SizeAccumulateDimension);
-  typename TInputImage::IndexValueType IndexAccumulateDimension = AccumulatedIndex[m_AccumulateDimension];
+  const SizeValueType SizeAccumulateDimension = AccumulatedSize[m_AccumulateDimension];
+  const auto          sizeAccumulateDimensionDouble = static_cast<double>(SizeAccumulateDimension);
+  const typename TInputImage::IndexValueType IndexAccumulateDimension = AccumulatedIndex[m_AccumulateDimension];
   for (unsigned int i = 0; i < InputImageDimension; ++i)
   {
     if (i != m_AccumulateDimension)
@@ -212,7 +208,7 @@ AccumulateImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, I
   Superclass::PrintSelf(os, indent);
 
   os << indent << "AccumulateDimension: " << m_AccumulateDimension << std::endl;
-  os << indent << "Average: " << (m_Average ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Average);
 }
 } // end namespace itk
 

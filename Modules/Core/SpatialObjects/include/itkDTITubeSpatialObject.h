@@ -56,7 +56,7 @@ public:
   using typename Superclass::PointType;
   using typename Superclass::TransformType;
   using typename Superclass::SpatialObjectPointType;
-  using PointContainerType = VectorContainer<IdentifierType, PointType>;
+  using PointContainerType = VectorContainer<PointType>;
   using PointContainerPointer = SmartPointer<PointContainerType>;
   using typename Superclass::VectorType;
   using typename Superclass::CovariantVectorType;
@@ -65,14 +65,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Method for creation through the object factory. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DTITubeSpatialObject);
 
 protected:
   DTITubeSpatialObject();
   ~DTITubeSpatialObject() override = default;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 };
 } // end namespace itk

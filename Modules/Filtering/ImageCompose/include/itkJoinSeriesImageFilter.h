@@ -62,7 +62,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(JoinSeriesImageFilter);
 
   /** Compiler can't inherit type alias? */
@@ -78,19 +78,17 @@ public:
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
   /** Set/Get spacing of the new dimension */
+  /** @ITKStartGrouping */
   itkSetMacro(Spacing, double);
   itkGetConstMacro(Spacing, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get origin of the new dimension */
+  /** @ITKStartGrouping */
   itkSetMacro(Origin, double);
   itkGetConstMacro(Origin, double);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputConvertibleToOutputCheck,
                   (Concept::Convertible<typename TInputImage::PixelType, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   JoinSeriesImageFilter();
@@ -104,7 +102,7 @@ protected:
    * \sa ProcessObject::VerifyInputInformation
    */
   void
-  VerifyInputInformation() ITKv5_CONST override;
+  VerifyInputInformation() const override;
 
   /** Overrides GenerateOutputInformation() in order to produce
    * an image which has a different information than the first input.

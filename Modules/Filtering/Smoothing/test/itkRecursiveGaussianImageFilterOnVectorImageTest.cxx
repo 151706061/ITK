@@ -47,14 +47,10 @@ itkRecursiveGaussianImageFilterOnVectorImageTest(int, char *[])
   vector1.Fill(1.0);
 
   // Create the 9x9 input image
-  ImageType::SizeType size;
-  size.Fill(9);
-  ImageType::IndexType index;
-  index.Fill(0);
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
-  auto inputImage = ImageType::New();
+  auto                        size = ImageType::SizeType::Filled(9);
+  ImageType::IndexType        index{};
+  const ImageType::RegionType region{ index, size };
+  auto                        inputImage = ImageType::New();
   inputImage->SetRegions(region);
   inputImage->SetNumberOfComponentsPerPixel(NumberOfComponents);
   inputImage->Allocate();
@@ -93,10 +89,10 @@ itkRecursiveGaussianImageFilterOnVectorImageTest(int, char *[])
   ITK_TRY_EXPECT_NO_EXCEPTION(filterY->Update());
 
 
-  // Test a few pixels of the  fitlered image
+  // Test a few pixels of the filtered image
   //
-  ImageType::Pointer filteredImage = filterY->GetOutput();
-  ConstIteratorType  cit(filteredImage, filteredImage->GetRequestedRegion());
+  const ImageType::Pointer filteredImage = filterY->GetOutput();
+  ConstIteratorType        cit(filteredImage, filteredImage->GetRequestedRegion());
   cit.SetDirection(0);
 
   index[0] = 4;

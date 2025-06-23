@@ -36,11 +36,11 @@ TransformGeometryImageFilter<TInputImage, TOutputImage>::TransformGeometryImageF
 
 template <typename TInputImage, typename TOutputImage>
 void
-TransformGeometryImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() ITKv5_CONST
+TransformGeometryImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() const
 {
   Superclass::VerifyPreconditions();
 
-  TransformConstPointer tx = this->GetTransform();
+  const TransformConstPointer tx = this->GetTransform();
 
   if (!tx->IsLinear())
   {
@@ -58,7 +58,7 @@ TransformGeometryImageFilter<TInputImage, TOutputImage>::GenerateOutputInformati
 
   OutputImageType * outputPtr = this->GetOutput();
 
-  TransformConstPointer tx = this->GetTransform();
+  const TransformConstPointer tx = this->GetTransform();
   tx->ApplyToImageMetadata(outputPtr);
 }
 

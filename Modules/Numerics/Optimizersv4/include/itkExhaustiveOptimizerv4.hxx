@@ -54,7 +54,7 @@ ExhaustiveOptimizerv4<TInternalComputationValueType>::StartWalking()
 
   this->SetInitialPosition(initialPos); // store the initial position
 
-  MeasureType initialValue = this->m_Metric->GetValue();
+  const MeasureType initialValue = this->m_Metric->GetValue();
   m_MaximumMetricValue = initialValue;
   m_MinimumMetricValue = initialValue;
 
@@ -101,7 +101,7 @@ ExhaustiveOptimizerv4<TInternalComputationValueType>::ResumeWalking()
 
   while (!m_Stop)
   {
-    ParametersType currentPosition = this->GetCurrentPosition();
+    const ParametersType currentPosition = this->GetCurrentPosition();
 
     if (m_Stop)
     {
@@ -203,7 +203,7 @@ ExhaustiveOptimizerv4<TInternalComputationValueType>::IncrementIndex(ParametersT
 }
 
 template <typename TInternalComputationValueType>
-const std::string
+std::string
 ExhaustiveOptimizerv4<TInternalComputationValueType>::GetStopConditionDescription() const
 {
   return m_StopConditionDescription.str();
@@ -228,7 +228,7 @@ ExhaustiveOptimizerv4<TInternalComputationValueType>::PrintSelf(std::ostream & o
      << std::endl;
   os << indent << "NumberOfSteps: " << static_cast<typename NumericTraits<StepsType>::PrintType>(m_NumberOfSteps)
      << std::endl;
-  os << indent << "Stop: " << (m_Stop ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Stop);
   os << indent << "StepLength: " << m_StepLength << std::endl;
   os << indent << "CurrentIndex: " << m_CurrentIndex << std::endl;
   os << indent

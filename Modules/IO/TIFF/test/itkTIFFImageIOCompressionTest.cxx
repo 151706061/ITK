@@ -41,7 +41,7 @@ itkTIFFImageIOCompressionTestHelper(int, char * argv[], int JPEGQuality)
   auto writer = WriterType::New();
 
 
-  itk::TIFFImageIO::Pointer imageIO = itk::TIFFImageIO::New();
+  const itk::TIFFImageIO::Pointer imageIO = itk::TIFFImageIO::New();
   ITK_TRY_EXPECT_NO_EXCEPTION(imageIO->SetCompressor(""));
   ITK_TEST_EXPECT_EQUAL(imageIO->GetCompressor(), "");
 
@@ -60,19 +60,23 @@ itkTIFFImageIOCompressionTestHelper(int, char * argv[], int JPEGQuality)
   ITK_TRY_EXPECT_NO_EXCEPTION(imageIO->SetCompressor("Deflate"));
   ITK_TEST_EXPECT_EQUAL(imageIO->GetCompressor(), "Deflate");
 
+  ITK_TRY_EXPECT_NO_EXCEPTION(imageIO->SetCompressor("AdobeDeflate"));
+  ITK_TEST_EXPECT_EQUAL(imageIO->GetCompressor(), "AdobeDeflate");
+
+
   imageIO->SetCompressionLevel(2);
   ITK_TEST_EXPECT_EQUAL(imageIO->GetCompressionLevel(), 2);
 
   imageIO->SetCompressionLevel(110);
   ITK_TEST_EXPECT_EQUAL(imageIO->GetCompressionLevel(), 100);
 
-  itk::TIFFImageIO::Pointer io = itk::TIFFImageIO::New();
+  const itk::TIFFImageIO::Pointer io = itk::TIFFImageIO::New();
   reader->SetFileName(argv[1]);
   reader->SetImageIO(io);
 
   ITK_TRY_EXPECT_NO_EXCEPTION(reader->Update());
 
-  std::string compression = argv[3];
+  const std::string compression = argv[3];
 
   // Write out a compressed version
   writer->SetInput(reader->GetOutput());
@@ -82,6 +86,14 @@ itkTIFFImageIOCompressionTestHelper(int, char * argv[], int JPEGQuality)
   {
 
     io->SetCompressionToDeflate();
+
+    ITK_TEST_EXPECT_EQUAL(compression, io->GetCompressor());
+    ITK_TEST_EXPECT_TRUE(io->GetUseCompression());
+  }
+  else if (compression == "AdobeDeflate")
+  {
+    std::cout << "Using AdobeDeflate\n";
+    io->SetCompressionToAdobeDeflate();
 
     ITK_TEST_EXPECT_EQUAL(compression, io->GetCompressor());
     ITK_TEST_EXPECT_TRUE(io->GetUseCompression());
@@ -150,11 +162,11 @@ itkTIFFImageIOCompressionTest(int argc, char * argv[])
     JPEGQuality = std::stoi(argv[4]);
   }
 
-  std::string inputFilename = argv[1];
+  const std::string inputFilename = argv[1];
 
   using ScalarPixelType = itk::IOComponentEnum;
 
-  itk::TIFFImageIO::Pointer imageIO = itk::TIFFImageIO::New();
+  const itk::TIFFImageIO::Pointer imageIO = itk::TIFFImageIO::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(imageIO, TIFFImageIO, ImageIOBase);
 
@@ -166,10 +178,10 @@ itkTIFFImageIOCompressionTest(int argc, char * argv[])
   std::cout << "Compression: " << argv[3] << std::endl;
   std::cout << "JPEGQuality: " << JPEGQuality << std::endl;
 
-  std::cout << " Pixel type (string): " << imageIO->GetPixelTypeAsString(imageIO->GetPixelType()) << std::endl;
+  std::cout << " Pixel type (string): " << itk::ImageIOBase::GetPixelTypeAsString(imageIO->GetPixelType()) << std::endl;
 
   const ScalarPixelType componentType = imageIO->GetComponentType();
-  std::cout << " Component Type is " << imageIO->GetComponentTypeAsString(componentType) << std::endl;
+  std::cout << " Component Type is " << itk::ImageIOBase::GetComponentTypeAsString(componentType) << std::endl;
 
   std::cout << " Component size: " << imageIO->GetComponentSize() << std::endl;
 

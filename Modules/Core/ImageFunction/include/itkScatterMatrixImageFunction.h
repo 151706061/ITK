@@ -41,11 +41,11 @@ namespace itk
  * \ingroup ImageFunctions
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = float>
+template <typename TInputImage, typename TCoordinate = float>
 class ITK_TEMPLATE_EXPORT ScatterMatrixImageFunction
   : public ImageFunction<TInputImage,
                          vnl_matrix<typename NumericTraits<typename TInputImage::PixelType::ValueType>::RealType>,
-                         TCoordRep>
+                         TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(ScatterMatrixImageFunction);
@@ -55,12 +55,12 @@ public:
   using Superclass =
     ImageFunction<TInputImage,
                   vnl_matrix<typename NumericTraits<typename TInputImage::PixelType::ValueType>::RealType>,
-                  TCoordRep>;
+                  TCoordinate>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScatterMatrixImageFunction);
 
   /** Method for creation through the object factory. */
@@ -112,9 +112,10 @@ public:
 
   /** Get/Set the radius of the neighborhood over which the
       statistics are evaluated */
+  /** @ITKStartGrouping */
   itkSetMacro(NeighborhoodRadius, unsigned int);
   itkGetConstReferenceMacro(NeighborhoodRadius, unsigned int);
-
+  /** @ITKEndGrouping */
 protected:
   ScatterMatrixImageFunction();
   ~ScatterMatrixImageFunction() override = default;

@@ -37,8 +37,7 @@ itkSimilarityIndexImageFilterTest(int, char *[])
   auto image1 = Image1Type::New();
   auto image2 = Image2Type::New();
 
-  Image1Type::SizeType size;
-  size.Fill(8);
+  auto size = Image1Type::SizeType::Filled(8);
 
   image1->SetRegions(size);
   image2->SetRegions(size);
@@ -46,11 +45,10 @@ itkSimilarityIndexImageFilterTest(int, char *[])
   image1->Allocate();
   image2->Allocate();
 
-  unsigned long numOfPixels = image1->GetBufferedRegion().GetNumberOfPixels();
-  unsigned long lower1 = 0;
-  unsigned long upper1 = static_cast<unsigned long>(static_cast<double>(numOfPixels) * 0.75) - 1;
-  auto          lower2 = static_cast<unsigned long>(static_cast<double>(numOfPixels) * 0.25);
-  unsigned long upper2 = numOfPixels - 1;
+  const unsigned long numOfPixels = image1->GetBufferedRegion().GetNumberOfPixels();
+  const unsigned long upper1 = static_cast<unsigned long>(static_cast<double>(numOfPixels) * 0.75) - 1;
+  const auto          lower2 = static_cast<unsigned long>(static_cast<double>(numOfPixels) * 0.25);
+  const unsigned long upper2 = numOfPixels - 1;
 
   itk::ImageRegionIterator<Image1Type> it1(image1, image1->GetBufferedRegion());
   itk::ImageRegionIterator<Image2Type> it2(image2, image2->GetBufferedRegion());
@@ -61,7 +59,7 @@ itkSimilarityIndexImageFilterTest(int, char *[])
 
     if (!it1.IsAtEnd())
     {
-      if (lower1 <= count && count <= upper1)
+      if (count <= upper1)
       {
         it1.Set(5);
       }
@@ -101,8 +99,8 @@ itkSimilarityIndexImageFilterTest(int, char *[])
 
 
   // check results
-  FilterType::RealType trueOverlap = 0.5 / 0.75;
-  FilterType::RealType overlap = filter->GetSimilarityIndex();
+  constexpr FilterType::RealType trueOverlap = 0.5 / 0.75;
+  const FilterType::RealType     overlap = filter->GetSimilarityIndex();
 
   std::cout << " True index: " << trueOverlap << std::endl;
   std::cout << " Computed index: " << overlap << std::endl;

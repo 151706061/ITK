@@ -112,7 +112,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SimpleImageToSpatialObjectMetric);
 
   enum
@@ -166,17 +166,15 @@ public:
   MeasureType
   GetValue(const ParametersType & parameters) const override
   {
-    double value;
     this->m_Transform->SetParameters(parameters);
 
     auto it = m_PointList.begin();
 
-    Index<2> index;
-    value = 0;
+    double value = 0;
     while (it != m_PointList.end())
     {
-      PointType transformedPoint = this->m_Transform->TransformPoint(*it);
-      index = this->m_FixedImage->TransformPhysicalPointToIndex(transformedPoint);
+      const PointType transformedPoint = this->m_Transform->TransformPoint(*it);
+      Index<2>        index = this->m_FixedImage->TransformPhysicalPointToIndex(transformedPoint);
       if (index[0] > 0L && index[1] > 0L &&
           index[0] < static_cast<long>(this->m_FixedImage->GetLargestPossibleRegion().GetSize()[0]) &&
           index[1] < static_cast<long>(this->m_FixedImage->GetLargestPossibleRegion().GetSize()[1]))
@@ -260,7 +258,7 @@ itkImageToSpatialObjectRegistrationTest(int, char *[])
 
   ImageType::Pointer image = imageFilter->GetOutput();
 
-  // blurr the image to have a global maximum
+  // blur the image to have a global maximum
   using GaussianFilterType = itk::DiscreteGaussianImageFilter<ImageType, ImageType>;
   auto gaussianFilter = GaussianFilterType::New();
 
@@ -341,7 +339,7 @@ itkImageToSpatialObjectRegistrationTest(int, char *[])
 
   optimizer->MaximizeOn();
 
-  itk::Statistics::NormalVariateGenerator::Pointer generator = itk::Statistics::NormalVariateGenerator::New();
+  const itk::Statistics::NormalVariateGenerator::Pointer generator = itk::Statistics::NormalVariateGenerator::New();
   generator->Initialize(12345);
 
   optimizer->SetNormalVariateGenerator(generator);

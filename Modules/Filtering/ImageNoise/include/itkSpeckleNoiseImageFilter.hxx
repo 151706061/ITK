@@ -49,10 +49,9 @@ SpeckleNoiseImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(
   {
     indSeed += outputRegionForThread.GetIndex(d);
   }
-  typename Statistics::MersenneTwisterRandomVariateGenerator::Pointer rand =
-    Statistics::MersenneTwisterRandomVariateGenerator::New();
-  const uint32_t seed = Self::Hash(this->GetSeed(), uint32_t(indSeed));
-  rand->Initialize(seed);
+  auto           rand = Statistics::MersenneTwisterRandomVariateGenerator::New();
+  const uint32_t seed = Self::Hash(this->GetSeed(), static_cast<uint32_t>(indSeed));
+  rand->SetSeed(seed);
 
   // Define the portion of the input to walk for this thread, using
   // the CallCopyOutputRegionToInputRegion method allows for the input
@@ -81,8 +80,8 @@ SpeckleNoiseImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(
     {
       // First generate the gamma distributed random variable
       // ref https://en.wikipedia.org/wiki/Gamma_distribution#Generating_gamma-distributed_random_variables
-      double xi;
-      double nu;
+      double xi = NAN;
+      double nu = NAN;
       do
       {
         const double v1 = 1.0 - rand->GetVariateWithOpenUpperRange(); // open *lower* range -- (0,1]

@@ -65,7 +65,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information ( and related methods ) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TikhonovDeconvolutionImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -99,9 +99,10 @@ public:
    * noise in the solution, but results in higher approximation error
    * in the deblurred image. Default value is 0.0, yielding the same
    * results as the InverseDeconvolutionImageFilter. */
+  /** @ITKStartGrouping */
   itkSetMacro(RegularizationConstant, double);
   itkGetConstMacro(RegularizationConstant, double);
-
+  /** @ITKEndGrouping */
 protected:
   TikhonovDeconvolutionImageFilter();
   ~TikhonovDeconvolutionImageFilter() override = default;
@@ -125,10 +126,7 @@ class ITK_TEMPLATE_EXPORT TikhonovDeconvolutionFunctor
 public:
   TikhonovDeconvolutionFunctor() = default;
   ~TikhonovDeconvolutionFunctor() = default;
-  TikhonovDeconvolutionFunctor(const TikhonovDeconvolutionFunctor & f)
-    : m_RegularizationConstant(f.m_RegularizationConstant)
-    , m_KernelZeroMagnitudeThreshold(f.m_KernelZeroMagnitudeThreshold)
-  {}
+  TikhonovDeconvolutionFunctor(const TikhonovDeconvolutionFunctor & f) = default;
 
   bool
   operator==(const TikhonovDeconvolutionFunctor &) const
@@ -141,9 +139,9 @@ public:
   inline TOutput
   operator()(const TInput1 & I, const TInput2 & H) const
   {
-    typename TOutput::value_type normH = std::norm(H);
-    typename TOutput::value_type denominator = normH + m_RegularizationConstant;
-    TOutput                      value{};
+    const typename TOutput::value_type normH = std::norm(H);
+    const typename TOutput::value_type denominator = normH + m_RegularizationConstant;
+    TOutput                            value{};
     if (denominator >= m_KernelZeroMagnitudeThreshold)
     {
       value = static_cast<TOutput>(I * (std::conj(H) / denominator));
@@ -154,30 +152,32 @@ public:
 
   /** Set/get the regular constant. This needs to be a non-negative
    * real value. */
+  /** @ITKStartGrouping */
   void
   SetRegularizationConstant(double constant)
   {
     m_RegularizationConstant = constant;
   }
-  double
+  [[nodiscard]] double
   GetRegularizationConstant() const
   {
     return m_RegularizationConstant;
   }
-
+  /** @ITKEndGrouping */
   /** Set/get the threshold value below which complex magnitudes are considered
    * to be zero. */
+  /** @ITKStartGrouping */
   void
   SetKernelZeroMagnitudeThreshold(double mu)
   {
     m_KernelZeroMagnitudeThreshold = mu;
   }
-  double
+  [[nodiscard]] double
   GetKernelZeroMagnitudeThreshold() const
   {
     return m_KernelZeroMagnitudeThreshold;
   }
-
+  /** @ITKEndGrouping */
 private:
   double m_RegularizationConstant = 0.0;
   double m_KernelZeroMagnitudeThreshold = 0.0;

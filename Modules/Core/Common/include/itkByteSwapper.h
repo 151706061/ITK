@@ -58,25 +58,36 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Work around MSVC bug (including ByteSwapper.h in a templated class). */
-  using OStreamType = std::ostream;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  /** Work around old MSVC bug (including ByteSwapper.h in a templated class). */
+  using OStreamType
+    [[deprecated("ByteSwapper::OStreamType is deprecated from ITK 6. Just use `std::ostream` instead!")]] =
+      std::ostream;
+#endif
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ByteSwapper);
 
-  /** Query the machine Endian-ness. */
-  static bool
-  SystemIsBigEndian();
+  /** Query the machine Endian-ness.
+  \note C++20 also allows querying the endianness, by using its enum class `std::endian`. */
+  static constexpr bool
+  SystemIsBigEndian()
+  {
+    return m_SystemIsBigEndian;
+  }
 
-  static bool
+  static constexpr bool
   SystemIsBE()
   {
     return SystemIsBigEndian();
   }
-  static bool
-  SystemIsLittleEndian();
+  static constexpr bool
+  SystemIsLittleEndian()
+  {
+    return !m_SystemIsBigEndian;
+  }
 
-  static bool
+  static constexpr bool
   SystemIsLE()
   {
     return SystemIsLittleEndian();
@@ -110,7 +121,7 @@ public:
    * others raise an exception. The method is used to
    * swap to and from Big Endian. */
   static void
-  SwapWriteRangeFromSystemToBigEndian(const T * p, int num, OStreamType * fp);
+  SwapWriteRangeFromSystemToBigEndian(const T * p, int num, std::ostream * fp);
 
   /** Generic swap method handles type T. The swapping is
    * done in-place. 2, 4 and 8 byte swapping
@@ -136,53 +147,29 @@ public:
    * others raise an exception. The method is used to
    * swap to and from Little Endian. */
   static void
-  SwapWriteRangeFromSystemToLittleEndian(const T * p, int num, OStreamType * fp);
+  SwapWriteRangeFromSystemToLittleEndian(const T * p, int num, std::ostream * fp);
 
 protected:
   ByteSwapper() = default;
   ~ByteSwapper() override = default;
 
-  /** Swap 2 bytes. */
+private:
+  /** Swaps the bytes of the specified argument in-place. Assumes that its number of bytes is either 2, 4, or 8.
+   * Otherwise, it throws an exception. */
   static void
-  Swap2(void * pin);
+  SwapBytes(T &);
 
-  /** Swap a range of two-byte words. Num is the number of two-byte
-   * words to swap. */
+  /** Swaps and writes the specified elements to the specified output stream. */
   static void
-  Swap2Range(void * ptr, BufferSizeType num);
+  SwapWriteRange(const T * buffer, SizeValueType numberOfElements, std::ostream & outputStream);
 
-  /** Swap and write a range of two-byte words. Num is the number of two-byte
-   * words to swap and write. */
-  static void
-  SwapWrite2Range(const void * ptr, BufferSizeType num, OStreamType * fp);
-
-  /** Swap four bytes. */
-  static void
-  Swap4(void * ptr);
-
-  /** Swap a range of four-byte words. Num is the number of four-byte words
-   * to swap. */
-  static void
-  Swap4Range(void * ptr, BufferSizeType num);
-
-  /** Swap and write a range of four-byte words. Num is the number of four-byte
-   * words to swap and write. */
-  static void
-  SwapWrite4Range(const void * ptr, BufferSizeType num, OStreamType * fp);
-
-  /** Swap 8 bytes. */
-  static void
-  Swap8(void * ptr);
-
-  /** Swap a range of 8-byte words. Num is the number of four-byte words
-   * to swap. */
-  static void
-  Swap8Range(void * ptr, BufferSizeType num);
-
-  /** Swap and write a range of 8-byte words. Num is the number of four-byte
-   * words to swap and write. */
-  static void
-  SwapWrite8Range(const void * ptr, BufferSizeType num, OStreamType * fp);
+  static constexpr bool m_SystemIsBigEndian{
+#ifdef CMAKE_WORDS_BIGENDIAN
+    true
+#else
+    false
+#endif
+  };
 };
 } // end namespace itk
 

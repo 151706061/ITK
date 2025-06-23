@@ -52,8 +52,7 @@ itkVotingBinaryImageFilterTestImp(const std::string & infname,
 
   filter->SetInput(reader->GetOutput());
 
-  typename FilterType::InputSizeType R;
-  R.Fill(itk::Math::CastWithRangeCheck<itk::SizeValueType>(radius));
+  auto R = FilterType::InputSizeType::Filled(itk::Math::CastWithRangeCheck<itk::SizeValueType>(radius));
   filter->SetRadius(R);
 
   filter->SetForegroundValue(itk::Math::CastWithRangeCheck<InputPixelType>(foregroundValue));
@@ -100,7 +99,7 @@ itkVotingBinaryImageFilterTest(int argc, char * argv[])
   const long         backgroundValue = atol(argv[5]);
 
 
-  itk::ImageIOBase::Pointer iobase =
+  const itk::ImageIOBase::Pointer iobase =
     itk::ImageIOFactory::CreateImageIO(infname.c_str(), itk::ImageIOFactory::IOFileModeEnum::ReadMode);
 
   if (iobase.IsNull())
@@ -159,6 +158,6 @@ itkVotingBinaryImageFilterTest(int argc, char * argv[])
       itkGenericExceptionMacro("Input image is a real, long, long long, or an unknown component type");
   }
 
-  std::cerr << "Unexcpected program flow!" << std::endl;
+  std::cerr << "Unexpected program flow!" << std::endl;
   return EXIT_FAILURE;
 }

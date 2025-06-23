@@ -21,6 +21,7 @@
 #include "itkObjectFactory.h"
 #include "itkObject.h"
 #include <vector>
+#include <memory> // For unique_ptr.
 
 namespace itk
 {
@@ -36,11 +37,19 @@ template <typename TNodeType>
 class ITK_TEMPLATE_EXPORT ConstSparseFieldLayerIterator
 {
 public:
-  const TNodeType & operator*() const { return *m_Pointer; }
-
-  const TNodeType * operator->() const { return m_Pointer; }
+  const TNodeType &
+  operator*() const
+  {
+    return *m_Pointer;
+  }
 
   const TNodeType *
+  operator->() const
+  {
+    return m_Pointer;
+  }
+
+  [[nodiscard]] const TNodeType *
   GetPointer() const
   {
     return m_Pointer;
@@ -53,10 +62,8 @@ public:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 
   ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstSparseFieldLayerIterator);
@@ -75,9 +82,13 @@ public:
     return *this;
   }
 
-  ConstSparseFieldLayerIterator() { m_Pointer = nullptr; }
+  ConstSparseFieldLayerIterator()
+    : m_Pointer(nullptr)
+  {}
 
-  ConstSparseFieldLayerIterator(TNodeType * p) { m_Pointer = p; }
+  ConstSparseFieldLayerIterator(TNodeType * p)
+    : m_Pointer(p)
+  {}
 
   ~ConstSparseFieldLayerIterator() = default;
 
@@ -103,9 +114,17 @@ public:
     : Superclass(p)
   {}
 
-  TNodeType & operator*() { return *this->m_Pointer; }
+  TNodeType &
+  operator*()
+  {
+    return *this->m_Pointer;
+  }
 
-  TNodeType * operator->() { return this->m_Pointer; }
+  TNodeType *
+  operator->()
+  {
+    return this->m_Pointer;
+  }
 
   TNodeType *
   GetPointer()
@@ -172,7 +191,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SparseFieldLayer);
 
   /** Type of node stored in the linked list. */
@@ -217,7 +236,7 @@ public:
   PopFront()
   {
     m_HeadNode->Next = m_HeadNode->Next->Next;
-    m_HeadNode->Next->Previous = m_HeadNode;
+    m_HeadNode->Next->Previous = m_HeadNode.get();
     m_Size -= 1;
   }
 
@@ -226,7 +245,7 @@ public:
   PushFront(NodeType * n)
   {
     n->Next = m_HeadNode->Next;
-    n->Previous = m_HeadNode;
+    n->Previous = m_HeadNode.get();
     m_HeadNode->Next->Previous = n;
     m_HeadNode->Next = n;
     m_Size += 1;
@@ -260,14 +279,14 @@ public:
   Iterator
   End()
   {
-    return Iterator(m_HeadNode);
+    return Iterator(m_HeadNode.get());
   }
 
   /** Returns a const iterator pointing one node past the end of the list. */
   ConstIterator
   End() const
   {
-    return ConstIterator(m_HeadNode);
+    return ConstIterator(m_HeadNode.get());
   }
 
   /** Returns TRUE if the list is empty, FALSE otherwise. Executes in constant
@@ -275,14 +294,12 @@ public:
   bool
   Empty() const
   {
-    if (m_HeadNode->Next == m_HeadNode)
+    if (m_HeadNode->Next == m_HeadNode.get())
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 
   /** Returns the number of elements in the list. Size() executes in constant
@@ -297,15 +314,15 @@ public:
 
 protected:
   SparseFieldLayer();
-  ~SparseFieldLayer() override;
+  ~SparseFieldLayer() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
   /** The anchor node of the list.  m_HeadNode->Next is the first node in the
    *  list. If m_HeadNode->Next == m_HeadNode, then the list is empty. */
-  NodeType *   m_HeadNode{};
-  unsigned int m_Size{};
+  const std::unique_ptr<NodeType> m_HeadNode{ std::make_unique<NodeType>() };
+  unsigned int                    m_Size{};
 };
 } // end namespace itk
 

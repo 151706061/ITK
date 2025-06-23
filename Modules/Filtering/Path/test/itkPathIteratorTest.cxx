@@ -48,9 +48,7 @@ itkPathIteratorTest(int, char *[])
   ImageType::SizeType size;
   size[0] = 128;
   size[1] = 128;
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const ImageType::RegionType region{ start, size };
   image->SetRegions(region);
   double spacing[ImageType::ImageDimension];
   spacing[0] = 1.0;
@@ -62,8 +60,7 @@ itkPathIteratorTest(int, char *[])
   using ImageRegionIteratorType = itk::ImageRegionIterator<ImageType>;
   ImageRegionIteratorType it(image, image->GetRequestedRegion());
   it.GoToBegin();
-  ImageType::PixelType storedValue;
-  IndexType            pixelIndex;
+  IndexType pixelIndex;
   while (!it.IsAtEnd())
   {
     pixelIndex = it.GetIndex();
@@ -81,7 +78,7 @@ itkPathIteratorTest(int, char *[])
   // Retrieve and print the value stored at pixel index (32,32)
   pixelIndex[0] = 32;
   pixelIndex[1] = 32;
-  storedValue = image->GetPixel(pixelIndex);
+  const ImageType::PixelType storedValue = image->GetPixel(pixelIndex);
   std::cout << "The pixel at index (" << pixelIndex[0] << ',' << pixelIndex[1] << ") has the value " << storedValue
             << ".\n"
             << std::endl;
@@ -135,9 +132,7 @@ itkPathIteratorTest(int, char *[])
     std::cout << "Test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed" << std::endl;
+  return EXIT_FAILURE;
 }

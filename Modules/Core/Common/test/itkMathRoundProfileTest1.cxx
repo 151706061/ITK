@@ -26,20 +26,25 @@ itkMathRoundTestHelperFunction(double x)
   return static_cast<int>(x >= 0. ? x : (itk::Math::ExactlyEquals(x, static_cast<int>(x)) ? x : x - 1.));
 }
 
-#define itkRoundMacro(x, y)                                                                  \
-  if (x >= 0.5)                                                                              \
-  {                                                                                          \
-    y = static_cast<int>(x + 0.5);                                                           \
-  }                                                                                          \
-  else                                                                                       \
-  {                                                                                          \
-    CLANG_PRAGMA_PUSH                                                                        \
-    CLANG_SUPPRESS_Wfloat_equal if ((x + 0.5) == static_cast<int>(x + 0.5)) CLANG_PRAGMA_POP \
-    {                                                                                        \
-      y = static_cast<int>(x + 0.5);                                                         \
-    }                                                                                        \
-    else { y = static_cast<int>(x - 0.5); }                                                  \
-  }                                                                                          \
+#define itkRoundMacro(x, y)                     \
+  if (x >= 0.5)                                 \
+  {                                             \
+    y = static_cast<int>(x + 0.5);              \
+  }                                             \
+  else                                          \
+  {                                             \
+    ITK_GCC_PRAGMA_PUSH                         \
+    ITK_GCC_SUPPRESS_Wfloat_equal               \
+    if ((x + 0.5) == static_cast<int>(x + 0.5)) \
+    {                                           \
+      y = static_cast<int>(x + 0.5);            \
+    }                                           \
+    else                                        \
+    {                                           \
+      y = static_cast<int>(x - 0.5);            \
+    }                                           \
+    ITK_GCC_PRAGMA_POP                          \
+  }                                             \
   ITK_MACROEND_NOOP_STATEMENT
 
 int
@@ -56,11 +61,11 @@ itkMathRoundProfileTest1(int, char *[])
   IntArrayType output3;
   IntArrayType output4;
 
-  const unsigned long numberOfValues = 1000L;
+  constexpr unsigned long numberOfValues = 1000L;
 
-  const double initialValue = -10.0;
+  constexpr double initialValue = -10.0;
 
-  const double valueIncrement = (-initialValue - initialValue) / numberOfValues;
+  constexpr double valueIncrement = (-initialValue - initialValue) / numberOfValues;
 
   std::cout << "Initial Value   = " << initialValue << std::endl;
   std::cout << "Value Increment = " << valueIncrement << std::endl;
@@ -93,10 +98,10 @@ itkMathRoundProfileTest1(int, char *[])
     // Count the time of simply assigning values in an std::vector
     //
     //
-    IntArrayType::const_iterator outItr1src = output1.begin();
-    auto                         outItr2dst = output2.begin();
+    auto outItr1src = output1.begin();
+    auto outItr2dst = output2.begin();
 
-    IntArrayType::const_iterator outEnd1 = output1.end();
+    const auto outEnd1 = output1.end();
 
     chronometer.Start("std::vector");
 
@@ -107,8 +112,8 @@ itkMathRoundProfileTest1(int, char *[])
 
     chronometer.Stop("std::vector");
 
-    ArrayType::const_iterator inpItr = input.begin();
-    ArrayType::const_iterator inputEnd = input.end();
+    auto inpItr = input.begin();
+    auto inputEnd = input.end();
 
     auto outItr1nc = output1.begin();
 
@@ -186,11 +191,11 @@ itkMathRoundProfileTest1(int, char *[])
   //
   // Now test the correctness of the output
   //
-  ArrayType::const_iterator inpItr = input.begin();
-  ArrayType::const_iterator inputEnd = input.end();
+  auto       inpItr = input.begin();
+  const auto inputEnd = input.end();
 
-  IntArrayType::const_iterator outItr1 = output1.begin();
-  IntArrayType::const_iterator outItr2 = output2.begin();
+  auto outItr1 = output1.begin();
+  auto outItr2 = output2.begin();
 
   bool roundMismatch = false;
 

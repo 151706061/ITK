@@ -63,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeshFileWriter);
 
   /** Some convenient type alias. */
@@ -86,9 +86,10 @@ public:
   GetInput(unsigned int idx);
 
   /** Specify the name of the output file to write. */
+  /** @ITKStartGrouping */
   itkSetStringMacro(FileName);
   itkGetStringMacro(FileName);
-
+  /** @ITKEndGrouping */
   /** Set/Get the MeshIO helper class. Usually this is created via the object
    * factory mechanism that determines whether a particular MeshIO can
    * write a certain file. This method provides a way to get the MeshIO
@@ -98,6 +99,7 @@ public:
    * correct choice and will allow a file to be created regardless of
    * the file extension. If the factory has set the MeshIO, the
    * extension must be supported by the specified MeshIO. */
+  /** @ITKStartGrouping */
   void
   SetMeshIO(MeshIOBase * io)
   {
@@ -110,7 +112,7 @@ public:
     m_UserSpecifiedMeshIO = true;
   }
   itkGetModifiableObjectMacro(MeshIO, MeshIOBase);
-
+  /** @ITKEndGrouping */
   void
   SetFileTypeAsASCII()
   {
@@ -137,12 +139,13 @@ public:
   }
 
   /** Set the compression On or Off */
+  /** @ITKStartGrouping */
   itkSetMacro(UseCompression, bool);
   itkGetConstReferenceMacro(UseCompression, bool);
   itkBooleanMacro(UseCompression);
-
+  /** @ITKEndGrouping */
 protected:
-  MeshFileWriter();
+  MeshFileWriter() = default;
   ~MeshFileWriter() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
@@ -177,13 +180,11 @@ protected:
 
 private:
   std::string         m_FileName{};
-  MeshIOBase::Pointer m_MeshIO{};
-  bool                m_UserSpecifiedMeshIO{}; // track whether the MeshIO is
-                                               // user specified
-  bool m_FactorySpecifiedMeshIO{};             // track whether the factory
-                                               // mechanism set the MeshIO
-  bool m_UseCompression{};
-  bool m_FileTypeIsBINARY{};
+  MeshIOBase::Pointer m_MeshIO{ nullptr };
+  bool                m_UserSpecifiedMeshIO{ false };    // track whether the MeshIO is user specified
+  bool                m_FactorySpecifiedMeshIO{ false }; // track whether the factory mechanism set the MeshIO
+  bool                m_UseCompression{ false };
+  bool                m_FileTypeIsBINARY{ false };
 };
 
 

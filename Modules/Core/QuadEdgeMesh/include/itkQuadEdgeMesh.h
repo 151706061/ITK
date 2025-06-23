@@ -43,7 +43,7 @@ namespace itk
  * \author Alexandre Gouaillard, Leonardo Florez-Valencia, Eric Boix
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/122
+ * https://doi.org/10.54294/4mx7kk
  *
  * \ingroup ITKQuadEdgeMesh
  */
@@ -71,7 +71,7 @@ public:
 
   /** Types defined in superclass. */
   using typename Superclass::CellPixelType;
-  using typename Superclass::CoordRepType;
+  using typename Superclass::CoordinateType;
   using typename Superclass::PointIdentifier;
   using typename Superclass::PointHashType;
   using typename Superclass::PointType;
@@ -83,7 +83,7 @@ public:
   // Point section:
   using typename Superclass::PointsContainer;
   using typename Superclass::PointsContainerPointer;
-  using CoordRepArrayType = CoordRepType[Self::PointDimension];
+  using CoordRepArrayType = CoordinateType[Self::PointDimension];
 
   // Point data section:
   using typename Superclass::PointDataContainer;
@@ -152,8 +152,9 @@ public:
   /** Auxiliary types. */
   using PointIdList = std::vector<PointIdentifier>;
   using EdgeListType = std::list<QEPrimal *>;
-  using EdgeListPointerType = EdgeListType *;
-
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using EdgeListPointerType [[deprecated("Please just use `EdgeListType *` instead!")]] = EdgeListType *;
+#endif
   using MeshClassCellsAllocationMethodEnum = itk::MeshEnums::MeshClassCellsAllocationMethod;
 
   /** Reserved PointIdentifier designated to represent the absence of Point */
@@ -164,8 +165,10 @@ public:
 
 public:
   /** Basic Object interface. */
+  /** @ITKStartGrouping */
   itkNewMacro(Self);
   itkOverrideGetNameOfClassMacro(QuadEdgeMesh);
+  /** @ITKEndGrouping */
 
 #if !defined(ITK_WRAPPING_PARSER)
   /** FrontIterator definitions */
@@ -215,10 +218,8 @@ public:
    * https://public.kitware.com/pipermail/insight-users/2005-April/012613.html
    */
   void
-  CopyInformation(const DataObject * data) override
-  {
-    (void)data;
-  }
+  CopyInformation(const DataObject * itkNotUsed(data)) override
+  {}
   void
   Graft(const DataObject * data) override;
 
@@ -234,25 +235,20 @@ public:
 #if !defined(ITK_WRAPPING_PARSER)
   /** overloaded method for backward compatibility */
   void
-  SetBoundaryAssignments(int dimension, BoundaryAssignmentsContainer * container)
-  {
-    (void)dimension;
-    (void)container;
-  }
+  SetBoundaryAssignments(int itkNotUsed(dimension), BoundaryAssignmentsContainer * itkNotUsed(container))
+  {}
 
   /** overloaded method for backward compatibility */
   BoundaryAssignmentsContainerPointer
-  GetBoundaryAssignments(int dimension)
+  GetBoundaryAssignments(int itkNotUsed(dimension))
   {
-    (void)dimension;
     return (nullptr);
   }
 
   /** overloaded method for backward compatibility */
   const BoundaryAssignmentsContainerPointer
-  GetBoundaryAssignments(int dimension) const
+  GetBoundaryAssignments(int itkNotUsed(dimension)) const
   {
-    (void)dimension;
     return (nullptr);
   }
 
@@ -260,66 +256,48 @@ public:
 
   /** overloaded method for backward compatibility */
   void
-  SetBoundaryAssignment(int                   dimension,
-                        CellIdentifier        cellId,
-                        CellFeatureIdentifier featureId,
-                        CellIdentifier        boundaryId)
-  {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
-    (void)boundaryId;
-  }
+  SetBoundaryAssignment(int                   itkNotUsed(dimension),
+                        CellIdentifier        itkNotUsed(cellId),
+                        CellFeatureIdentifier itkNotUsed(featureId),
+                        CellIdentifier        itkNotUsed(boundaryId))
+  {}
 
   /** overloaded method for backward compatibility */
   bool
-  GetBoundaryAssignment(int                   dimension,
-                        CellIdentifier        cellId,
-                        CellFeatureIdentifier featureId,
-                        CellIdentifier *      boundaryId) const
+  GetBoundaryAssignment(int                   itkNotUsed(dimension),
+                        CellIdentifier        itkNotUsed(cellId),
+                        CellFeatureIdentifier itkNotUsed(featureId),
+                        CellIdentifier *      itkNotUsed(boundaryId))
   {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
-    (void)boundaryId;
     return (false); // ALEX: is it the good way?
   }
 
   /** overloaded method for backward compatibility */
   bool
-  RemoveBoundaryAssignment(int dimension, CellIdentifier cellId, CellFeatureIdentifier featureId)
+  RemoveBoundaryAssignment(int                   itkNotUsed(dimension),
+                           CellIdentifier        itkNotUsed(cellId),
+                           CellFeatureIdentifier itkNotUsed(featureId))
   {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
     return (false); // ALEX: is it the good way?
   }
 
   /** overloaded method for backward compatibility */
   bool
-  GetCellBoundaryFeature(int                   dimension,
-                         CellIdentifier        cellId,
-                         CellFeatureIdentifier featureId,
-                         CellAutoPointer &     cellAP) const
+  GetCellBoundaryFeature(int                   itkNotUsed(dimension),
+                         CellIdentifier        itkNotUsed(cellId),
+                         CellFeatureIdentifier itkNotUsed(featureId),
+                         CellAutoPointer &     itkNotUsed(cellAP)) const
   {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
-    (void)cellAP;
     return (false);
   }
 
   /** overloaded method for backward compatibility */
   CellIdentifier
-  GetCellBoundaryFeatureNeighbors(int                        dimension,
-                                  CellIdentifier             cellId,
-                                  CellFeatureIdentifier      featureId,
-                                  std::set<CellIdentifier> * cellSet)
+  GetCellBoundaryFeatureNeighbors(int                        itkNotUsed(dimension),
+                                  CellIdentifier             itkNotUsed(cellId),
+                                  CellFeatureIdentifier      itkNotUsed(featureId),
+                                  std::set<CellIdentifier> * itkNotUsed(cellSet))
   {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
-    (void)cellSet;
     return CellIdentifier{};
   }
 
@@ -332,15 +310,11 @@ public:
 
   /** overloaded method for backward compatibility */
   bool
-  GetAssignedCellBoundaryIfOneExists(int                   dimension,
-                                     CellIdentifier        cellId,
-                                     CellFeatureIdentifier featureId,
-                                     CellAutoPointer &     cellAP) const
+  GetAssignedCellBoundaryIfOneExists(int                   itkNotUsed(dimension),
+                                     CellIdentifier        itkNotUsed(cellId),
+                                     CellFeatureIdentifier itkNotUsed(featureId),
+                                     CellAutoPointer &     itkNotUsed(cellAP)) const
   {
-    (void)dimension;
-    (void)cellId;
-    (void)featureId;
-    (void)cellAP;
     return (false); // ALEX: is it the good way?
   }
 
@@ -438,7 +412,7 @@ public:
   FindEdgeCell(const PointIdentifier & pid0, const PointIdentifier & pid1) const;
 
   ///  Compute the euclidean length of argument edge
-  CoordRepType
+  CoordinateType
   ComputeEdgeLength(QEPrimal * e);
 
   PointIdentifier
@@ -452,11 +426,6 @@ public:
 
   PointIdentifier
   Splice(QEPrimal * a, QEPrimal * b);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-  // End concept checking
-#endif
 
   // for reusability of a mesh in the MeshToMesh filter
   void
@@ -485,9 +454,10 @@ public:
 
 protected:
   /** Constructor and Destructor. */
+  /** @ITKStartGrouping */
   QuadEdgeMesh();
   ~QuadEdgeMesh() override;
-
+  /** @ITKEndGrouping */
   /** Release the memory of each one of the cells independently. */
   virtual void
   ClearCellsContainer();

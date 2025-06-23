@@ -58,8 +58,8 @@ public:
   using MeasureType = Superclass::MeasureType;
 
   GradientDescentLineSearchOptimizerv4TestMetric()
+
   {
-    m_Iterations = 0;
     m_Parameters.SetSize(SpaceDimension);
     m_Parameters.Fill(0);
   }
@@ -71,7 +71,7 @@ public:
   void
   GetDerivative(DerivativeType & derivative) const override
   {
-    MeasureType value;
+    MeasureType value = NAN;
     GetValueAndDerivative(value, derivative);
   }
 
@@ -83,8 +83,8 @@ public:
       derivative.SetSize(2);
     }
 
-    double x = m_Parameters[0];
-    double y = m_Parameters[1];
+    const double x = m_Parameters[0];
+    const double y = m_Parameters[1];
 
     std::cout << "GetValueAndDerivative( ";
     std::cout << x << ' ';
@@ -107,10 +107,10 @@ public:
   MeasureType
   GetValue() const override
   {
-    double x = m_Parameters[0];
-    double y = m_Parameters[1];
+    const double x = m_Parameters[0];
+    const double y = m_Parameters[1];
 
-    MeasureType value = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const MeasureType value = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     return value;
   }
@@ -155,7 +155,7 @@ public:
 
 private:
   ParametersType       m_Parameters;
-  mutable unsigned int m_Iterations;
+  mutable unsigned int m_Iterations{ 0 };
 };
 
 ///////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ itkGradientDescentLineSearchOptimizerv4Test(int, char *[])
 
 
   // Declaration of the Metric
-  GradientDescentLineSearchOptimizerv4TestMetric::Pointer metric =
+  const GradientDescentLineSearchOptimizerv4TestMetric::Pointer metric =
     GradientDescentLineSearchOptimizerv4TestMetric::New();
 
   itkOptimizer->SetMetric(metric);
@@ -253,19 +253,19 @@ itkGradientDescentLineSearchOptimizerv4Test(int, char *[])
   scales.Fill(0.5);
   itkOptimizer->SetScales(scales);
 
-  typename OptimizerType::InternalComputationValueType epsilon = 1.e-4;
+  constexpr typename OptimizerType::InternalComputationValueType epsilon = 1.e-4;
   itkOptimizer->SetEpsilon(epsilon);
   ITK_TEST_SET_GET_VALUE(epsilon, itkOptimizer->GetEpsilon());
 
-  typename OptimizerType::InternalComputationValueType lowerLimit = -10;
+  constexpr typename OptimizerType::InternalComputationValueType lowerLimit = -10;
   itkOptimizer->SetLowerLimit(lowerLimit);
   ITK_TEST_SET_GET_VALUE(lowerLimit, itkOptimizer->GetLowerLimit());
 
-  typename OptimizerType::InternalComputationValueType upperLimit = 10;
+  constexpr typename OptimizerType::InternalComputationValueType upperLimit = 10;
   itkOptimizer->SetUpperLimit(upperLimit);
   ITK_TEST_SET_GET_VALUE(upperLimit, itkOptimizer->GetUpperLimit());
 
-  unsigned int maximumLineSearchIterations = 100;
+  constexpr unsigned int maximumLineSearchIterations = 100;
   itkOptimizer->SetMaximumLineSearchIterations(maximumLineSearchIterations);
   ITK_TEST_SET_GET_VALUE(maximumLineSearchIterations, itkOptimizer->GetMaximumLineSearchIterations());
 

@@ -23,12 +23,11 @@ namespace itk
 {
 template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
 SpatialObjectReader<VDimension, PixelType, TMeshTraits>::SpatialObjectReader()
-{
-  m_FileName = "";
-  m_SpatialObject = nullptr;
-  m_Group = nullptr;
-  m_MetaToSpatialConverter = MetaSceneConverterType::New();
-}
+  : m_FileName("")
+  , m_Group(nullptr)
+  , m_SpatialObject(nullptr)
+  , m_MetaToSpatialConverter(MetaSceneConverterType::New())
+{}
 
 template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
 void
@@ -41,6 +40,20 @@ SpatialObjectReader<VDimension, PixelType, TMeshTraits>::Update()
   {
     itkExceptionMacro("No objects were found in file " << m_FileName);
   }
+}
+
+template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
+void
+SpatialObjectReader<VDimension, PixelType, TMeshTraits>::SetMetaIOVersion(unsigned int ver)
+{
+  m_MetaToSpatialConverter->SetMetaIOVersion(ver);
+}
+
+template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
+unsigned int
+SpatialObjectReader<VDimension, PixelType, TMeshTraits>::GetMetaIOVersion() const
+{
+  return m_MetaToSpatialConverter->GetMetaIOVersion();
 }
 
 /** Add a converter for a new MetaObject/SpatialObject type */

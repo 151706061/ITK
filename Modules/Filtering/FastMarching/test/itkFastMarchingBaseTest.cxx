@@ -36,7 +36,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingBaseTestHelper);
 
   using typename Superclass::Traits;
@@ -52,7 +52,7 @@ protected:
   FastMarchingBaseTestHelper() = default;
   ~FastMarchingBaseTestHelper() override = default;
 
-  IdentifierType
+  [[nodiscard]] IdentifierType
   GetTotalNumberOfNodes() const override
   {
     return 1;
@@ -144,7 +144,7 @@ itkFastMarchingBaseTest(int argc, char * argv[])
     double normalizationFactor = 1.0;
     ITK_TEST_SET_GET_VALUE(normalizationFactor, fmm->GetNormalizationFactor());
 
-    typename ImageFastMarching::OutputPixelType targetReachedValue{};
+    constexpr typename ImageFastMarching::OutputPixelType targetReachedValue{};
     ITK_TEST_EXPECT_EQUAL(targetReachedValue, fmm->GetTargetReachedValue());
 
     bool collectPoints = false;
@@ -157,10 +157,9 @@ itkFastMarchingBaseTest(int argc, char * argv[])
 
     auto                                     processedPoints = ImageFastMarching::NodePairContainerType::New();
     typename ImageFastMarching::NodePairType node_pair;
-    ImageType::OffsetType                    offset = { { 28, 35 } };
+    constexpr ImageType::OffsetType          offset = { { 28, 35 } };
 
-    itk::Index<Dimension> index;
-    index.Fill(0);
+    constexpr itk::Index<Dimension> index{};
 
     node_pair.SetValue(0.0);
     node_pair.SetNode(index + offset);
@@ -190,9 +189,7 @@ itkFastMarchingBaseTest(int argc, char * argv[])
 
 
     using OutputImageType = ImageFastMarching::OutputDomainType;
-    OutputImageType::Pointer output = fmm->GetOutput();
-
-    (void)output;
+    [[maybe_unused]] const OutputImageType::Pointer output = fmm->GetOutput();
   }
   else if (useMeshVsImage == 1)
   {
@@ -208,9 +205,7 @@ itkFastMarchingBaseTest(int argc, char * argv[])
 
 
     using OutputMeshType = MeshFastMarching::OutputDomainType;
-    OutputMeshType::Pointer output = fmm->GetOutput();
-
-    (void)output;
+    [[maybe_unused]] const OutputMeshType::Pointer output = fmm->GetOutput();
   }
 
   // Test streaming enumeration for FastMarchingTraitsEnums::TopologyCheck elements

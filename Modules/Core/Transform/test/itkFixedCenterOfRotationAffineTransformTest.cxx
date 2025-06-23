@@ -26,16 +26,11 @@ int
 itkFixedCenterOfRotationAffineTransformTest(int, char *[])
 {
   using FCoRAffine2DType = itk::FixedCenterOfRotationAffineTransform<double, 2>;
-  using FAffine2DType = itk::AffineTransform<double, 2>;
-  FCoRAffine2DType::MatrixType      matrix2;
-  FAffine2DType::Pointer            inverse2;
-  FCoRAffine2DType::InputVectorType vector2;
-  FCoRAffine2DType::InputPointType  point2;
 
-  auto id2 = FCoRAffine2DType::New();
-  matrix2 = id2->GetMatrixComponent();
-  vector2 = id2->GetOffsetComponent();
-  point2 = id2->GetCenterOfRotationComponent();
+  auto                              id2 = FCoRAffine2DType::New();
+  FCoRAffine2DType::MatrixType      matrix2 = id2->GetMatrixComponent();
+  FCoRAffine2DType::InputVectorType vector2 = id2->GetOffsetComponent();
+  FCoRAffine2DType::InputPointType  point2 = id2->GetCenterOfRotationComponent();
 
   std::cout << "Instantiation of an identity Transform: ";
 
@@ -64,10 +59,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   /* Create and show a simple 2D transform from given parameters */
   matrix2[0][0] = 1.0;
@@ -96,10 +90,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   /** Test set matrix after setting components */
   double scale1[2];
@@ -115,7 +108,7 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     ITK_TEST_EXPECT_EQUAL(scale1[i], scale3[i]);
   }
 
-  typename FCoRAffine2DType::InputVectorType vScale = itk::MakeVector(2.0, 4.0);
+  const typename FCoRAffine2DType::InputVectorType vScale = itk::MakeVector(2.0, 4.0);
   aff2->SetScaleComponent(vScale);
   ITK_TEST_SET_GET_VALUE(vScale, aff2->GetScaleComponent());
 
@@ -134,10 +127,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   /** Try scaling */
   std::cout << "Testing scaling: ";
@@ -152,10 +144,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   /** Test the parameters */
   std::cout << "Setting/Getting parameters: ";
@@ -179,8 +170,7 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
   parameters[5] = 4.0;
 
   aff2->SetParameters(parameters);
-  FCoRAffine2DType::ParametersType parameters2;
-  parameters2 = aff2->GetParameters();
+  FCoRAffine2DType::ParametersType parameters2 = aff2->GetParameters();
 
   if (parameters2[0] != 1.0 || parameters2[1] != 2.0 || parameters2[2] != 3.0 || parameters2[3] != 4.0 ||
       parameters2[4] != 3.0 || parameters2[5] != 4.0)
@@ -188,10 +178,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   /** Testing point transformation */
   std::cout << "Transforming Point: ";
@@ -200,7 +189,7 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
   point[0] = 1;
   point[1] = 2;
 
-  FCoRAffine2DType::InputPointType transformedPoint = aff2->TransformPoint(point);
+  const FCoRAffine2DType::InputPointType transformedPoint = aff2->TransformPoint(point);
 
 
   FCoRAffine2DType::InputPointType expectedPoint;
@@ -224,10 +213,9 @@ itkFixedCenterOfRotationAffineTransformTest(int, char *[])
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   std::cout << "Done!" << std::endl;
 

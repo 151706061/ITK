@@ -45,7 +45,7 @@ namespace itk
    \endcode
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -96,7 +96,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryImageToShapeLabelMapFilter);
 
   /**
@@ -104,57 +104,59 @@ public:
    * by face+edge+vertex connectivity.  Default is FullyConnectedOff.  For objects that
    * are 1 pixel wide, use FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputImagePixelType>));
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputImagePixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputImagePixelType>));
-  // End concept checking
-#endif
 
   /**
    * Set/Get the value used as "background" in the output image.
    * Defaults to NumericTraits<PixelType>::NonpositiveMin().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputBackgroundValue, OutputImagePixelType);
   itkGetConstMacro(OutputBackgroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the value used as "foreground" in the output image.
    * Defaults to NumericTraits<PixelType>::max().
    */
+  /** @ITKStartGrouping */
   itkSetMacro(InputForegroundValue, InputImagePixelType);
   itkGetConstMacro(InputForegroundValue, InputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the maximum Feret diameter should be computed or not.
    * Default value is false, because of the high computation time required.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ComputeFeretDiameter, bool);
   itkGetConstReferenceMacro(ComputeFeretDiameter, bool);
   itkBooleanMacro(ComputeFeretDiameter);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the perimeter should be computed or not.
    * Default value is false, because of the high computation time required.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ComputePerimeter, bool);
   itkGetConstReferenceMacro(ComputePerimeter, bool);
   itkBooleanMacro(ComputePerimeter);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the oriented bounding box should be
    * computed or not. Default value is false because of potential
    * memory consumption issues with sparse labels.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ComputeOrientedBoundingBox, bool);
   itkGetConstReferenceMacro(ComputeOrientedBoundingBox, bool);
   itkBooleanMacro(ComputeOrientedBoundingBox);
-
+  /** @ITKEndGrouping */
 protected:
   BinaryImageToShapeLabelMapFilter();
   ~BinaryImageToShapeLabelMapFilter() override = default;

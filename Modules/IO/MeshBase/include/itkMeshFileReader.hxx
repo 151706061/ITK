@@ -35,11 +35,9 @@ namespace itk
 {
 template <typename TOutputMesh, typename ConvertPointPixelTraits, typename ConvertCellPixelTraits>
 MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::MeshFileReader()
-{
-  m_MeshIO = nullptr;
-  m_FileName = "";
-  m_UserSpecifiedMeshIO = false;
-}
+  : m_MeshIO(nullptr)
+  , m_FileName("")
+{}
 
 template <typename TOutputMesh, typename ConvertPointPixelTraits, typename ConvertCellPixelTraits>
 void
@@ -102,7 +100,7 @@ template <typename T>
 void
 MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::ReadPoints(T * buffer)
 {
-  typename TOutputMesh::Pointer output = this->GetOutput();
+  const typename TOutputMesh::Pointer output = this->GetOutput();
   output->GetPoints()->Reserve(m_MeshIO->GetNumberOfPoints());
   OutputPointType point;
 
@@ -122,7 +120,7 @@ template <typename T>
 void
 MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::ReadCells(T * buffer)
 {
-  typename TOutputMesh::Pointer output = this->GetOutput();
+  const typename TOutputMesh::Pointer output = this->GetOutput();
 
   SizeValueType        index{};
   OutputCellIdentifier id{};
@@ -344,7 +342,7 @@ template <typename TOutputMesh, typename ConvertPointPixelTraits, typename Conve
 void
 MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::ReadPointData()
 {
-  typename TOutputMesh::Pointer output = this->GetOutput();
+  const typename TOutputMesh::Pointer output = this->GetOutput();
 
   const auto outputPointDataBuffer =
     make_unique_for_overwrite<OutputPointPixelType[]>(m_MeshIO->GetNumberOfPointPixels());
@@ -356,8 +354,8 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Re
     // the point pixel types don't match a type conversion needs to be
     // performed
     itkDebugMacro("Buffer conversion required from: "
-                  << m_MeshIO->GetComponentTypeAsString(m_MeshIO->GetPointPixelComponentType()) << " to: "
-                  << m_MeshIO->GetComponentTypeAsString(
+                  << MeshIOBase::GetComponentTypeAsString(m_MeshIO->GetPointPixelComponentType()) << " to: "
+                  << MeshIOBase::GetComponentTypeAsString(
                        MeshIOBase::MapComponentType<typename ConvertPointPixelTraits::ComponentType>::CType)
                   << "ConvertPointPixelTraits::NumberOfComponents " << ConvertPointPixelTraits::GetNumberOfComponents()
                   << " m_MeshIO->NumberOfComponents " << m_MeshIO->GetNumberOfPointPixelComponents());
@@ -386,7 +384,7 @@ template <typename TOutputMesh, typename ConvertPointPixelTraits, typename Conve
 void
 MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::ReadCellData()
 {
-  typename TOutputMesh::Pointer output = this->GetOutput();
+  const typename TOutputMesh::Pointer output = this->GetOutput();
 
   const auto outputCellDataBuffer = make_unique_for_overwrite<OutputCellPixelType[]>(m_MeshIO->GetNumberOfCellPixels());
 
@@ -397,8 +395,8 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Re
     // the cell pixel types don't match a type conversion needs to be
     // performed
     itkDebugMacro("Buffer conversion required from: "
-                  << m_MeshIO->GetComponentTypeAsString(m_MeshIO->GetCellPixelComponentType()) << " to: "
-                  << m_MeshIO->GetComponentTypeAsString(
+                  << MeshIOBase::GetComponentTypeAsString(m_MeshIO->GetCellPixelComponentType()) << " to: "
+                  << MeshIOBase::GetComponentTypeAsString(
                        MeshIOBase::MapComponentType<typename ConvertCellPixelTraits::ComponentType>::CType)
                   << "ConvertCellPixelTraits::NumberOfComponents " << ConvertCellPixelTraits::GetNumberOfComponents()
                   << " m_MeshIO->NumberOfComponents " << m_MeshIO->GetNumberOfCellPixelComponents());
@@ -450,7 +448,7 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Ge
   if (m_MeshIO.IsNull())
   {
     std::ostringstream msg;
-    msg << " Could not create IO object for file " << m_FileName.c_str() << std::endl;
+    msg << " Could not create IO object for file " << m_FileName << std::endl;
     if (!m_ExceptionMessage.empty())
     {
       msg << m_ExceptionMessage;
@@ -478,7 +476,7 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Ge
 {
   m_MeshIO->SetPointDimension(OutputPointDimension);
 
-  typename TOutputMesh::Pointer output = this->GetOutput();
+  const typename TOutputMesh::Pointer output = this->GetOutput();
 
   // Test if the file exists and if it can be opened.
   // An exception will be thrown otherwise, since we can't
@@ -722,23 +720,27 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Co
     MeshFileReaderException e(__FILE__, __LINE__);
     std::ostringstream      msg;
     msg << "Couldn't convert component type: " << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(m_MeshIO->GetPointPixelComponentType()) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(m_MeshIO->GetPointPixelComponentType()) << std::endl
         << "to one of: " << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned char>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<char>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned short>::CType)
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned char>::CType)
         << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<short>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned int>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<int>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long long>::CType)
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<char>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned short>::CType)
         << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<float>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<double>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long double>::CType) << std::endl;
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<short>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned int>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<int>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long long>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long long>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<float>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<double>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long double>::CType)
+        << std::endl;
     e.SetDescription(msg.str().c_str());
     e.SetLocation(ITK_LOCATION);
     throw e;
@@ -793,23 +795,27 @@ MeshFileReader<TOutputMesh, ConvertPointPixelTraits, ConvertCellPixelTraits>::Co
     MeshFileReaderException e(__FILE__, __LINE__);
     std::ostringstream      msg;
     msg << "Couldn't convert component type: " << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(m_MeshIO->GetCellPixelComponentType()) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(m_MeshIO->GetCellPixelComponentType()) << std::endl
         << "to one of: " << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned char>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<char>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned short>::CType)
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned char>::CType)
         << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<short>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned int>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<int>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long long>::CType)
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<char>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned short>::CType)
         << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long long>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<float>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<double>::CType) << std::endl
-        << "    " << m_MeshIO->GetComponentTypeAsString(MeshIOBase::MapComponentType<long double>::CType) << std::endl;
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<short>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned int>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<int>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<unsigned long long>::CType)
+        << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long long>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<float>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<double>::CType) << std::endl
+        << "    " << MeshIOBase::GetComponentTypeAsString(MeshIOBase::MapComponentType<long double>::CType)
+        << std::endl;
     e.SetDescription(msg.str().c_str());
     e.SetLocation(ITK_LOCATION);
     throw e;

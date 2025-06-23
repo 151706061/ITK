@@ -69,7 +69,7 @@ itkDiscreteGaussianDerivativeImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(derivativeFilter, DiscreteGaussianDerivativeImageFilter, ImageToImageFilter);
 
 
-  itk::SimpleFilterWatcher watcher(derivativeFilter, "DiscreteGaussianDerivativeImageFilter");
+  const itk::SimpleFilterWatcher watcher(derivativeFilter, "DiscreteGaussianDerivativeImageFilter");
 
   derivativeFilter->SetInput(reader->GetOutput());
 
@@ -82,7 +82,7 @@ itkDiscreteGaussianDerivativeImageFilterTest(int argc, char * argv[])
   derivativeFilter->SetOrder(order);
   ITK_TEST_SET_GET_VALUE(order, derivativeFilter->GetOrder());
 
-  double sigma = std::stod(argv[5]);
+  const double sigma = std::stod(argv[5]);
 
   DerivativeFilterType::ArrayType::ValueType maxErrorVal = 0.001;
   int                                        maxKernelWidth = 100;
@@ -96,14 +96,12 @@ itkDiscreteGaussianDerivativeImageFilterTest(int argc, char * argv[])
     maxKernelWidth = std::stoi(argv[7]);
   }
 
-  DerivativeFilterType::ArrayType variance;
-  variance.Fill(sigma * sigma);
+  auto variance = itk::MakeFilled<DerivativeFilterType::ArrayType>(sigma * sigma);
 
   derivativeFilter->SetVariance(variance);
   ITK_TEST_SET_GET_VALUE(variance, derivativeFilter->GetVariance());
 
-  DerivativeFilterType::ArrayType maxError;
-  maxError.Fill(maxErrorVal);
+  auto maxError = itk::MakeFilled<DerivativeFilterType::ArrayType>(maxErrorVal);
 
   derivativeFilter->SetMaximumError(maxErrorVal);
   ITK_TEST_SET_GET_VALUE(maxError, derivativeFilter->GetMaximumError());
@@ -111,14 +109,14 @@ itkDiscreteGaussianDerivativeImageFilterTest(int argc, char * argv[])
   derivativeFilter->SetMaximumKernelWidth(maxKernelWidth);
   ITK_TEST_SET_GET_VALUE(maxKernelWidth, derivativeFilter->GetMaximumKernelWidth());
 
-  bool useImageSpacing = true;
+  constexpr bool useImageSpacing = true;
   ITK_TEST_SET_GET_BOOLEAN(derivativeFilter, UseImageSpacing, useImageSpacing);
 
-  bool normalizeAcrossScale = false;
+  constexpr bool normalizeAcrossScale = false;
   ITK_TEST_SET_GET_BOOLEAN(derivativeFilter, NormalizeAcrossScale, normalizeAcrossScale);
 
-  unsigned int internalNumberOfStreamDivisions = DerivativeFilterType::InputImageType::GetImageDimension() *
-                                                 DerivativeFilterType::InputImageType::GetImageDimension();
+  constexpr unsigned int internalNumberOfStreamDivisions = DerivativeFilterType::InputImageType::GetImageDimension() *
+                                                           DerivativeFilterType::InputImageType::GetImageDimension();
   derivativeFilter->SetInternalNumberOfStreamDivisions(internalNumberOfStreamDivisions);
   ITK_TEST_SET_GET_VALUE(internalNumberOfStreamDivisions, derivativeFilter->GetInternalNumberOfStreamDivisions());
 

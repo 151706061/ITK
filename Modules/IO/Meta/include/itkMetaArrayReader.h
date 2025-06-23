@@ -39,7 +39,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MetaArrayReader);
 
   /** Set the filename. */
@@ -141,8 +141,7 @@ public:
   {
     if (static_cast<int>(VLength) <= m_MetaArray.Length())
     {
-      unsigned int i;
-      for (i = 0; i < VLength; ++i)
+      for (unsigned int i = 0; i < VLength; ++i)
       {
         this->GetElement((*_array)[i], i);
       }
@@ -160,8 +159,7 @@ public:
   {
     if (static_cast<int>(VLength) <= m_MetaArray.Length())
     {
-      unsigned int i;
-      for (i = 0; i < VLength; ++i)
+      for (unsigned int i = 0; i < VLength; ++i)
       {
         this->GetElement((*_vector)[i], i);
       }
@@ -180,8 +178,7 @@ public:
   {
     if (static_cast<int>(VLength) <= m_MetaArray.Length())
     {
-      unsigned int i;
-      for (i = 0; i < VLength; ++i)
+      for (unsigned int i = 0; i < VLength; ++i)
       {
         this->GetElement((*_vector)[i], i);
       }

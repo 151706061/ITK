@@ -56,10 +56,8 @@ public:
     {
       return static_cast<TOutput>(A);
     }
-    else
-    {
-      return m_OutsideValue;
-    }
+
+    return m_OutsideValue;
   }
 
   /** Method to explicitly set the outside value of the mask */
@@ -70,7 +68,7 @@ public:
   }
 
   /** Method to get the outside value of the mask */
-  const TOutput &
+  [[nodiscard]] const TOutput &
   GetOutsideValue() const
   {
     return m_OutsideValue;
@@ -82,8 +80,9 @@ public:
   {
     m_MaskingValue = maskingValue;
   }
+
   /** Method to get the masking value */
-  const TMask &
+  [[nodiscard]] const TMask &
   GetMaskingValue() const
   {
     return m_MaskingValue;
@@ -163,7 +162,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MaskImageFilter);
 
   /** Typedefs **/
@@ -173,6 +172,7 @@ public:
    *  the original value of the input image while pixels not set in
    *  the mask will be set to the "OutsideValue".
    */
+  /** @ITKStartGrouping */
   void
   SetMaskImage(const MaskImageType * maskImage)
   {
@@ -184,6 +184,7 @@ public:
   {
     return static_cast<const MaskImageType *>(this->ProcessObject::GetInput(1));
   }
+  /** @ITKEndGrouping */
 
   /** Method to explicitly set the outside value of the mask. Defaults to 0 */
   void
@@ -220,13 +221,9 @@ public:
     return this->GetFunctor().GetMaskingValue();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(MaskEqualityComparableCheck, (Concept::EqualityComparable<typename TMaskImage::PixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck,
                   (Concept::Convertible<typename TInputImage::PixelType, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   MaskImageFilter() = default;
@@ -272,8 +269,8 @@ private:
     // image. Otherwise, check that the number of components in the
     // outside value is the same as the number of components in the
     // output image. If not, throw an exception.
-    VariableLengthVector<TValue> currentValue = this->GetFunctor().GetOutsideValue();
-    VariableLengthVector<TValue> zeroVector(currentValue.GetSize());
+    const VariableLengthVector<TValue> currentValue = this->GetFunctor().GetOutsideValue();
+    VariableLengthVector<TValue>       zeroVector(currentValue.GetSize());
     zeroVector.Fill(TValue{});
 
     if (currentValue == zeroVector)

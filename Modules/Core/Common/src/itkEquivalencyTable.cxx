@@ -22,18 +22,17 @@ namespace itk
 bool
 EquivalencyTable::Add(unsigned long a, unsigned long b)
 {
-  std::pair<Iterator, bool> result;
   if (a == b)
   {
     return false;
   }
-  else if (a < b)
+  if (a < b)
   { // swap a, b
-    unsigned long temp = a;
+    const unsigned long temp = a;
     a = b;
     b = temp;
   }
-  result = m_HashMap.insert(ValueType(a, b));
+  const std::pair<Iterator, bool> result = m_HashMap.insert(ValueType(a, b));
 
   if (result.second == false)
   { // Stop endless loops.
@@ -41,10 +40,8 @@ EquivalencyTable::Add(unsigned long a, unsigned long b)
     {
       return false;
     }
-    else
-    {
-      return (this->Add((*(result.first)).second, b));
-    }
+
+    return (this->Add((*(result.first)).second, b));
   }
   else
   {
@@ -55,20 +52,19 @@ EquivalencyTable::Add(unsigned long a, unsigned long b)
 bool
 EquivalencyTable::AddAndFlatten(unsigned long a, unsigned long b)
 {
-  std::pair<Iterator, bool> result;
   if (a == b)
   {
     return false;
   }
-  else if (a < b)
+  if (a < b)
   { // swap a, b
-    unsigned long temp = a;
+    const unsigned long temp = a;
     a = b;
     b = temp;
   }
 
-  unsigned long bFlattened = this->RecursiveLookup(b);
-  result = m_HashMap.insert(ValueType(a, bFlattened));
+  const unsigned long             bFlattened = this->RecursiveLookup(b);
+  const std::pair<Iterator, bool> result = m_HashMap.insert(ValueType(a, bFlattened));
 
   if (result.second == false)
   { // Stop endless loops.
@@ -76,10 +72,8 @@ EquivalencyTable::AddAndFlatten(unsigned long a, unsigned long b)
     {
       return false;
     }
-    else
-    {
-      return (this->Add((*(result.first)).second, bFlattened));
-    }
+
+    return (this->Add((*(result.first)).second, bFlattened));
   }
   else
   {

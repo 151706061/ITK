@@ -48,7 +48,10 @@ PSOTest2();
 int
 PSOTest3();
 
+namespace
+{
 bool verboseFlag = false;
+}
 
 /**
  * The particle swarm optimizer is a stochastic algorithm. Consequentially, we run
@@ -63,14 +66,15 @@ itkParticleSwarmOptimizerTest(int argc, char * argv[])
     verboseFlag = std::stoi(argv[1]) ? true : false;
   }
 
-  unsigned int i, allIterations = 10;
-  double       threshold = 0.8;
-  unsigned int success1, success2, success3;
+  constexpr unsigned int allIterations = 10;
+  constexpr double       threshold = 0.8;
+  unsigned int           success1{};
+  unsigned int           success2{};
+  unsigned int           success3{};
 
   std::cout << "Particle Swarm Optimizer Test \n \n";
 
-  success1 = success2 = success3 = 0;
-  for (i = 0; i < allIterations; ++i)
+  for (unsigned int i = 0; i < allIterations; ++i)
   {
     if (EXIT_SUCCESS == PSOTest1())
     {
@@ -106,10 +110,10 @@ PSOTest1()
   std::cout << "Particle Swarm Optimizer Test 1 [f(x) = if(x<0) x^2+4x; else 2x^2-8x]\n";
   std::cout << "-------------------------------\n";
 
-  double knownParameters = 2.0;
+  constexpr double knownParameters = 2.0;
 
   // the function we want to optimize
-  itk::ParticleSwarmTestF1::Pointer costFunction = itk::ParticleSwarmTestF1::New();
+  const itk::ParticleSwarmTestF1::Pointer costFunction = itk::ParticleSwarmTestF1::New();
 
   auto itkOptimizer = OptimizerType::New();
   itkOptimizer->UseSeedOn();
@@ -117,12 +121,13 @@ PSOTest1()
 
   // set optimizer parameters
   OptimizerType::ParameterBoundsType bounds;
-  bounds.push_back(std::make_pair(-10, 10));
-  unsigned int                  numberOfParticles = 10;
-  unsigned int                  maxIterations = 100;
-  double                        xTolerance = 0.1;
-  double                        fTolerance = 0.001;
-  OptimizerType::ParametersType initialParameters(1), finalParameters;
+  bounds.emplace_back(-10, 10);
+  constexpr unsigned int        numberOfParticles = 10;
+  constexpr unsigned int        maxIterations = 100;
+  constexpr double              xTolerance = 0.1;
+  constexpr double              fTolerance = 0.001;
+  OptimizerType::ParametersType initialParameters(1);
+
 
   itkOptimizer->SetParameterBounds(bounds);
   itkOptimizer->SetNumberOfParticles(numberOfParticles);
@@ -132,7 +137,7 @@ PSOTest1()
   itkOptimizer->SetCostFunction(costFunction);
 
   // observe the iterations
-  itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
+  const itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
   if (verboseFlag)
   {
     itkOptimizer->AddObserver(itk::IterationEvent(), observer);
@@ -144,7 +149,7 @@ PSOTest1()
     initialParameters[0] = -9;
     itkOptimizer->SetInitialPosition(initialParameters);
     itkOptimizer->StartOptimization();
-    finalParameters = itkOptimizer->GetCurrentPosition();
+    OptimizerType::ParametersType finalParameters = itkOptimizer->GetCurrentPosition();
 
     // check why we stopped and see if the optimization succeeded
     std::cout << "Reason for stopping optimization:\n";
@@ -207,7 +212,7 @@ PSOTest2()
   knownParameters[1] = -2.0;
 
   // the function we want to optimize
-  itk::ParticleSwarmTestF2::Pointer costFunction = itk::ParticleSwarmTestF2::New();
+  const itk::ParticleSwarmTestF2::Pointer costFunction = itk::ParticleSwarmTestF2::New();
 
   auto itkOptimizer = OptimizerType::New();
   itkOptimizer->UseSeedOn();
@@ -215,13 +220,13 @@ PSOTest2()
 
   // set optimizer parameters
   OptimizerType::ParameterBoundsType bounds;
-  bounds.push_back(std::make_pair(-10, 10));
-  bounds.push_back(std::make_pair(-10, 10));
-  unsigned int                  numberOfParticles = 10;
-  unsigned int                  maxIterations = 100;
-  double                        xTolerance = 0.1;
-  double                        fTolerance = 0.001;
-  OptimizerType::ParametersType initialParameters(2), finalParameters;
+  bounds.emplace_back(-10, 10);
+  bounds.emplace_back(-10, 10);
+  constexpr unsigned int        numberOfParticles = 10;
+  constexpr unsigned int        maxIterations = 100;
+  constexpr double              xTolerance = 0.1;
+  constexpr double              fTolerance = 0.001;
+  OptimizerType::ParametersType initialParameters(2);
 
   itkOptimizer->SetParameterBounds(bounds);
   itkOptimizer->SetNumberOfParticles(numberOfParticles);
@@ -231,7 +236,7 @@ PSOTest2()
   itkOptimizer->SetCostFunction(costFunction);
 
   // observe the iterations
-  itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
+  const itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
   if (verboseFlag)
   {
     itkOptimizer->AddObserver(itk::IterationEvent(), observer);
@@ -243,7 +248,7 @@ PSOTest2()
     initialParameters[1] = -9;
     itkOptimizer->SetInitialPosition(initialParameters);
     itkOptimizer->StartOptimization();
-    finalParameters = itkOptimizer->GetCurrentPosition();
+    OptimizerType::ParametersType finalParameters = itkOptimizer->GetCurrentPosition();
 
     // check why we stopped and see if the optimization succeeded
     std::cout << "Reason for stopping optimization:\n";
@@ -279,14 +284,14 @@ PSOTest3()
   std::cout << "----------------------------------\n";
 
 
-  const double tolerance = 1e-16;
+  constexpr double tolerance = 1e-16;
 
   itk::Array<double> knownParameters(2);
   knownParameters[0] = 1.0;
   knownParameters[1] = 1.0;
 
   // the function we want to optimize
-  itk::ParticleSwarmTestF3::Pointer costFunction = itk::ParticleSwarmTestF3::New();
+  const itk::ParticleSwarmTestF3::Pointer costFunction = itk::ParticleSwarmTestF3::New();
 
   auto itkOptimizer = OptimizerType::New();
   itkOptimizer->UseSeedOn();
@@ -294,14 +299,13 @@ PSOTest3()
 
   // set optimizer parameters
   OptimizerType::ParameterBoundsType bounds;
-  bounds.push_back(std::make_pair(-100, 100));
-  bounds.push_back(std::make_pair(-100, 100));
-  unsigned int                  numberOfParticles = 100;
-  unsigned int                  maxIterations = 200;
-  double                        xTolerance = 0.1;
-  double                        fTolerance = 0.01;
+  bounds.emplace_back(-100, 100);
+  bounds.emplace_back(-100, 100);
+  constexpr unsigned int        numberOfParticles = 100;
+  constexpr unsigned int        maxIterations = 200;
+  constexpr double              xTolerance = 0.1;
+  constexpr double              fTolerance = 0.01;
   OptimizerType::ParametersType initialParameters(2);
-  OptimizerType::ParametersType finalParameters;
 
   // Exercise Get/Set methods
   itkOptimizer->PrintSwarmOn();
@@ -321,7 +325,7 @@ PSOTest3()
     return EXIT_FAILURE;
   }
 
-  unsigned int numberOfGenerationsWithMinimalImprovement = 1;
+  constexpr unsigned int numberOfGenerationsWithMinimalImprovement = 1;
   itkOptimizer->SetNumberOfGenerationsWithMinimalImprovement(numberOfGenerationsWithMinimalImprovement);
   if (itkOptimizer->GetNumberOfGenerationsWithMinimalImprovement() != numberOfGenerationsWithMinimalImprovement)
   {
@@ -339,7 +343,7 @@ PSOTest3()
   }
   itkOptimizer->SetCostFunction(costFunction);
 
-  double percentageParticlesConverged = 0.6;
+  constexpr double percentageParticlesConverged = 0.6;
   itkOptimizer->SetPercentageParticlesConverged(percentageParticlesConverged);
   if (itk::Math::abs(itkOptimizer->GetPercentageParticlesConverged() - percentageParticlesConverged) > tolerance)
   {
@@ -347,7 +351,7 @@ PSOTest3()
     return EXIT_FAILURE;
   }
 
-  double inertiaCoefficient = 0.7298;
+  constexpr double inertiaCoefficient = 0.7298;
   itkOptimizer->SetInertiaCoefficient(inertiaCoefficient);
   if (itk::Math::abs(itkOptimizer->GetInertiaCoefficient() - inertiaCoefficient))
   {
@@ -355,7 +359,7 @@ PSOTest3()
     return EXIT_FAILURE;
   }
 
-  double personalCoefficient = 1.496;
+  constexpr double personalCoefficient = 1.496;
   itkOptimizer->SetPersonalCoefficient(personalCoefficient);
   if (itk::Math::abs(itkOptimizer->GetPersonalCoefficient() - personalCoefficient))
   {
@@ -363,7 +367,7 @@ PSOTest3()
     return EXIT_FAILURE;
   }
 
-  double gobalCoefficient = 1.496;
+  constexpr double gobalCoefficient = 1.496;
   itkOptimizer->SetGlobalCoefficient(gobalCoefficient);
   if (itk::Math::abs(itkOptimizer->GetGlobalCoefficient() - gobalCoefficient))
   {
@@ -375,7 +379,7 @@ PSOTest3()
   itkOptimizer->Print(std::cout);
 
   // observe the iterations
-  itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
+  const itk::CommandIterationUpdateParticleSwarm::Pointer observer = itk::CommandIterationUpdateParticleSwarm::New();
 
   if (verboseFlag)
   {
@@ -394,7 +398,7 @@ PSOTest3()
     // check why we stopped and see if the optimization succeeded
     std::cout << "Reason for stopping optimization:\n";
     std::cout << '\t' << itkOptimizer->GetStopConditionDescription() << '\n';
-    finalParameters = itkOptimizer->GetCurrentPosition();
+    OptimizerType::ParametersType finalParameters = itkOptimizer->GetCurrentPosition();
     std::cout << "Known parameters   = " << knownParameters << "   ";
     std::cout << "Estimated parameters = " << finalParameters << std::endl;
     if (itk::Math::abs(finalParameters[0] - knownParameters[0]) > xTolerance ||

@@ -59,6 +59,24 @@ public:
   using ValueType = T;
   using ComponentType = T;
 
+  /** A pointer to the ValueType. */
+  using pointer = ValueType *;
+
+  /** A const pointer to the ValueType. */
+  using const_pointer = const ValueType *;
+
+  /** A reference to the ValueType. */
+  using reference = ValueType &;
+
+  /** A const reference to the ValueType. */
+  using const_reference = const ValueType &;
+
+  /** The return type of the non-const overloads of begin() and end(). */
+  using iterator = ValueType *;
+
+  /** The return type of cbegin() and cend(), and the const overloads of begin() and end(). */
+  using const_iterator = const ValueType *;
+
   /** Number Of Columns and Rows. */
   static constexpr unsigned int RowDimensions = VRows;
   static constexpr unsigned int ColumnDimensions = VColumns;
@@ -72,22 +90,28 @@ public:
   using CompatibleSquareMatrixType = Matrix<T, VColumns, VColumns>;
 
   /** Matrix by Vector multiplication.  */
-  Vector<T, VRows> operator*(const Vector<T, VColumns> & vect) const;
+  Vector<T, VRows>
+  operator*(const Vector<T, VColumns> & vect) const;
 
   /** Matrix by Point multiplication.  */
-  Point<T, VRows> operator*(const Point<T, VColumns> & pnt) const;
+  Point<T, VRows>
+  operator*(const Point<T, VColumns> & pnt) const;
 
   /** Matrix by CovariantVector multiplication.  */
-  CovariantVector<T, VRows> operator*(const CovariantVector<T, VColumns> & covect) const;
+  CovariantVector<T, VRows>
+  operator*(const CovariantVector<T, VColumns> & covect) const;
 
   /** Matrix by vnl_vector_fixed multiplication.  */
-  vnl_vector_fixed<T, VRows> operator*(const vnl_vector_fixed<T, VColumns> & inVNLvect) const;
+  vnl_vector_fixed<T, VRows>
+  operator*(const vnl_vector_fixed<T, VColumns> & inVNLvect) const;
 
   /** Matrix by Matrix multiplication.  */
-  Self operator*(const CompatibleSquareMatrixType & matrix) const;
+  Self
+  operator*(const CompatibleSquareMatrixType & matrix) const;
 
   template <unsigned int OuterDim>
-  Matrix<T, VRows, OuterDim> operator*(const vnl_matrix_fixed<T, VRows, OuterDim> & matrix) const
+  Matrix<T, VRows, OuterDim>
+  operator*(const vnl_matrix_fixed<T, VRows, OuterDim> & matrix) const
   {
     const Matrix<T, VRows, OuterDim> result(m_Matrix * matrix);
     return result;
@@ -108,7 +132,8 @@ public:
   operator-=(const Self & matrix);
 
   /** Matrix by vnl_matrix multiplication.  */
-  vnl_matrix<T> operator*(const vnl_matrix<T> & matrix) const;
+  vnl_matrix<T>
+  operator*(const vnl_matrix<T> & matrix) const;
 
   /** Matrix by Matrix multiplication.  */
   void
@@ -119,7 +144,8 @@ public:
   operator*=(const vnl_matrix<T> & matrix);
 
   /** Matrix by vnl_vector multiplication.  */
-  vnl_vector<T> operator*(const vnl_vector<T> & vc) const;
+  vnl_vector<T>
+  operator*(const vnl_vector<T> & vc) const;
 
   /** Matrix by scalar multiplication. */
   void
@@ -129,7 +155,8 @@ public:
   }
 
   /** Matrix by scalar multiplication.  */
-  Self operator*(const T & value) const
+  Self
+  operator*(const T & value) const
   {
     Self result(*this);
 
@@ -169,10 +196,18 @@ public:
   }
 
   /** Return a row of the matrix. */
-  inline T * operator[](unsigned int i) { return m_Matrix[i]; }
+  inline T *
+  operator[](unsigned int i)
+  {
+    return m_Matrix[i];
+  }
 
   /** Return a row of the matrix. */
-  inline const T * operator[](unsigned int i) const { return m_Matrix[i]; }
+  inline const T *
+  operator[](unsigned int i) const
+  {
+    return m_Matrix[i];
+  }
 
   /** Return the matrix. */
   inline InternalMatrixType &
@@ -182,7 +217,7 @@ public:
   }
 
   /** Return the matrix. */
-  inline const InternalMatrixType &
+  [[nodiscard]] inline const InternalMatrixType &
   GetVnlMatrix() const
   {
     return m_Matrix;
@@ -273,19 +308,19 @@ public:
   {}
 
   /** Return the inverse matrix. */
-  inline vnl_matrix_fixed<T, VColumns, VRows>
+  [[nodiscard]] inline vnl_matrix_fixed<T, VColumns, VRows>
   GetInverse() const
   {
     if (vnl_determinant(m_Matrix) == T{})
     {
       itkGenericExceptionMacro("Singular matrix. Determinant is 0.");
     }
-    vnl_matrix_inverse<T> inverse(m_Matrix.as_ref());
+    const vnl_matrix_inverse<T> inverse(m_Matrix.as_ref());
     return vnl_matrix_fixed<T, VColumns, VRows>{ inverse.as_matrix() };
   }
 
   /** Return the transposed matrix. */
-  inline vnl_matrix_fixed<T, VColumns, VRows>
+  [[nodiscard]] inline vnl_matrix_fixed<T, VColumns, VRows>
   GetTranspose() const
   {
     return vnl_matrix_fixed<T, VColumns, VRows>{ m_Matrix.transpose().as_matrix() };
@@ -298,12 +333,76 @@ public:
    */
   Matrix() = default;
 
+  /** Returns the number of elements. */
+  [[nodiscard]] constexpr unsigned int
+  size() const
+  {
+    return m_Matrix.size();
+  }
+
+  /** Returns an iterator to the first element. */
+  iterator
+  begin()
+  {
+    return m_Matrix.begin();
+  }
+
+  /** Returns an iterator just beyond the last element. */
+  iterator
+  end()
+  {
+    return m_Matrix.end();
+  }
+
+  /** Returns a const iterator to the first element. */
+  [[nodiscard]] const_iterator
+  begin() const
+  {
+    return m_Matrix.begin();
+  }
+
+  /** Returns a const iterator just beyond the last element. */
+  [[nodiscard]] const_iterator
+  end() const
+  {
+    return m_Matrix.end();
+  }
+
+  /** Returns a const iterator to the first element. */
+  [[nodiscard]] const_iterator
+  cbegin() const
+  {
+    return m_Matrix.begin();
+  }
+
+  /** Returns a const iterator just beyond the last element. */
+  [[nodiscard]] const_iterator
+  cend() const
+  {
+    return m_Matrix.end();
+  }
+
   void
-  swap(Self & other)
+  swap(Self & other) noexcept
   {
     // allow for augment dependent look up
     using std::swap;
     swap(this->m_Matrix, other.m_Matrix);
+  }
+
+  inline void
+  PrintSelf(std::ostream & os, Indent indent) const
+  {
+    os << indent << "Matrix (" << VRows << "x" << VColumns << ")\n";
+    for (unsigned int r = 0; r < VRows; ++r)
+    {
+      os << indent << "  ";
+      for (unsigned int c = 0; c < VColumns; ++c)
+      {
+        os << m_Matrix(r, c) << " ";
+      }
+      os << "\n";
+    }
   }
 
 private:
@@ -321,7 +420,7 @@ operator<<(std::ostream & os, const Matrix<T, VRows, VColumns> & v)
 
 template <typename T, unsigned int VRows, unsigned int VColumns>
 inline void
-swap(const Matrix<T, VRows, VColumns> & a, const Matrix<T, VRows, VColumns> & b)
+swap(const Matrix<T, VRows, VColumns> & a, const Matrix<T, VRows, VColumns> & b) noexcept
 {
   a.swap(b);
 }

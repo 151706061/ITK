@@ -25,7 +25,7 @@
 
 
 // Define the dimension of the images
-static const unsigned int Dimension = 2;
+static constexpr unsigned int Dimension = 2;
 
 
 template <typename ImageType, typename CenterCoordinateType>
@@ -55,12 +55,12 @@ Test_GetCircles_should_return_empty_list_when_NumberOfCircles_is_set_to_zero()
   using ImageType = itk::Image<PixelType>;
 
   // Create an image that has at least one circle.
-  const auto                image = ImageType::New();
-  const ImageType::SizeType size = { { 64, 64 } };
+  const auto                    image = ImageType::New();
+  constexpr ImageType::SizeType size = { { 64, 64 } };
   image->SetRegions(size);
   image->AllocateInitialized();
-  const unsigned int center[] = { 16, 16 };
-  constexpr double   radius = 7.0;
+  constexpr unsigned int center[] = { 16, 16 };
+  constexpr double       radius = 7.0;
   CreateCircle<ImageType>(image, center, radius);
 
   using FilterType = itk::HoughTransform2DCirclesImageFilter<PixelType, PixelType, PixelType>;
@@ -92,8 +92,8 @@ Test_GetCircles_should_return_empty_list_when_input_image_is_uniform()
   const auto filter = FilterType::New();
 
   // Create an input image for the filter.
-  const auto                image = ImageType::New();
-  const ImageType::SizeType size = { { 32, 32 } };
+  const auto                    image = ImageType::New();
+  constexpr ImageType::SizeType size = { { 32, 32 } };
   image->SetRegions(size);
   image->Allocate();
 
@@ -129,13 +129,13 @@ Test_RadiusImage_and_OutputImage_may_have_different_types()
   using InputImageType = itk::Image<InputPixelType>;
 
   // Create an image that has at least one circle.
-  const auto                     inputImage = InputImageType::New();
-  const InputImageType::SizeType size = { { 64, 64 } };
+  const auto                         inputImage = InputImageType::New();
+  constexpr InputImageType::SizeType size = { { 64, 64 } };
   inputImage->SetRegions(size);
   inputImage->Allocate();
   inputImage->FillBuffer(1);
-  const unsigned int center[] = { 32, 32 };
-  constexpr double   radius = 8.5;
+  constexpr unsigned int center[] = { 32, 32 };
+  constexpr double       radius = 8.5;
   CreateCircle<InputImageType>(inputImage, center, radius);
 
   using OutputPixelType = unsigned long;
@@ -256,12 +256,12 @@ Test_Center_IsInside_SpatialObject_from_GetCircles()
 {
   using PixelType = unsigned int;
   using ImageType = itk::Image<PixelType>;
-  const auto                image = ImageType::New();
-  const ImageType::SizeType imageSize = { { 16, 32 } };
+  const auto                    image = ImageType::New();
+  constexpr ImageType::SizeType imageSize = { { 16, 32 } };
   image->SetRegions(imageSize);
   image->AllocateInitialized();
-  const double center[] = { 6.0, 9.0 };
-  const double radius = 1.0;
+  constexpr double center[] = { 6.0, 9.0 };
+  constexpr double radius = 1.0;
   CreateCircle<ImageType>(image, center, radius);
 
   using FilterType = itk::HoughTransform2DCirclesImageFilter<PixelType, unsigned int, double>;
@@ -290,7 +290,7 @@ Test_Center_IsInside_SpatialObject_from_GetCircles()
   if (!isInside)
   {
     std::cout << "ERROR: The center of the actual circle should be inside the"
-              << " spacial object of the detected circle!" << std::endl;
+              << " spatial object of the detected circle!" << std::endl;
     std::cout << circle << std::endl;
   }
   return isInside;
@@ -316,11 +316,9 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
 
   ImageType::RegionType region;
 
-  ImageType::SizeType size;
-  size.Fill(100);
+  auto size = ImageType::SizeType::Filled(100);
 
-  ImageType::IndexType index;
-  index.Fill(0);
+  ImageType::IndexType index{};
 
   region.SetSize(size);
   region.SetIndex(index);
@@ -371,40 +369,40 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(houghFilter, HoughTransform2DCirclesImageFilter, ImageToImageFilter);
 
 
-  double threshold = 2.3;
+  constexpr double threshold = 2.3;
   houghFilter->SetThreshold(threshold);
   ITK_TEST_SET_GET_VALUE(threshold, houghFilter->GetThreshold());
 
-  double minMaxRadius = 16.2;
+  constexpr double minMaxRadius = 16.2;
   houghFilter->SetRadius(minMaxRadius);
   ITK_TEST_SET_GET_VALUE(minMaxRadius, houghFilter->GetMinimumRadius());
   ITK_TEST_SET_GET_VALUE(minMaxRadius, houghFilter->GetMaximumRadius());
 
-  double minimumRadius = 2.1;
+  constexpr double minimumRadius = 2.1;
   houghFilter->SetMinimumRadius(minimumRadius);
   ITK_TEST_SET_GET_VALUE(minimumRadius, houghFilter->GetMinimumRadius());
 
-  double maximumRadius = 20.4;
+  constexpr double maximumRadius = 20.4;
   houghFilter->SetMaximumRadius(maximumRadius);
   ITK_TEST_SET_GET_VALUE(maximumRadius, houghFilter->GetMaximumRadius());
 
-  const double gradientNormThreshold = 1.1;
+  constexpr double gradientNormThreshold = 1.1;
   houghFilter->SetGradientNormThreshold(gradientNormThreshold);
   ITK_TEST_SET_GET_VALUE(gradientNormThreshold, houghFilter->GetGradientNormThreshold());
 
-  double sigmaGradient = 1.2;
+  constexpr double sigmaGradient = 1.2;
   houghFilter->SetSigmaGradient(sigmaGradient);
   ITK_TEST_SET_GET_VALUE(sigmaGradient, houghFilter->GetSigmaGradient());
 
-  float discRadiusRatio = 1.1;
+  constexpr float discRadiusRatio = 1.1;
   houghFilter->SetDiscRadiusRatio(discRadiusRatio);
   ITK_TEST_SET_GET_VALUE(discRadiusRatio, houghFilter->GetDiscRadiusRatio());
 
-  float variance = 10;
+  constexpr float variance = 10;
   houghFilter->SetVariance(variance);
   ITK_TEST_SET_GET_VALUE(variance, houghFilter->GetVariance());
 
-  float sweepAngle = 0.2;
+  constexpr float sweepAngle = 0.2;
   houghFilter->SetSweepAngle(sweepAngle);
   ITK_TEST_SET_GET_VALUE(sweepAngle, houghFilter->GetSweepAngle());
 
@@ -412,7 +410,7 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
   houghFilter->SetNumberOfCircles(numberOfCircles);
   ITK_TEST_SET_GET_VALUE(numberOfCircles, houghFilter->GetNumberOfCircles());
 
-  bool useImageSpacing = false;
+  constexpr bool useImageSpacing = false;
   houghFilter->SetUseImageSpacing(useImageSpacing);
   ITK_TEST_SET_GET_VALUE(useImageSpacing, houghFilter->GetUseImageSpacing());
 
@@ -427,9 +425,9 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
 
   circleList = houghFilter->GetCircles();
 
-  double radiusTolerance = 2.0;
+  constexpr double radiusTolerance = 2.0;
 
-  HoughTransformFilterType::CirclesListType::const_iterator it = circleList.begin();
+  auto it = circleList.begin();
 
   unsigned int i = 0;
   while (it != circleList.end())
@@ -455,9 +453,9 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
   }
 
   // Check the circle center
-  HoughImageType::Pointer accumulator = houghFilter->GetOutput();
+  const HoughImageType::Pointer accumulator = houghFilter->GetOutput();
 
-  HoughImageType::ConstPointer radiusImage = houghFilter->GetRadiusImage();
+  const HoughImageType::ConstPointer radiusImage = houghFilter->GetRadiusImage();
 
   // Blur the accumulator in order to find the maximum
   using GaussianFilterType = itk::DiscreteGaussianImageFilter<HoughImageType, HoughImageType>;
@@ -472,7 +470,7 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
 
   gaussianFilter->Update();
 
-  HoughImageType::Pointer postProcessImage = gaussianFilter->GetOutput();
+  const HoughImageType::Pointer postProcessImage = gaussianFilter->GetOutput();
 
   using MinMaxCalculatorType = itk::MinimumMaximumImageCalculator<HoughImageType>;
   auto minMaxCalculator = MinMaxCalculatorType::New();
@@ -499,7 +497,7 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
       if (itk::Math::ExactlyEquals(it_input.Get(), max))
       {
         it_output.Set(255);
-        double radius2 = radiusImage->GetPixel(it_output.GetIndex());
+        const double radius2 = radiusImage->GetPixel(it_output.GetIndex());
         centerResult[foundCircles][0] = it_output.GetIndex()[0];
         centerResult[foundCircles][1] = it_output.GetIndex()[1];
         radiusResult[foundCircles] = radius2;
@@ -535,7 +533,7 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
   } while (foundCircles < numberOfCircles);
 
   // Check the circle detection
-  double centerTolerance = 2.0;
+  constexpr double centerTolerance = 2.0;
   for (i = 0; i < numberOfCircles; ++i)
   {
     if (!itk::Math::FloatAlmostEqual(
@@ -568,9 +566,7 @@ itkHoughTransform2DCirclesImageTest(int, char *[])
     std::cout << "Test succeeded!" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test FAILED!" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test FAILED!" << std::endl;
+  return EXIT_FAILURE;
 }

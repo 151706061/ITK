@@ -63,7 +63,7 @@ template <unsigned int TDimension>
 auto
 GaussianSpatialObject<TDimension>::SquaredZScoreInWorldSpace(const PointType & point) const -> ScalarType
 {
-  PointType transformedPoint = this->GetObjectToWorldTransformInverse()->TransformPoint(point);
+  const PointType transformedPoint = this->GetObjectToWorldTransformInverse()->TransformPoint(point);
 
   return this->SquaredZScoreInObjectSpace(transformedPoint);
 }
@@ -127,7 +127,7 @@ GaussianSpatialObject<TDimension>::ValueAtInObjectSpace(const PointType &   poin
     if (IsInsideInObjectSpace(point))
     {
       const double zsq = this->SquaredZScoreInObjectSpace(point);
-      value = m_Maximum * (ScalarType)std::exp(-zsq / 2.0);
+      value = m_Maximum * static_cast<ScalarType>(std::exp(-zsq / 2.0));
       return true;
     }
   }
@@ -171,7 +171,7 @@ GaussianSpatialObject<TDimension>::InternalClone() const
   // this to new transform.
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");

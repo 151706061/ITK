@@ -25,13 +25,13 @@
 
 using SizeType = itk::Size<3>;
 using ImageType = itk::Image<unsigned short, 3>;
-using CoordRepType = double;
-using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
+using CoordinateType = itk::SpacePrecisionType;
+using InterpolatorType = itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
 using IndexType = InterpolatorType::IndexType;
 using PointType = InterpolatorType::PointType;
 using ContinuousIndexType = InterpolatorType::ContinuousIndexType;
 
-using NNInterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
+using NNInterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
 namespace
 {
 
@@ -53,7 +53,7 @@ TestGeometricPoint(const TInterpolator * interp, const PointType & point, bool i
 
   std::cout << " Point: " << point;
 
-  bool bvalue = interp->IsInsideBuffer(point);
+  const bool bvalue = interp->IsInsideBuffer(point);
   std::cout << " Inside: " << bvalue;
 
   if (bvalue != isInside)
@@ -64,7 +64,7 @@ TestGeometricPoint(const TInterpolator * interp, const PointType & point, bool i
 
   if (isInside)
   {
-    double value = interp->Evaluate(point);
+    const double value = interp->Evaluate(point);
     std::cout << " Value: " << value;
 
     if (itk::Math::abs(value - trueValue) > 1e-9)
@@ -89,7 +89,7 @@ TestContinuousIndex(const TInterpolator * interp, const ContinuousIndexType & in
 
   std::cout << " Index: " << index;
 
-  bool bvalue = interp->IsInsideBuffer(index);
+  const bool bvalue = interp->IsInsideBuffer(index);
   std::cout << " Inside: " << bvalue;
 
   if (bvalue != isInside)
@@ -100,7 +100,7 @@ TestContinuousIndex(const TInterpolator * interp, const ContinuousIndexType & in
 
   if (isInside)
   {
-    double value = interp->EvaluateAtContinuousIndex(index);
+    const double value = interp->EvaluateAtContinuousIndex(index);
     std::cout << " Value: " << value;
 
     if (itk::Math::abs(value - trueValue) > 1e-9)
@@ -158,21 +158,17 @@ itkInterpolateTest(int, char *[])
   /* Test evaluation at continuous indices and corresponding
      gemetric points */
   std::cout << "Evaluate at: " << std::endl;
-  ContinuousIndexType cindex;
-  IndexType           mindex;
-  PointType           point;
-  bool                passed;
 
   // an integer position inside the image
   itk::SpacePrecisionType darray1[3] = { 10, 20, 40 };
-  cindex = ContinuousIndexType(darray1);
-  passed = TestContinuousIndex<InterpolatorType>(interp, cindex, true, 70);
+  auto                    cindex = ContinuousIndexType(darray1);
+  bool                    passed = TestContinuousIndex<InterpolatorType>(interp, cindex, true, 70);
 
   if (!passed)
   {
     flag = 1;
   }
-
+  PointType point;
   image->TransformContinuousIndexToPhysicalPoint(cindex, point);
   passed = TestGeometricPoint<InterpolatorType>(interp, point, true, 70);
 
@@ -180,7 +176,7 @@ itkInterpolateTest(int, char *[])
   {
     flag = 1;
   }
-
+  IndexType mindex;
   mindex.CopyWithRound(cindex);
   double expectedValue = mindex[0] + mindex[1] + mindex[2];
   if (itk::Math::NotAlmostEquals(interp->EvaluateAtIndex(mindex), expectedValue))
@@ -210,8 +206,8 @@ itkInterpolateTest(int, char *[])
   }
 
   // position near image border
-  itk::SpacePrecisionType epsilon = 1.0e-10;
-  itk::SpacePrecisionType darray3[3] = { 19 - epsilon, 20, 40 };
+  constexpr itk::SpacePrecisionType epsilon = 1.0e-10;
+  itk::SpacePrecisionType           darray3[3] = { 19 - epsilon, 20, 40 };
   cindex = ContinuousIndexType(darray3);
   passed = TestContinuousIndex<InterpolatorType>(interp, cindex, true, 79);
 
@@ -371,10 +367,9 @@ itkInterpolateTest(int, char *[])
     std::cout << "*** Some test failed" << std::endl;
     return flag;
   }
-  else
-  {
-    std::cout << "All tests successfully passed" << std::endl;
-  }
+
+  std::cout << "All tests successfully passed" << std::endl;
+
 
   return EXIT_SUCCESS;
 }

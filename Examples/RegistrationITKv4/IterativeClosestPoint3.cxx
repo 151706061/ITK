@@ -165,9 +165,9 @@ main(int argc, char * argv[])
   scales.Fill(0.01);
 
   constexpr unsigned long numberOfIterations = 100;
-  const double            gradientTolerance = 1e-5; // convergence criterion
-  const double            valueTolerance = 1e-5;    // convergence criterion
-  const double            epsilonFunction = 1e-6;   // convergence criterion
+  constexpr double        gradientTolerance = 1e-5; // convergence criterion
+  constexpr double        valueTolerance = 1e-5;    // convergence criterion
+  constexpr double        epsilonFunction = 1e-6;   // convergence criterion
 
   optimizer->SetScales(scales);
   optimizer->SetNumberOfIterations(numberOfIterations);
@@ -216,12 +216,6 @@ main(int argc, char * argv[])
   auto pointsToImageFilter = PointsToImageFilterType::New();
 
   pointsToImageFilter->SetInput(fixedPointSet);
-
-  BinaryImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-
-  BinaryImageType::PointType origin;
-  origin.Fill(0.0);
   // Software Guide : EndCodeSnippet
 
   // Software Guide : BeginLatex
@@ -232,10 +226,9 @@ main(int argc, char * argv[])
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  pointsToImageFilter->SetSpacing(spacing);
-  pointsToImageFilter->SetOrigin(origin);
   pointsToImageFilter->Update();
-  BinaryImageType::Pointer binaryImage = pointsToImageFilter->GetOutput();
+  const BinaryImageType::Pointer binaryImage =
+    pointsToImageFilter->GetOutput();
 
   using DistanceImageType = itk::Image<unsigned short, Dimension>;
   using DistanceFilterType =

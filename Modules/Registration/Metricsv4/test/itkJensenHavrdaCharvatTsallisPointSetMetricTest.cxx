@@ -19,7 +19,7 @@
 #include "itkJensenHavrdaCharvatTsallisPointSetToPointSetMetricv4.h"
 #include "itkTranslationTransform.h"
 #include "itkTestingMacros.h"
-
+#include "itkMakeFilled.h"
 #include <fstream>
 
 template <unsigned int Dimension>
@@ -32,20 +32,17 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
   using VectorType = typename PointType::VectorType;
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
   // Produce two simple point sets of 1) a circle and 2) the same circle with an offset
-  PointType  offset;
-  float      normOffset = 0;
-  VectorType normalizedOffset;
+  auto offset = itk::MakeFilled<PointType>(2);
+  auto normalizedOffset = itk::MakeFilled<VectorType>(2);
+
+  float normOffset = 0;
   for (unsigned int d = 0; d < Dimension; ++d)
   {
-    offset[d] = 2;
     normOffset += itk::Math::sqr(offset[d]);
-    normalizedOffset[d] = offset[d];
   }
   normOffset = std::sqrt(normOffset);
   normalizedOffset /= normOffset;
@@ -53,14 +50,14 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
   unsigned long count = 0;
   for (float theta = 0; theta < 2.0 * itk::Math::pi; theta += 0.1)
   {
-    PointType fixedPoint;
-    float     radius = 100.0;
+    constexpr float radius = 100.0;
+    PointType       fixedPoint;
     fixedPoint[0] = radius * std::cos(theta);
     fixedPoint[1] = radius * std::sin(theta);
     // simplistic point set test:
     //    fixedPoint[0] = 1;
     //    fixedPoint[1] = 1;
-    if (Dimension > 2)
+    if constexpr (Dimension > 2)
     {
       fixedPoint[2] = radius * std::sin(theta);
       //      fixedPoint[2] = 1;
@@ -70,7 +67,7 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
     PointType movingPoint;
     movingPoint[0] = fixedPoint[0] + offset[0];
     movingPoint[1] = fixedPoint[1] + offset[1];
-    if (Dimension > 2)
+    if constexpr (Dimension > 2)
     {
       movingPoint[2] = fixedPoint[2] + offset[2];
     }
@@ -86,14 +83,12 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
 
   // check various alpha values between accepted values of [1.0, 2.0]
 
-  unsigned int numberOfAlphaValues = 6;
-  float        alphaValues[] = { 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f };
-  float        metricValues2D[] = { 0.143842f, -0.0129571f, -0.00105768f, -0.000115118f, -1.40956e-05f, -1.84099e-06f };
-  float metricValues3D[] = { 0.175588f, -0.0086854f, -0.000475248f, -3.46729e-05f, -2.84585e-06f, -2.49151e-07f };
+  constexpr unsigned int numberOfAlphaValues = 6;
+  constexpr float        alphaValues[] = { 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f };
 
-  unsigned int evaluationKNeighborhood = 50;
-  auto         useAnisotropicCovariances = false;
-  unsigned int covarianceKNeighborhood = 5;
+  constexpr unsigned int evaluationKNeighborhood = 50;
+  auto                   useAnisotropicCovariances = false;
+  constexpr unsigned int covarianceKNeighborhood = 5;
 
   for (unsigned int i = 0; i < numberOfAlphaValues; ++i)
   {
@@ -111,7 +106,7 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
     metric->SetAlpha(alphaValues[i]);
     ITK_TEST_SET_GET_VALUE(alphaValues[i], metric->GetAlpha());
 
-    typename PointSetMetricType::RealType pointSetSigma = 1.0;
+    const typename PointSetMetricType::RealType pointSetSigma = 1.0;
     metric->SetPointSetSigma(pointSetSigma);
     ITK_TEST_SET_GET_VALUE(pointSetSigma, metric->GetPointSetSigma());
 
@@ -123,7 +118,7 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
     metric->SetCovarianceKNeighborhood(covarianceKNeighborhood);
     ITK_TEST_SET_GET_VALUE(covarianceKNeighborhood, metric->GetCovarianceKNeighborhood());
 
-    typename PointSetMetricType::RealType kernelSigma = 10.0;
+    const typename PointSetMetricType::RealType kernelSigma = 10.0;
     metric->SetKernelSigma(kernelSigma);
     ITK_TEST_SET_GET_VALUE(kernelSigma, metric->GetKernelSigma());
 
@@ -133,9 +128,11 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
 
     metric->Initialize();
 
-    typename PointSetMetricType::MeasureType    value = metric->GetValue(), value2;
-    typename PointSetMetricType::DerivativeType derivative, derivative2;
+    const typename PointSetMetricType::MeasureType value = metric->GetValue();
+    typename PointSetMetricType::DerivativeType    derivative;
     metric->GetDerivative(derivative);
+    typename PointSetMetricType::MeasureType    value2;
+    typename PointSetMetricType::DerivativeType derivative2;
     metric->GetValueAndDerivative(value2, derivative2);
 
     derivative /= derivative.magnitude();
@@ -153,15 +150,21 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
       }
     }
 
-    if (Dimension == 2)
+    if constexpr (Dimension == 2)
     {
+      static constexpr float metricValues2D[] = { 0.143842f,     -0.0129571f,   -0.00105768f,
+                                                  -0.000115118f, -1.40956e-05f, -1.84099e-06f };
+
       if (itk::Math::abs(value - metricValues2D[i]) > 0.01)
       {
         std::cerr << "calculated value is different than expected." << std::endl;
       }
     }
-    else if (Dimension == 3)
+    else if constexpr (Dimension == 3)
     {
+      static constexpr float metricValues3D[] = { 0.175588f,     -0.0086854f,   -0.000475248f,
+                                                  -3.46729e-05f, -2.84585e-06f, -2.49151e-07f };
+
       if (itk::Math::abs(value - metricValues3D[i]) > 0.01)
       {
         std::cerr << "calculated value is different than expected." << std::endl;
@@ -205,7 +208,7 @@ itkJensenHavrdaCharvatTsallisPointSetMetricTestRun()
         moving_str1 << sourcePoint[d] << ' ';
         moving_str2 << targetPoint[d] << ' ';
       }
-      if (Dimension < 3)
+      if constexpr (Dimension < 3)
       {
         moving_str1 << "0 ";
         moving_str2 << "0 ";

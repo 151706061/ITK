@@ -42,20 +42,18 @@ NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOut
 template <typename TInputImage, typename TFeatureImage, typename TOutputPixelType, typename TOutputImage>
 NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOutputImage>::
   NarrowBandLevelSetImageFilter()
+  : m_IsoFilter(IsoFilterType::New())
+  , m_ChamferFilter(ChamferFilterType::New())
+  , m_SegmentationFunction(nullptr)
 {
   this->SetNumberOfRequiredInputs(2);
   // this->SetNarrowBandInnerRadius();
   // this->SetNarrowBandTotalRadius();
-  m_SegmentationFunction = nullptr;
-
-  m_IsoFilter = IsoFilterType::New();
-  m_ChamferFilter = ChamferFilterType::New();
 
   // Provide some reasonable defaults which will at least prevent infinite
   // looping.
   this->SetMaximumRMSError(0.02);
   this->SetNumberOfIterations(1000);
-  m_ReverseExpansionDirection = false;
 }
 
 template <typename TInputImage, typename TFeatureImage, typename TOutputPixelType, typename TOutputImage>
@@ -63,12 +61,10 @@ void
 NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOutputImage>::SetSegmentationFunction(
   SegmentationFunctionType * s)
 {
-  unsigned int i;
-
   m_SegmentationFunction = s;
 
   typename SegmentationFunctionType::RadiusType r;
-  for (i = 0; i < Self::ImageDimension; ++i)
+  for (unsigned int i = 0; i < Self::ImageDimension; ++i)
   {
     r[i] = 1;
   }
@@ -89,7 +85,7 @@ NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOut
 
   // A positive speed value causes surface expansion, the opposite of the
   // default.  Flip the sign of the propagation and advection weights.
-  if (m_ReverseExpansionDirection == true)
+  if (m_ReverseExpansionDirection)
   {
     this->GetSegmentationFunction()->ReverseExpansionDirection();
   }
@@ -110,7 +106,7 @@ NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOut
   Superclass::GenerateData();
 
   // Reset all the signs of the weights.
-  if (m_ReverseExpansionDirection == true)
+  if (m_ReverseExpansionDirection)
   {
     this->GetSegmentationFunction()->ReverseExpansionDirection();
   }
@@ -120,7 +116,7 @@ template <typename TInputImage, typename TFeatureImage, typename TOutputPixelTyp
 void
 NarrowBandLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType, TOutputImage>::CreateNarrowBand()
 {
-  typename OutputImageType::Pointer levelset = this->GetOutput();
+  const typename OutputImageType::Pointer levelset = this->GetOutput();
 
   if (!this->m_NarrowBand->Empty())
   {

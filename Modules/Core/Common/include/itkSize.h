@@ -29,8 +29,7 @@
 namespace itk
 {
 
-/** \struct Size
- * \brief Represent a n-dimensional size (bounds) of a n-dimensional image.
+/** \brief Represent a n-dimensional size (bounds) of a n-dimensional image.
  *
  * Size is a templated class to represent multi-dimensional array bounds,
  * i.e. (I,J,K,...).  Size is templated over the dimension of the bounds.
@@ -139,7 +138,8 @@ public:
   }
 
   /** Multiply two sizes (elementwise product).  */
-  const Self operator*(const Self & vec) const
+  const Self
+  operator*(const Self & vec) const
   {
     Self result;
 
@@ -163,7 +163,7 @@ public:
 
   /** Get the size. This provides a read only pointer to the size.
    * \sa SetSize */
-  const SizeValueType *
+  [[nodiscard]] const SizeValueType *
   GetSize() const
   {
     return m_InternalArray;
@@ -197,7 +197,7 @@ public:
    * \warning No bound checking is performed
    * \sa GetSize()
    * \sa SetElement() */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetElement(unsigned long element) const
   {
     return m_InternalArray[element];
@@ -268,12 +268,12 @@ public:
   }
 
   void
-  swap(Size & other)
+  swap(Size & other) noexcept
   {
     std::swap(m_InternalArray, other.m_InternalArray);
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   cbegin() const
   {
     return &m_InternalArray[0];
@@ -285,13 +285,13 @@ public:
     return &m_InternalArray[0];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   begin() const
   {
     return &m_InternalArray[0];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   cend() const
   {
     return &m_InternalArray[VDimension];
@@ -303,7 +303,7 @@ public:
     return &m_InternalArray[VDimension];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   end() const
   {
     return &m_InternalArray[VDimension];
@@ -315,7 +315,7 @@ public:
     return reverse_iterator(end());
   }
 
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   rbegin() const
   {
     return const_reverse_iterator(end());
@@ -327,33 +327,41 @@ public:
     return reverse_iterator(begin());
   }
 
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   rend() const
   {
     return const_reverse_iterator(begin());
   }
 
-  constexpr size_type
+  [[nodiscard]] constexpr size_type
   size() const
   {
     return VDimension;
   }
 
-  constexpr size_type
+  [[nodiscard]] constexpr size_type
   max_size() const
   {
     return VDimension;
   }
 
-  constexpr bool
+  [[nodiscard]] constexpr bool
   empty() const
   {
     return false;
   }
 
-  constexpr reference operator[](size_type pos) { return m_InternalArray[pos]; }
+  constexpr reference
+  operator[](size_type pos)
+  {
+    return m_InternalArray[pos];
+  }
 
-  constexpr const_reference operator[](size_type pos) const { return m_InternalArray[pos]; }
+  constexpr const_reference
+  operator[](size_type pos) const
+  {
+    return m_InternalArray[pos];
+  }
 
   reference
   at(size_type pos)
@@ -362,32 +370,32 @@ public:
     return m_InternalArray[pos];
   }
 
-  const_reference
+  [[nodiscard]] const_reference
   at(size_type pos) const
   {
     ExceptionThrowingBoundsCheck(pos);
     return m_InternalArray[pos];
   }
 
-  reference
+  constexpr reference
   front()
   {
     return *begin();
   }
 
-  const_reference
+  [[nodiscard]] constexpr const_reference
   front() const
   {
     return *begin();
   }
 
-  reference
+  constexpr reference
   back()
   {
     return VDimension ? *(end() - 1) : *end();
   }
 
-  const_reference
+  [[nodiscard]] constexpr const_reference
   back() const
   {
     return VDimension ? *(end() - 1) : *end();
@@ -399,7 +407,7 @@ public:
     return &m_InternalArray[0];
   }
 
-  const SizeValueType *
+  [[nodiscard]] const SizeValueType *
   data() const
   {
     return &m_InternalArray[0];
@@ -436,7 +444,7 @@ operator<<(std::ostream & os, const Size<VDimension> & obj)
   {
     os << obj[i] << ", ";
   }
-  if (VDimension >= 1)
+  if constexpr (VDimension >= 1)
   {
     os << obj[VDimension - 1];
   }
@@ -491,7 +499,7 @@ operator>=(const Size<VDimension> & one, const Size<VDimension> & two)
 // Specialized algorithms [6.2.2.2].
 template <unsigned int VDimension>
 inline void
-swap(Size<VDimension> & one, Size<VDimension> & two)
+swap(Size<VDimension> & one, Size<VDimension> & two) noexcept
 {
   std::swap(one.m_InternalArray, two.m_InternalArray);
 }

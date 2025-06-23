@@ -51,7 +51,7 @@ itkSpatialObjectDuplicatorTest(int, char *[])
   std::cout << "ModifiedOutput: " << duplicator->GetModifiedOutput() << std::endl;
 #endif
 
-  EllipseType::Pointer ellipse_copy = duplicator->GetOutput();
+  const EllipseType::Pointer ellipse_copy = duplicator->GetOutput();
 
   std::cout << ellipse_copy->GetRadiusInObjectSpace() << std::endl;
   std::cout << ellipse_copy->GetProperty().GetColor() << std::endl;
@@ -65,11 +65,11 @@ itkSpatialObjectDuplicatorTest(int, char *[])
   auto duplicatorGroup = DuplicatorGroupType::New();
   duplicatorGroup->SetInput(group);
   duplicatorGroup->Update();
-  GroupType::Pointer groupCopy = duplicatorGroup->GetOutput();
+  const GroupType::Pointer groupCopy = duplicatorGroup->GetOutput();
 
   GroupType::ChildrenListType * children = groupCopy->GetChildren();
 
-  EllipseType::Pointer ellipse_copy2 = static_cast<EllipseType *>((*(children->begin())).GetPointer());
+  const EllipseType::Pointer ellipse_copy2 = static_cast<EllipseType *>((*(children->begin())).GetPointer());
   std::cout << ellipse_copy2->GetRadiusInObjectSpace() << std::endl;
 
   delete children;
@@ -118,11 +118,10 @@ itkSpatialObjectDuplicatorTest(int, char *[])
   auto duplicatorDti = DuplicatorDTIType::New();
   duplicatorDti->SetInput(dtiTube);
   duplicatorDti->Update();
-  DTITubeType::Pointer dtiTube_copy = duplicatorDti->GetOutput();
+  const DTITubeType::Pointer dtiTube_copy = duplicatorDti->GetOutput();
 
   // Testing DTITubeSO
   std::cout << "Testing DTITubeSpatialObject: ";
-  DTITubeType::DTITubePointListType::const_iterator jdti;
 
   bool found = false;
   if (!strcmp(dtiTube_copy->GetTypeName().c_str(), "DTITubeSpatialObject"))
@@ -136,7 +135,7 @@ itkSpatialObjectDuplicatorTest(int, char *[])
       return EXIT_FAILURE;
     }
 
-    for (jdti = dtiTube_copy->GetPoints().begin(); jdti != dtiTube_copy->GetPoints().end(); ++jdti)
+    for (auto jdti = dtiTube_copy->GetPoints().begin(); jdti != dtiTube_copy->GetPoints().end(); ++jdti)
     {
       for (unsigned int d = 0; d < 3; ++d)
       {
@@ -211,8 +210,7 @@ itkSpatialObjectDuplicatorTest(int, char *[])
                   << std::endl;
         return EXIT_FAILURE;
       }
-      int ind;
-      for (ind = 0; ind < 6; ++ind)
+      for (int ind = 0; ind < 6; ++ind)
       {
         if (itk::Math::NotExactlyEquals(jdti->GetTensorMatrix()[ind], ind))
         {

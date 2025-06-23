@@ -67,7 +67,7 @@ public:
     m_Beta = NumericTraits<RealType>::OneValue() - m_Alpha;
   }
 
-  RealType
+  [[nodiscard]] RealType
   GetAlpha() const
   {
     return m_Alpha;
@@ -136,7 +136,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WeightedAddImageFilter);
 
   /** Set the weight for the first operand of the weighted addition */
@@ -154,15 +154,11 @@ public:
     return this->GetFunctor().GetAlpha();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(Input1HasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage1::PixelType>));
   itkConceptMacro(Input1RealTypeMultiplyCheck,
                   (Concept::MultiplyOperator<typename TInputImage1::PixelType, RealType, RealType>));
   itkConceptMacro(Input2RealTypeMultiplyCheck,
                   (Concept::MultiplyOperator<typename TInputImage2::PixelType, RealType, RealType>));
-  // End concept checking
-#endif
 
 protected:
   WeightedAddImageFilter() = default;

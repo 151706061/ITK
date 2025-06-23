@@ -60,7 +60,7 @@ public:
   /** Standard New method */
   itkNewMacro(Self);
 
-  /** Runtime information support */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DilateObjectMorphologyImageFilter);
 
   /** duplicates from base class to avoid compiler warnings */
@@ -80,11 +80,7 @@ public:
   /** Type of the pixels in the Kernel. */
   using KernelPixelType = typename TKernel::PixelType;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(KernelGreaterThanComparableCheck, (Concept::GreaterThanComparable<KernelPixelType>));
-  // End concept checking
-#endif
 
 protected:
   DilateObjectMorphologyImageFilter();

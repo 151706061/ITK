@@ -25,7 +25,7 @@
 #include "itkImageAlgorithm.h"
 #include <type_traits>
 
-// Better name demanging for gcc
+// Better name demangling for gcc
 #if defined(__GNUC__) && !defined(__EMSCRIPTEN__)
 #  define GCC_USEDEMANGLE
 #endif
@@ -40,15 +40,14 @@ template <typename T>
 std::string
 GetClampTypeName()
 {
-  std::string name;
 #ifdef GCC_USEDEMANGLE
-  char const * mangledName = typeid(T).name();
-  int          status;
-  char *       unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
-  name = unmangled;
+  const char *      mangledName = typeid(T).name();
+  int               status = 0;
+  char *            unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
+  const std::string name = unmangled;
   free(unmangled);
 #else
-  name = typeid(T).name();
+  const std::string name = typeid(T).name();
 #endif
 
   return name;
@@ -66,7 +65,7 @@ TestClampFromTo()
   using SourceType = itk::RandomImageSource<InputImageType>;
   auto source = SourceType::New();
 
-  typename InputImageType::SizeType randomSize = { { 18, 17, 23 } };
+  const typename InputImageType::SizeType randomSize = { { 18, 17, 23 } };
   source->SetSize(randomSize);
   source->UpdateLargestPossibleRegion();
   auto                                sourceCopy = InputImageType::New();
@@ -150,18 +149,18 @@ template <typename TInputPixelType>
 bool
 TestClampFrom()
 {
-  bool success = TestClampFromTo<TInputPixelType, char>() && TestClampFromTo<TInputPixelType, unsigned char>() &&
-                 TestClampFromTo<TInputPixelType, short>() && TestClampFromTo<TInputPixelType, unsigned short>() &&
-                 TestClampFromTo<TInputPixelType, int>() && TestClampFromTo<TInputPixelType, unsigned int>() &&
-                 TestClampFromTo<TInputPixelType, long>() && TestClampFromTo<TInputPixelType, unsigned long>() &&
+  const bool success =
+    TestClampFromTo<TInputPixelType, char>() && TestClampFromTo<TInputPixelType, unsigned char>() &&
+    TestClampFromTo<TInputPixelType, short>() && TestClampFromTo<TInputPixelType, unsigned short>() &&
+    TestClampFromTo<TInputPixelType, int>() && TestClampFromTo<TInputPixelType, unsigned int>() &&
+    TestClampFromTo<TInputPixelType, long>() && TestClampFromTo<TInputPixelType, unsigned long>() &&
 // Visual Studio has a false failure in due to
 // imprecise integer to double conversion. It causes the comparison
 // dInValue > expectedMax to pass when it should fail.
 #ifndef _MSC_VER
-                 TestClampFromTo<TInputPixelType, long long>() &&
-                 TestClampFromTo<TInputPixelType, unsigned long long>() &&
+    TestClampFromTo<TInputPixelType, long long>() && TestClampFromTo<TInputPixelType, unsigned long long>() &&
 #endif
-                 TestClampFromTo<TInputPixelType, float>() && TestClampFromTo<TInputPixelType, double>();
+    TestClampFromTo<TInputPixelType, float>() && TestClampFromTo<TInputPixelType, double>();
 
   return success;
 }
@@ -179,7 +178,7 @@ TestClampFromToWithCustomBounds()
   source->SetMin(static_cast<TInputPixelType>(0));
   source->SetMax(static_cast<TInputPixelType>(20));
 
-  typename InputImageType::SizeType randomSize = { { 18, 17, 23 } };
+  const typename InputImageType::SizeType randomSize = { { 18, 17, 23 } };
   source->SetSize(randomSize);
   source->UpdateLargestPossibleRegion();
   auto                                sourceCopy = InputImageType::New();
@@ -219,9 +218,9 @@ TestClampFromToWithCustomBounds()
     TOutputPixelType outValue = ot.Value();
     TOutputPixelType expectedValue;
 
-    auto   dInValue = static_cast<double>(inValue);
-    double expectedMin = filter->GetLowerBound();
-    double expectedMax = filter->GetUpperBound();
+    auto         dInValue = static_cast<double>(inValue);
+    const double expectedMin = filter->GetLowerBound();
+    const double expectedMax = filter->GetUpperBound();
 
 
     if (dInValue < expectedMin)
@@ -264,18 +263,18 @@ template <typename TInputPixelType>
 bool
 TestClampFromWithCustomBounds()
 {
-  bool success = TestClampFromToWithCustomBounds<TInputPixelType, char>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, unsigned char>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, short>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, unsigned short>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, int>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, unsigned int>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, long>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, unsigned long>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, long long>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, unsigned long long>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, float>() &&
-                 TestClampFromToWithCustomBounds<TInputPixelType, double>();
+  const bool success = TestClampFromToWithCustomBounds<TInputPixelType, char>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, unsigned char>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, short>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, unsigned short>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, int>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, unsigned int>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, long>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, unsigned long>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, long long>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, unsigned long long>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, float>() &&
+                       TestClampFromToWithCustomBounds<TInputPixelType, double>();
 
   return success;
 }
@@ -291,17 +290,18 @@ itkClampImageFilterTest(int, char *[])
   auto filter = FilterType::New();
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, ClampImageFilter, UnaryFunctorImageFilter);
 
-  bool success = TestClampFrom<char>() && TestClampFrom<unsigned char>() && TestClampFrom<short>() &&
-                 TestClampFrom<unsigned short>() && TestClampFrom<int>() && TestClampFrom<unsigned int>() &&
-                 TestClampFrom<long>() && TestClampFrom<unsigned long>() && TestClampFrom<long long>() &&
-                 TestClampFrom<unsigned long long>() && TestClampFrom<float>() && TestClampFrom<double>() &&
+  const bool success = TestClampFrom<char>() && TestClampFrom<unsigned char>() && TestClampFrom<short>() &&
+                       TestClampFrom<unsigned short>() && TestClampFrom<int>() && TestClampFrom<unsigned int>() &&
+                       TestClampFrom<long>() && TestClampFrom<unsigned long>() && TestClampFrom<long long>() &&
+                       TestClampFrom<unsigned long long>() && TestClampFrom<float>() && TestClampFrom<double>() &&
 
-                 TestClampFromWithCustomBounds<char>() && TestClampFromWithCustomBounds<unsigned char>() &&
-                 TestClampFromWithCustomBounds<short>() && TestClampFromWithCustomBounds<unsigned short>() &&
-                 TestClampFromWithCustomBounds<int>() && TestClampFromWithCustomBounds<unsigned int>() &&
-                 TestClampFromWithCustomBounds<long>() && TestClampFromWithCustomBounds<unsigned long>() &&
-                 TestClampFromWithCustomBounds<long long>() && TestClampFromWithCustomBounds<unsigned long long>() &&
-                 TestClampFromWithCustomBounds<float>() && TestClampFromWithCustomBounds<double>();
+                       TestClampFromWithCustomBounds<char>() && TestClampFromWithCustomBounds<unsigned char>() &&
+                       TestClampFromWithCustomBounds<short>() && TestClampFromWithCustomBounds<unsigned short>() &&
+                       TestClampFromWithCustomBounds<int>() && TestClampFromWithCustomBounds<unsigned int>() &&
+                       TestClampFromWithCustomBounds<long>() && TestClampFromWithCustomBounds<unsigned long>() &&
+                       TestClampFromWithCustomBounds<long long>() &&
+                       TestClampFromWithCustomBounds<unsigned long long>() && TestClampFromWithCustomBounds<float>() &&
+                       TestClampFromWithCustomBounds<double>();
 
   std::cout << std::endl;
   if (!success)

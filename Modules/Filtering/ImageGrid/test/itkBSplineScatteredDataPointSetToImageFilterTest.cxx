@@ -72,7 +72,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest(int argc, char * argv[])
       PointSetType::PointType point;
       reader->GetOutput()->TransformIndexToPhysicalPoint(It.GetIndex(), point);
 
-      unsigned long i = pointSet->GetNumberOfPoints();
+      const unsigned long i = pointSet->GetNumberOfPoints();
       pointSet->SetPoint(i, point);
 
       auto V = itk::MakeFilled<PointSetType::PixelType>(DataDimension);
@@ -92,8 +92,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest(int argc, char * argv[])
   unsigned int splineOrder = 0u;
   ITK_TRY_EXPECT_EXCEPTION(filter->SetSplineOrder(splineOrder));
 
-  FilterType::ArrayType splineOrderArray;
-  splineOrderArray.Fill(4u);
+  auto splineOrderArray = itk::MakeFilled<FilterType::ArrayType>(4u);
   filter->SetSplineOrder(splineOrderArray);
   ITK_TEST_SET_GET_VALUE(splineOrderArray, filter->GetSplineOrder());
 
@@ -106,8 +105,7 @@ itkBSplineScatteredDataPointSetToImageFilterTest(int argc, char * argv[])
   unsigned int numberOfLevels = 0u;
   ITK_TRY_EXPECT_EXCEPTION(filter->SetNumberOfLevels(numberOfLevels));
 
-  FilterType::ArrayType numberOfLevelsArray;
-  numberOfLevelsArray.Fill(4u);
+  auto numberOfLevelsArray = itk::MakeFilled<FilterType::ArrayType>(4u);
   filter->SetNumberOfLevels(numberOfLevelsArray);
   ITK_TEST_SET_GET_VALUE(numberOfLevelsArray, filter->GetNumberOfLevels());
 
@@ -117,14 +115,12 @@ itkBSplineScatteredDataPointSetToImageFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(numberOfLevelsArray, filter->GetNumberOfLevels());
 
 
-  FilterType::ArrayType ncps;
-  ncps.Fill(4u);
+  auto ncps = itk::MakeFilled<FilterType::ArrayType>(4u);
   filter->SetNumberOfControlPoints(ncps);
   ITK_TEST_SET_GET_VALUE(ncps, filter->GetNumberOfControlPoints());
 
 
-  FilterType::ArrayType close;
-  close.Fill(0u);
+  constexpr FilterType::ArrayType close{};
   filter->SetCloseDimension(close);
   ITK_TEST_SET_GET_VALUE(close, filter->GetCloseDimension());
 

@@ -39,7 +39,7 @@ namespace itk
 class TransformBaseTemplateEnums
 {
 public:
-  /** \class TransformCategory
+  /**
    * \ingroup ITKTransform
    * */
   enum class TransformCategory : uint8_t
@@ -83,12 +83,25 @@ public:
   using FixedParametersValueType = double;
   using FixedParametersType = OptimizerParameters<FixedParametersValueType>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TransformBaseTemplate);
 
   /** The number of parameters can potentially be very large,
    *  therefore we use here a large capacity integer. */
   using NumberOfParametersType = IdentifierType;
+
+  /* For storing the  name of InputSpace */
+  itkSetMacro(InputSpaceName, std::string);
+  itkGetConstReferenceMacro(InputSpaceName, std::string);
+
+  /** For storing the  name of InputSpace/OutputSpace.
+
+  InputSpaceName, OutputSpaceName provide identifiers for the world spaces
+  that the transform applied to and the direction of the spatial transformation.
+  The direction of the transform goes from the input space to output space.
+  Typical values include the names of an atlas or a dataset. */
+  itkSetMacro(OutputSpaceName, std::string);
+  itkGetConstReferenceMacro(OutputSpaceName, std::string);
 
   /** Return the number of parameters that completely define the Transform  */
   virtual NumberOfParametersType
@@ -166,18 +179,12 @@ public:
   GetTransformCategory() const = 0;
 
 protected:
-#if defined(__GNUC__)
-  // A bug in some versions of the GCC and Clang compilers
-  // result in an ICE or linker error when "= default" is requested.
-  // This was observed in at least gcc 4.8 and 5.4.0, and
-  // AppleClang 7.0.2 and 8.0.0. Probably others too.
-  // "= default" doesn't gain us much, so just don't use it here.
-  TransformBaseTemplate(){};
-  ~TransformBaseTemplate() override{};
-#else
   TransformBaseTemplate() = default;
   ~TransformBaseTemplate() override = default;
-#endif
+
+private:
+  std::string m_InputSpaceName{};
+  std::string m_OutputSpaceName{};
 };
 
 /** This helps to meet backward compatibility */

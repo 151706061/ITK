@@ -27,8 +27,7 @@ namespace itk
  *
  * This class defines the elastic body spline (EBS) transformation.
  * It is implemented in as straightforward a manner as possible from
- * the IEEE TMI paper by Davis, Khotanzad, Flamig, and Harms,
- * Vol. 16 No. 3 June 1997
+ * \cite davis1997.
  * Taken from the paper:
  * The EBS "is based on a physical model of a homogeneous, isotropic,
  * three-dimensional elastic body. The model can approximate the way
@@ -49,7 +48,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ElasticBodySplineKernelTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -94,7 +93,6 @@ protected:
   using typename Superclass::GMatrixType;
   /** Compute G(x)
    * For the elastic body spline, this is:
-   * \f$ G(x) = [alpha*r(x)^2*I - 3*x*x']*r(x) \f$
    * \f$ G(x) = [\alpha*r(x)^2*I - 3*x*x']*r(x) \f$
    * where
    * \f$\alpha = 12 ( 1 - \nu ) - 1\f$

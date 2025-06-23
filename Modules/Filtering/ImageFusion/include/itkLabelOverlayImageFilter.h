@@ -40,7 +40,7 @@ namespace itk
  * INRA de Jouy-en-Josas, France.
  *
  * This class was contributed to the Insight Journal
- * https://www.insight-journal.org/browse/publication/79
+ * https://doi.org/10.54294/xr1bvx
  *
  * \sa LabelToRGBImageFilter
  * \sa LabelMapOverlayImageFilter, LabelOverlayFunctor
@@ -79,42 +79,41 @@ public:
   using LabelPixelType = typename TLabelImage::PixelType;
   using InputPixelType = typename TInputImage::PixelType;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelOverlayImageFilter);
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** Set/Get the label image. */
+  /** @ITKStartGrouping */
   void
   SetLabelImage(const TLabelImage * input);
   const LabelImageType *
   GetLabelImage() const;
-
+  /** @ITKEndGrouping */
   /** Set/Get the opacity of the colored label image. The value must be
    * between 0 and 1.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Opacity, double);
   itkGetConstReferenceMacro(Opacity, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the background value. */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, LabelPixelType);
   itkGetConstReferenceMacro(BackgroundValue, LabelPixelType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputPixelShouldHaveValueType, (Concept::HasValueType<OutputPixelType>));
   itkConceptMacro(OutputPixelShouldHaveBracketOperator,
                   (Concept::BracketOperator<OutputPixelType, unsigned int, typename OutputPixelType::ValueType>));
-  // End concept checking
-#endif
 
   /** Empty the color LUT container. */
   void
   ResetColors();
 
   /** Get number of colors in the LUT container. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfColors() const;
 
   /** type of the color component. */

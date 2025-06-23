@@ -49,12 +49,9 @@ itkGradientRecursiveGaussianFilterTest2(int, char *[])
   mySizeType size;
   size[0] = 64;
 
-  myIndexType start;
-  start.Fill(0);
+  myIndexType start{};
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  myRegionType region{ start, size };
 
   // Initialize Image A
   inputImage->SetRegions(region);
@@ -113,13 +110,13 @@ itkGradientRecursiveGaussianFilterTest2(int, char *[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  myGradientImageType::Pointer outputImage = filter->GetOutput();
+  const myGradientImageType::Pointer outputImage = filter->GetOutput();
 
   // Declare Iterator type for the output image
   using myOutputIteratorType = itk::ImageRegionIteratorWithIndex<myGradientImageType>;
 
   // Create an iterator for going through the output image
-  myOutputIteratorType itg(outputImage, outputImage->GetRequestedRegion());
+  const myOutputIteratorType itg(outputImage, outputImage->GetRequestedRegion());
 
   // All objects should be automatically destroyed at this point
   return EXIT_SUCCESS;

@@ -49,21 +49,21 @@ namespace itk
  *
  * \ingroup ITKSignedDistanceFunction
  */
-template <typename TCoordRep, unsigned int VSpaceDimension>
+template <typename TCoordinate, unsigned int VSpaceDimension>
 class ITK_TEMPLATE_EXPORT ShapeSignedDistanceFunction
-  : public SpatialFunction<double, VSpaceDimension, Point<TCoordRep, VSpaceDimension>>
+  : public SpatialFunction<double, VSpaceDimension, Point<TCoordinate, VSpaceDimension>>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(ShapeSignedDistanceFunction);
 
   /** Standard class type aliases. */
   using Self = ShapeSignedDistanceFunction;
-  using Superclass = SpatialFunction<double, VSpaceDimension, Point<TCoordRep, VSpaceDimension>>;
+  using Superclass = SpatialFunction<double, VSpaceDimension, Point<TCoordinate, VSpaceDimension>>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapeSignedDistanceFunction);
 
   /** OutputType type alias support */
@@ -76,7 +76,11 @@ public:
   static constexpr unsigned int SpaceDimension = VSpaceDimension;
 
   /** CoordRep type alias support */
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
 
   /** Point type alias support */
   using PointType = InputType;
@@ -93,13 +97,13 @@ public:
   {
     return m_Parameters;
   }
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetNumberOfShapeParameters() const = 0;
 
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetNumberOfPoseParameters() const = 0;
 
-  virtual unsigned int
+  [[nodiscard]] virtual unsigned int
   GetNumberOfParameters() const
   {
     return this->GetNumberOfShapeParameters() + this->GetNumberOfPoseParameters();

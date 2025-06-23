@@ -24,9 +24,7 @@
 #include "itkNumericTraits.h"
 #include "itkProcessObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class ScalarImageToCooccurrenceMatrixFilter
  *  \brief This class computes a co-occurrence matrix (histogram) from
@@ -35,10 +33,7 @@ namespace Statistics
  *
  * This filters creates a grey-level co-occurrence matrix from a N-D scalar
  * image. This is the first step in texture description a la Haralick. (See
- * Haralick, R.M., K. Shanmugam and I. Dinstein. 1973. Textural Features for
- * Image Classification. IEEE Transactions on Systems, Man and Cybernetics.
- * SMC-3(6):610-620. See also Haralick, R.M. 1979. Statistical and Structural
- * Approaches to Texture. Proceedings of the IEEE, 67:786-804.)
+ * \cite haralick1973 and \cite haralick1979.
  *
  * The basic idea is as follows:
  * Given an image and an offset (e.g. (1, -1) for a 2-d image), grey-level
@@ -104,7 +99,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarImageToCooccurrenceMatrixFilter);
 
   /** standard New() method support */
@@ -136,16 +131,18 @@ public:
 
   /** Get/Set the offset or offsets over which the co-occurrence pairs will be computed.
       Calling either of these methods clears the previous offsets. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(Offsets, OffsetVector);
   itkGetConstObjectMacro(Offsets, OffsetVector);
-
+  /** @ITKEndGrouping */
   void
   SetOffset(const OffsetType offset);
 
   /** Set number of histogram bins along each axis */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfBinsPerAxis, unsigned int);
   itkGetConstMacro(NumberOfBinsPerAxis, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set the min and max (inclusive) pixel value that will be placed in the
     histogram */
   void
@@ -156,10 +153,11 @@ public:
 
   /** Set the calculator to normalize the histogram (divide all bins by the
     total frequency). Normalization is off by default. */
+  /** @ITKStartGrouping */
   itkSetMacro(Normalize, bool);
   itkGetConstMacro(Normalize, bool);
   itkBooleanMacro(Normalize);
-
+  /** @ITKEndGrouping */
   /** Method to set/get the image */
   using Superclass::SetInput;
   void
@@ -181,9 +179,10 @@ public:
 
   /** Set the pixel value of the mask that should be considered "inside" the
     object. Defaults to one. */
+  /** @ITKStartGrouping */
   itkSetMacro(InsidePixelValue, MaskPixelType);
   itkGetConstMacro(InsidePixelValue, MaskPixelType);
-
+  /** @ITKEndGrouping */
 protected:
   ScalarImageToCooccurrenceMatrixFilter();
   ~ScalarImageToCooccurrenceMatrixFilter() override = default;
@@ -223,8 +222,7 @@ private:
 
   MaskPixelType m_InsidePixelValue{};
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkScalarImageToCooccurrenceMatrixFilter.hxx"

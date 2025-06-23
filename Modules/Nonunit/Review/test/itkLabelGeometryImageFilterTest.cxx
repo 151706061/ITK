@@ -153,10 +153,9 @@ LabelGeometryImageFilterTest(std::string labelImageName,
   using MatrixType = WriterType::vnlMatrixType;
   MatrixType matrix(numberOfLabels, numberOfColumns);
 
-  int                                              rowIndex = 0;
-  typename LabelGeometryType::LabelsType           allLabels = labelGeometryFilter->GetLabels();
-  typename LabelGeometryType::LabelsType::iterator allLabelsIt;
-  for (allLabelsIt = allLabels.begin(); allLabelsIt != allLabels.end(); ++allLabelsIt)
+  int                                    rowIndex = 0;
+  typename LabelGeometryType::LabelsType allLabels = labelGeometryFilter->GetLabels();
+  for (auto allLabelsIt = allLabels.begin(); allLabelsIt != allLabels.end(); ++allLabelsIt)
   {
     int columnIndex = 0;
     labelValue = *allLabelsIt;
@@ -166,7 +165,7 @@ LabelGeometryImageFilterTest(std::string labelImageName,
 
     matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetCentroid(labelValue)[0];
     matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetCentroid(labelValue)[1];
-    if (VDimension == 3)
+    if constexpr (VDimension == 3)
     {
       matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetCentroid(labelValue)[2];
     }
@@ -176,7 +175,7 @@ LabelGeometryImageFilterTest(std::string labelImageName,
     }
     matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetWeightedCentroid(labelValue)[0];
     matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetWeightedCentroid(labelValue)[1];
-    if (VDimension == 3)
+    if constexpr (VDimension == 3)
     {
       matrix(rowIndex, columnIndex++) = labelGeometryFilter->GetWeightedCentroid(labelValue)[2];
     }
@@ -199,28 +198,27 @@ LabelGeometryImageFilterTest(std::string labelImageName,
 
   // Set up the headers.
   WriterType::StringVectorType columnName;
-  columnName.push_back("Label number");
-  columnName.push_back("Volume (voxels)");
-  columnName.push_back("Integrated intensity");
-  columnName.push_back("Centroid X (voxel)");
-  columnName.push_back("Centroid Y (voxel)");
-  columnName.push_back("Centroid Z (voxel)");
-  columnName.push_back("Weighted centroid X (voxel)");
-  columnName.push_back("Weighted centroid Y (voxel)");
-  columnName.push_back("Weighted centroid Z (voxel)");
-  columnName.push_back("Major axis length");
-  columnName.push_back("Minor axis length");
-  columnName.push_back("Eccentricity");
-  columnName.push_back("Elongation");
-  columnName.push_back("Orientation");
+  columnName.emplace_back("Label number");
+  columnName.emplace_back("Volume (voxels)");
+  columnName.emplace_back("Integrated intensity");
+  columnName.emplace_back("Centroid X (voxel)");
+  columnName.emplace_back("Centroid Y (voxel)");
+  columnName.emplace_back("Centroid Z (voxel)");
+  columnName.emplace_back("Weighted centroid X (voxel)");
+  columnName.emplace_back("Weighted centroid Y (voxel)");
+  columnName.emplace_back("Weighted centroid Z (voxel)");
+  columnName.emplace_back("Major axis length");
+  columnName.emplace_back("Minor axis length");
+  columnName.emplace_back("Eccentricity");
+  columnName.emplace_back("Elongation");
+  columnName.emplace_back("Orientation");
 
   // write out the array2D object
   auto writer = WriterType::New();
   writer->SetFileName(outputFileName);
   writer->SetInput(&matrix);
   writer->SetColumnHeaders(columnName);
-  MatrixType * matrixPointer;
-  matrixPointer = new MatrixType(matrix.data_block(), numberOfLabels, numberOfColumns);
+  auto * matrixPointer = new MatrixType(matrix.data_block(), numberOfLabels, numberOfColumns);
   writer->SetInput(matrixPointer);
 
   ITK_TRY_EXPECT_NO_EXCEPTION(writer->Write());

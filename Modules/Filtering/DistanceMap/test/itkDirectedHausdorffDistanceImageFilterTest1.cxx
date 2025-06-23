@@ -35,8 +35,7 @@ itkDirectedHausdorffDistanceImageFilterTest1(int, char *[])
   auto image1 = Image1Type::New();
   auto image2 = Image2Type::New();
 
-  Image1Type::SizeType size;
-  size.Fill(50);
+  auto size = Image1Type::SizeType::Filled(50);
 
   image1->SetRegions(size);
   image2->SetRegions(size);
@@ -85,15 +84,15 @@ itkDirectedHausdorffDistanceImageFilterTest1(int, char *[])
   // Compute the directed Hausdorff distance h(image1,image2)
   {
     using FilterType = itk::DirectedHausdorffDistanceImageFilter<Image1Type, Image2Type>;
-    auto                     filter = FilterType::New();
-    itk::SimpleFilterWatcher watcher(filter, "filter");
+    auto                           filter = FilterType::New();
+    const itk::SimpleFilterWatcher watcher(filter, "filter");
 
     filter->SetInput1(image1);
     filter->SetInput2(image2);
     filter->Update();
 
     // Check results
-    const FilterType::RealType trueDistance = 10 * std::sqrt(static_cast<double>(ImageDimension));
+    const FilterType::RealType trueDistance = 10 * std::sqrt(double{ ImageDimension });
     const FilterType::RealType distance = filter->GetDirectedHausdorffDistance();
 
     std::cout << " True distance: " << trueDistance << std::endl;
@@ -123,7 +122,7 @@ itkDirectedHausdorffDistanceImageFilterTest1(int, char *[])
     filter->Update();
 
     // Check results
-    const FilterType::RealType trueDistance = 5 * std::sqrt(static_cast<double>(ImageDimension));
+    const FilterType::RealType trueDistance = 5 * std::sqrt(double{ ImageDimension });
     const FilterType::RealType distance = filter->GetDirectedHausdorffDistance();
 
     std::cout << " True distance: " << trueDistance << std::endl;

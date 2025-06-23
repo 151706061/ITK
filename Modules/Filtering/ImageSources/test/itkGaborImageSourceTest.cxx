@@ -32,15 +32,14 @@ itkGaborImageSourceTestHelper(char * outputFilename, bool calculcateImaginaryPar
   using GaborSourceType = itk::GaborImageSource<ImageType>;
   auto gaborImage = GaborSourceType::New();
 
-  if (ImageDimension == 2)
+  if constexpr (ImageDimension == 2)
   {
-    typename ImageType::SizeType size;
-    size.Fill(64 * 4);
+    auto size = ImageType::SizeType::Filled(64 * 4);
     gaborImage->SetSize(size);
   }
 
   typename GaborSourceType::ArrayType sigma;
-  if (ImageDimension == 2)
+  if constexpr (ImageDimension == 2)
   {
     sigma[0] = 2.0;
     sigma[1] = 5.0;
@@ -54,11 +53,11 @@ itkGaborImageSourceTestHelper(char * outputFilename, bool calculcateImaginaryPar
   gaborImage->SetSigma(sigma);
   ITK_TEST_SET_GET_VALUE(sigma, gaborImage->GetSigma());
 
-  typename GaborSourceType::ArrayType mean(0.1);
+  const typename GaborSourceType::ArrayType mean(0.1);
   gaborImage->SetMean(mean);
   ITK_TEST_SET_GET_VALUE(mean, gaborImage->GetMean());
 
-  double frequency = 0.1;
+  constexpr double frequency = 0.1;
   gaborImage->SetFrequency(frequency);
   ITK_TEST_SET_GET_VALUE(frequency, gaborImage->GetFrequency());
 

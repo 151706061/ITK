@@ -52,7 +52,7 @@ public:
   using Self = BackwardDifferenceOperator;
   using Superclass = NeighborhoodOperator<TPixel, TDimension, TAllocator>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BackwardDifferenceOperator);
 
   /** Type alias support for pixel type. */
@@ -73,6 +73,7 @@ protected:
     this->FillCenteredDirectional(coeff);
   }
 };
+
 } // namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

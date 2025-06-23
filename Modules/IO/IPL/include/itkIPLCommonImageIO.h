@@ -72,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(IPLCommonImageIO);
 
   /*-------- This part of the interfaces deals with reading data. ----- */
@@ -140,7 +140,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
   int
-  AddElementToList(char const * const filename,
+  AddElementToList(const char * const filename,
                    const float        sliceLocation,
                    const int          offset,
                    const int          XDim,

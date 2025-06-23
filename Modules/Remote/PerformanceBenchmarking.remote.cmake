@@ -55,9 +55,9 @@ For more information, see::
   McCormick M., Kang H.J., Barre S.
   Performance Benchmarking the Insight Toolkit
   The Insight Journal. January-December. 2016.
-  https://insight-journal.org/browse/publication/972
+  https://doi.org/10.54294/9feae9
 "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKPerformanceBenchmarking.git
-  GIT_TAG 950921a642a720867c00c92c548312a4939da917
+  GIT_TAG 3c8e8b1abdea02365e4384ae900a2afdd039b365
   )

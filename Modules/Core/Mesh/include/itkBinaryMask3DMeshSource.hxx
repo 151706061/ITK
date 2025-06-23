@@ -33,8 +33,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::BinaryMask3DMeshSource()
   // Modify superclass default values, can be overridden by subclasses
   this->SetNumberOfRequiredInputs(1);
 
-  SizeType size;
-  size.Fill(0);
+  constexpr SizeType size{};
   m_RegionOfInterest.SetSize(size);
 
   this->GetOutput()->GetPoints()->Reserve(m_NodeLimit);
@@ -44,11 +43,9 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::BinaryMask3DMeshSource()
 template <typename TInputImage, typename TOutputMesh>
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::~BinaryMask3DMeshSource()
 {
-  int i;
-
   if (m_CurrentFrame)
   {
-    for (i = 0; i < 2000; ++i)
+    for (int i = 0; i < 2000; ++i)
     {
       free(m_CurrentFrame[i]);
     }
@@ -56,7 +53,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::~BinaryMask3DMeshSource()
   }
   if (m_CurrentRow)
   {
-    for (i = 0; i < 200; ++i)
+    for (int i = 0; i < 200; ++i)
     {
       free(m_CurrentRow[i]);
     }
@@ -64,7 +61,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::~BinaryMask3DMeshSource()
   }
   if (m_LastFrame)
   {
-    for (i = 0; i < m_LastFrameNum; ++i)
+    for (int i = 0; i < m_LastFrameNum; ++i)
     {
       free(m_LastFrame[i]);
     }
@@ -72,7 +69,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::~BinaryMask3DMeshSource()
   }
   if (m_LastRow)
   {
-    for (i = 0; i < m_LastRowNum; ++i)
+    for (int i = 0; i < m_LastRowNum; ++i)
     {
       free(m_LastRow[i]);
     }
@@ -108,13 +105,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::XFlip(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -160,13 +154,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::YFlip(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -212,13 +203,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::ZFlip(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -264,13 +252,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::XRotation(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -320,13 +305,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::YRotation(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -376,13 +358,10 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::ZRotation(unsigned char * x)
 {
-  unsigned char nodeindex;
-
   int i = 0;
-
   while (i < 3)
   {
-    nodeindex = x[i];
+    const auto nodeindex = x[i];
     switch (static_cast<int>(nodeindex))
     {
       case 1:
@@ -432,9 +411,7 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::inverse(unsigned char * x)
 {
-  unsigned char tmp;
-
-  tmp = x[2];
+  const unsigned char tmp = x[2];
   x[2] = x[1];
   x[1] = tmp;
 }
@@ -1037,153 +1014,146 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::CreateMesh()
   InputImageIterator it3(m_InputImage, m_RegionOfInterest);
   InputImageIterator it4(m_InputImage, m_RegionOfInterest);
 
-  it1.GoToBegin();
-  it2.GoToBegin();
-  it3.GoToBegin();
-  it4.GoToBegin();
-
   InputImageSizeType inputImageSize = m_RegionOfInterest.GetSize();
   m_ImageWidth = inputImageSize[0];
   m_ImageHeight = inputImageSize[1];
   m_ImageDepth = inputImageSize[2];
-  int frame = m_ImageWidth * m_ImageHeight;
-  int row = m_ImageWidth;
-
-  int i = 0;
-  int j;
-
-  while (i < frame)
+  const int frame = m_ImageWidth * m_ImageHeight;
+  const int row = m_ImageWidth;
   {
-    ++it3;
-    ++it4;
-    ++i;
+    int i = 0;
+
+    while (i < frame)
+    {
+      ++it3;
+      ++it4;
+      ++i;
+    }
+
+    i = 0;
+
+    while (i < row)
+    {
+      ++it2;
+      ++it4;
+      ++i;
+    }
   }
-
-  i = 0;
-
-  while (i < row)
-  {
-    ++it2;
-    ++it4;
-    ++i;
-  }
-
-  unsigned char vertexindex;
 
   if (m_CurrentRow)
   {
-    for (i = 0; i < 200; ++i)
+    for (int i = 0; i < 200; ++i)
     {
       free(m_CurrentRow[i]);
     }
     free(m_CurrentRow);
   }
-  m_CurrentRow = (IdentifierType **)malloc(200 * sizeof(IdentifierType *));
-  for (i = 0; i < 200; ++i)
+  m_CurrentRow = static_cast<IdentifierType **>(malloc(200 * sizeof(IdentifierType *)));
+  for (int i = 0; i < 200; ++i)
   {
-    m_CurrentRow[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+    m_CurrentRow[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
   }
 
   if (m_CurrentFrame)
   {
-    for (i = 0; i < 2000; ++i)
+    for (int i = 0; i < 2000; ++i)
     {
       free(m_CurrentFrame[i]);
     }
     free(m_CurrentFrame);
   }
 
-  m_CurrentFrame = (IdentifierType **)malloc(2000 * sizeof(IdentifierType *));
+  m_CurrentFrame = static_cast<IdentifierType **>(malloc(2000 * sizeof(IdentifierType *)));
 
-  for (i = 0; i < 2000; ++i)
+  for (int i = 0; i < 2000; ++i)
   {
-    m_CurrentFrame[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+    m_CurrentFrame[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
   }
 
-  i = 0;
-
-  while (!it4.IsAtEnd())
   {
-    vertexindex = 0;
+    int i = 0;
+    while (!it4.IsAtEnd())
+    {
+      unsigned char vertexindex = 0;
 
-    if (Math::ExactlyEquals(it1.Value(), m_ObjectValue))
-    {
-      vertexindex += 1;
-    }
-    if (Math::ExactlyEquals(it2.Value(), m_ObjectValue))
-    {
-      vertexindex += 8;
-    }
-    if (Math::ExactlyEquals(it3.Value(), m_ObjectValue))
-    {
-      vertexindex += 16;
-    }
-    if (Math::ExactlyEquals(it4.Value(), m_ObjectValue))
-    {
-      vertexindex += 128;
-    }
-    ++it1;
-    ++it2;
-    ++it3;
-    ++it4;
-
-    if ((i % m_ImageWidth < m_ImageWidth - 1) &&
-        ((i % (m_ImageWidth * m_ImageHeight)) / m_ImageWidth < m_ImageHeight - 1))
-    {
       if (Math::ExactlyEquals(it1.Value(), m_ObjectValue))
       {
-        vertexindex += 2;
+        vertexindex += 1;
       }
       if (Math::ExactlyEquals(it2.Value(), m_ObjectValue))
       {
-        vertexindex += 4;
+        vertexindex += 8;
       }
       if (Math::ExactlyEquals(it3.Value(), m_ObjectValue))
       {
-        vertexindex += 32;
+        vertexindex += 16;
       }
       if (Math::ExactlyEquals(it4.Value(), m_ObjectValue))
       {
-        vertexindex += 64;
+        vertexindex += 128;
       }
-    }
-    else
-    {
-      if ((i % (m_ImageWidth * m_ImageHeight)) / m_ImageWidth == m_ImageHeight - 1)
+      ++it1;
+      ++it2;
+      ++it3;
+      ++it4;
+
+      if ((i % m_ImageWidth < m_ImageWidth - 1) &&
+          ((i % (m_ImageWidth * m_ImageHeight)) / m_ImageWidth < m_ImageHeight - 1))
       {
-        if (vertexindex > 50)
-        {
-          vertexindex -= 128;
-        }
-        if (((vertexindex > 7) && (vertexindex < 10)) || (vertexindex > 17))
-        {
-          vertexindex -= 8;
-        }
         if (Math::ExactlyEquals(it1.Value(), m_ObjectValue))
         {
           vertexindex += 2;
+        }
+        if (Math::ExactlyEquals(it2.Value(), m_ObjectValue))
+        {
+          vertexindex += 4;
         }
         if (Math::ExactlyEquals(it3.Value(), m_ObjectValue))
         {
           vertexindex += 32;
         }
+        if (Math::ExactlyEquals(it4.Value(), m_ObjectValue))
+        {
+          vertexindex += 64;
+        }
       }
-    }
+      else
+      {
+        if ((i % (m_ImageWidth * m_ImageHeight)) / m_ImageWidth == m_ImageHeight - 1)
+        {
+          if (vertexindex > 50)
+          {
+            vertexindex -= 128;
+          }
+          if (((vertexindex > 7) && (vertexindex < 10)) || (vertexindex > 17))
+          {
+            vertexindex -= 8;
+          }
+          if (Math::ExactlyEquals(it1.Value(), m_ObjectValue))
+          {
+            vertexindex += 2;
+          }
+          if (Math::ExactlyEquals(it3.Value(), m_ObjectValue))
+          {
+            vertexindex += 32;
+          }
+        }
+      }
+      for (auto & voxelElem : m_CurrentVoxel)
+      {
+        voxelElem = 0;
+      }
 
-    for (j = 0; j < 14; ++j)
-    {
-      m_CurrentVoxel[j] = 0;
+      if ((vertexindex == 0) || (vertexindex == 255))
+      {
+        //      for ( j=0; j<13; j++ ) m_LastVoxel[j] = 0;
+      }
+      else
+      {
+        this->AddCells(m_LUT[vertexindex][0], m_LUT[vertexindex][1], i);
+      }
+      ++i;
     }
-
-    if ((vertexindex == 0) || (vertexindex == 255))
-    {
-      //      for ( j=0; j<13; j++ ) m_LastVoxel[j] = 0;
-    }
-    else
-    {
-      this->AddCells(m_LUT[vertexindex][0], m_LUT[vertexindex][1], i);
-    }
-    ++i;
   }
 
   // This indicates that the current BufferedRegion is equal to the
@@ -1196,22 +1166,17 @@ template <typename TInputImage, typename TOutputMesh>
 void
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltype, unsigned char celltran, int index)
 {
-
-  int               i;
-  IdentifierType ** currentrowtmp;
-  IdentifierType ** currentframetmp;
-
-  currentrowtmp = (IdentifierType **)malloc(4 * sizeof(IdentifierType *));
-  for (i = 0; i < 4; ++i)
+  auto ** currentrowtmp = static_cast<IdentifierType **>(malloc(4 * sizeof(IdentifierType *)));
+  for (int i = 0; i < 4; ++i)
   {
-    currentrowtmp[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+    currentrowtmp[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
     currentrowtmp[i][0] = 0;
     currentrowtmp[i][1] = 0;
   }
-  currentframetmp = (IdentifierType **)malloc(4 * sizeof(IdentifierType *));
-  for (i = 0; i < 4; ++i)
+  auto ** currentframetmp = static_cast<IdentifierType **>(malloc(4 * sizeof(IdentifierType *)));
+  for (int i = 0; i < 4; ++i)
   {
-    currentframetmp[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+    currentframetmp[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
     currentframetmp[i][0] = 0;
     currentframetmp[i][1] = 0;
   }
@@ -1219,9 +1184,9 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
   if ((index % m_ImageWidth == 0) || (index > m_LastVoxelIndex + 1))
   {
     m_ColFlag = 0;
-    for (i = 0; i < 14; ++i)
+    for (auto & i : m_LastVoxel)
     {
-      m_LastVoxel[i] = 0;
+      i = 0;
     }
   }
   else
@@ -1260,18 +1225,18 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
       {
         if (m_LastRowNum > m_CurrentRowIndex)
         {
-          for (i = m_CurrentRowIndex; i < m_LastRowNum; ++i)
+          for (int i = m_CurrentRowIndex; i < m_LastRowNum; ++i)
           {
             free(m_LastRow[i]);
           }
         }
         m_LastRow = (IdentifierType **)realloc(m_LastRow, m_CurrentRowIndex * sizeof(IdentifierType *));
       }
-      for (i = 0; i < m_CurrentRowIndex; ++i)
+      for (int i = 0; i < m_CurrentRowIndex; ++i)
       {
         if (i > m_LastRowNum - 1)
         {
-          m_LastRow[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+          m_LastRow[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
         }
         m_LastRow[i][0] = m_CurrentRow[i][0];
         m_LastRow[i][1] = m_CurrentRow[i][1];
@@ -1286,7 +1251,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
     {
       if (m_LastRowNum > 0)
       {
-        for (i = 0; i < m_LastRowNum; ++i)
+        for (int i = 0; i < m_LastRowNum; ++i)
         {
           free(m_LastRow[i]);
         }
@@ -1309,18 +1274,18 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
       {
         if (m_LastFrameNum > m_CurrentFrameIndex)
         {
-          for (i = m_CurrentFrameIndex; i < m_LastFrameNum; ++i)
+          for (int i = m_CurrentFrameIndex; i < m_LastFrameNum; ++i)
           {
             free(m_LastFrame[i]);
           }
         }
         m_LastFrame = (IdentifierType **)realloc(m_LastFrame, m_CurrentFrameIndex * sizeof(IdentifierType *));
       }
-      for (i = 0; i < m_CurrentFrameIndex; ++i)
+      for (int i = 0; i < m_CurrentFrameIndex; ++i)
       {
         if (i > m_LastFrameNum - 1)
         {
-          m_LastFrame[i] = (IdentifierType *)malloc(2 * sizeof(IdentifierType));
+          m_LastFrame[i] = static_cast<IdentifierType *>(malloc(2 * sizeof(IdentifierType)));
         }
         m_LastFrame[i][0] = m_CurrentFrame[i][0];
         m_LastFrame[i][1] = m_CurrentFrame[i][1];
@@ -1333,7 +1298,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
   {
     if (index % (m_ImageWidth * m_ImageHeight) == 0)
     {
-      for (i = 0; i < m_LastFrameNum; ++i)
+      for (int i = 0; i < m_LastFrameNum; ++i)
       {
         free(m_LastFrame[i]);
       }
@@ -1386,11 +1351,9 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
 
   typename TriCell::CellAutoPointer        insertCell;
   typename OutputMeshType::PointIdentifier tripoints[3];
-  unsigned char *                          tp;
-  tp = (unsigned char *)malloc(3 * sizeof(unsigned char));
+  auto *                                   tp = static_cast<unsigned char *>(malloc(3 * sizeof(unsigned char)));
 
-  IdentifierType * tpl;
-  tpl = (IdentifierType *)malloc(3 * sizeof(IdentifierType));
+  auto * tpl = static_cast<IdentifierType *>(malloc(3 * sizeof(IdentifierType)));
 
   switch (static_cast<int>(celltype))
   {
@@ -2311,51 +2274,50 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
       ++m_NumberOfCells;
       break;
   }
-
-  i = 0;
-  int j;
-  while (i < 4)
   {
-    if (currentrowtmp[i][0] != 0)
+    int i = 0;
+    while (i < 4)
     {
-      m_CurrentRow[m_CurrentRowIndex][1] = currentrowtmp[i][1];
-      m_CurrentRow[m_CurrentRowIndex++][0] = currentrowtmp[i][0];
-      if (m_CurrentRowIndex == m_CurrentRowNum)
+      if (currentrowtmp[i][0] != 0)
       {
-        m_CurrentRowNum += 100;
-        m_CurrentRow = (IdentifierType **)realloc(m_CurrentRow, sizeof(IdentifierType *) * m_CurrentRowNum);
-        for (j = m_CurrentRowIndex; j < m_CurrentRowNum; ++j)
+        m_CurrentRow[m_CurrentRowIndex][1] = currentrowtmp[i][1];
+        m_CurrentRow[m_CurrentRowIndex++][0] = currentrowtmp[i][0];
+        if (m_CurrentRowIndex == m_CurrentRowNum)
         {
-          m_CurrentRow[j] = (IdentifierType *)malloc(sizeof(IdentifierType) * 2);
+          m_CurrentRowNum += 100;
+          m_CurrentRow = (IdentifierType **)realloc(m_CurrentRow, sizeof(IdentifierType *) * m_CurrentRowNum);
+          for (int j = m_CurrentRowIndex; j < m_CurrentRowNum; ++j)
+          {
+            m_CurrentRow[j] = static_cast<IdentifierType *>(malloc(sizeof(IdentifierType) * 2));
+          }
         }
       }
-    }
 
-    if (currentframetmp[i][0] != 0)
-    {
-      m_CurrentFrame[m_CurrentFrameIndex][1] = currentframetmp[i][1];
-      m_CurrentFrame[m_CurrentFrameIndex++][0] = currentframetmp[i][0];
-      if (m_CurrentFrameIndex == m_CurrentFrameNum)
+      if (currentframetmp[i][0] != 0)
       {
-        m_CurrentFrameNum += 1000;
-        m_CurrentFrame = (IdentifierType **)realloc(m_CurrentFrame, sizeof(IdentifierType *) * m_CurrentFrameNum);
-        for (j = m_CurrentFrameIndex; j < m_CurrentFrameNum; ++j)
+        m_CurrentFrame[m_CurrentFrameIndex][1] = currentframetmp[i][1];
+        m_CurrentFrame[m_CurrentFrameIndex++][0] = currentframetmp[i][0];
+        if (m_CurrentFrameIndex == m_CurrentFrameNum)
         {
-          m_CurrentFrame[j] = (IdentifierType *)malloc(sizeof(IdentifierType) * 2);
+          m_CurrentFrameNum += 1000;
+          m_CurrentFrame = (IdentifierType **)realloc(m_CurrentFrame, sizeof(IdentifierType *) * m_CurrentFrameNum);
+          for (int j = m_CurrentFrameIndex; j < m_CurrentFrameNum; ++j)
+          {
+            m_CurrentFrame[j] = static_cast<IdentifierType *>(malloc(sizeof(IdentifierType) * 2));
+          }
         }
       }
-    }
 
-    ++i;
+      ++i;
+    }
   }
-
-  for (i = 0; i < 4; ++i)
+  for (int i = 0; i < 4; ++i)
   {
     free(currentrowtmp[i]);
   }
   free(currentrowtmp);
 
-  for (i = 0; i < 4; ++i)
+  for (int i = 0; i < 4; ++i)
   {
     free(currentframetmp[i]);
   }
@@ -2369,7 +2331,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddCells(unsigned char celltyp
   m_LastVoxel[9] = m_CurrentVoxel[10];
   m_LastVoxel[8] = m_CurrentVoxel[6];
   m_LastVoxel[12] = m_CurrentVoxel[11];
-  for (i = 1; i < 14; ++i)
+  for (int i = 1; i < 14; ++i)
   {
     m_CurrentVoxel[i] = 0;
   }
@@ -2383,10 +2345,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddNodes(int               ind
                                                            IdentifierType ** currentrowtmp,
                                                            IdentifierType ** currentframetmp)
 {
-  int        i;
-  OPointType new_p;
-
-  for (i = 0; i < 3; ++i)
+  for (int i = 0; i < 3; ++i)
   {
     m_PointFound = 0;
     if (m_AvailableNodes[nodesid[i]] != 0)
@@ -2407,6 +2366,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddNodes(int               ind
       // We transform the point to the physical space since the mesh does not
       // have the notion
       // of spacing and origin
+      OPointType new_p;
       this->m_InputImage->TransformContinuousIndexToPhysicalPoint(indTemp, new_p);
       this->m_OutputMesh->SetPoint(m_NumberOfNodes, new_p);
 
@@ -2491,20 +2451,18 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddNodes(int               ind
         {
           continue;
         }
-        else
+
+        if (nodesid[i] == 9)
         {
-          if (nodesid[i] == 9)
-          {
-            globalnodesid[i] = this->SearchThroughLastRow((index % m_ImageWidth) * 13 - 3, 0, m_LastRowNum - 1);
-          }
-          if (nodesid[i] == 10)
-          {
-            globalnodesid[i] = this->SearchThroughLastRow((index % m_ImageWidth) * 13 + 22, 0, m_LastRowNum - 1);
-          }
-          if (m_PointFound != 0)
-          {
-            continue;
-          }
+          globalnodesid[i] = this->SearchThroughLastRow((index % m_ImageWidth) * 13 - 3, 0, m_LastRowNum - 1);
+        }
+        if (nodesid[i] == 10)
+        {
+          globalnodesid[i] = this->SearchThroughLastRow((index % m_ImageWidth) * 13 + 22, 0, m_LastRowNum - 1);
+        }
+        if (m_PointFound != 0)
+        {
+          continue;
         }
       }
       if ((m_LastFrameNum != 0) && ((nodesid[i] == 1) || (nodesid[i] == 2) || (nodesid[i] == 3) || (nodesid[i] == 4)))
@@ -2515,22 +2473,20 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::AddNodes(int               ind
         {
           continue;
         }
-        else
+
+        if (nodesid[i] == 4)
         {
-          if (nodesid[i] == 4)
-          {
-            globalnodesid[i] =
-              this->SearchThroughLastFrame((index % (m_ImageWidth * m_ImageHeight)) * 13 - 11, 0, m_LastFrameNum - 1);
-          }
-          if (nodesid[i] == 1)
-          {
-            globalnodesid[i] = this->SearchThroughLastFrame(
-              (index % (m_ImageWidth * m_ImageHeight) - m_ImageWidth) * 13 + 3, 0, m_LastFrameNum - 1);
-          }
-          if (m_PointFound != 0)
-          {
-            continue;
-          }
+          globalnodesid[i] =
+            this->SearchThroughLastFrame((index % (m_ImageWidth * m_ImageHeight)) * 13 - 11, 0, m_LastFrameNum - 1);
+        }
+        if (nodesid[i] == 1)
+        {
+          globalnodesid[i] = this->SearchThroughLastFrame(
+            (index % (m_ImageWidth * m_ImageHeight) - m_ImageWidth) * 13 + 3, 0, m_LastFrameNum - 1);
+        }
+        if (m_PointFound != 0)
+        {
+          continue;
         }
       }
     }
@@ -2605,27 +2561,23 @@ template <typename TInputImage, typename TOutputMesh>
 IdentifierType
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::SearchThroughLastRow(int index, int start, int end)
 {
-  int  mid;
   auto lindex = static_cast<IdentifierType>(index);
-
   if ((end - start) > 1)
   {
-    mid = static_cast<int>(std::floor(static_cast<float>((start + end) / 2)));
+    const auto mid = static_cast<int>(std::floor(static_cast<float>((start + end) / 2)));
     if (lindex == m_LastRow[mid][0])
     {
       m_PointFound = 1;
       return m_LastRow[mid][1];
     }
+
+    if (lindex > m_LastRow[mid][0])
+    {
+      return this->SearchThroughLastRow(index, mid + 1, end);
+    }
     else
     {
-      if (lindex > m_LastRow[mid][0])
-      {
-        return this->SearchThroughLastRow(index, mid + 1, end);
-      }
-      else
-      {
-        return this->SearchThroughLastRow(index, start, mid);
-      }
+      return this->SearchThroughLastRow(index, start, mid);
     }
   }
   else
@@ -2648,13 +2600,12 @@ template <typename TInputImage, typename TOutputMesh>
 IdentifierType
 BinaryMask3DMeshSource<TInputImage, TOutputMesh>::SearchThroughLastFrame(int index, int start, int end)
 {
-  int            mid;
   auto           lindex = static_cast<IdentifierType>(index);
   IdentifierType result = 0;
 
   if ((end - start) > 1)
   {
-    mid = static_cast<int>(std::floor(static_cast<float>((start + end) / 2)));
+    const auto mid = static_cast<int>(std::floor(static_cast<float>((start + end) / 2)));
     if (lindex == m_LastFrame[mid][0])
     {
       m_PointFound = 1;
@@ -2694,7 +2645,7 @@ BinaryMask3DMeshSource<TInputImage, TOutputMesh>::PrintSelf(std::ostream & os, I
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "RegionOfInterestProvidedByUser: " << (m_RegionOfInterestProvidedByUser ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(RegionOfInterestProvidedByUser);
   os << indent << "RegionOfInterest: " << m_RegionOfInterest << std::endl;
 
   os << indent << "LUT: " << m_LUT << std::endl;

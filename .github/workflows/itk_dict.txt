@@ -44,7 +44,6 @@ Crofton's
 Cuadra
 Cz
 DDataFrameobject
-Dz
 Dasarathy
 Deref
 Dij
@@ -55,6 +54,7 @@ Dxx
 Dyx
 Dyy
 Dyz
+Dz
 Dzx
 Dzy
 Dzz
@@ -74,13 +74,13 @@ Fletch
 Freesurfer
 Frenet
 GEAdw
+GPUSuperclass's
 Gao
 Gibbsian
+Gifti
 Golby
 Graphviz
 Greenleaf
-Gifti
-GPUSuperclass's
 Guillen
 Haar
 Hackathon
@@ -95,11 +95,11 @@ Hilden
 Hiraki
 Hirschberg
 Hostname
-Intelli
 IOregion
 ITKIOMeshGifti
 ITKImageToIplImage
 ITKOptimizersv
+Intelli
 Irfan
 Irix
 Isocenter
@@ -224,13 +224,14 @@ Vkept
 Vox
 Wachowiak
 Wanlin
+Wdeprecated
 Wi
+Wmaybe
 Wtautological
 Xu
 Y'CbCr
 Yager's
 Yixun
-Yhis
 Yuanting
 Zeiss
 Zosso
@@ -276,6 +277,7 @@ btw
 buf
 bugfix
 bw
+byteswap
 byu
 bzip
 calc
@@ -616,6 +618,7 @@ memcpy
 memmove
 memset
 merchantability
+mersenne
 meshpixperelt
 metacharacters
 metricb
@@ -651,6 +654,7 @@ mv
 myhistogram
 myreferenceimage
 mx
+natively
 nbOfDirections
 nbOfPixels
 ncodewords
@@ -740,6 +744,7 @@ ponderation
 posn
 postcondition
 posteriori
+pragmas
 preallocated
 precalculate
 precalculating

@@ -67,8 +67,7 @@ itkMultiLevelSetDenseImageSubset2DTest(int, char *[])
   using DomainMapImageFilterType = itk::LevelSetDomainMapImageFilter<IdListImageType, CacheImageType>;
 
   // load binary input
-  InputImageType::SizeType size;
-  size.Fill(1000);
+  auto size = InputImageType::SizeType::Filled(1000);
 
   InputImageType::PointType origin;
   origin[0] = 0.0;
@@ -78,12 +77,9 @@ itkMultiLevelSetDenseImageSubset2DTest(int, char *[])
   spacing[0] = 1.0;
   spacing[1] = 1.0;
 
-  InputImageType::IndexType index;
-  index.Fill(0);
+  InputImageType::IndexType index{};
 
-  InputImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  InputImageType::RegionType region{ index, size };
 
   // Input initialization
   auto input = InputImageType::New();
@@ -138,17 +134,17 @@ itkMultiLevelSetDenseImageSubset2DTest(int, char *[])
   auto adaptor1 = BinaryImageToLevelSetType::New();
   adaptor1->SetInputImage(binary);
   adaptor1->Initialize();
-  LevelSetType::Pointer levelSet1 = adaptor1->GetModifiableLevelSet();
+  const LevelSetType::Pointer levelSet1 = adaptor1->GetModifiableLevelSet();
 
   auto adaptor2 = BinaryImageToLevelSetType::New();
   adaptor2->SetInputImage(binary);
   adaptor2->Initialize();
-  LevelSetType::Pointer levelSet2 = adaptor2->GetModifiableLevelSet();
+  const LevelSetType::Pointer levelSet2 = adaptor2->GetModifiableLevelSet();
 
   auto adaptor3 = BinaryImageToLevelSetType::New();
   adaptor3->SetInputImage(binary);
   adaptor3->Initialize();
-  LevelSetType::Pointer levelSet3 = adaptor3->GetModifiableLevelSet();
+  const LevelSetType::Pointer levelSet3 = adaptor3->GetModifiableLevelSet();
 
   index = input->TransformPhysicalPointToIndex(binary->GetOrigin());
   InputImageType::OffsetType offset;

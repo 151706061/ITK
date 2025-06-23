@@ -21,9 +21,7 @@
 #include "itkFunctionBase.h"
 #include "itkMeasurementVectorTraits.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class DistanceMetric
@@ -58,11 +56,12 @@ public:
   using MeasurementVectorType = TVector;
 
   /** declare Measurement vector component type */
+
   /** Type used to represent the number of components oft he
     MeasurementVectorType */
   using MeasurementVectorSizeType = unsigned int;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DistanceMetric);
 
   using OriginType = Array<double>;
@@ -105,16 +104,14 @@ public:
       {
         return;
       }
-      else
-      {
-        this->m_MeasurementVectorSize = s;
-        this->Modified();
-      }
+
+      this->m_MeasurementVectorSize = s;
+      this->Modified();
     }
     else
     {
       // If this is a non-resizable vector type
-      MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
+      const MeasurementVectorSizeType defaultLength = NumericTraits<MeasurementVectorType>::GetLength({});
       // and the new length is different from the default one, then throw an
       // exception
       if (defaultLength != s)
@@ -139,8 +136,7 @@ private:
   /** Number of components in the MeasurementVectorType */
   MeasurementVectorSizeType m_MeasurementVectorSize{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkDistanceMetric.hxx"

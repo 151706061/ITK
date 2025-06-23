@@ -66,8 +66,8 @@ void
 SpatialObjectToPointSetFilter<TPointBasedSpatialObject, TOutputPointSet>::GenerateData()
 {
   // Get the input and output pointers
-  const SpatialObjectType *            inputObject = this->GetInput();
-  typename OutputPointSetType::Pointer outputPointSet = this->GetOutput();
+  const SpatialObjectType *                  inputObject = this->GetInput();
+  const typename OutputPointSetType::Pointer outputPointSet = this->GetOutput();
 
   using PointIdentifier = typename OutputPointSetType::PointIdentifier;
 
@@ -79,8 +79,8 @@ SpatialObjectToPointSetFilter<TPointBasedSpatialObject, TOutputPointSet>::Genera
     numberOfPoints = inputSO->GetNumberOfPoints() / m_SamplingFactor;
   }
 
-  ChildrenListType *                        children = inputObject->GetChildren(m_ChildrenDepth);
-  typename ChildrenListType::const_iterator it = children->begin();
+  ChildrenListType * children = inputObject->GetChildren(m_ChildrenDepth);
+  auto               it = children->begin();
 
   while (it != children->end())
   {

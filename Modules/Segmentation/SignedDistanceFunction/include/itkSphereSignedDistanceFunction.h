@@ -41,19 +41,20 @@ namespace itk
  *
  * \ingroup ITKSignedDistanceFunction
  */
-template <typename TCoordRep, unsigned int VSpaceDimension>
-class ITK_TEMPLATE_EXPORT SphereSignedDistanceFunction : public ShapeSignedDistanceFunction<TCoordRep, VSpaceDimension>
+template <typename TCoordinate, unsigned int VSpaceDimension>
+class ITK_TEMPLATE_EXPORT SphereSignedDistanceFunction
+  : public ShapeSignedDistanceFunction<TCoordinate, VSpaceDimension>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(SphereSignedDistanceFunction);
 
   /** Standard class type aliases. */
   using Self = SphereSignedDistanceFunction;
-  using Superclass = ShapeSignedDistanceFunction<TCoordRep, VSpaceDimension>;
+  using Superclass = ShapeSignedDistanceFunction<TCoordinate, VSpaceDimension>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SphereSignedDistanceFunction);
 
   /** New macro for creation of through the object factory. */
@@ -69,7 +70,7 @@ public:
   static constexpr unsigned int SpaceDimension = Superclass::SpaceDimension;
 
   /** CoordRep type alias support */
-  using typename Superclass::CoordRepType;
+  using typename Superclass::CoordinateType;
 
   /** Point type alias support */
   using typename Superclass::PointType;
@@ -82,12 +83,12 @@ public:
   void
   SetParameters(const ParametersType &) override;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfShapeParameters() const override
   {
     return 1;
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoseParameters() const override
   {
     return SpaceDimension;
@@ -105,7 +106,7 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
-  using VectorType = Vector<CoordRepType, Self::SpaceDimension>;
+  using VectorType = Vector<CoordinateType, Self::SpaceDimension>;
 
   VectorType m_Translation{};
   double     m_Radius{};

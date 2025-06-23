@@ -53,7 +53,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Command);
 
   /** Abstract method that defines the action to be taken by the command. */
@@ -89,9 +89,10 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(MemberCommand);
 
   /** pointer to a member function that takes a Object* and the event */
+  /** @ITKStartGrouping */
   using TMemberFunctionPointer = void (T::*)(Object *, const EventObject &);
   using TConstMemberFunctionPointer = void (T::*)(const Object *, const EventObject &);
-
+  /** @ITKEndGrouping */
   /** Standard class type aliases. */
   using Self = MemberCommand;
   using Pointer = SmartPointer<Self>;
@@ -99,7 +100,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MemberCommand);
 
   /**  Set the callback function along with the object that it will
@@ -173,7 +174,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ReceptorMemberCommand);
 
   /**  Set the callback function along with the object that it will
@@ -236,7 +237,7 @@ public:
   using Self = SimpleMemberCommand;
   using Pointer = SmartPointer<Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SimpleMemberCommand);
 
   /** Method for creation through the object factory. */
@@ -300,7 +301,7 @@ public:
   using Self = SimpleConstMemberCommand;
   using Pointer = SmartPointer<Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SimpleConstMemberCommand);
 
   /** Method for creation through the object factory. */
@@ -358,15 +359,16 @@ class ITKCommon_EXPORT CStyleCommand : public Command
 {
 public:
   /** Typedefs for C-style callbacks. */
+  /** @ITKStartGrouping */
   using FunctionPointer = void (*)(Object *, const EventObject &, void *);
   using ConstFunctionPointer = void (*)(const Object *, const EventObject &, void *);
   using DeleteDataFunctionPointer = void (*)(void *);
-
+  /** @ITKEndGrouping */
   /** Standard class type aliases. */
   using Self = CStyleCommand;
   using Pointer = SmartPointer<Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CStyleCommand);
 
   /** Method for creation through the object factory. */
@@ -378,11 +380,12 @@ public:
   SetClientData(void * cd);
 
   /** Set the C callback function pointer to be called at Execute time. */
+  /** @ITKStartGrouping */
   void
   SetCallback(FunctionPointer f);
   void
   SetConstCallback(ConstFunctionPointer f);
-
+  /** @ITKEndGrouping */
   /** Set the callback to delete the client data. */
   void
   SetClientDataDeleteCallback(DeleteDataFunctionPointer f);
@@ -424,7 +427,7 @@ public:
 
   using FunctionObjectType = std::function<void(const EventObject &)>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FunctionCommand);
 
   /** Method for creation through the object factory. */

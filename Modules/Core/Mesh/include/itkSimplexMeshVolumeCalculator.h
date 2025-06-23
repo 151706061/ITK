@@ -40,9 +40,7 @@ namespace itk
  * The original implementation has been replaced with an algorithm
  * based on the discrete form of the divergence theorem.  The general
  * assumption here is that the model is of  closed surface.  For more
- * details see the following reference  (Alyassin A.M. et al,
- * "Evaluation of new algorithms for the interactive measurement of
- * surface area and volume", Med Phys 21(6) 1994.).
+ * details see \cite alyassin1994.
  * \ingroup ITKMesh
  *
  * \sphinx
@@ -69,7 +67,7 @@ public:
   /** Method of creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SimplexMeshVolumeCalculator);
 
   using InputMeshType = TInputMesh;
@@ -110,7 +108,9 @@ public:
     /**
      * default constructor
      */
-    SimplexCellVisitor() { m_CenterMap = PointMapType::New(); }
+    SimplexCellVisitor()
+      : m_CenterMap(PointMapType::New())
+    {}
     virtual ~SimplexCellVisitor() = default;
 
     /**
@@ -121,9 +121,8 @@ public:
     {
       using PointIdIterator = typename SimplexPolygonType::PointIdIterator;
       PointIdIterator it = poly->PointIdsBegin();
-      InputPointType  center, p;
-      center.Fill(0);
-      p.Fill(0.0);
+      InputPointType  center{};
+      InputPointType  p{};
 
       while (it != poly->PointIdsEnd())
       {

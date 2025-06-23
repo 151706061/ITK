@@ -49,7 +49,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevenbergMarquardtOptimizer);
 
   /** InternalParameters type alias. */
@@ -86,7 +86,7 @@ public:
   MeasureType
   GetValue() const;
 
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
 protected:

@@ -60,7 +60,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RingBuffer);
 
   /** Set the number of buffers
@@ -78,11 +78,12 @@ public:
   MoveHead(OffsetValueType offset);
 
   /** Convenience methods for moving Head +/- 1 */
+  /** @ITKStartGrouping */
   void
   MoveHeadForward();
   void
   MoveHeadBackward();
-
+  /** @ITKEndGrouping */
   /** Report whether or not the indicated buffer is full */
   bool
   BufferIsFull(OffsetValueType offset);
@@ -104,11 +105,12 @@ public:
 
 protected:
   /**-PROTECTED METHODS------------------------------------------------------*/
+  /** @ITKStartGrouping */
   RingBuffer();
   ~RingBuffer() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
-
+  /** @ITKEndGrouping */
   /** Get the proper buffer index from an offset */
   OffsetValueType
   GetOffsetBufferIndex(OffsetValueType offset);

@@ -66,9 +66,11 @@
 #include "itkDistanceToCentroidMembershipFunction.h"
 #include "itkMinimumDecisionRule.h"
 // Software Guide : EndCodeSnippet
+namespace
+{
 
 int
-main(int argc, char * argv[])
+ExampleMain(int argc, const char * const argv[])
 {
   if (argc < 7)
   {
@@ -105,23 +107,19 @@ main(int argc, char * argv[])
   // Software Guide : BeginLatex
   //
   // First we define the pixel type and dimension of the image that we intend
-  // to classify. With this image type we can also declare the
-  // \doxygen{ImageFileReader} needed for reading the input image, create one
-  // and set its input filename. In this particular case we choose to use
-  // \code{short} as pixel type, which is typical for MicroMRI and CT
-  // data sets.
+  // to classify and read the input image.In this particular case we choose to
+  // use \code{short} as pixel type, which is typical for MicroMRI and CT data
+  // sets. We open a try block to enclose most of the code in this example.
   //
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
+
   using PixelType = short;
   constexpr unsigned int Dimension = 2;
 
   using ImageType = itk::Image<PixelType, Dimension>;
-
-  using ReaderType = itk::ImageFileReader<ImageType>;
-  auto reader = ReaderType::New();
-  reader->SetFileName(inputImageFileName);
+  auto input = itk::ReadImage<ImageType>(inputImageFileName);
   // Software Guide : EndCodeSnippet
 
 
@@ -139,18 +137,17 @@ main(int argc, char * argv[])
 
   using LabelImageType = itk::Image<LabelPixelType, Dimension>;
 
-  using LabelReaderType = itk::ImageFileReader<LabelImageType>;
-  auto labelReader = LabelReaderType::New();
-  labelReader->SetFileName(inputLabelImageFileName);
+  const auto labelInput =
+    itk::ReadImage<LabelImageType>(inputLabelImageFileName);
   // Software Guide : EndCodeSnippet
 
 
   // Software Guide : BeginLatex
   //
-  // Since the Markov Random Field algorithm is defined in general for images
-  // whose pixels have multiple components, that is, images of vector type, we
-  // must adapt our scalar image in order to satisfy the interface expected by
-  // the \code{MRFImageFilter}. We do this by using the
+  // Since the Markov Random Field algorithm is defined in general for
+  // images whose pixels have multiple components, that is, images of vector
+  // type, we must adapt our scalar image in order to satisfy the interface
+  // expected by the \code{MRFImageFilter}. We do this by using the
   // \doxygen{ComposeImageFilter}. With this filter we will present our
   // scalar image as a vector image whose vector pixels contain a single
   // component.
@@ -166,7 +163,7 @@ main(int argc, char * argv[])
     itk::ComposeImageFilter<ImageType, ArrayImageType>;
 
   auto scalarToArrayFilter = ScalarToArrayFilterType::New();
-  scalarToArrayFilter->SetInput(reader->GetOutput());
+  scalarToArrayFilter->SetInput(input);
   // Software Guide : EndCodeSnippet
 
 
@@ -190,8 +187,8 @@ main(int argc, char * argv[])
 
   // Software Guide : BeginLatex
   //
-  // We set now some of the parameters for the MRF filter. In particular, the
-  // number of classes to be used during the classification, the maximum
+  // We set now some of the parameters for the MRF filter. In particular,
+  // the number of classes to be used during the classification, the maximum
   // number of iterations to be run in this filter and the error tolerance
   // that will be used as a criterion for convergence.
   //
@@ -208,10 +205,10 @@ main(int argc, char * argv[])
   //
   // The smoothing factor represents the tradeoff between fidelity to the
   // observed image and the smoothness of the segmented image. Typical
-  // smoothing factors have values between 1~5. This factor will multiply the
-  // weights that define the influence of neighbors on the classification of a
-  // given pixel. The higher the value, the more uniform will be the regions
-  // resulting from the classification refinement.
+  // smoothing factors have values between 1~5. This factor will multiply
+  // the weights that define the influence of neighbors on the
+  // classification of a given pixel. The higher the value, the more uniform
+  // will be the regions resulting from the classification refinement.
   //
   // Software Guide : EndLatex
 
@@ -224,10 +221,10 @@ main(int argc, char * argv[])
   //
   // Given that the MRF filter need to continually relabel the pixels, it
   // needs access to a set of membership functions that will measure to what
-  // degree every pixel belongs to a particular class.  The classification is
-  // performed by the \doxygen{ImageClassifierBase} class, that is
-  // instantiated using the type of the input vector image and the type of the
-  // labeled image.
+  // degree every pixel belongs to a particular class.  The classification
+  // is performed by the \doxygen{ImageClassifierBase} class, that is
+  // instantiated using the type of the input vector image and the type of
+  // the labeled image.
   //
   // Software Guide : EndLatex
 
@@ -242,11 +239,11 @@ main(int argc, char * argv[])
   // Software Guide : BeginLatex
   //
   // The classifier need a decision rule to be set by the user. Note that we
-  // must use \code{GetPointer()} in the call of the \code{SetDecisionRule()}
-  // method because we are passing a SmartPointer, and smart pointer cannot
-  // perform polymorphism, we must then extract the raw pointer that is
-  // associated to the smart pointer. This extraction is done with the
-  // GetPointer() method.
+  // must use \code{GetPointer()} in the call of the
+  // \code{SetDecisionRule()} method because we are passing a SmartPointer,
+  // and smart pointer cannot perform polymorphism, we must then extract the
+  // raw pointer that is associated to the smart pointer. This extraction is
+  // done with the GetPointer() method.
   //
   // Software Guide : EndLatex
 
@@ -279,7 +276,7 @@ main(int argc, char * argv[])
   MembershipFunctionType::CentroidType centroid(1);
   for (unsigned int i = 0; i < numberOfClasses; ++i)
   {
-    MembershipFunctionPointer membershipFunction =
+    const MembershipFunctionPointer membershipFunction =
       MembershipFunctionType::New();
 
     centroid[0] = std::stod(argv[i + numberOfArgumentsBeforeMeans]);
@@ -303,9 +300,9 @@ main(int argc, char * argv[])
   // Software Guide : BeginLatex
   //
   // We set the Smoothing factor. This factor will multiply the weights that
-  // define the influence of neighbors on the classification of a given pixel.
-  // The higher the value, the more uniform will be the regions resulting from
-  // the classification refinement.
+  // define the influence of neighbors on the classification of a given
+  // pixel. The higher the value, the more uniform will be the regions
+  // resulting from the classification refinement.
   //
   // Software Guide : EndLatex
 
@@ -321,9 +318,9 @@ main(int argc, char * argv[])
   // classification of any given pixel. Note that despite the fact that we
   // call this a radius, it is actually the half size of an hypercube. That
   // is, the actual region of influence will not be circular but rather an
-  // n-dimensional box. For example, a neighborhood radius of 2 in a 3D image
-  // will result in a clique of size 5x5x5 pixels, and a radius of 1 will
-  // result in a clique of size 3x3x3 pixels.
+  // n-dimensional box. For example, a neighborhood radius of 2 in a 3D
+  // image will result in a clique of size 5x5x5 pixels, and a radius of 1
+  // will result in a clique of size 3x3x3 pixels.
   //
   // Software Guide : EndLatex
 
@@ -337,9 +334,9 @@ main(int argc, char * argv[])
   // We should now set the weights used for the neighbors. This is done by
   // passing an array of values that contains the linear sequence of weights
   // for the neighbors. For example, in a neighborhood of size 3x3x3, we
-  // should provide a linear array of 9 weight values. The values are packaged
-  // in a \code{std::vector} and are supposed to be \code{double}. The
-  // following lines illustrate a typical set of values for a 3x3x3
+  // should provide a linear array of 9 weight values. The values are
+  // packaged in a \code{std::vector} and are supposed to be \code{double}.
+  // The following lines illustrate a typical set of values for a 3x3x3
   // neighborhood. The array is arranged and then passed to the filter by
   // using the method \code{SetMRFNeighborhoodWeight()}.
   //
@@ -364,16 +361,16 @@ main(int argc, char * argv[])
   // We now scale weights so that the smoothing function and the image
   // fidelity functions have comparable value. This is necessary since the
   // label image and the input image can have different dynamic ranges. The
-  // fidelity function is usually computed using a distance function, such as
-  // the \doxygen{DistanceToCentroidMembershipFunction} or one of the other
-  // membership functions. They tend to have values in the order of the means
-  // specified.
+  // fidelity function is usually computed using a distance function, such
+  // as the \doxygen{DistanceToCentroidMembershipFunction} or one of the
+  // other membership functions. They tend to have values in the order of
+  // the means specified.
   //
   // Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
   double totalWeight = 0;
-  for (double weight : weights)
+  for (const double weight : weights)
   {
     totalWeight += weight;
   }
@@ -401,11 +398,12 @@ main(int argc, char * argv[])
   // Software Guide : BeginLatex
   //
   // The output image produced by the \doxygen{MRFImageFilter} has the same
-  // pixel type as the labeled input image. In the following lines we use the
+  // pixel type as the labeled input image. In the following lines we use
+  // the
   // \code{OutputImageType} in order to instantiate the type of a
-  // \doxygen{ImageFileWriter}. Then create one, and connect it to the output
-  // of the classification filter after passing it through an intensity
-  // rescaler to rescale it to an 8 bit dynamic range
+  // \doxygen{ImageFileWriter}. Then create one, and connect it to the
+  // output of the classification filter after passing it through an
+  // intensity rescaler to rescale it to an 8 bit dynamic range
   //
   // Software Guide : EndLatex
 
@@ -424,40 +422,20 @@ main(int argc, char * argv[])
   intensityRescaler->SetOutputMaximum(255);
   intensityRescaler->SetInput(mrfFilter->GetOutput());
 
-  // Software Guide : BeginCodeSnippet
-  using WriterType = itk::ImageFileWriter<OutputImageType>;
-
-  auto writer = WriterType::New();
-
-  writer->SetInput(intensityRescaler->GetOutput());
-
-  writer->SetFileName(outputImageFileName);
-  // Software Guide : EndCodeSnippet
-
-
   // Software Guide : BeginLatex
   //
   // We are now ready for triggering the execution of the pipeline. This is
-  // done by simply invoking the \code{Update()} method in the writer. This
-  // call will propagate the update request to the reader and then to the MRF
-  // filter.
+  // done by simply invoking the \code{WriteImage()} function. This call
+  // will propagate the update request to the MRF filter and writes the
+  // processed image to the specified file. After the filter has been
+  // updated, we can get the number of iterations and the stop condition. At
+  // the end of the program, we close the try block with a catch statement.
   //
   // Software Guide : EndLatex
 
 
   // Software Guide : BeginCodeSnippet
-  try
-  {
-    writer->Update();
-  }
-  catch (const itk::ExceptionObject & excp)
-  {
-    std::cerr << "Problem encountered while writing ";
-    std::cerr << " image file : " << argv[2] << std::endl;
-    std::cerr << excp << std::endl;
-    return EXIT_FAILURE;
-  }
-  // Software Guide : EndCodeSnippet
+  itk::WriteImage(intensityRescaler->GetOutput(), outputImageFileName);
 
   std::cout << "Number of Iterations : ";
   std::cout << mrfFilter->GetNumberOfIterations() << std::endl;
@@ -465,6 +443,9 @@ main(int argc, char * argv[])
   std::cout << "  (1) Maximum number of iterations " << std::endl;
   std::cout << "  (2) Error tolerance:  " << std::endl;
   std::cout << mrfFilter->GetStopCondition() << std::endl;
+
+  return EXIT_SUCCESS;
+  // Software Guide : EndCodeSnippet
 
   //  Software Guide : BeginLatex
   //
@@ -482,6 +463,27 @@ main(int argc, char * argv[])
   //  and the means were estimated by ScalarImageKmeansModelEstimator.cxx.
   //
   //  Software Guide : EndLatex
+}
+} // namespace
 
-  return EXIT_SUCCESS;
+int
+main(int argc, char * argv[])
+{
+  try
+  {
+    return ExampleMain(argc, argv);
+  }
+  catch (const itk::ExceptionObject & exceptionObject)
+  {
+    std::cerr << "ITK exception caught:\n" << exceptionObject << '\n';
+  }
+  catch (const std::exception & stdException)
+  {
+    std::cerr << "std exception caught:\n" << stdException.what() << '\n';
+  }
+  catch (...)
+  {
+    std::cerr << "Unhandled exception!\n";
+  }
+  return EXIT_FAILURE;
 }

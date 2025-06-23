@@ -63,7 +63,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUNeighborhoodOperatorImageFilter);
 
   /** Extract some information from the image types.  Dimensionality
@@ -135,7 +135,6 @@ public:
    * \sa ProcessObject::GenerateInputRequestedRegion()
   virtual void GenerateInputRequestedRegion();*/
 
-#ifdef ITK_USE_CONCEPT_CHECKING
   // Begin concept checking
   // itkConceptMacro( SameDimensionCheck,
   //                  ( Concept::SameDimension< InputImageDimension, ImageDimension > ) );
@@ -148,7 +147,6 @@ public:
   // itkConceptMacro( OperatorAdditiveOperatorsCheck,
   //                  ( Concept::AdditiveOperators< OperatorValueType > ) );
   // End concept checking
-#endif
 
 protected:
   GPUNeighborhoodOperatorImageFilter();

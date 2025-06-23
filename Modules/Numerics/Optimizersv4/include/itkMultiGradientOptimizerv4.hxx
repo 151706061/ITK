@@ -26,13 +26,11 @@ namespace itk
 
 template <typename TInternalComputationValueType>
 MultiGradientOptimizerv4Template<TInternalComputationValueType>::MultiGradientOptimizerv4Template()
-
+  : m_StopCondition(StopConditionObjectToObjectOptimizerEnum::MAXIMUM_NUMBER_OF_ITERATIONS)
+  , m_MaximumMetricValue(NumericTraits<MeasureType>::max())
 {
   this->m_NumberOfIterations = static_cast<SizeValueType>(0);
-  this->m_StopCondition = StopConditionObjectToObjectOptimizerEnum::MAXIMUM_NUMBER_OF_ITERATIONS;
   this->m_StopConditionDescription << this->GetNameOfClass() << ": ";
-
-  this->m_MaximumMetricValue = NumericTraits<MeasureType>::max();
   this->m_MinimumMetricValue = this->m_MaximumMetricValue;
 }
 
@@ -44,7 +42,7 @@ MultiGradientOptimizerv4Template<TInternalComputationValueType>::PrintSelf(std::
 
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Stop: " << (m_Stop ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Stop);
   os << indent << "StopCondition: " << m_StopCondition << std::endl;
   os << indent << "StopConditionDescription: " << m_StopConditionDescription.str() << std::endl;
   os << indent << "OptimizersList: " << m_OptimizersList << std::endl;
@@ -87,7 +85,7 @@ MultiGradientOptimizerv4Template<TInternalComputationValueType>::GetMetricValues
 template <typename TInternalComputationValueType>
 auto
 MultiGradientOptimizerv4Template<TInternalComputationValueType>::GetStopConditionDescription() const
-  -> const StopConditionReturnStringType
+  -> StopConditionReturnStringType
 {
   return this->m_StopConditionDescription.str();
 }

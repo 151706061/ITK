@@ -42,7 +42,7 @@ namespace itk
  * as an paper to the Insight Journal:
  *
  *  "Stochastic Fractal Dimension Image"
- *  https://www.insight-journal.org/browse/publication/318
+ *  https://doi.org/10.54294/ne109t
  *
  * \author Nick Tustison
  *
@@ -74,7 +74,7 @@ public:
   using MaskImageType = TMaskImage;
   using OutputImageType = TOutputImage;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(StochasticFractalDimensionImageFilter);
 
   /** Set/Get the input mask image that will constraint the computation of the

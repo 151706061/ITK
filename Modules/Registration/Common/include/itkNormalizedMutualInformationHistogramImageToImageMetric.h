@@ -64,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NormalizedMutualInformationHistogramImageToImageMetric);
 
   /** Types transferred from the base class */
@@ -90,9 +90,10 @@ public:
 protected:
   /** Constructor is protected to ensure that \c New() function is used to
       create instances. */
+  /** @ITKStartGrouping */
   NormalizedMutualInformationHistogramImageToImageMetric() = default;
   ~NormalizedMutualInformationHistogramImageToImageMetric() override = default;
-
+  /** @ITKEndGrouping */
   /** Evaluates the normalized mutual information from the histogram. */
   MeasureType
   EvaluateMeasure(HistogramType & histogram) const override;

@@ -23,9 +23,7 @@
 #include "itkFEMObject.h"
 #include "itkProcessObject.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class ImageToRectilinearFEMObjectFilter
@@ -54,7 +52,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToRectilinearFEMObjectFilter);
 
   static constexpr unsigned int NDimensions = TInputImage::ImageDimension;
@@ -82,12 +80,8 @@ public:
   using ElementBaseType = itk::fem::Element;
   using ElementBasePointerType = itk::fem::Element::ConstPointer;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-//  itkConceptMacro(SameDimensionOrMinusOne,
-//    (Concept::SameDimensionOrMinusOne<VDimension, 3>));
-// End concept checking
-#endif
+  // itkConceptMacro(SameDimensionOrMinusOne,
+  //   (Concept::SameDimensionOrMinusOne<VDimension, 3>));
 
   /**Get/Set the number of voxels/pixels in each dimension used
    *during the mesh generation
@@ -175,8 +169,7 @@ private:
   MaterialPointerType      m_Material{};
   ElementBasePointerType   m_Element{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkImageToRectilinearFEMObjectFilter.hxx"

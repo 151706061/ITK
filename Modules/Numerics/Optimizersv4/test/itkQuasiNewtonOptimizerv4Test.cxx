@@ -37,10 +37,10 @@
 
 template <typename TMovingTransform>
 int
-itkQuasiNewtonOptimizerv4TestTemplated(int         numberOfIterations,
-                                       double      shiftOfStep,
-                                       std::string scalesOption,
-                                       bool        usePhysicalSpaceForShift = true)
+itkQuasiNewtonOptimizerv4TestTemplated(int                 numberOfIterations,
+                                       double              shiftOfStep,
+                                       const std::string & scalesOption,
+                                       bool                usePhysicalSpaceForShift = true)
 {
   const unsigned int Dimension = TMovingTransform::SpaceDimension;
   using PixelType = double;
@@ -177,8 +177,8 @@ itkQuasiNewtonOptimizerv4TestTemplated(int         numberOfIterations,
   //
   // results
   //
-  ParametersType finalParameters = movingTransform->GetParameters();
-  ParametersType fixedParameters = movingTransform->GetFixedParameters();
+  ParametersType       finalParameters = movingTransform->GetParameters();
+  const ParametersType fixedParameters = movingTransform->GetFixedParameters();
   std::cout << "Estimated scales = " << optimizer->GetScales() << std::endl;
   std::cout << "finalParameters = " << finalParameters << std::endl;
   std::cout << "fixedParameters = " << fixedParameters << std::endl;
@@ -211,11 +211,9 @@ itkQuasiNewtonOptimizerv4TestTemplated(int         numberOfIterations,
     std::cout << "Test FAILED." << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "Test PASSED." << std::endl;
-    return EXIT_SUCCESS;
-  }
+
+  std::cout << "Test PASSED." << std::endl;
+  return EXIT_SUCCESS;
 }
 
 int
@@ -245,11 +243,12 @@ itkQuasiNewtonOptimizerv4Test(int argc, char ** const argv)
 
   std::cout << std::endl << "Optimizing translation transform with shift scales" << std::endl;
   using TranslationTransformType = itk::TranslationTransform<double, Dimension>;
-  int ret1 = itkQuasiNewtonOptimizerv4TestTemplated<TranslationTransformType>(numberOfIterations, shiftOfStep, "shift");
+  const int ret1 =
+    itkQuasiNewtonOptimizerv4TestTemplated<TranslationTransformType>(numberOfIterations, shiftOfStep, "shift");
 
   std::cout << std::endl << "Optimizing translation transform with Jacobian scales" << std::endl;
   using TranslationTransformType = itk::TranslationTransform<double, Dimension>;
-  int ret2 =
+  const int ret2 =
     itkQuasiNewtonOptimizerv4TestTemplated<TranslationTransformType>(numberOfIterations, shiftOfStep, "jacobian");
 
   if (ret1 == EXIT_SUCCESS && ret2 == EXIT_SUCCESS)
@@ -257,9 +256,7 @@ itkQuasiNewtonOptimizerv4Test(int argc, char ** const argv)
     std::cout << std::endl << "Tests PASSED." << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << std::endl << "Tests FAILED." << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << std::endl << "Tests FAILED." << std::endl;
+  return EXIT_FAILURE;
 }

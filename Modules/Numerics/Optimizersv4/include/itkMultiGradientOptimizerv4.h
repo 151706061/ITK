@@ -56,7 +56,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiGradientOptimizerv4Template);
 
   /** Method for creation through the object factory. */
@@ -92,7 +92,7 @@ public:
   using MetricValuesListType = std::vector<MeasureType>;
 
   /** Get stop condition enum */
-  const StopConditionObjectToObjectOptimizerEnum &
+  [[nodiscard]] const StopConditionObjectToObjectOptimizerEnum &
   GetStopCondition() const override
   {
     return this->m_StopCondition;
@@ -113,7 +113,7 @@ public:
   ResumeOptimization() override;
 
   /** Get the reason for termination */
-  const StopConditionReturnStringType
+  StopConditionReturnStringType
   GetStopConditionDescription() const override;
 
   /** Get the list of optimizers currently held. */
@@ -130,9 +130,10 @@ public:
 
 protected:
   /** Default constructor */
+  /** @ITKStartGrouping */
   MultiGradientOptimizerv4Template();
   ~MultiGradientOptimizerv4Template() override = default;
-
+  /** @ITKEndGrouping */
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 

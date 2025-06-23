@@ -43,15 +43,14 @@ itkArrowSpatialObjectTest(int, char *[])
 
   // Testing the length
   std::cout << "Testing length : ";
-  double length = 2;
+  constexpr double length = 2;
   myArrow->SetLengthInObjectSpace(length);
   ITK_TEST_SET_GET_VALUE(length, myArrow->GetLengthInObjectSpace());
 
   // Testing the direction of the arrow
   std::cout << "Testing direction : ";
 
-  ArrowType::VectorType direction;
-  direction.Fill(0);
+  ArrowType::VectorType direction{};
   direction[1] = 1.0;
 
   myArrow->SetDirectionInObjectSpace(direction);

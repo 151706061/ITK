@@ -24,14 +24,15 @@ namespace itk
 
 template <typename TFixedPointSet, typename TMovingImage>
 PointSetToImageMetric<TFixedPointSet, TMovingImage>::PointSetToImageMetric()
+  : m_FixedPointSet(nullptr)
+  , m_MovingImage(nullptr)
+  , m_Transform(nullptr)
+  , m_Interpolator(nullptr)
+  , m_ComputeGradient(true)
+  , m_GradientImage(nullptr)
 {
-  m_FixedPointSet = nullptr;   // has to be provided by the user.
-  m_MovingImage = nullptr;     // has to be provided by the user.
-  m_Transform = nullptr;       // has to be provided by the user.
-  m_Interpolator = nullptr;    // has to be provided by the user.
-  m_ComputeGradient = true;    // metric computes gradient by default
-  m_NumberOfPixelsCounted = 0; // initialize to zero
-  m_GradientImage = nullptr;   // computed at initialization
+  // metric computes gradient by default
+  // computed at initialization
 }
 
 template <typename TFixedPointSet, typename TMovingImage>
@@ -79,7 +80,7 @@ PointSetToImageMetric<TFixedPointSet, TMovingImage>::Initialize()
 
   if (m_ComputeGradient)
   {
-    GradientImageFilterPointer gradientFilter = GradientImageFilterType::New();
+    const GradientImageFilterPointer gradientFilter = GradientImageFilterType::New();
 
     gradientFilter->SetInput(m_MovingImage);
 
@@ -115,7 +116,7 @@ PointSetToImageMetric<TFixedPointSet, TMovingImage>::PrintSelf(std::ostream & os
   itkPrintSelfObjectMacro(Transform);
   itkPrintSelfObjectMacro(Interpolator);
 
-  os << indent << "ComputeGradient: " << (m_ComputeGradient ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(ComputeGradient);
 
   itkPrintSelfObjectMacro(GradientImage);
 }

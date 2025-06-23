@@ -24,15 +24,12 @@ namespace itk
 {
 template <typename TInputMesh, typename TOutputMesh>
 SmoothingQuadEdgeMeshFilter<TInputMesh, TOutputMesh>::SmoothingQuadEdgeMeshFilter()
-{
-  this->m_CoefficientsMethod = nullptr;
-  this->m_DelaunayConforming = false;
-  this->m_NumberOfIterations = 1;
-  this->m_RelaxationFactor = static_cast<OutputCoordType>(1.0);
-
-  this->m_InputDelaunayFilter = InputOutputDelaunayConformingType::New();
-  this->m_OutputDelaunayFilter = OutputDelaunayConformingType::New();
-}
+  : m_CoefficientsMethod(nullptr)
+  , m_InputDelaunayFilter(InputOutputDelaunayConformingType::New())
+  , m_OutputDelaunayFilter(OutputDelaunayConformingType::New())
+  , m_NumberOfIterations(1)
+  , m_RelaxationFactor(static_cast<OutputCoordType>(1.0))
+{}
 
 template <typename TInputMesh, typename TOutputMesh>
 SmoothingQuadEdgeMeshFilter<TInputMesh, TOutputMesh>::~SmoothingQuadEdgeMeshFilter() = default;
@@ -49,29 +46,14 @@ template <typename TInputMesh, typename TOutputMesh>
 void
 SmoothingQuadEdgeMeshFilter<TInputMesh, TOutputMesh>::GenerateData()
 {
-  OutputPointIdentifier numberOfPoints = this->GetInput()->GetNumberOfPoints();
+  const OutputPointIdentifier numberOfPoints = this->GetInput()->GetNumberOfPoints();
 
   ProgressReporter progress(this, 0, m_NumberOfIterations * (numberOfPoints + 1), 100);
 
   OutputMeshPointer mesh = OutputMeshType::New();
 
-  OutputPointsContainerPointer temp = OutputPointsContainer::New();
+  const OutputPointsContainerPointer temp = OutputPointsContainer::New();
   temp->Reserve(numberOfPoints);
-
-  OutputPointsContainerPointer  points;
-  OutputPointsContainerIterator it;
-
-  OutputPointType  p;
-  OutputPointType  q;
-  OutputPointType  r;
-  OutputVectorType v;
-
-  OutputCoordType coeff;
-  OutputCoordType sum_coeff;
-  OutputCoordType den;
-
-  OutputQEType * qe;
-  OutputQEType * qe_it;
 
   if (this->m_DelaunayConforming)
   {
@@ -102,30 +84,31 @@ SmoothingQuadEdgeMeshFilter<TInputMesh, TOutputMesh>::GenerateData()
 
   for (unsigned int iter = 0; iter < m_NumberOfIterations; ++iter)
   {
-    points = mesh->GetPoints();
+    OutputPointsContainerPointer points = mesh->GetPoints();
 
-    for (it = points->Begin(); it != points->End(); ++it)
+    for (OutputPointsContainerIterator it = points->Begin(); it != points->End(); ++it)
     {
-      p = it.Value();
-      qe = p.GetEdge();
+      OutputPointType p = it.Value();
+      OutputQEType *  qe = p.GetEdge();
       if (qe != nullptr)
       {
-        r = p;
+        OutputPointType  r = p;
+        OutputVectorType v;
         v.Fill(0.0);
-        qe_it = qe;
-        sum_coeff = 0.;
+        OutputQEType *  qe_it = qe;
+        OutputCoordType sum_coeff = 0.;
         do
         {
-          q = mesh->GetPoint(qe_it->GetDestination());
+          OutputPointType q = mesh->GetPoint(qe_it->GetDestination());
 
-          coeff = (*m_CoefficientsMethod)(mesh, qe_it);
+          OutputCoordType coeff = (*m_CoefficientsMethod)(mesh, qe_it);
           sum_coeff += coeff;
 
           v += coeff * (q - p);
           qe_it = qe_it->GetOnext();
         } while (qe_it != qe);
 
-        den = 1.0 / static_cast<OutputCoordType>(sum_coeff);
+        OutputCoordType den = 1.0 / static_cast<OutputCoordType>(sum_coeff);
         v *= den;
 
         r += m_RelaxationFactor * v;
@@ -175,7 +158,7 @@ SmoothingQuadEdgeMeshFilter<TInputMesh, TOutputMesh>::PrintSelf(std::ostream & o
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "DelaunayConforming: " << (m_DelaunayConforming ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(DelaunayConforming);
   os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
   os << indent << "RelaxationFactor: " << m_RelaxationFactor << std::endl;
 }

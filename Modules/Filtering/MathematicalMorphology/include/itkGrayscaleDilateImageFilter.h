@@ -65,7 +65,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GrayscaleDilateImageFilter);
 
   /** Image related type alias. */
@@ -124,10 +124,11 @@ public:
   itkGetConstMacro(Boundary, PixelType);
 
   /** Set/Get the backend filter class. */
+  /** @ITKStartGrouping */
   void
   SetAlgorithm(AlgorithmEnum algo);
   itkGetConstMacro(Algorithm, AlgorithmEnum);
-
+  /** @ITKEndGrouping */
   /** GrayscaleDilateImageFilter need to set its internal filters as modified */
   void
   Modified() const override;

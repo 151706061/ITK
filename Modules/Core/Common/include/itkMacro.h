@@ -68,29 +68,28 @@ namespace itk
 #define itkNotUsed(x)
 
 // clang-format off
-
 /** The `static_assert(true, "")`  idiom is commonly employed for
  *  C++11 or greater to ensure that it is compile-time only
  *  check that can not be part of the binary file.
- *  This allows a macro to be used anywhere that a statement
- *  is expected, and to enforce consistent use of ; after
- *  a macro. The static_assert is a constexpr that can be used
- *  in places where raw statements (i.e. 'do{} while(0)') are
+ *
+ *  The ITK_NOOP_STATEMENT idiom allows a macro to be used anywhere
+ *  that a statement is expected, and to enforce consistent use of
+ *  ';' after a macro. The static_assert is a constexpr that can be
+ *  used in places where raw statements (i.e. 'do{} while(0)') are
  *  not allowed (i.e. after class member function definitions).
  *  */
 #define ITK_NOOP_STATEMENT static_assert(true, "")
 
-
-#if defined(ITK_FUTURE_LEGACY_REMOVE)
-
-#  define ITK_MACROEND_NOOP_STATEMENT ITK_NOOP_STATEMENT
-#else
-/* NOTE:  The ITK_MACROEND_NOOP_STATEMENT must be defined to nothing
- * in order to maintain backwards compatibility with earlier macro
- * uses that may or may not have ';' after the macro is used. */
-/* Purposefully empty */
-#  define ITK_MACROEND_NOOP_STATEMENT
-#endif
+/* NOTE:  The ITK_MACROEND_NOOP_STATEMENT is used at the end
+ * of ITK supported macros to ensure that when the macro
+ * is used in the code base that the line must have ';' after
+ * the macro is used. This makes formatting visually similar
+ * to functions, and greatly improves the clang-format
+ * behaviors for indentation.  This also assists
+ * modern IDE's and removes 1000's of warnings about
+ * unused statements or unnecessary ';' when macros are
+ * used. */
+#define ITK_MACROEND_NOOP_STATEMENT ITK_NOOP_STATEMENT
 // clang-format on
 
 // Define ITK_PRAGMA macro.
@@ -99,28 +98,65 @@ namespace itk
 // to be quoted.
 #define ITK_PRAGMA(x) _Pragma(#x)
 
-// The clang compiler has many useful non-default compiler warnings
-// that tend to have a high false positive rate.
-// The following set of defines allows us to suppress false positives
-// and still track down suspicious code
+// The GCC/Clang compilers have many useful non-default compiler warnings
+// that tend to have a high false positive rate or are otherwise not always appropriate.
+// The following set of defines allows us to suppress instances of said warnings.
+
+// For GCC and Clang (Clang also identifies itself as GCC, and supports these pragmas):
+#if defined(__GNUC__)
+#  define ITK_GCC_PRAGMA_PUSH ITK_PRAGMA(GCC diagnostic push)
+#  define ITK_GCC_PRAGMA_POP ITK_PRAGMA(GCC diagnostic pop)
+#  define ITK_GCC_SUPPRESS_Wfloat_equal ITK_PRAGMA(GCC diagnostic ignored "-Wfloat-equal")
+#  define ITK_GCC_SUPPRESS_Wformat_nonliteral ITK_PRAGMA(GCC diagnostic ignored "-Wformat-nonliteral")
+#  define ITK_GCC_SUPPRESS_Warray_bounds ITK_PRAGMA(GCC diagnostic ignored "-Warray-bounds")
+#else
+#  define ITK_GCC_PRAGMA_PUSH
+#  define ITK_GCC_PRAGMA_POP
+#  define ITK_GCC_SUPPRESS_Wfloat_equal
+#  define ITK_GCC_SUPPRESS_Wformat_nonliteral
+#  define ITK_GCC_SUPPRESS_Warray_bounds
+#endif
+
+// For Clang only (and not GCC):
 #if defined(__clang__) && defined(__has_warning)
-#  define CLANG_PRAGMA_PUSH ITK_PRAGMA(clang diagnostic push)
-#  define CLANG_PRAGMA_POP ITK_PRAGMA(clang diagnostic pop)
-#  if __has_warning("-Wfloat-equal")
-#    define CLANG_SUPPRESS_Wfloat_equal ITK_PRAGMA(clang diagnostic ignored "-Wfloat-equal")
+#  define ITK_CLANG_PRAGMA_PUSH ITK_PRAGMA(clang diagnostic push)
+#  define ITK_CLANG_PRAGMA_POP ITK_PRAGMA(clang diagnostic pop)
+#  if __has_warning("-Wzero-as-null-pointer-constant")
+#    define ITK_CLANG_SUPPRESS_Wzero_as_null_pointer_constant \
+      ITK_PRAGMA(clang diagnostic ignored "-Wzero-as-null-pointer-constant")
 #  else
-#    define CLANG_SUPPRESS_Wfloat_equal
+#    define ITK_CLANG_SUPPRESS_Wzero_as_null_pointer_constant
 #  endif
-#  if __has_warning("-Wc++14-extensions")
-#    define CLANG_SUPPRESS_Wcpp14_extensions ITK_PRAGMA(clang diagnostic ignored "-Wc++14-extensions")
+#  if __has_warning("-Wduplicate-enum")
+#    define ITK_CLANG_SUPPRESS_Wduplicate_enum ITK_PRAGMA(clang diagnostic ignored "-Wduplicate-enum")
 #  else
-#    define CLANG_SUPPRESS_Wcpp14_extensions
+#    define ITK_CLANG_SUPPRESS_Wduplicate_enum
 #  endif
 #else
-#  define CLANG_PRAGMA_PUSH
-#  define CLANG_PRAGMA_POP
-#  define CLANG_SUPPRESS_Wfloat_equal
-#  define CLANG_SUPPRESS_Wcpp14_extensions
+#  define ITK_CLANG_PRAGMA_PUSH
+#  define ITK_CLANG_PRAGMA_POP
+#  define ITK_CLANG_SUPPRESS_Wzero_as_null_pointer_constant
+#  define ITK_CLANG_SUPPRESS_Wduplicate_enum
+#endif
+
+// These were not intended as public API, but some code was nevertheless using them.
+// Support the pre ITK 5.4 spelling for compatibility.
+#define CLANG_PRAGMA_PUSH ITK_CLANG_PRAGMA_PUSH
+#define CLANG_PRAGMA_POP ITK_CLANG_PRAGMA_POP
+#define CLANG_SUPPRESS_Wfloat_equal ITK_GCC_SUPPRESS_Wfloat_equal
+
+// For GCC/Clang, to decorate printf-like functions allowing for compiler checks of format strings.
+#if defined(__GNUC__)
+#  define ITK_FORMAT_PRINTF(a, b) __attribute__((format(printf, a, b)))
+#else
+#  define ITK_FORMAT_PRINTF(a, b)
+#endif
+
+#if !defined(ITK_LEGACY_REMOVE)
+// Issue warning if deprecated preprocessor flag is used.
+#  define CLANG_SUPPRESS_Wcpp14_extensions                                                                \
+    [[deprecated("Remove deprecated CLANG_SUPPRESS_Wcpp14_extensions c++14 warning suppression")]] void * \
+      CLANG_SUPPRESS_Wcpp14_extensions = nullptr;
 #endif
 
 // Intel compiler convenience macros
@@ -157,38 +193,36 @@ namespace itk
  * MSVC++ 14.2 _MSC_VER == 1920 (Visual Studio 2019 Version 16.0)
  */
 #if defined(_MSC_VER) && (_MSC_VER < 1920)
-#  error "MSVC versions before Visual Studio 2019 are not supported under ITKv5.4"
+#  error "MSVC versions before Visual Studio 2019 are not supported"
 #endif
 #if defined(__SUNPRO_CC) && (__SUNPRO_CC < 0x5140)
-#  error "SUNPro C++ < 5.14.0 is not supported under ITKv5 and above"
+#  error "SUNPro C++ < 5.14.0 is not supported"
 #endif
 #if defined(__CYGWIN__)
-#  error "The Cygwin compiler is not supported in ITKv4 and above"
+#  error "The Cygwin compiler is not supported"
 #endif
 #if defined(__BORLANDC__)
-#  error "The Borland C compiler is not supported in ITKv4 and above"
+#  error "The Borland C compiler is not supported"
 #endif
 #if defined(__MWERKS__)
-#  error "The MetroWerks compiler is not supported in ITKv4 and above"
+#  error "The MetroWerks compiler is not supported"
 #endif
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER) && (__GNUC__ < 7)
-#  error "GCC < 7 is not supported under ITKv5.4"
+#  error "GCC < 7 is not supported"
 #endif
 #if defined(__sgi)
 // This is true for IRIX 6.5.18m with MIPSPro 7.3.1.3m.
 // TODO: At some future point, it may be necessary to
 // define a minimum __sgi version that will work.
-#  error "The SGI compiler is not supported under ITKv4 and above"
+#  error "The SGI compiler is not supported"
 #endif
-#if defined(__APPLE__)
-#  if defined(__clang__) && (__cplusplus < 201703L)
-#    error "Apple LLVM compiling with a standard less than C++17 is not supported under ITKv5.4"
-#  endif
+#if defined(__apple_build_version__) && (__apple_build_version__ < 12000032)
+#  error "AppleClang < Xcode 12.4 is not supported"
 #elif defined(__clang__) && (__clang_major__ < 5)
-#  error "Clang < 5 is not supported under ITKv5.4"
+#  error "Clang < 5 is not supported"
 #endif
 #if defined(__INTEL_COMPILER) && (__INTEL_COMPILER < 1910)
-#  error "Intel C++ < 19.1 is not supported under ITKv5.4"
+#  error "Intel C++ < 19.1 is not supported4"
 #endif
 
 // Setup symbol exports
@@ -235,51 +269,6 @@ namespace itk
 #endif
 
 
-//-*-*-*
-// The following deprecations should be removed in ITKV6 and later
-// NOTE DEPRECATED should be ITK_NOEXCEPT
-#define ITK_NOEXCEPT_OR_THROW error "Replace ITK_NOEXCEPT_OR_THROW with ITK_NOEXCEPT"
-// NOTE DEPRECATED!  should be ITK_COMPILER_CXX_STATIC_ASSERT
-#if !defined(ITK_LEGACY_REMOVE)
-#  define ITK_DELETE_FUNCTION = delete
-#else
-#  define ITK_DELETE_FUNCTION error "Replace ITK_DELETE_FUNCTION with = delete"
-#endif
-//-*-*-*
-
-// DEPRECATED: These macros are left here for compatibility with remote modules.
-// Once they have been removed from all known remote modules, this code should
-// be removed.
-#if defined(ITK_FUTURE_LEGACY_REMOVE)
-#  define ITK_CONSTEXPR_FUNC "Replace ITK_CONSTEXPR_FUNC with constexpr"
-#  define ITK_CONSTEXPR_VAR "Replace ITK_CONSTEXPR_VAR with constexpr"
-/** Exposes enum value as an int*/
-#  define itkExposeEnumValue(name) static_cast<int>(name)
-// Future remove#  define itkExposeEnumValue(name) "Replace type of  " #  name " with proper enumeration instead of
-// integer."
-#else
-#  define ITK_CONSTEXPR_FUNC constexpr
-#  define ITK_CONSTEXPR_VAR constexpr
-/** Exposes enum value as an int*/
-#  define itkExposeEnumValue(name) static_cast<int>(name)
-#endif
-
-// Use "ITK_FALLTHROUGH;" to annotate deliberate fall-through in switches,
-// use it analogously to "break;".  The trailing semi-colon is required.
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-#  if (__GNUC__ >= 7)
-#    define ITK_FALLTHROUGH __attribute__((fallthrough))
-#  endif
-#elif defined(__has_warning)
-#  if __has_feature(cxx_attributes) && __has_warning("-Wimplicit-fallthrough")
-#    define ITK_FALLTHROUGH [[clang::fallthrough]]
-#  endif
-#endif
-
-#ifndef ITK_FALLTHROUGH
-#  define ITK_FALLTHROUGH ((void)0)
-#endif
-
 /** Define two object creation methods.  The first method, New(),
  * creates an object from a class, potentially deferring to a factory.
  * The second method, CreateAnother(), creates an object from an
@@ -300,12 +289,13 @@ namespace itk
  * Break the methods into itkSimpleNewMacro and itkCreateAnotherMacro
  * so we can selectively overload CreateAnother() without having to
  * provide a definition for New(). */
+/** @ITKStartGrouping */
 #define itkNewMacro(x)      \
   itkSimpleNewMacro(x);     \
   itkCreateAnotherMacro(x); \
   itkCloneMacro(x);         \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 #define itkSimpleNewMacro(x)                              \
   static Pointer New()                                    \
   {                                                       \
@@ -334,14 +324,15 @@ namespace itk
 /** Define an object creation method throwing an exception if the object
  * is not created through the object factory, for use in base classes that
  * do not fully implement a backend. */
+/** @ITKStartGrouping */
 #define itkFactoryOnlyNewMacro(x)  \
   itkSimpleFactoryOnlyNewMacro(x); \
   itkCreateAnotherMacro(x);        \
   itkCloneMacro(x);                \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 #define itkSimpleFactoryOnlyNewMacro(x)                                                                 \
-  static auto New()->Pointer                                                                            \
+  static auto New() -> Pointer                                                                          \
   {                                                                                                     \
     Pointer smartPtr = ::itk::ObjectFactory<x>::Create();                                               \
     if (smartPtr == nullptr)                                                                            \
@@ -366,17 +357,18 @@ namespace itk
  * UnRegister() on the rawPtr to compensate for LightObject's constructor
  * initializing an object's reference count to 1 (needed for proper
  * initialization of process objects and data objects cycles). */
+/** @ITKStartGrouping */
 #define itkFactorylessNewMacro(x) \
   static Pointer New()            \
   {                               \
-    x *     rawPtr = new x();     \
+    auto *  rawPtr = new x();     \
     Pointer smartPtr = rawPtr;    \
     rawPtr->UnRegister();         \
     return smartPtr;              \
   }                               \
   itkCreateAnotherMacro(x);       \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 //
 // A macro to disallow the copy constructor, copy assignment,
 // move constructor, and move assignment functions.
@@ -392,13 +384,28 @@ namespace itk
   TypeName(TypeName &&) = delete;                  \
   TypeName & operator=(TypeName &&) = delete
 
-#if !defined(ITK_FUTURE_LEGACY_REMOVE)
+#if !defined(ITK_LEGACY_REMOVE)
 #  define ITK_DISALLOW_COPY_AND_ASSIGN(TypeName) ITK_DISALLOW_COPY_AND_MOVE(TypeName)
 #else
 #  define ITK_DISALLOW_COPY_AND_ASSIGN(TypeName) \
     static_assert(false, "Replace deprecated ITK_DISALLOW_COPY_AND_ASSIGN with modern ITK_DISALLOW_COPY_AND_MOVE")
 #endif
 
+
+/** Explicitly "defaults" the copy constructor, copy assignment operator, move constructor, and move assignment operator
+of the specified class. Especially meant to address compiler warnings like:
+ - "warning: definition of implicit copy assignment operator for '<TypeName>' is deprecated because it has a
+user-declared destructor [-Wdeprecated]" (Mac10.13-AppleClang)
+ - "warning C5267: definition of implicit copy constructor for '<TypeName>' is deprecated because it has a user-provided
+destructor." (Visual Studio 2022/MSVC)
+  Intended to be used in the public section of a class. */
+/** @ITKStartGrouping */
+#define ITK_DEFAULT_COPY_AND_MOVE(TypeName)         \
+  TypeName(const TypeName &) = default;             \
+  TypeName & operator=(const TypeName &) = default; \
+  TypeName(TypeName &&) = default;                  \
+  TypeName & operator=(TypeName &&) = default
+/** @ITKEndGrouping */
 
 // When ITK_EXPERIMENTAL_CXX20_REWRITTEN_UNEQUAL_OPERATOR is defined, ITK uses
 // the ability for operator!= to be rewritten automatically in terms of
@@ -471,6 +478,7 @@ namespace itk
  * OutputWindow::GetInstance()->DisplayText();
  * This is to avoid Object \#include of OutputWindow
  * while OutputWindow \#includes Object. */
+/** @ITKStartGrouping */
 extern ITKCommon_EXPORT void
 OutputWindowDisplayText(const char *);
 
@@ -485,6 +493,7 @@ OutputWindowDisplayGenericOutputText(const char *);
 
 extern ITKCommon_EXPORT void
 OutputWindowDisplayDebugText(const char *);
+/** @ITKEndGrouping */
 
 } // end namespace itk
 
@@ -493,12 +502,12 @@ OutputWindowDisplayDebugText(const char *);
  * also used to catch errors, etc. Requires that the caller implements
  * the GetDebug() method (see itk::Object). Example usage looks like:
  * itkDebugMacro("this is debug info" << this->SomeVariable); */
+/** @ITKStartGrouping */
 #if defined(NDEBUG)
 #  define itkDebugMacro(x) ITK_NOOP_STATEMENT
 #  define itkDebugStatement(x) ITK_NOOP_STATEMENT
 #else
 #  define itkDebugMacro(x)                                                     \
-    do                                                                         \
     {                                                                          \
       using namespace ::itk::print_helper; /* for ostream << std::vector<T> */ \
       if (this->GetDebug() && ::itk::Object::GetGlobalWarningDisplay())        \
@@ -508,18 +517,17 @@ OutputWindowDisplayDebugText(const char *);
                << this->GetNameOfClass() << " (" << this << "): " x << "\n\n"; \
         ::itk::OutputWindowDisplayDebugText(itkmsg.str().c_str());             \
       }                                                                        \
-    } while (0)
-
+    }                                                                          \
+    ITK_MACROEND_NOOP_STATEMENT
 // The itkDebugStatement is to be used to protect code that is only
 // used in the itkDebugMacro
 #  define itkDebugStatement(x) x
 #endif
-
+/** @ITKEndGrouping */
 /** This macro is used to print warning information (i.e., unusual circumstance
  * but not necessarily fatal.) Example usage looks like:
  * itkWarningMacro("this is warning info" << this->SomeVariable); */
 #define itkWarningMacro(x)                                                   \
-  do                                                                         \
   {                                                                          \
     if (::itk::Object::GetGlobalWarningDisplay())                            \
     {                                                                        \
@@ -528,7 +536,9 @@ OutputWindowDisplayDebugText(const char *);
              << this->GetNameOfClass() << " (" << this << "): " x << "\n\n"; \
       ::itk::OutputWindowDisplayWarningText(itkmsg.str().c_str());           \
     }                                                                        \
-  } while (0)
+  }                                                                          \
+  ITK_MACROEND_NOOP_STATEMENT
+
 
 #define itkWarningStatement(x) x
 
@@ -638,7 +648,7 @@ OutputWindowDisplayDebugText(const char *);
 // declared in their class.  Example usage:
 //
 //   // \deprecated Replaced by MyOtherMethod() as of ITK 2.0.
-//   itkLegacyMacro(void MyMethod());
+//   itkLegacyMacro(void MyMethod();)
 //
 // See below for what to do for the method definition.
 #if defined(ITK_LEGACY_REMOVE)
@@ -646,10 +656,10 @@ OutputWindowDisplayDebugText(const char *);
 #else
 #  if defined(ITK_LEGACY_SILENT) || defined(ITK_LEGACY_TEST)
 //   Provide legacy methods with no warnings.
-#    define itkLegacyMacro(method) method
+#    define itkLegacyMacro(method) method /* no ';' */
 #  else
 //   Request compile-time warnings for uses of deprecated methods.
-#    define itkLegacyMacro(method) [[deprecated]] method
+#    define itkLegacyMacro(method) [[deprecated]] method /* no ';' */
 #  endif
 #endif
 
@@ -697,7 +707,7 @@ OutputWindowDisplayDebugText(const char *);
 // the cache lines. By aligning multi-threaded structures with the
 // cache lines, false shared can be reduced, and performance
 // increased.
-#define ITK_CACHE_LINE_ALIGNMENT 64
+constexpr size_t ITK_CACHE_LINE_ALIGNMENT = 64;
 
 //
 // itkPadStruct will add padding to a structure to ensure a minimum size
@@ -709,7 +719,7 @@ OutputWindowDisplayDebugText(const char *);
   struct newtype : public oldtype                                         \
   {                                                                       \
     char _StructPadding[mincachesize - (sizeof(oldtype) % mincachesize)]; \
-  };
+  }
 
 //
 // itkAlignedTypedef is a macro which creates a new type to make a
@@ -769,7 +779,8 @@ compilers.
   for (unsigned int i = 0; i < NumberOfIterations; ++i)                                                   \
   {                                                                                                       \
     DestinationArray[i] = static_cast<DestinationElementType>(SourceArray[i]);                            \
-  }
+  }                                                                                                       \
+  ITK_MACROEND_NOOP_STATEMENT
 
 //--------------------------------------------------------------------------------
 // Macro that generates an unrolled for loop for rounding and assigning
@@ -785,7 +796,8 @@ compilers.
   for (unsigned int i = 0; i < NumberOfIterations; ++i)                                                           \
   {                                                                                                               \
     DestinationArray[i] = ::itk::Math::Round<DestinationElementType>(SourceArray[i]);                             \
-  }
+  }                                                                                                               \
+  ITK_MACROEND_NOOP_STATEMENT
 
 // end of Template Meta Programming helper macros
 
@@ -848,6 +860,7 @@ compilers.
 #endif
 
 /** Set an input. This defines the Set"name"() method */
+/** @ITKStartGrouping */
 #define itkSetInputMacro(name, type)                                                     \
   virtual void Set##name(const type * _arg)                                              \
   {                                                                                      \
@@ -859,8 +872,9 @@ compilers.
     }                                                                                    \
   }                                                                                      \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Get an input. This defines the Get"name"() method */
+/** @ITKStartGrouping */
 #define itkGetInputMacro(name, type)                                                           \
   virtual const type * Get##name() const                                                       \
   {                                                                                            \
@@ -868,11 +882,12 @@ compilers.
     return itkDynamicCastInDebugMode<const type *>(this->ProcessObject::GetInput(#name));      \
   }                                                                                            \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 // clang-format off
 /** Set a decorated input. This defines the Set"name"() and a Set"name"Input() method */
+/** @ITKStartGrouping */
 #define itkSetDecoratedInputMacro(name, type)                                                                       \
-  virtual void Set##name##Input(const SimpleDataObjectDecorator<type> * _arg)                                       \
+  virtual void Set## name## Input(const SimpleDataObjectDecorator<type> * _arg)                                       \
   {                                                                                                                 \
     itkDebugMacro("setting input " #name " to " << _arg);                                                           \
     if (_arg != itkDynamicCastInDebugMode<SimpleDataObjectDecorator<type> *>(this->ProcessObject::GetInput(#name))) \
@@ -881,28 +896,29 @@ compilers.
       this->Modified();                                                                                             \
     }                                                                                                               \
   }                                                                                                                 \
-  virtual void Set##name(const SimpleDataObjectDecorator<type> * _arg) { this->Set##name##Input(_arg); }            \
-  virtual void Set##name(const type & _arg)                                                                         \
+  virtual void Set## name(const SimpleDataObjectDecorator<type> * _arg) { this->Set## name## Input(_arg); }            \
+  virtual void Set## name(const type & _arg)                                                                         \
   {                                                                                                                 \
     using DecoratorType = SimpleDataObjectDecorator<type>;                                                          \
     itkDebugMacro("setting input " #name " to " << _arg);                                                           \
     const DecoratorType * oldInput =                                                                                \
       itkDynamicCastInDebugMode<const DecoratorType *>(this->ProcessObject::GetInput(#name));                       \
-    CLANG_PRAGMA_PUSH                                                                                               \
-    CLANG_SUPPRESS_Wfloat_equal                                                                                     \
+    ITK_GCC_PRAGMA_PUSH                                                                                             \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                                                                   \
     if (oldInput && oldInput->Get() == _arg)                                                                        \
     {                                                                                                               \
       return;                                                                                                       \
     }                                                                                                               \
-    CLANG_PRAGMA_POP                                                                                                \
+    ITK_GCC_PRAGMA_POP                                                                                              \
     auto newInput = DecoratorType::New();                                                                           \
     newInput->Set(_arg);                                                                                            \
-    this->Set##name##Input(newInput);                                                                               \
+    this->Set## name## Input(newInput);                                                                               \
   }                                                                                                                 \
   ITK_MACROEND_NOOP_STATEMENT
 // clang-format on
-
+/** @ITKEndGrouping */
 /** Set a decorated input. This defines the Set"name"() and Set"name"Input() method */
+/** @ITKStartGrouping */
 #define itkGetDecoratedInputMacro(name, type)                                                                        \
   virtual const SimpleDataObjectDecorator<type> * Get##name##Input() const                                           \
   {                                                                                                                  \
@@ -922,7 +938,7 @@ compilers.
     return input->Get();                                                                                             \
   }                                                                                                                  \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Set a decorated input. This defines the Set"name"() and Set"name"Input() method
  * and Get"name" and Get"name"Input methods */
 #define itkSetGetDecoratedInputMacro(name, type) \
@@ -933,6 +949,7 @@ compilers.
  * itk::DataObject. This defines the Set"name"() and Set"name"Input
  * methods.
  */
+/** @ITKStartGrouping */
 #define itkSetDecoratedObjectInputMacro(name, type)                                                           \
   virtual void Set##name##Input(const DataObjectDecorator<type> * _arg)                                       \
   {                                                                                                           \
@@ -958,11 +975,12 @@ compilers.
     this->Set##name##Input(newInput);                                                                         \
   }                                                                                                           \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Get a decorated input that derives from itk::Object, but not from
  * itk::DataObject. This defines the Get"name"() and Get"name"Input
  * methods.
  */
+/** @ITKStartGrouping */
 #define itkGetDecoratedObjectInputMacro(name, type)                                                            \
   virtual const DataObjectDecorator<type> * Get##name##Input() const                                           \
   {                                                                                                            \
@@ -982,7 +1000,7 @@ compilers.
     return input->Get();                                                                                       \
   }                                                                                                            \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Set a decorated input. This defines the Set"name"() and Set"name"Input() method
  * and Get"name" and Get"name"Input methods */
 #define itkSetGetDecoratedObjectInputMacro(name, type) \
@@ -992,44 +1010,49 @@ compilers.
 /** Set built-in type or regular C++ type.  Creates member Set"name"() (e.g., SetVisibility()); */
 // clang-format off
 #define itkSetMacro(name, type)                     \
-  virtual void Set##name(type _arg)           \
+  virtual void Set## name(type _arg)                 \
   {                                                 \
     itkDebugMacro("setting " #name " to " << _arg); \
-    CLANG_PRAGMA_PUSH                               \
-    CLANG_SUPPRESS_Wfloat_equal                     \
-    if (this->m_##name != _arg)                     \
+    ITK_GCC_PRAGMA_PUSH                             \
+    ITK_GCC_SUPPRESS_Wfloat_equal                   \
+    if (this->m_## name != _arg)                     \
     {                                               \
-      this->m_##name = std::move(_arg);                        \
+      this->m_## name = std::move(_arg);             \
       this->Modified();                             \
     }                                               \
-    CLANG_PRAGMA_POP                                \
+    ITK_GCC_PRAGMA_POP                              \
   }                                                 \
   ITK_MACROEND_NOOP_STATEMENT
 // clang-format on
+
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility()); */
+/** @ITKStartGrouping */
 #define itkGetMacro(name, type)                       \
   virtual type Get##name() { return this->m_##name; } \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility());
  * This is the "const" form of the itkGetMacro.  It should be used unless
  * the member can be changed through the "Get" access routine. */
+/** @ITKStartGrouping */
 #define itkGetConstMacro(name, type)                        \
   virtual type Get##name() const { return this->m_##name; } \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility());
  * This is the "const" form of the itkGetMacro.  It should be used unless
  * the member can be changed through the "Get" access routine.
  * This versions returns a const reference to the variable. */
+/** @ITKStartGrouping */
 #define itkGetConstReferenceMacro(name, type)                       \
   virtual const type & Get##name() const { return this->m_##name; } \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Set built-in type.  Creates member Set"name"() (e.g., SetVisibility());
  * This should be used when the type is an enum. It is used to avoid warnings on
  * some compilers with non specified enum types passed to
  * itkDebugMacro. */
+/** @ITKStartGrouping */
 #define itkSetEnumMacro(name, type)                                    \
   virtual void Set##name(const type _arg)                              \
   {                                                                    \
@@ -1041,18 +1064,20 @@ compilers.
     }                                                                  \
   }                                                                    \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Get built-in type.  Creates member Get"name"() (e.g., GetVisibility());
  * This should be use when the type is an enum. It is use to avoid warnings on
  * some compilers with non specified enum types passed to
  * itkDebugMacro. */
+/** @ITKStartGrouping */
 #define itkGetEnumMacro(name, type)                         \
   virtual type Get##name() const { return this->m_##name; } \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Set character string.  Creates member Set"name"()
  * (e.g., SetFilename(char *)). The macro assumes that
  * the class member (name) is declared a type std::string. */
+/** @ITKStartGrouping */
 #define itkSetStringMacro(name)                                                       \
   virtual void Set##name(const char * _arg)                                           \
   {                                                                                   \
@@ -1072,7 +1097,7 @@ compilers.
   }                                                                                   \
   virtual void Set##name(const std::string & _arg) { this->Set##name(_arg.c_str()); } \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 
 /** Get character string.  Creates member Get"name"()
  * (e.g., SetFilename(char *)). The macro assumes that
@@ -1085,40 +1110,42 @@ compilers.
 /** Set built-in type where value is constrained between min/max limits.
  * Create member Set"name"() (e.q., SetRadius()). \#defines are
  * convenience for clamping open-ended values. */
+/** @ITKStartGrouping */
 #define itkSetClampMacro(name, type, min, max)                                  \
-  virtual void Set##name(type _arg)                                             \
+  virtual void Set## name(type _arg)                                             \
   {                                                                             \
     const type temp_extrema = (_arg <= min ? min : (_arg >= max ? max : _arg)); \
     itkDebugMacro("setting " << #name " to " << _arg);                          \
-    CLANG_PRAGMA_PUSH                                                           \
-    CLANG_SUPPRESS_Wfloat_equal                                                 \
-    if (this->m_##name != temp_extrema)                                         \
+    ITK_GCC_PRAGMA_PUSH                                                         \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                               \
+    if (this->m_## name != temp_extrema)                                         \
     {                                                                           \
-      this->m_##name = temp_extrema;                                            \
+      this->m_## name = temp_extrema;                                            \
       this->Modified();                                                         \
     }                                                                           \
-    CLANG_PRAGMA_POP                                                            \
+    ITK_GCC_PRAGMA_POP                                                          \
   }                                                                             \
   ITK_MACROEND_NOOP_STATEMENT
 // clang-format on
-
+/** @ITKEndGrouping */
 // clang-format off
 /** Set pointer to object; uses Object reference counting methodology.
  * Creates method Set"name"() (e.g., SetPoints()). Note that using
  * smart pointers requires using raw pointers when setting input. */
+/** @ITKStartGrouping */
 #define itkSetObjectMacro(name, type)                  \
-  virtual void Set##name(type * _arg)                  \
+  virtual void Set## name(type * _arg)                  \
   {                                                    \
     itkDebugMacro("setting " << #name " to " << _arg); \
-    if (this->m_##name != _arg)                        \
+    if (this->m_## name != _arg)                        \
     {                                                  \
-      this->m_##name = _arg;                           \
+      this->m_## name = _arg;                           \
       this->Modified();                                \
     }                                                  \
   }                                                    \
   ITK_MACROEND_NOOP_STATEMENT
 // clang-format on
-
+/** @ITKEndGrouping */
 /** Get a raw pointer to an object.  Creates the member
  * Get"name"() (e.g., GetPoints()).
  * NOTE:  This function returns a non-const
@@ -1159,7 +1186,8 @@ compilers.
     virtual type * Get##name()                                                                    \
     {                                                                                             \
       purposeful_error("itkGetObjectMacro should be replaced with itkGetModifiableObjectMacro."); \
-    }
+    }                                                                                             \
+    ITK_MACROEND_NOOP_STATEMENT
 
 #  define itkGetModifiableObjectMacro(name, type)                                \
     virtual type * GetModifiable##name() { return this->m_##name.GetPointer(); } \
@@ -1168,6 +1196,7 @@ compilers.
 #else // defined ( ITK_FUTURE_LEGACY_REMOVE )
 /** Get a raw pointer to an object.  Creates the member
  * Get"name"() (e.g., GetPoints()). */
+/** @ITKStartGrouping */
 #  define itkGetObjectMacro(name, type)                                \
     virtual type * Get##name() { return this->m_##name.GetPointer(); } \
     ITK_MACROEND_NOOP_STATEMENT
@@ -1175,6 +1204,7 @@ compilers.
     virtual type * GetModifiable##name() { return this->m_##name.GetPointer(); } \
     itkGetConstObjectMacro(name, type);                                          \
     itkGetObjectMacro(name, type)
+/** @ITKEndGrouping */
 #endif // defined ( ITK_FUTURE_LEGACY_REMOVE )
 
 // For backwards compatibility define ITK_EXPORT to nothing
@@ -1190,6 +1220,7 @@ compilers.
 /** Set const pointer to object; uses Object reference counting methodology.
  * Creates method Set"name"() (e.g., SetPoints()). Note that using
  * smart pointers requires using raw pointers when setting input. */
+/** @ITKStartGrouping */
 #define itkSetConstObjectMacro(name, type)             \
   virtual void Set##name(const type * _arg)            \
   {                                                    \
@@ -1201,43 +1232,86 @@ compilers.
     }                                                  \
   }                                                    \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Create members "name"On() and "name"Off() (e.g., DebugOn() DebugOff()).
  * Set method must be defined to use this macro. */
-#define itkBooleanMacro(name)                        \
-  virtual void name##On() { this->Set##name(true); } \
-  virtual void name##Off() { this->Set##name(false); }
+/** @ITKStartGrouping */
+#define itkBooleanMacro(name)                          \
+  virtual void name##On() { this->Set##name(true); }   \
+  virtual void name##Off() { this->Set##name(false); } \
+  ITK_MACROEND_NOOP_STATEMENT
+/** @ITKEndGrouping */
+
+/**
+ * \brief A utility function to encapsulate a commonly used paradigm
+ * for filling one container with a value for Set##Name# Methods
+ *
+ * returns false if no values were changed.
+ * return true if any of the values are changed.
+ * \ingroup ITKCommon
+ */
+template <typename MemberContainerType, typename CopyFromValueType, typename LoopEndType>
+bool
+ContainerFillWithCheck(MemberContainerType & m, const CopyFromValueType & c, const LoopEndType N)
+{
+  bool value_updated = false;
+  for (unsigned int i = 0; i < N; ++i)
+  {
+    ITK_GCC_PRAGMA_PUSH
+    ITK_GCC_SUPPRESS_Wfloat_equal
+    if (m[i] != c)
+    {
+      m[i] = c;
+      value_updated = true;
+    }
+    ITK_GCC_PRAGMA_POP
+  }
+  return value_updated;
+}
+
+/**
+ * \brief A utility function to encapsulate a commonly used paradigm
+ * for copying one container to another inside of a "Set##Name# Methods
+ *
+ * returns false if no values were changed.
+ * return true if any of the values are changed.
+ * \ingroup ITKCommon
+ */
+template <typename MemberContainerType, typename CopyFromContainerType, typename LoopEndType>
+bool
+ContainerCopyWithCheck(MemberContainerType & m, const CopyFromContainerType & c, const LoopEndType N)
+{
+  bool value_updated = false;
+  for (LoopEndType i = 0; i < N; ++i)
+  {
+    ITK_GCC_PRAGMA_PUSH
+    ITK_GCC_SUPPRESS_Wfloat_equal
+    if (m[i] != c[i])
+    {
+      m[i] = c[i];
+      value_updated = true;
+    }
+    ITK_GCC_PRAGMA_POP
+  }
+  return value_updated;
+}
 
 // clang-format off
 /** General set vector macro creates a single method that copies specified
  * number of values into object.
  * Examples: void SetColor(c,3) */
-#define itkSetVectorMacro(name, type, count) \
-  virtual void Set##name(type data[])        \
-  {                                          \
-    unsigned int i;                          \
-    for (i = 0; i < count; ++i)              \
-    {                                        \
-      CLANG_PRAGMA_PUSH                      \
-      CLANG_SUPPRESS_Wfloat_equal            \
-      if (data[i] != this->m_##name[i])      \
-      {                                      \
-        break;                               \
-      }                                      \
-      CLANG_PRAGMA_POP                       \
-    }                                        \
-    if (i < count)                           \
-    {                                        \
-      this->Modified();                      \
-      for (i = 0; i < count; ++i)            \
-      {                                      \
-        this->m_##name[i] = data[i];         \
-      }                                      \
-    }                                        \
-  }                                          \
+/** @ITKStartGrouping */
+#define itkSetVectorMacro(name, type, count)                    \
+  virtual void Set## name(type data[])                          \
+  {                                                             \
+    if (ContainerCopyWithCheck( this->m_## name, data, count))  \
+    {                                                           \
+      this->Modified();                                         \
+    }                                                           \
+  }                                                             \
   ITK_MACROEND_NOOP_STATEMENT
 // clang-format on
-
+/** @ITKEndGrouping */
 /** Get vector macro. Returns pointer to type (i.e., array of type).
  * This is for efficiency. */
 #define itkGetVectorMacro(name, type, count)                  \
@@ -1255,6 +1329,7 @@ compilers.
  * then without adding the `class` keyword. Useful when an export specifier
  * needs to be added between the `class` keyword and the class name.
  */
+/** @ITKStartGrouping */
 #define itkGPUKernelMacro(kernel)          \
   kernel                                   \
   {                                        \
@@ -1264,9 +1339,10 @@ compilers.
     ~kernel() = delete;                    \
     static const char * GetOpenCLSource(); \
   }
-
-#define itkGetOpenCLSourceFromKernelMacro(kernel) \
-  static const char * GetOpenCLSource() { return kernel::GetOpenCLSource(); }
+/** @ITKEndGrouping */
+#define itkGetOpenCLSourceFromKernelMacro(kernel)                             \
+  static const char * GetOpenCLSource() { return kernel::GetOpenCLSource(); } \
+  ITK_MACROEND_NOOP_STATEMENT
 
 // A useful macro in the PrintSelf method for printing member variables
 // which are pointers to object based on the LightObject class.
@@ -1283,7 +1359,15 @@ compilers.
   ITK_MACROEND_NOOP_STATEMENT
 
 
+// A useful macro in the PrintSelf method for printing boolean member
+// variables.
+#define itkPrintSelfBooleanMacro(name)                                           \
+  os << indent << #name << ": " << (this->m_##name ? "On" : "Off") << std::endl; \
+  ITK_MACROEND_NOOP_STATEMENT
+
+
 /** Set a decorated output. This defines the Set"name"() and a Set"name"Output() method */
+/** @ITKStartGrouping */
 #define itkSetDecoratedOutputMacro(name, type)                                                                       \
   virtual void Set##name##Output(const SimpleDataObjectDecorator<type> * _arg)                                       \
   {                                                                                                                  \
@@ -1318,8 +1402,9 @@ compilers.
     }                                                                                                                \
   }                                                                                                                  \
   ITK_MACROEND_NOOP_STATEMENT
-
+/** @ITKEndGrouping */
 /** Set a decorated output. This defines the Get"name"() and Get"name"Output() method */
+/** @ITKStartGrouping */
 #define itkGetDecoratedOutputMacro(name, type)                                                                        \
   virtual const SimpleDataObjectDecorator<type> * Get##name##Output() const                                           \
   {                                                                                                                   \
@@ -1339,96 +1424,110 @@ compilers.
     return output->Get();                                                                                             \
   }                                                                                                                   \
   ITK_MACROEND_NOOP_STATEMENT
-
-
-/** Defines to provide compatibility with derived iterators.
- *
- * With ITKv5 several methods for Image Iterators have been
- * devirtualized for performance reasons. These definitions may help
- * provide legacy compatibility, or help  detecting derived iterators
- * relying on the virtual  interface. Compatibility for derived
- * classes can be achieved with defining ITKV4_COMPATIBILITY. Code
- * should be migrated to no longer rely on the old virtual interface.
- */
-#if defined(ITKV4_COMPATIBILITY)
-#  define ITK_ITERATOR_VIRTUAL virtual
-#  define ITK_ITERATOR_OVERRIDE override
-#  define ITK_ITERATOR_FINAL
-#elif !defined(ITK_LEGACY_REMOVE)
-#  define ITK_ITERATOR_VIRTUAL virtual
-#  define ITK_ITERATOR_OVERRIDE override
-#  define ITK_ITERATOR_FINAL final
+/** @ITKEndGrouping */
+// ITK_FUTURE_DEPRECATED is only for internal use, within the implementation of ITK. It allows triggering "deprecated"
+// warnings when legacy support is removed, which warn that a specific feature may be removed in the future.
+#if defined(ITK_LEGACY_REMOVE) && !defined(ITK_LEGACY_SILENT)
+#  define ITK_FUTURE_DEPRECATED(message) [[deprecated(message)]]
 #else
-#  define ITK_ITERATOR_VIRTUAL
-#  define ITK_ITERATOR_OVERRIDE
-#  define ITK_ITERATOR_FINAL
+#  define ITK_FUTURE_DEPRECATED(message)
 #endif
 
-#if defined(ITKV4_COMPATIBILITY)
-// A macro for methods which are const in ITKv5, but not in ITKv4
-#  define ITKv5_CONST
+#if __cplusplus >= 202002L
+#  define ITK_NODISCARD(message) [[nodiscard(message)]]
 #else
-// A macro for methods which are const in ITKv5, but not in ITKv4
-#  define ITKv5_CONST const
+#  define ITK_NODISCARD(message) [[nodiscard]]
 #endif
 
-#define itkExceptionObject_h
-#include "itkExceptionObject.h"
-#undef itkExceptionObject_h
+//-*-*-*
 
-/** itkDynamicCastInDebugMode
- * Use static_cast in Release builds, and dynamic_cast in Debug
- *
- * Note: this must come after:
- *
- *   #include "itkExceptionObject.h"
- */
-template <typename TTarget, typename TSource>
-TTarget
-itkDynamicCastInDebugMode(TSource x)
-{
-#ifndef NDEBUG
-  if (x == nullptr)
-  {
-    return nullptr;
-  }
-  TTarget rval = dynamic_cast<TTarget>(x);
-  if (rval == nullptr)
-  {
-    itkGenericExceptionMacro("Failed dynamic cast to " << typeid(TTarget).name()
-                                                       << " object type = " << x->GetNameOfClass());
-  }
-  return rval;
-#else
-  return static_cast<TTarget>(x);
-#endif
-}
+#if defined(ITK_LEGACY_REMOVE)
+#  define itkExposeEnumValue(name) \
+    static_assert(false, "ERROR: Replace static_cast<int>(name) with with proper enumeration instead of integer")
 
-#ifdef ITK_LEGACY_REMOVE
-#  if __cplusplus >= 202002L
-#    define ITK_NODISCARD(message) [[nodiscard(message)]]
-#  else
-#    define ITK_NODISCARD(message) [[nodiscard]]
-#  endif
-#else
-#  define ITK_NODISCARD(message)
-#endif
+#  define ITK_NOEXCEPT_OR_THROW static_assert(false, "Replace ITK_NOEXCEPT_OR_THROW with ITK_NOEXCEPT")
+
+#  define ITK_DELETE_FUNCTION static_assert(false, "ERROR: ITK_DELETE_FUNCTION must be replaced with `= delete`"
+#  define ITK_CONSTEXPR_FUNC static_assert(false, "ERROR: ITK_CONSTEXPR_FUNC must be replaced with 'constexpr'")
+#  define ITK_CONSTEXPR_VAR static_assert(false, "ERROR: ITK_CONSTEXPR_VAR must be replaced with 'constexpr'")
+
+#  define ITK_FALLTHROUGH static_assert(false, "ERROR: ITK_FALLTHROUGH must be replaced with '[[fallthrough]]'")
 
 // Defines which used to be in itk_compiler_detection.h
-#define ITK_ALIGNAS(X) alignas(X)
-#define ITK_ALIGNOF(X) alignof(X)
-#define ITK_DEPRECATED [[deprecated]]
-#define ITK_DEPRECATED_MSG(MSG) [[deprecated(MSG)]]
-#define ITK_CONSTEXPR constexpr
-#define ITK_DELETED_FUNCTION = delete
-#define ITK_EXTERN_TEMPLATE extern
-#define ITK_FINAL final
-#define ITK_NOEXCEPT noexcept
-#define ITK_NOEXCEPT_EXPR(X) noexcept(X)
-#define ITK_NULLPTR nullptr
-#define ITK_OVERRIDE override
-#define ITK_STATIC_ASSERT(X) static_assert(X, #X)
-#define ITK_STATIC_ASSERT_MSG(X, MSG) static_assert(X, MSG)
-#define ITK_THREAD_LOCAL thread_local
+#  define ITK_ALIGNAS static_assert(false, "ERROR: ITK_ALIGNAS must be replaced with 'alignas'")
+#  define ITK_ALIGNOF static_assert(false, "ERROR: ITK_ALIGNOF must be replaced with 'alignof'")
+#  define ITK_DEPRECATED static_assert(false, "ERROR: ITK_DEPRECATED must be replaced with '[[deprecated]]'")
+#  define ITK_DEPRECATED_MSG \
+    static_assert(false, "ERROR: ITK_DEPRECATED_MSG must be replaced with '[[deprecated(MSG)]]'")
+#  define ITK_CONSTEXPR static_assert(false, "ERROR: ITK_CONSTEXPR must be replaced with 'constexpr'")
+#  define ITK_DELETED_FUNCTION static_assert(false, "ERROR: ITK_DELETED_FUNCTION must be replaced with '= delete'")
+#  define ITK_EXTERN_TEMPLATE static_assert(false, "ERROR: ITK_EXTERN_TEMPLATE must be replaced with 'extern'")
+#  define ITK_FINAL static_assert(false, "ERROR: ITK_FINAL must be replaced with 'final'")
+#  define ITK_NOEXCEPT static_assert(false, "ERROR: ITK_NOEXCEPT must be replaced with 'noexcept'")
+#  define ITK_NOEXCEPT_EXPR static_assert(false, "ERROR: ITK_NOEXCEPT_EXPR must be replaced with 'noexcept'")
+#  define ITK_NULLPTR static_assert(false, "ERROR: ITK_NULLPTR must be replaced with 'nullptr'")
+#  define ITK_OVERRIDE static_assert(false, "ERROR: ITK_OVERRIDE must be replaced with 'override'")
+#  define ITK_STATIC_ASSERT static_assert(false, "ERROR: ITK_STATIC_ASSERT must be replaced with 'static_assert'")
+#  define ITK_STATIC_ASSERT_MSG \
+    static_assert(false, "ERROR: ITK_STATIC_ASSERT_MSG must be replaced with 'static_assert'")
+#  define ITK_THREAD_LOCAL static_assert(false, "ERROR: ITK_THREAD_LOCAL must be replaced with 'thread_local'")
 
-#endif // end of itkMacro.h
+// A macro for methods which are const in ITKv5 and ITKv6 require const for functions
+#  define ITKv5_CONST static_assert(false, "ERROR: ITKv5_CONST must be replaced with 'const'")
+
+#  define ITK_ITERATOR_VIRTUAL static_assert(false, "ERROR: ITK_ITERATOR_VIRTUAL must be removed'")
+#  define ITK_ITERATOR_OVERRIDE static_assert(false, "ERROR: ITK_ITERATOR_OVERRIDE must be removed")
+#  define ITK_ITERATOR_FINAL static_assert(false, "ERROR: ITK_ITERATOR_FINAL must be removed")
+
+#else
+// DEPRECATED: These macros are left here for compatibility with remote modules.
+// Once they have been removed from all known remote modules, this code should
+// be removed.
+
+// Future remove `#define itkExposeEnumValue(name)`
+// "Replace type of  `name` with proper enumeration instead of integer.
+#  define itkExposeEnumValue(name) static_cast<int>(name)
+
+
+#  define ITK_NOEXCEPT_OR_THROW ITK_NOEXCEPT
+
+#  define ITK_FALLTHROUGH [[fallthrough]]
+
+#  define ITK_DELETE_FUNCTION = delete
+
+#  define ITK_CONSTEXPR_FUNC constexpr
+#  define ITK_CONSTEXPR_VAR constexpr
+
+// Defines which used to be in itk_compiler_detection.h
+#  define ITK_ALIGNAS(X) alignas(X)
+#  define ITK_ALIGNOF(X) alignof(X)
+#  define ITK_DEPRECATED [[deprecated]]
+#  define ITK_DEPRECATED_MSG(MSG) [[deprecated(MSG)]]
+#  define ITK_CONSTEXPR constexpr
+#  define ITK_DELETED_FUNCTION = delete
+#  define ITK_EXTERN_TEMPLATE extern
+#  define ITK_FINAL final
+#  define ITK_NOEXCEPT noexcept
+#  define ITK_NOEXCEPT_EXPR(X) noexcept(X)
+#  define ITK_NULLPTR nullptr
+#  define ITK_OVERRIDE override
+#  define ITK_STATIC_ASSERT(X) static_assert(X, #X)
+#  define ITK_STATIC_ASSERT_MSG(X, MSG) static_assert(X, MSG)
+#  define ITK_THREAD_LOCAL thread_local
+
+// A macro for methods which are const in after ITKv4
+#  define ITKv5_CONST const
+
+#  define ITK_ITERATOR_VIRTUAL  /*purposefully empty for ITKv6, iterators are not virtual for performance reasons*/
+#  define ITK_ITERATOR_OVERRIDE /*purposefully empty for ITKv6, iterators are not virtual for performance reasons*/
+#  define ITK_ITERATOR_FINAL    /*purposefully empty for ITKv6, iterators are not virtual for performance reasons*/
+#endif
+
+#define allow_inclusion_of_itkExceptionObject_h
+// Must include itkExceptionObject.h at the end of the file
+// because it depends on the macros defined above
+#include "itkExceptionObject.h"
+
+
+#undef allow_inclusion_of_itkExceptionObject_h
+#endif // itkMacro_h

@@ -20,10 +20,7 @@
 
 namespace itk
 {
-SpatialObjectProperty::SpatialObjectProperty()
-{
-  this->Clear();
-}
+SpatialObjectProperty::SpatialObjectProperty() { this->Clear(); }
 
 void
 SpatialObjectProperty::Clear()
@@ -116,10 +113,8 @@ SpatialObjectProperty::GetTagScalarValue(const std::string & tag, double & value
     value = it->second;
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 bool
@@ -131,10 +126,17 @@ SpatialObjectProperty::GetTagStringValue(const std::string & tag, std::string & 
     value = it->second;
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
+}
+
+
+std::string
+SpatialObjectProperty::GetTagStringValue(const std::string & tag) const
+{
+  std::string value = "";
+  this->GetTagStringValue(tag, value);
+  return value;
 }
 
 std::map<std::string, double> &

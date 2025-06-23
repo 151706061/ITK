@@ -81,6 +81,16 @@ public:
   itkGetConstMacro(BinaryPoints, bool);
   itkBooleanMacro(BinaryPoints);
 
+  /** Set the version of MetaIO to use.
+   *    Version 0 cannot accurately represented ImageSpatialObjects.
+   *    Version 1 fixes bugs in Version 0, but introduces new tag-value
+   *      pairs that might throw warnings on older readers. */
+
+  void
+  SetMetaIOVersion(unsigned int ver);
+  unsigned int
+  GetMetaIOVersion() const;
+
   void
   SetTransformPrecision(unsigned int precision);
 
@@ -88,10 +98,11 @@ public:
   GetTransformPrecision();
 
   /** Set/Get if the images should be written in a different file */
+  /** @ITKStartGrouping */
   itkSetMacro(WriteImagesInSeparateFile, bool);
   itkGetConstMacro(WriteImagesInSeparateFile, bool);
   itkBooleanMacro(WriteImagesInSeparateFile);
-
+  /** @ITKEndGrouping */
   /** Add a converter for a new MetaObject/SpatialObject type */
   void
   RegisterMetaConverter(const char *            metaTypeName,

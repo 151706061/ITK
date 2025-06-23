@@ -49,7 +49,7 @@ Assert_GetNumberOfOffsets_returns_expected_number()
                 "Checked ConnectedImageNeighborhoodShape::GetNumberOfOffsets().");
 
   // Test GetNumberOfOffsets() on a non-const shape, at run-time:
-  ShapeType nonConstShape = constexprShape;
+  const ShapeType nonConstShape = constexprShape;
   ASSERT_EQ(nonConstShape.GetNumberOfOffsets(), VExpectedNumberOfOffsets);
 }
 
@@ -82,7 +82,7 @@ Assert_GenerateImageNeighborhoodOffsets_returns_expected_offsets_excluding_cente
 {
   using ShapeType = itk::ConnectedImageNeighborhoodShape<VImageDimension>;
 
-  const bool      includeCenterPixel = false;
+  constexpr bool  includeCenterPixel = false;
   const ShapeType shape{ VMaximumCityblockDistance, includeCenterPixel };
 
   ASSERT_EQ(GenerateImageNeighborhoodOffsets(shape), expectedOffsets);
@@ -125,7 +125,7 @@ Assert_Offsets_are_unique_and_colexicographically_ordered()
   for (unsigned int maximumCityblockDistance = 0; maximumCityblockDistance < VImageDimension;
        ++maximumCityblockDistance)
   {
-    for (bool includeCenterPixel : { false, true })
+    for (const bool includeCenterPixel : { false, true })
     {
       const ShapeType               shape{ maximumCityblockDistance, includeCenterPixel };
       const std::vector<OffsetType> offsets = GenerateImageNeighborhoodOffsets(shape);
@@ -249,14 +249,12 @@ TEST(ConnectedImageNeighborhoodShape, SupportsConstShapedNeighborhoodIterator)
 
   // Create a "dummy" image.
   const auto image = ImageType::New();
-  SizeType   imageSize;
-  imageSize.Fill(1);
+  auto       imageSize = SizeType::Filled(1);
   image->SetRegions(imageSize);
   image->AllocateInitialized();
 
   // Create a radius, (just) large enough for all offsets activated below here.
-  SizeType radius;
-  radius.Fill(1);
+  auto radius = SizeType::Filled(1);
 
   itk::ConstShapedNeighborhoodIterator<ImageType> shapedNeighborhoodIterator{ radius,
                                                                               image,

@@ -29,14 +29,14 @@ namespace itk
 
 template <typename TInputPointSet, typename TOutputImage>
 PointSetToImageFilter<TInputPointSet, TOutputImage>::PointSetToImageFilter()
+  : m_InsideValue(NumericTraits<ValueType>::OneValue())
+  , m_OutsideValue(ValueType{})
 {
   this->SetNumberOfRequiredInputs(1);
   this->m_Size.Fill(0);
   this->m_Origin.Fill(0.0);
   this->m_Spacing.Fill(1.0);
   this->m_Direction.SetIdentity();
-  this->m_InsideValue = NumericTraits<ValueType>::OneValue();
-  this->m_OutsideValue = ValueType{};
 }
 
 template <typename TInputPointSet, typename TOutputImage>
@@ -107,27 +107,24 @@ template <typename TInputPointSet, typename TOutputImage>
 void
 PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
 {
-  unsigned int i;
-
   itkDebugMacro("PointSetToImageFilter::Update() called");
 
   // Get the input and output pointers
   const InputPointSetType * InputPointSet = this->GetInput();
-  OutputImagePointer        OutputImage = this->GetOutput();
-
-  // Generate the image
-  double   origin[InputPointSetDimension];
-  SizeType size;
+  const OutputImagePointer  OutputImage = this->GetOutput();
 
   using BoundingBoxType = BoundingBox<typename InputPointSetType::PointIdentifier,
                                       InputPointSetDimension,
-                                      typename InputPointSetType::CoordRepType,
+                                      typename InputPointSetType::CoordinateType,
                                       typename InputPointSetType::PointsContainer>;
   auto bb = BoundingBoxType::New();
   bb->SetPoints(InputPointSet->GetPoints());
   bb->ComputeBoundingBox();
 
-  for (i = 0; i < InputPointSetDimension; ++i)
+  // Generate the image
+  double   origin[InputPointSetDimension];
+  SizeType size;
+  for (unsigned int i = 0; i < InputPointSetDimension; ++i)
   {
     size[i] = static_cast<SizeValueType>(bb->GetBounds()[2 * i + 1] - bb->GetBounds()[2 * i]);
     origin[i] = bb->GetBounds()[2 * i];
@@ -141,7 +138,7 @@ PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
   // PointSet's bounding box will be used as default.
 
   bool specified = false;
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     if (m_Size[i] != SizeValueType{})
     {
@@ -167,7 +164,7 @@ PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
   // the point-set is used as default.
 
   specified = false;
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     if (Math::NotExactlyEquals(m_Spacing[i], typename NumericTraits<SpacingType>::ValueType{}))
     {
@@ -182,7 +179,7 @@ PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
   }
 
   specified = false;
-  for (i = 0; i < OutputImageDimension; ++i)
+  for (unsigned int i = 0; i < OutputImageDimension; ++i)
   {
     if (Math::NotExactlyEquals(m_Origin[i], typename NumericTraits<PointType>::ValueType{}))
     {
@@ -193,7 +190,7 @@ PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
 
   if (specified)
   {
-    for (i = 0; i < OutputImageDimension; ++i)
+    for (unsigned int i = 0; i < OutputImageDimension; ++i)
     {
       origin[i] = m_Origin[i]; // set origin
     }
@@ -205,8 +202,8 @@ PointSetToImageFilter<TInputPointSet, TOutputImage>::GenerateData()
   OutputImage->FillBuffer(m_OutsideValue);
 
   using PointIterator = typename InputPointSetType::PointsContainer::ConstIterator;
-  PointIterator pointItr = InputPointSet->GetPoints()->Begin();
-  PointIterator pointEnd = InputPointSet->GetPoints()->End();
+  PointIterator       pointItr = InputPointSet->GetPoints()->Begin();
+  const PointIterator pointEnd = InputPointSet->GetPoints()->End();
 
   typename OutputImageType::IndexType index;
 

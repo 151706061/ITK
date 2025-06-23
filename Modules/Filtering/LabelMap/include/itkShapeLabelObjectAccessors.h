@@ -26,13 +26,11 @@
  * This code was contributed in the Insight Journal paper:
  * "Label object representation and manipulation with ITK"
  * by Lehmann G.
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  */
 
-namespace itk
-{
-namespace Functor
+namespace itk::Functor
 {
 template <typename TLabelObject>
 class NumberOfPixelsLabelObjectAccessor
@@ -272,7 +270,6 @@ public:
   }
 };
 
-} // namespace Functor
-} // end namespace itk
+} // namespace itk::Functor
 
 #endif

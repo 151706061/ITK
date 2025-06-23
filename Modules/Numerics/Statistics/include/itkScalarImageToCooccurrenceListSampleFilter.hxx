@@ -18,10 +18,7 @@
 #ifndef itkScalarImageToCooccurrenceListSampleFilter_hxx
 #define itkScalarImageToCooccurrenceListSampleFilter_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TImage>
 ScalarImageToCooccurrenceListSampleFilter<TImage>::ScalarImageToCooccurrenceListSampleFilter()
@@ -65,7 +62,7 @@ ScalarImageToCooccurrenceListSampleFilter<TImage>::GetOutput() const -> const Sa
 
 template <typename TImage>
 typename ScalarImageToCooccurrenceListSampleFilter<TImage>::DataObjectPointer
-  ScalarImageToCooccurrenceListSampleFilter<TImage>::MakeOutput(DataObjectPointerArraySizeType)
+ScalarImageToCooccurrenceListSampleFilter<TImage>::MakeOutput(DataObjectPointerArraySizeType)
 {
   return SampleType::New().GetPointer();
 }
@@ -74,8 +71,7 @@ template <typename TImage>
 void
 ScalarImageToCooccurrenceListSampleFilter<TImage>::GenerateData()
 {
-  typename ShapedNeighborhoodIteratorType::RadiusType radius;
-  radius.Fill(1);
+  constexpr auto radius = MakeFilled<typename ShapedNeighborhoodIteratorType::RadiusType>(1);
 
   using FaceCalculatorType = itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<ImageType>;
 
@@ -96,12 +92,9 @@ ScalarImageToCooccurrenceListSampleFilter<TImage>::GenerateData()
 
   output->SetMeasurementVectorSize(measurementVectorSize);
 
-  typename FaceCalculatorType::FaceListType faceList = faceCalculator(input, input->GetRequestedRegion(), radius);
+  const typename FaceCalculatorType::FaceListType faceList = faceCalculator(input, input->GetRequestedRegion(), radius);
 
-  OffsetType center_offset;
-  center_offset.Fill(0);
-
-  bool isInside;
+  constexpr OffsetType center_offset{};
 
   for (const auto & face : faceList)
   {
@@ -124,6 +117,7 @@ ScalarImageToCooccurrenceListSampleFilter<TImage>::GenerateData()
 
         // Check if the point is inside and add the measurement vector
         // only if its inside
+        bool            isInside = false;
         const PixelType pixel_intensity = it.GetPixel(ci.GetNeighborhoodIndex(), isInside);
         if (isInside)
         {
@@ -166,7 +160,6 @@ ScalarImageToCooccurrenceListSampleFilter<TImage>::UseNeighbor(const OffsetType 
     m_OffsetTable.push_back(offset);
   }
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

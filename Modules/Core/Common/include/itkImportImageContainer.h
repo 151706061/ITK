@@ -60,7 +60,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Standard part of every itk Object. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImportImageContainer);
 
   /** Get the pointer from which the image data is imported. */
@@ -80,10 +80,18 @@ public:
   SetImportPointer(TElement * ptr, TElementIdentifier num, bool LetContainerManageMemory = false);
 
   /** Index operator. This version can be an lvalue. */
-  TElement & operator[](const ElementIdentifier id) { return m_ImportPointer[id]; }
+  TElement &
+  operator[](const ElementIdentifier id)
+  {
+    return m_ImportPointer[id];
+  }
 
   /** Index operator. This version can only be an rvalue */
-  const TElement & operator[](const ElementIdentifier id) const { return m_ImportPointer[id]; }
+  const TElement &
+  operator[](const ElementIdentifier id) const
+  {
+    return m_ImportPointer[id];
+  }
 
   /** Return a pointer to the beginning of the buffer.  This is used by
    * the image iterator class. */
@@ -147,10 +155,11 @@ public:
    *  Note that the normal logic of this class set the value of the boolean
    *  flag. This may override your setting if you call this methods prematurely.
    *  \warning Improper use of these methods will result in memory leaks */
+  /** @ITKStartGrouping */
   itkSetMacro(ContainerManageMemory, bool);
   itkGetConstMacro(ContainerManageMemory, bool);
   itkBooleanMacro(ContainerManageMemory);
-
+  /** @ITKEndGrouping */
 protected:
   ImportImageContainer() = default;
   ~ImportImageContainer() override;

@@ -95,7 +95,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToSpatialObjectRegistrationMethod);
 
   /**  Type of the Fixed image. */
@@ -135,33 +135,40 @@ public:
   using DataObjectPointer = typename DataObject::Pointer;
 
   /** Set/Get the Fixed image. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(FixedImage, FixedImageType);
   itkGetConstObjectMacro(FixedImage, FixedImageType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Moving Spatial Object. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(MovingSpatialObject, MovingSpatialObjectType);
   itkGetConstObjectMacro(MovingSpatialObject, MovingSpatialObjectType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Optimizer. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Optimizer, OptimizerType);
   itkGetModifiableObjectMacro(Optimizer, OptimizerType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Metric. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Metric, MetricType);
   itkGetModifiableObjectMacro(Metric, MetricType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Transform. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Transform, TransformType);
   itkGetModifiableObjectMacro(Transform, TransformType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Interpolator. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Interpolator, InterpolatorType);
   itkGetModifiableObjectMacro(Interpolator, InterpolatorType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the initial transformation parameters. */
+  /** @ITKStartGrouping */
   itkSetMacro(InitialTransformParameters, ParametersType);
   itkGetConstReferenceMacro(InitialTransformParameters, ParametersType);
-
+  /** @ITKEndGrouping */
   /** Get the last transformation parameters visited by
    * the optimizer. */
   itkGetConstReferenceMacro(LastTransformParameters, ParametersType);

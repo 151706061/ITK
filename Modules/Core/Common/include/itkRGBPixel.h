@@ -80,7 +80,13 @@ public:
 #ifdef ITK_FUTURE_LEGACY_REMOVE
   RGBPixel() = default;
 #else
-  RGBPixel() { this->Fill(0); }
+  constexpr RGBPixel()
+    : Superclass(Superclass())
+  {
+    // `: Superclass(Superclass())` is a workaround for an old compiler bug. A simple `: Superclass()` triggered
+    // warnings from GCC 9.4.0 saying: "warning: '<anonymous>' may be used uninitialized in this function
+    // [-Wmaybe-uninitialized]".
+  }
 #endif
 
 #if defined(ITK_LEGACY_REMOVE)
@@ -90,12 +96,14 @@ public:
   /** Prevents copy-initialization from `nullptr`, as well as from `0` (NULL). */
   RGBPixel(std::nullptr_t) = delete;
 #else
+
   /** Constructor to fill Red=Blue=Green= r.
    * \note ITK_LEGACY_REMOVE=ON will disallow implicit conversion from a component value. */
   RGBPixel(const ComponentType & r) { this->Fill(r); }
 #endif
 
   /** Pass-through constructor for the Array base class. */
+  /** @ITKStartGrouping */
   template <typename TRGBPixelValueType>
   RGBPixel(const RGBPixel<TRGBPixelValueType> & r)
     : BaseArray(r)
@@ -103,8 +111,10 @@ public:
   RGBPixel(const ComponentType r[3])
     : BaseArray(r)
   {}
+  /** @ITKEndGrouping */
 
   /** Pass-through assignment operator for the Array base class. */
+  /** @ITKStartGrouping */
   template <typename TRGBPixelValueType>
   Self &
   operator=(const RGBPixel<TRGBPixelValueType> & r)
@@ -112,20 +122,25 @@ public:
     BaseArray::operator=(r);
     return *this;
   }
+  /** @ITKEndGrouping */
 
   Self &
   operator=(const ComponentType r[3]);
 
   /** Arithmetic operations between pixels. Return a new RGBPixel. */
+  /** @ITKStartGrouping */
   Self
   operator+(const Self & r) const;
   Self
-       operator-(const Self & r) const;
-  Self operator*(const ComponentType & r) const;
+  operator-(const Self & r) const;
+  Self
+  operator*(const ComponentType & r) const;
   Self
   operator/(const ComponentType & r) const;
+  /** @ITKEndGrouping */
 
   /** Arithmetic-assignment operators. */
+  /** @ITKStartGrouping */
   const Self &
   operator+=(const Self & r);
   const Self &
@@ -134,6 +149,7 @@ public:
   operator*=(const ComponentType & r);
   const Self &
   operator/=(const ComponentType & r);
+  /** @ITKEndGrouping */
 
   /** Implements strict weak ordering. For use in STL, e.g. std::map. */
   bool
@@ -150,14 +166,14 @@ public:
   }
 
   /** Return the value for the Nth component. */
-  ComponentType
+  [[nodiscard]] ComponentType
   GetNthComponent(int c) const
   {
     return this->operator[](c);
   }
 
   /** Return the Euclidean norm of the vector defined by the RGB components. */
-  ComponentType
+  [[nodiscard]] ComponentType
   GetScalarValue() const
   {
     return static_cast<ComponentType>(
@@ -204,28 +220,28 @@ public:
   }
 
   /** Get the Red component. */
-  const ComponentType &
+  [[nodiscard]] const ComponentType &
   GetRed() const
   {
     return this->operator[](0);
   }
 
   /** Get the Green component. */
-  const ComponentType &
+  [[nodiscard]] const ComponentType &
   GetGreen() const
   {
     return this->operator[](1);
   }
 
   /** Get the Blue component. */
-  const ComponentType &
+  [[nodiscard]] const ComponentType &
   GetBlue() const
   {
     return this->operator[](2);
   }
 
   /** Get Luminance out of RGB */
-  LuminanceType
+  [[nodiscard]] LuminanceType
   GetLuminance() const;
 };
 
@@ -239,7 +255,7 @@ operator>>(std::istream & is, RGBPixel<TComponent> & c);
 
 template <typename T>
 inline void
-swap(RGBPixel<T> & a, RGBPixel<T> & b)
+swap(RGBPixel<T> & a, RGBPixel<T> & b) noexcept
 {
   a.swap(b);
 }

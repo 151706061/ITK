@@ -37,12 +37,11 @@ itkOtsuThresholdCalculatorTest(int, char *[])
   using CalculatorType = itk::OtsuThresholdCalculator<HistogramType>;
 
   // Allocate a simple test image
-  auto                  image = ImageType::New();
-  ImageType::RegionType region;
-
+  auto image = ImageType::New();
   // Define the image size and physical coordinates
-  SizeType size = { { 20, 20, 20 } };
+  constexpr SizeType size = { { 20, 20, 20 } };
 
+  ImageType::RegionType region;
   region.SetSize(size);
   image->SetRegions(region);
   image->Allocate();
@@ -53,27 +52,25 @@ itkOtsuThresholdCalculatorTest(int, char *[])
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
-  unsigned long numPixels = region.GetNumberOfPixels();
+  const unsigned long numPixels = region.GetNumberOfPixels();
 
   using IteratorType = itk::ImageRegionIterator<ImageType>;
   IteratorType iter(image, image->GetBufferedRegion());
 
-  ImageType::PixelType value1 = 10;
-  ImageType::PixelType value2 = 50;
-  ImageType::PixelType range = 5;
-  ImageType::PixelType r2 = range * 2 + 1;
+  constexpr ImageType::PixelType value1 = 10;
+  constexpr ImageType::PixelType value2 = 50;
+  constexpr ImageType::PixelType range = 5;
+  constexpr ImageType::PixelType r2 = range * 2 + 1;
 
   // Fill one half of with values of value1 +- 2
-  unsigned long i;
-
-  for (i = 0; i < numPixels / 2; ++i)
+  for (unsigned long i = 0; i < numPixels / 2; ++i)
   {
     iter.Set((i % r2) + value1 - range);
     ++iter;
   }
 
   // Fill the other half with values of value2 +- 2
-  for (i = numPixels / 2; i < numPixels; ++i)
+  for (unsigned long i = numPixels / 2; i < numPixels; ++i)
   {
     iter.Set((i % r2) + value2 - range);
     ++iter;
@@ -90,12 +87,7 @@ itkOtsuThresholdCalculatorTest(int, char *[])
   auto calculator = CalculatorType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(calculator, OtsuThresholdCalculator, HistogramThresholdCalculator);
-
-#if defined(ITKV4_COMPATIBILITY)
-  bool returnBinMidpoint{ true };
-#else
-  bool returnBinMidpoint{ false };
-#endif
+  constexpr bool returnBinMidpoint{ false };
   ITK_TEST_SET_GET_BOOLEAN(calculator, ReturnBinMidpoint, returnBinMidpoint);
 
   calculator->SetInput(histGenerator->GetOutput());
@@ -103,7 +95,7 @@ itkOtsuThresholdCalculatorTest(int, char *[])
   calculator->Update();
 
   // Return minimum of intensity
-  double thresholdResult = calculator->GetThreshold();
+  const double thresholdResult = calculator->GetThreshold();
   std::cout << "The threshold intensity value is : " << thresholdResult << std::endl;
 
   if (thresholdResult < static_cast<double>(value1) || thresholdResult > static_cast<double>(value2))

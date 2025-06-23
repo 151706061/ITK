@@ -26,9 +26,8 @@ namespace itk
 /** \class MaximumProjectionImageFilter
  * \brief Maximum projection
  *
- * This class was contributed to the insight journal by Gaetan Lehmann.
- * The original paper can be found at
- * https://www.insight-journal.org/browse/publication/71
+ * This class was contributed to the insight journal by Gaetan Lehmann
+ * \cite Lehmann_2006_a.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la reproduction,
  *  inra de jouy-en-josas, France.
@@ -55,13 +54,40 @@ public:
   inline void
   Initialize()
   {
-    m_Maximum = NumericTraits<TInputPixel>::NonpositiveMin();
+
+    // check if scalar or fixed length array type
+    if constexpr (std::is_same_v<TInputPixel, typename NumericTraits<TInputPixel>::ValueType>)
+    {
+      m_Maximum = NumericTraits<TInputPixel>::NonpositiveMin();
+    }
+    else
+    {
+      m_Maximum = TInputPixel();
+      m_Maximum.Fill(NumericTraits<typename TInputPixel::ValueType>::NonpositiveMin());
+    }
   }
 
   inline void
   operator()(const TInputPixel & input)
   {
-    m_Maximum = std::max(m_Maximum, input);
+    if constexpr (std::is_same_v<TInputPixel, typename NumericTraits<TInputPixel>::ValueType>)
+    {
+      m_Maximum = std::max(m_Maximum, input);
+    }
+    else
+    {
+      if (itk::NumericTraits<TInputPixel>::GetLength(m_Maximum) == 0)
+      {
+        m_Maximum = input;
+      }
+      else
+      {
+        for (unsigned int i = 0; i < itk::NumericTraits<TInputPixel>::GetLength(m_Maximum); ++i)
+        {
+          m_Maximum[i] = std::max(m_Maximum[i], input[i]);
+        }
+      }
+    }
   }
 
   inline TInputPixel
@@ -93,18 +119,15 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MaximumProjectionImageFilter);
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-  itkConceptMacro(InputPixelTypeGreaterThanComparable, (Concept::GreaterThanComparable<InputPixelType>));
+  itkConceptMacro(InputPixelTypeGreaterThanComparable,
+                  (Concept::GreaterThanComparable<typename itk::NumericTraits<InputPixelType>::ValueType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   MaximumProjectionImageFilter() = default;

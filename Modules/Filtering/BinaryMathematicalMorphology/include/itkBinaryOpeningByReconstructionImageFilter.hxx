@@ -27,11 +27,9 @@ namespace itk
 
 template <typename TInputImage, typename TKernel>
 BinaryOpeningByReconstructionImageFilter<TInputImage, TKernel>::BinaryOpeningByReconstructionImageFilter()
-{
-  m_ForegroundValue = NumericTraits<PixelType>::max();
-  m_BackgroundValue = PixelType{};
-  m_FullyConnected = false;
-}
+  : m_ForegroundValue(NumericTraits<PixelType>::max())
+  , m_BackgroundValue(PixelType{})
+{}
 
 template <typename TInputImage, typename TKernel>
 void
@@ -41,7 +39,7 @@ BinaryOpeningByReconstructionImageFilter<TInputImage, TKernel>::GenerateInputReq
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -56,8 +54,7 @@ BinaryOpeningByReconstructionImageFilter<TInputImage, TKernel>::GenerateData()
   this->AllocateOutputs();
 
   /** set up erosion and dilation methods */
-  typename BinaryErodeImageFilter<InputImageType, OutputImageType, TKernel>::Pointer erode =
-    BinaryErodeImageFilter<InputImageType, OutputImageType, TKernel>::New();
+  auto erode = BinaryErodeImageFilter<InputImageType, OutputImageType, TKernel>::New();
   erode->SetForegroundValue(m_ForegroundValue); // Intensity value to erode
   erode->SetBackgroundValue(m_BackgroundValue); // Replacement value of eroded voxels
   erode->SetKernel(this->GetKernel());
@@ -65,8 +62,7 @@ BinaryOpeningByReconstructionImageFilter<TInputImage, TKernel>::GenerateData()
   erode->ReleaseDataFlagOn();
   erode->SetNumberOfWorkUnits(this->GetNumberOfWorkUnits());
 
-  typename BinaryReconstructionByDilationImageFilter<OutputImageType>::Pointer dilate =
-    BinaryReconstructionByDilationImageFilter<OutputImageType>::New();
+  auto dilate = BinaryReconstructionByDilationImageFilter<OutputImageType>::New();
   dilate->SetForegroundValue(m_ForegroundValue);
   dilate->SetBackgroundValue(m_BackgroundValue);
   dilate->SetMarkerImage(erode->GetOutput());
@@ -97,7 +93,7 @@ BinaryOpeningByReconstructionImageFilter<TInputImage, TKernel>::PrintSelf(std::o
      << std::endl;
   os << indent << "BackgroundValue: " << static_cast<typename NumericTraits<PixelType>::PrintType>(m_BackgroundValue)
      << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 
 } // end namespace itk

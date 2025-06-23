@@ -68,7 +68,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEquationContainer);
 
   using TermContainerType = TTermContainer;
@@ -112,9 +112,10 @@ public:
   ComputeCFLContribution() const;
 
   /** Set/Get the input speed or feature image */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Input, InputImageType);
   itkGetModifiableObjectMacro(Input, InputImageType);
-
+  /** @ITKEndGrouping */
   itkSetObjectMacro(LevelSetContainer, LevelSetContainerType);
   itkGetModifiableObjectMacro(LevelSetContainer, LevelSetContainerType);
 
@@ -138,8 +139,16 @@ public:
     ConstIterator(const Iterator & it)
       : m_Iterator(it.m_Iterator)
     {}
-    ConstIterator & operator*() { return *this; }
-    ConstIterator * operator->() { return this; }
+    ConstIterator &
+    operator*()
+    {
+      return *this;
+    }
+    ConstIterator *
+    operator->()
+    {
+      return this;
+    }
     ConstIterator &
     operator++()
     {
@@ -182,13 +191,13 @@ public:
 
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
-    LevelSetIdentifierType
+    [[nodiscard]] LevelSetIdentifierType
     GetIdentifier() const
     {
       return m_Iterator->first;
     }
 
-    TermContainerType *
+    [[nodiscard]] TermContainerType *
     GetEquation() const
     {
       return m_Iterator->second;
@@ -211,8 +220,16 @@ public:
     {}
     ~Iterator() = default;
 
-    Iterator & operator*() { return *this; }
-    Iterator * operator->() { return this; }
+    Iterator &
+    operator*()
+    {
+      return *this;
+    }
+    Iterator *
+    operator->()
+    {
+      return this;
+    }
 
     Iterator &
     operator++()
@@ -257,13 +274,13 @@ public:
 
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
-    LevelSetIdentifierType
+    [[nodiscard]] LevelSetIdentifierType
     GetIdentifier() const
     {
       return m_Iterator->first;
     }
 
-    TermContainerType *
+    [[nodiscard]] TermContainerType *
     GetEquation() const
     {
       return m_Iterator->second;

@@ -78,9 +78,7 @@ itkCenteredVersorTransformInitializerTest(int, char *[])
   index[1] = 0;
   index[2] = 0;
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const RegionType region{ index, size };
 
 
   auto fixedImage = FixedImageType::New();
@@ -181,7 +179,7 @@ itkCenteredVersorTransformInitializerTest(int, char *[])
     TransformType::InputVectorType relativeCenter = movingCenter - fixedCenter;
 
 
-    const double tolerance = 1e-3;
+    constexpr double tolerance = 1e-3;
 
     for (unsigned int k = 0; k < Dimension; ++k)
     {

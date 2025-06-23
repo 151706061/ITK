@@ -104,7 +104,7 @@ itkSubtractImageFilterTest(int, char *[])
 
 
   // Get the filter output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
 
   // Create an iterator for going through the image output
@@ -112,7 +112,7 @@ itkSubtractImageFilterTest(int, char *[])
 
   // Check the content of the result image
   //
-  const auto expectedValue = static_cast<OutputImageType::PixelType>(valueA - valueB);
+  constexpr auto expectedValue = static_cast<OutputImageType::PixelType>(valueA - valueB);
   while (!oIt.IsAtEnd())
   {
     if (!itk::Math::ExactlyEquals(oIt.Get(), expectedValue))

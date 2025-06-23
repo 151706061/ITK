@@ -337,9 +337,10 @@ public:
     this->m_Transform->SetParameters(parameters);
 
     value = 0;
-    for (auto it : m_PointList)
+    for (auto point : m_PointList)
     {
-      PointType transformedPoint = this->m_Transform->TransformPoint(it);
+      const PointType transformedPoint =
+        this->m_Transform->TransformPoint(point);
       if (this->m_Interpolator->IsInsideBuffer(transformedPoint))
       {
         value += this->m_Interpolator->Evaluate(transformedPoint);
@@ -917,7 +918,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   // Software Guide : BeginCodeSnippet
-  RegistrationType::ParametersType finalParameters =
+  const RegistrationType::ParametersType finalParameters =
     registration->GetLastTransformParameters();
 
   std::cout << "Final Solution is : " << finalParameters << std::endl;

@@ -18,9 +18,7 @@
 
 #include "itkFEMLinearSystemWrapper.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 LinearSystemWrapper::~LinearSystemWrapper() = default;
@@ -28,19 +26,17 @@ LinearSystemWrapper::~LinearSystemWrapper() = default;
 void
 LinearSystemWrapper::Clean()
 {
-  unsigned int i;
-
   // FIXME: Does not work properly for all derived classes
   // clear all data
-  for (i = 0; i < m_NumberOfMatrices; ++i)
+  for (unsigned int i = 0; i < m_NumberOfMatrices; ++i)
   {
     this->DestroyMatrix(i);
   }
-  for (i = 0; i < m_NumberOfVectors; ++i)
+  for (unsigned int i = 0; i < m_NumberOfVectors; ++i)
   {
     this->DestroyVector(i);
   }
-  for (i = 0; i < m_NumberOfSolutions; ++i)
+  for (unsigned int i = 0; i < m_NumberOfSolutions; ++i)
   {
     this->DestroySolution(i);
   }
@@ -57,11 +53,9 @@ LinearSystemWrapper::ScaleMatrix(Float scale, unsigned int matrixIndex)
     return;
   }
 
-  unsigned int i;
-  unsigned int j;
-  for (i = 0; i < m_Order; ++i)
+  for (unsigned int i = 0; i < m_Order; ++i)
   {
-    for (j = 0; j < m_Order; ++j)
+    for (unsigned int j = 0; j < m_Order; ++j)
     {
       this->SetMatrixValue(i, j, scale * GetMatrixValue(i, j, matrixIndex), matrixIndex);
     }
@@ -77,9 +71,7 @@ LinearSystemWrapper::ScaleVector(Float scale, unsigned int vectorIndex)
   {
     return;
   }
-
-  unsigned int i;
-  for (i = 0; i < m_Order; ++i)
+  for (unsigned int i = 0; i < m_Order; ++i)
   {
     this->SetVectorValue(i, scale * GetVectorValue(i, vectorIndex), vectorIndex);
   }
@@ -93,9 +85,7 @@ LinearSystemWrapper::ScaleSolution(Float scale, unsigned int solutionIndex)
   {
     return;
   }
-
-  unsigned int i;
-  for (i = 0; i < m_Order; ++i)
+  for (unsigned int i = 0; i < m_Order; ++i)
   {
     this->SetSolutionValue(i, scale * GetSolutionValue(i, solutionIndex), solutionIndex);
   }
@@ -122,15 +112,11 @@ LinearSystemWrapper::AddSolutionValue(unsigned int i, Float value, unsigned int 
 void
 LinearSystemWrapper::MultiplyMatrixVector(unsigned int resultVector, unsigned int matrixIndex, unsigned int vectorIndex)
 {
-
-  unsigned int i;
-  unsigned int j;
-
   this->InitializeVector(resultVector);
   /* perform multiply */
-  for (i = 0; i < m_Order; ++i)
+  for (unsigned int i = 0; i < m_Order; ++i)
   {
-    for (j = 0; j < m_Order; ++j)
+    for (unsigned int j = 0; j < m_Order; ++j)
     {
       this->AddVectorValue(
         i, this->GetMatrixValue(i, j, matrixIndex) * this->GetVectorValue(j, vectorIndex), resultVector);
@@ -144,15 +130,11 @@ LinearSystemWrapper::MultiplyMatrixSolution(unsigned int resultVector,
                                             unsigned int matrixIndex,
                                             unsigned int solutionIndex)
 {
-
-  unsigned int i;
-  unsigned int j;
-
   this->InitializeVector(resultVector);
   /* perform multiply */
-  for (i = 0; i < m_Order; ++i)
+  for (unsigned int i = 0; i < m_Order; ++i)
   {
-    for (j = 0; j < m_Order; ++j)
+    for (unsigned int j = 0; j < m_Order; ++j)
     {
       this->AddVectorValue(
         i, this->GetMatrixValue(i, j, matrixIndex) * this->GetSolutionValue(j, solutionIndex), resultVector);
@@ -181,15 +163,13 @@ LinearSystemWrapper::OptimizeMatrixStorage(unsigned int matrixIndex, unsigned in
   this->InitializeMatrix(matrixIndex);
 
   /* loop through old matrix and pull out non-zero values */
-  ColumnArray  currentRow;
-  unsigned int i;
-  unsigned int j;
-  for (i = 0; i < this->m_Order; ++i)
+  for (unsigned int i = 0; i < this->m_Order; ++i)
   {
+    ColumnArray currentRow;
     this->GetColumnsOfNonZeroMatrixElementsInRow(i, currentRow, tempMatrixIndex);
-    for (j = 0; j < currentRow.size(); ++j)
+    for (unsigned int rowElement : currentRow)
     {
-      this->SetMatrixValue(i, currentRow[j], this->GetMatrixValue(i, currentRow[j], tempMatrixIndex), matrixIndex);
+      this->SetMatrixValue(i, rowElement, this->GetMatrixValue(i, rowElement, tempMatrixIndex), matrixIndex);
     }
   }
 
@@ -200,12 +180,10 @@ LinearSystemWrapper::OptimizeMatrixStorage(unsigned int matrixIndex, unsigned in
 void
 LinearSystemWrapper::CopyMatrix(unsigned int matrixIndex1, unsigned int matrixIndex2)
 {
-  ColumnArray  cols;
-  unsigned int r;
-
   this->InitializeMatrix(matrixIndex2);
-  for (r = 0; r < this->m_Order; ++r)
+  for (unsigned int r = 0; r < this->m_Order; ++r)
   {
+    ColumnArray cols;
     this->GetColumnsOfNonZeroMatrixElementsInRow(r, cols, matrixIndex1);
     for (const auto & col : cols)
     {
@@ -217,10 +195,9 @@ LinearSystemWrapper::CopyMatrix(unsigned int matrixIndex1, unsigned int matrixIn
 void
 LinearSystemWrapper::AddMatrixMatrix(unsigned int matrixIndex1, unsigned int matrixIndex2)
 {
-  ColumnArray  cols;
-  unsigned int r;
-  for (r = 0; r < this->m_Order; ++r)
+  for (unsigned int r = 0; r < this->m_Order; ++r)
   {
+    ColumnArray cols;
     this->GetColumnsOfNonZeroMatrixElementsInRow(r, cols, matrixIndex2);
     for (const auto & col : cols)
     {
@@ -232,8 +209,7 @@ LinearSystemWrapper::AddMatrixMatrix(unsigned int matrixIndex1, unsigned int mat
 void
 LinearSystemWrapper::CopyVector(unsigned int vectorSource, unsigned int vectorDestination)
 {
-  unsigned int r;
-  for (r = 0; r < this->m_Order; ++r)
+  for (unsigned int r = 0; r < this->m_Order; ++r)
   {
     this->SetVectorValue(r, this->GetVectorValue(r, vectorSource), vectorDestination);
   }
@@ -242,8 +218,7 @@ LinearSystemWrapper::CopyVector(unsigned int vectorSource, unsigned int vectorDe
 void
 LinearSystemWrapper::AddVectorVector(unsigned int vectorIndex1, unsigned int vectorIndex2)
 {
-  unsigned int r;
-  for (r = 0; r < this->m_Order; ++r)
+  for (unsigned int r = 0; r < this->m_Order; ++r)
   {
     this->AddVectorValue(r, this->GetVectorValue(r, vectorIndex2), vectorIndex1);
   }
@@ -260,19 +235,18 @@ LinearSystemWrapper::ReverseCuthillMckeeOrdering(ColumnArray & newNumbering, uns
 void
 LinearSystemWrapper::CuthillMckeeOrdering(ColumnArray & newNumbering, int startingRow, unsigned int matrixIndex)
 {
-  ColumnArray reverseMapping; /* temp storage for re-mapping
-                                of rows */
+  /* temp storage for re-mapping
+                               of rows */
 
-  newNumbering = ColumnArray(this->m_Order);   /* new row numbering */
-  reverseMapping = ColumnArray(this->m_Order); /* allocate temp storage */
-  unsigned int i;                              /* loop counter */
+  newNumbering = ColumnArray(this->m_Order);               /* new row numbering */
+  ColumnArray reverseMapping = ColumnArray(this->m_Order); /* allocate temp storage */
 
   /* find degrees of each row in matrix & initialize newNumbering vector */
   ColumnArray currentRow;               /* column indices of nonzero in
                                           current row */
   ColumnArray rowDegree(this->m_Order); /* degrees in each row */
   /* initialize variables */
-  for (i = 0; i < this->m_Order; ++i)
+  for (unsigned int i = 0; i < this->m_Order; ++i)
   {
     this->GetColumnsOfNonZeroMatrixElementsInRow(i, currentRow, matrixIndex);
     rowDegree[i] = static_cast<unsigned int>(currentRow.size() - 1); /*
@@ -292,7 +266,7 @@ LinearSystemWrapper::CuthillMckeeOrdering(ColumnArray & newNumbering, int starti
   {
     unsigned int lowestDegree = rowDegree[0];
     startingRow = 0;
-    for (i = 1; i < this->m_Order; ++i)
+    for (unsigned int i = 1; i < this->m_Order; ++i)
     {
       if (rowDegree[i] < lowestDegree)
       {
@@ -308,7 +282,7 @@ LinearSystemWrapper::CuthillMckeeOrdering(ColumnArray & newNumbering, int starti
 
   /* follow connections and assign new row numbering */
   this->FollowConnectionsCuthillMckeeOrdering(startingRow, rowDegree, reverseMapping, nextRowNumber, matrixIndex);
-  for (i = 0; i < this->m_Order; ++i)
+  for (unsigned int i = 0; i < this->m_Order; ++i)
   {
     newNumbering[reverseMapping[i]] = i;
   }
@@ -321,16 +295,6 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
                                                            unsigned int  nextRowNumber,
                                                            unsigned int  matrixIndex)
 {
-  int i; // these must be signed ints since they are compared
-         // to size()-1
-  int                   j;
-  int                   k;
-  unsigned int          temp;
-  ColumnArray::iterator rowBufferIt;
-  ColumnArray::iterator nextRowsIt;
-  ColumnArray           bufferArray;
-  ColumnArray           rowBuffer;
-
   if (reverseMapping[rowNumber] > (this->m_Order - 1))
   {
     return;
@@ -340,7 +304,7 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
   ColumnArray nextRows;
   this->GetColumnsOfNonZeroMatrixElementsInRow(rowNumber, nextRows, matrixIndex);
   /* remove diagonal element */
-  for (nextRowsIt = nextRows.begin(); nextRowsIt != nextRows.end(); ++nextRowsIt)
+  for (auto nextRowsIt = nextRows.begin(); nextRowsIt != nextRows.end(); ++nextRowsIt)
   {
     if (*nextRowsIt == rowNumber)
     {
@@ -351,13 +315,13 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
   /* order by degree */
   if (nextRows.size() > 1)
   {
-    for (i = 0; i < static_cast<int>(nextRows.size()) - 1; ++i)
+    for (int i = 0; i < static_cast<int>(nextRows.size()) - 1; ++i)
     {
-      for (j = 0; j < static_cast<int>(nextRows.size()) - 1 - i; ++j)
+      for (int j = 0; j < static_cast<int>(nextRows.size()) - 1 - i; ++j)
       {
         if (rowDegree[nextRows[j + 1]] < rowDegree[nextRows[j]])
         {
-          temp = nextRows[j + 1];
+          unsigned int temp = nextRows[j + 1];
           nextRows[j + 1] = nextRows[j];
           nextRows[j] = temp;
         }
@@ -365,21 +329,23 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
     }
   }
 
+  ColumnArray bufferArray;
   /* while there are more rows to examine */
   while ((!nextRows.empty()) && (nextRowNumber < this->m_Order))
   {
     bufferArray.clear();
-    for (i = 0; i < static_cast<int>(nextRows.size()); ++i)
+    for (unsigned int nextRow : nextRows)
     {
-      reverseMapping[nextRows[i]] = nextRowNumber++;
+      reverseMapping[nextRow] = nextRowNumber++;
     }
     /* renumber rows in nextRows */
-    for (i = 0; i < static_cast<int>(nextRows.size()); ++i)
+    for (unsigned int nextRow : nextRows)
     {
       /* connections of current row */
-      this->GetColumnsOfNonZeroMatrixElementsInRow(nextRows[i], rowBuffer, matrixIndex);
+      ColumnArray rowBuffer;
+      this->GetColumnsOfNonZeroMatrixElementsInRow(nextRow, rowBuffer, matrixIndex);
       /* remove previously renumbered rows */
-      for (rowBufferIt = rowBuffer.begin(); rowBufferIt != rowBuffer.end(); ++rowBufferIt)
+      for (auto rowBufferIt = rowBuffer.begin(); rowBufferIt != rowBuffer.end(); ++rowBufferIt)
       {
         if (reverseMapping[*rowBufferIt] < this->m_Order)
         {
@@ -390,13 +356,13 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
       /* order by degree */
       if (rowBuffer.size() > 1)
       {
-        for (k = 0; k < static_cast<int>(rowBuffer.size()) - 1; ++k)
+        for (int k = 0; k < static_cast<int>(rowBuffer.size()) - 1; ++k)
         {
-          for (j = 0; j < static_cast<int>(rowBuffer.size()) - 1 - k; ++j)
+          for (int j = 0; j < static_cast<int>(rowBuffer.size()) - 1 - k; ++j)
           {
             if (rowDegree[rowBuffer[j + 1]] < rowDegree[rowBuffer[j]])
             {
-              temp = rowBuffer[j + 1];
+              unsigned int temp = rowBuffer[j + 1];
               rowBuffer[j + 1] = rowBuffer[j];
               rowBuffer[j] = temp;
             }
@@ -405,13 +371,12 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
       }
 
       /* add rows in rowBuffer to bufferArray (don't add repeats) */
-      unsigned int repeatFlag;
-      for (k = 0; k < static_cast<int>(rowBuffer.size()); ++k)
+      for (unsigned int k : rowBuffer)
       {
-        repeatFlag = 0;
-        for (j = 0; j < static_cast<int>(bufferArray.size()); ++j)
+        unsigned int repeatFlag = 0;
+        for (unsigned int j : bufferArray)
         {
-          if (bufferArray[j] == rowBuffer[k])
+          if (j == k)
           {
             repeatFlag = 1;
           }
@@ -419,7 +384,7 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
 
         if (!repeatFlag)
         {
-          bufferArray.push_back(rowBuffer[k]);
+          bufferArray.push_back(k);
         }
       }
     }
@@ -431,22 +396,21 @@ LinearSystemWrapper::FollowConnectionsCuthillMckeeOrdering(unsigned int  rowNumb
 
 FEMExceptionLinearSystem::~FEMExceptionLinearSystem() noexcept = default;
 
-FEMExceptionLinearSystem::FEMExceptionLinearSystem(const char * file,
+FEMExceptionLinearSystem::FEMExceptionLinearSystem(std::string  file,
                                                    unsigned int lineNumber,
                                                    std::string  location,
                                                    std::string  moreDescription)
-  : FEMException(file, lineNumber)
+  : FEMException(std::move(file), lineNumber, std::move(location))
 {
   SetDescription("Error in linear system: " + moreDescription);
-  SetLocation(location);
 }
 
-FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(const char * file,
+FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(std::string  file,
                                                                unsigned int lineNumber,
                                                                std::string,
                                                                std::string  moreDescription,
                                                                unsigned int index1)
-  : FEMException(file, lineNumber)
+  : FEMException(std::move(file), lineNumber)
 {
   std::ostringstream buf;
 
@@ -454,13 +418,13 @@ FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(const char * file
   SetDescription(buf.str().c_str());
 }
 
-FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(const char * file,
+FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(std::string  file,
                                                                unsigned int lineNumber,
                                                                std::string,
                                                                std::string,
                                                                unsigned int index1,
                                                                unsigned int index2)
-  : FEMException(file, lineNumber)
+  : FEMException(std::move(file), lineNumber)
 {
   std::ostringstream buf;
 
@@ -470,5 +434,4 @@ FEMExceptionLinearSystemBounds::FEMExceptionLinearSystemBounds(const char * file
 
 FEMExceptionLinearSystemBounds::~FEMExceptionLinearSystemBounds() noexcept = default;
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem

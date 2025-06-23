@@ -36,8 +36,8 @@ ComplexToComplex1DFFTImageFilter<TInputImage, TOutputImage>::GenerateInputReques
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the inputs
-  typename InputImageType::Pointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
-  typename OutputImageType::Pointer outputPtr = this->GetOutput();
+  const typename InputImageType::Pointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const typename OutputImageType::Pointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -72,7 +72,7 @@ template <typename TInputImage, typename TOutputImage>
 void
 ComplexToComplex1DFFTImageFilter<TInputImage, TOutputImage>::EnlargeOutputRequestedRegion(DataObject * output)
 {
-  OutputImageType * outputPtr = dynamic_cast<OutputImageType *>(output);
+  auto * outputPtr = dynamic_cast<OutputImageType *>(output);
 
   // we need to enlarge the region in the fft direction to the
   // largest possible in that direction

@@ -36,33 +36,30 @@ JointHistogramMutualInformationImageToImageMetricv4<
   TVirtualImage,
   TInternalComputationValueType,
   TMetricTraits>::JointHistogramMutualInformationImageToImageMetricv4()
-
+  : m_JointHistogramMutualInformationDenseComputeJointPDFThreader(
+      JointHistogramMutualInformationDenseComputeJointPDFThreaderType::New())
+  , m_JointHistogramMutualInformationSparseComputeJointPDFThreader(
+      JointHistogramMutualInformationSparseComputeJointPDFThreaderType::New())
+  , m_JointPDF(JointPDFType::New())
+  , m_VarianceForJointPDFSmoothing(1.5)
+  , m_NumberOfHistogramBins(20)
+  , m_FixedImageTrueMin(TInternalComputationValueType{})
+  , m_FixedImageTrueMax(TInternalComputationValueType{})
+  , m_MovingImageTrueMin(TInternalComputationValueType{})
+  , m_MovingImageTrueMax(TInternalComputationValueType{})
+  , m_FixedImageBinSize(TInternalComputationValueType{})
+  , m_MovingImageBinSize(TInternalComputationValueType{})
+  , m_JointPDFSum(TInternalComputationValueType{})
+  , m_Log2(std::log(2.0))
+  , m_Padding(2)
 {
   // Initialize histogram properties
-  this->m_NumberOfHistogramBins = 20;
-  this->m_FixedImageTrueMin = TInternalComputationValueType{};
-  this->m_FixedImageTrueMax = TInternalComputationValueType{};
-  this->m_MovingImageTrueMin = TInternalComputationValueType{};
-  this->m_MovingImageTrueMax = TInternalComputationValueType{};
-  this->m_FixedImageBinSize = TInternalComputationValueType{};
-  this->m_MovingImageBinSize = TInternalComputationValueType{};
-  this->m_Padding = 2;
-  this->m_JointPDFSum = TInternalComputationValueType{};
-  this->m_Log2 = std::log(2.0);
-  this->m_VarianceForJointPDFSmoothing = 1.5;
-
   // We have our own GetValueAndDerivativeThreader's that we want
   // ImageToImageMetricv4 to use.
   this->m_DenseGetValueAndDerivativeThreader =
     JointHistogramMutualInformationDenseGetValueAndDerivativeThreaderType::New();
   this->m_SparseGetValueAndDerivativeThreader =
     JointHistogramMutualInformationSparseGetValueAndDerivativeThreaderType::New();
-
-  this->m_JointHistogramMutualInformationDenseComputeJointPDFThreader =
-    JointHistogramMutualInformationDenseComputeJointPDFThreaderType::New();
-  this->m_JointHistogramMutualInformationSparseComputeJointPDFThreader =
-    JointHistogramMutualInformationSparseComputeJointPDFThreaderType::New();
-  this->m_JointPDF = JointPDFType::New();
 }
 
 template <typename TFixedImage,
@@ -217,7 +214,7 @@ JointHistogramMutualInformationImageToImageMetricv4<TFixedImage,
   /* Prepare histograms for use in GetValueAndDerivative */
 
   // Initialize the joint pdf and the fixed and moving image marginal pdfs
-  PDFValueType pdfzero{};
+  constexpr PDFValueType pdfzero{};
   this->m_JointPDF->FillBuffer(pdfzero);
   this->m_FixedImageMarginalPDF->FillBuffer(pdfzero);
   this->m_MovingImageMarginalPDF->FillBuffer(pdfzero);
@@ -227,7 +224,7 @@ JointHistogramMutualInformationImageToImageMetricv4<TFixedImage,
    */
   if (this->m_UseSampledPointSet)
   {
-    SizeValueType numberOfPoints = this->GetNumberOfDomainPoints();
+    const SizeValueType numberOfPoints = this->GetNumberOfDomainPoints();
     if (numberOfPoints < 1)
     {
       itkExceptionMacro("VirtualSampledPointSet must have 1 or more points.");
@@ -350,25 +347,23 @@ JointHistogramMutualInformationImageToImageMetricv4<TFixedImage,
   2- The MI energy is bounded in the range of [0  min(H(x),H(y))].
   3- The ComputeMutualInformation() iterator range should cover the entire PDF.
   4- The normalization is done based on NumberOfHistogramBins-1 instead of NumberOfHistogramBins. */
-  TInternalComputationValueType                       px, py, pxy;
+
+  constexpr TInternalComputationValueType             eps = NumericTraits<TInternalComputationValueType>::epsilon();
   CompensatedSummation<TInternalComputationValueType> total_mi;
-  TInternalComputationValueType                       local_mi;
-  TInternalComputationValueType                       eps = NumericTraits<TInternalComputationValueType>::epsilon();
-  typename JointPDFType::IndexType                    index;
   for (SizeValueType ii = 0; ii < m_NumberOfHistogramBins; ++ii)
   {
     MarginalPDFIndexType mind;
     mind[0] = ii;
-    px = this->m_FixedImageMarginalPDF->GetPixel(mind);
+    TInternalComputationValueType px = this->m_FixedImageMarginalPDF->GetPixel(mind);
     for (SizeValueType jj = 0; jj < m_NumberOfHistogramBins; ++jj)
     {
       mind[0] = jj;
-      py = this->m_MovingImageMarginalPDF->GetPixel(mind);
-      TInternalComputationValueType denom = px * py;
-      index[0] = ii;
-      index[1] = jj;
-      pxy = m_JointPDF->GetPixel(index);
-      local_mi = 0;
+      TInternalComputationValueType          py = this->m_MovingImageMarginalPDF->GetPixel(mind);
+      TInternalComputationValueType          denom = px * py;
+      const typename JointPDFType::IndexType index = { static_cast<long>(ii), static_cast<long>(jj) };
+
+      TInternalComputationValueType pxy = m_JointPDF->GetPixel(index);
+      TInternalComputationValueType local_mi = 0;
       if (itk::Math::abs(denom) > eps)
       {
         if (pxy / denom > eps)
@@ -379,7 +374,7 @@ JointHistogramMutualInformationImageToImageMetricv4<TFixedImage,
       }
       total_mi += local_mi;
     } // over jh bins 2
-  }   // over jh bins 1
+  } // over jh bins 1
   return (-1.0 * total_mi.GetSum() / this->m_Log2);
 }
 

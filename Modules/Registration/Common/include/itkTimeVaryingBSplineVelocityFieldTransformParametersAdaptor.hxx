@@ -32,17 +32,14 @@ namespace itk
 template <typename TTransform>
 TimeVaryingBSplineVelocityFieldTransformParametersAdaptor<
   TTransform>::TimeVaryingBSplineVelocityFieldTransformParametersAdaptor()
+  : m_SplineOrder(3)
 {
   this->m_RequiredFixedParameters.SetSize(TotalDimension * (TotalDimension + 4));
-
   this->m_RequiredTransformDomainOrigin.Fill(0.0);
   this->m_RequiredTransformDomainDirection.SetIdentity();
   this->m_RequiredTransformDomainSize.Fill(1);
   this->m_RequiredTransformDomainSpacing.Fill(0.0);
   this->m_RequiredTransformDomainMeshSize.Fill(1);
-
-  this->m_SplineOrder = 3;
-
   this->UpdateRequiredFixedParameters();
 }
 
@@ -142,10 +139,10 @@ TimeVaryingBSplineVelocityFieldTransformParametersAdaptor<TTransform>::UpdateReq
   OriginType origin;
   for (SizeValueType i = 0; i < TotalDimension; ++i)
   {
-    FixedParametersValueType domainPhysicalDimensions =
+    const FixedParametersValueType domainPhysicalDimensions =
       (this->m_RequiredTransformDomainSize[i] - 1.0) * this->m_RequiredTransformDomainSpacing[i];
 
-    FixedParametersValueType gridSpacing =
+    const FixedParametersValueType gridSpacing =
       domainPhysicalDimensions / static_cast<FixedParametersValueType>(this->m_RequiredTransformDomainMeshSize[i]);
     origin[i] = -0.5 * gridSpacing * (this->m_SplineOrder - 1);
   }
@@ -209,10 +206,10 @@ TimeVaryingBSplineVelocityFieldTransformParametersAdaptor<TTransform>::SetRequir
   OriginType origin;
   for (SizeValueType i = 0; i < TotalDimension; ++i)
   {
-    FixedParametersValueType domainPhysicalDimensions =
+    const FixedParametersValueType domainPhysicalDimensions =
       static_cast<FixedParametersValueType>(this->m_RequiredTransformDomainSize[i] - 1.0) *
       this->m_RequiredTransformDomainSpacing[i];
-    FixedParametersValueType gridSpacing =
+    const FixedParametersValueType gridSpacing =
       domainPhysicalDimensions / static_cast<FixedParametersValueType>(this->m_RequiredTransformDomainMeshSize[i]);
     origin[i] = 0.5 * gridSpacing * (this->m_SplineOrder - 1);
   }
@@ -251,14 +248,14 @@ TimeVaryingBSplineVelocityFieldTransformParametersAdaptor<TTransform>::AdaptTran
     return;
   }
 
-  SizeType      requiredLatticeSize = this->GetRequiredControlPointLatticeSize();
-  OriginType    requiredLatticeOrigin = this->GetRequiredControlPointLatticeOrigin();
-  SpacingType   requiredLatticeSpacing = this->GetRequiredControlPointLatticeSpacing();
-  DirectionType requiredLatticeDirection = this->GetRequiredControlPointLatticeDirection();
+  const SizeType      requiredLatticeSize = this->GetRequiredControlPointLatticeSize();
+  const OriginType    requiredLatticeOrigin = this->GetRequiredControlPointLatticeOrigin();
+  const SpacingType   requiredLatticeSpacing = this->GetRequiredControlPointLatticeSpacing();
+  const DirectionType requiredLatticeDirection = this->GetRequiredControlPointLatticeDirection();
 
   const RegionType & latticeRegion =
     this->m_Transform->GetTimeVaryingVelocityFieldControlPointLattice()->GetLargestPossibleRegion();
-  IndexType requiredLatticeIndex = latticeRegion.GetIndex();
+  const IndexType requiredLatticeIndex = latticeRegion.GetIndex();
 
   using ComponentImageType = Image<ParametersValueType, TotalDimension>;
 
@@ -267,7 +264,7 @@ TimeVaryingBSplineVelocityFieldTransformParametersAdaptor<TTransform>::AdaptTran
   using UpsampleFilterType = ResampleImageFilter<ComponentImageType, ComponentImageType, ParametersValueType>;
   using DecompositionFilterType = BSplineDecompositionImageFilter<ComponentImageType, ComponentImageType>;
 
-  TimeVaryingVelocityFieldControlPointLatticePointer requiredLattice =
+  const TimeVaryingVelocityFieldControlPointLatticePointer requiredLattice =
     TimeVaryingVelocityFieldControlPointLatticeType::New();
   requiredLattice->SetRegions(requiredLatticeSize);
   requiredLattice->SetOrigin(requiredLatticeOrigin);

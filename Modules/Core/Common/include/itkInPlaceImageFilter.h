@@ -85,7 +85,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InPlaceImageFilter);
 
   /** Superclass type alias. */
@@ -110,10 +110,11 @@ public:
    * will be effective only if CanRunInPlace also returns true.
    * By default CanRunInPlace checks whether the input and output
    * image type match. */
+  /** @ITKStartGrouping */
   itkSetMacro(InPlace, bool);
   itkGetConstMacro(InPlace, bool);
   itkBooleanMacro(InPlace);
-
+  /** @ITKEndGrouping */
   /** Can the filter run in place? To do so, the filter's first input
    * and output must have the same dimension and pixel type. This
    * method can be used in conjunction with the InPlace ivar to
@@ -122,7 +123,7 @@ public:
    * operation if the InPlace is true and CanRunInPlace is true.
    * CanRunInPlace may also be overridden by InPlaceImageFilter
    * subclasses to fine tune its behavior. */
-  virtual bool
+  [[nodiscard]] virtual bool
   CanRunInPlace() const;
 
 protected:

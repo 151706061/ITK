@@ -54,9 +54,8 @@ itkNrrdVectorImageReadTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  myImage::Pointer   image = reader->GetOutput();
-  myImage::IndexType coord;
-  PixelType          sample;
+  const myImage::Pointer image = reader->GetOutput();
+
 
   // The test image has been constructed so that the vector coefficients
   // coincide with sample coordinates
@@ -64,6 +63,7 @@ itkNrrdVectorImageReadTest(int argc, char * argv[])
   unsigned int idx = 0;
   for (unsigned int zi = 0; zi < 5; ++zi)
   {
+    myImage::IndexType coord;
     coord[2] = zi;
     for (unsigned int yi = 0; yi < 5; ++yi)
     {
@@ -71,7 +71,7 @@ itkNrrdVectorImageReadTest(int argc, char * argv[])
       for (unsigned int xi = 0; xi < 5; ++xi)
       {
         coord[0] = xi;
-        sample = image->GetPixel(coord);
+        PixelType sample = image->GetPixel(coord);
         err += itk::Math::abs(sample[0] - coord[0]);
         err += itk::Math::abs(sample[1] - coord[1]);
         err += itk::Math::abs(sample[2] - coord[2]);
@@ -86,8 +86,6 @@ itkNrrdVectorImageReadTest(int argc, char * argv[])
     std::cout << "test FAILED because values not as expected\n";
     return EXIT_FAILURE;
   }
-  else
-  {
-    return EXIT_SUCCESS;
-  }
+
+  return EXIT_SUCCESS;
 }

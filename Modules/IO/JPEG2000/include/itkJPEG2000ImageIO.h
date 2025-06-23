@@ -48,6 +48,7 @@ public:
     JPT_CFMT = 2,
     MJ2_CFMT = 3
   };
+
   /** \class DFMFormat
    * \ingroup ITKIOJPEG2000
    * */
@@ -77,7 +78,7 @@ extern ITKIOJPEG2000_EXPORT std::ostream &
  * This code was contributed in the Insight Journal paper:
  * "Support for Streaming the JPEG2000 File Format"
  * by Mosaliganti K., Ibanez L., Megason S
- * https://www.insight-journal.org/browse/publication/741
+ * https://doi.org/10.54294/bo53br
  *
  *
  *  \ingroup IOFilters
@@ -96,7 +97,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(JPEG2000ImageIO);
 
   /*-------- This part of the interfaces deals with reading data. ----- */

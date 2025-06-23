@@ -68,12 +68,11 @@ class ITK_TEMPLATE_EXPORT BinaryThreshold
 {
 public:
   BinaryThreshold()
-  {
-    m_LowerThreshold = NumericTraits<TInput>::NonpositiveMin();
-    m_UpperThreshold = NumericTraits<TInput>::max();
-    m_OutsideValue = TOutput{};
-    m_InsideValue = NumericTraits<TOutput>::max();
-  }
+    : m_LowerThreshold(NumericTraits<TInput>::NonpositiveMin())
+    , m_UpperThreshold(NumericTraits<TInput>::max())
+    , m_InsideValue(NumericTraits<TOutput>::max())
+    , m_OutsideValue(TOutput{})
+  {}
 
   ~BinaryThreshold() = default;
 
@@ -149,7 +148,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryThresholdImageFilter);
 
   /** Pixel types. */
@@ -208,14 +207,10 @@ public:
   virtual const InputPixelObjectType *
   GetLowerThresholdInput() const;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputPixelType>));
   itkConceptMacro(InputPixelTypeComparable, (Concept::Comparable<InputPixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   BinaryThresholdImageFilter();

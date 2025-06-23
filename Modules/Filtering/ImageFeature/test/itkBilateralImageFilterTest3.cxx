@@ -35,7 +35,7 @@ itkBilateralImageFilterTest3(int argc, char * argv[])
 
   using PixelType = unsigned char;
   using myImage = itk::Image<PixelType, 2>;
-  itk::ImageFileReader<myImage>::Pointer input = itk::ImageFileReader<myImage>::New();
+  const itk::ImageFileReader<myImage>::Pointer input = itk::ImageFileReader<myImage>::New();
   input->SetFileName(argv[1]);
 
   // Create a filter
@@ -81,8 +81,7 @@ itkBilateralImageFilterTest3(int argc, char * argv[])
 
 
   // Generate test image
-  itk::ImageFileWriter<myImage>::Pointer writer;
-  writer = itk::ImageFileWriter<myImage>::New();
+  const itk::ImageFileWriter<myImage>::Pointer writer = itk::ImageFileWriter<myImage>::New();
   writer->SetInput(filter3->GetOutput());
   writer->SetFileName(argv[2]);
 

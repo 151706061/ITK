@@ -47,10 +47,10 @@ itk_fetch_module(
   "An ITK_-based implementation of principal components analysis.
 A more detailed description can be found in the Insight Journal article:
   Bowers M., Younes L. ''Principal Components Analysis of Scalar, Vector, and Mesh Vertex Data.''
-    https://www.insight-journal.org/browse/publication/878
+    https://doi.org/10.54294/loekqj
     August, 2013.
 "
   MODULE_COMPLIANCE_LEVEL 2
   GIT_REPOSITORY https://github.com/InsightSoftwareConsortium/ITKPrincipalComponentsAnalysis.git
-  GIT_TAG 2f8d8bffb37fca8875a674465af5e3d902432f30
+  GIT_TAG 88e3f65aabdc9cf2c11f03907975a4e605676504
   )

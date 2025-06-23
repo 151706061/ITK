@@ -51,7 +51,7 @@ public:
 int
 itkMultiThreaderParallelizeArrayTest(int argc, char * argv[])
 {
-  itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
+  const itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
   if (mt.IsNull())
   {
     std::cerr << "MultiThreaderBase could not be instantiated!" << std::endl;
@@ -59,7 +59,7 @@ itkMultiThreaderParallelizeArrayTest(int argc, char * argv[])
   }
   if (argc >= 2)
   {
-    unsigned int workUnitCount = static_cast<unsigned int>(std::stoi(argv[1]));
+    const unsigned int workUnitCount = static_cast<unsigned int>(std::stoi(argv[1]));
     mt->SetNumberOfWorkUnits(workUnitCount);
   }
 
@@ -70,8 +70,7 @@ itkMultiThreaderParallelizeArrayTest(int argc, char * argv[])
   auto progressPO = SomeProcessObject::New();
   auto showProgress = ShowProgress::New();
   progressPO->AddObserver(itk::ProgressEvent(), showProgress);
-  mt->ParallelizeArray(
-    1, size, [&vec](int i) { vec[i] = i; }, progressPO);
+  mt->ParallelizeArray(1, size, [&vec](int i) { vec[i] = i; }, progressPO);
 
   int result = EXIT_SUCCESS;
   if (vec[0] != 0)

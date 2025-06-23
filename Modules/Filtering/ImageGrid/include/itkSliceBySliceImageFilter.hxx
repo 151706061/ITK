@@ -35,12 +35,10 @@ SliceBySliceImageFilter<TInputImage,
                         TOutputFilter,
                         TInternalInputImageType,
                         TInternalOutputImageType>::SliceBySliceImageFilter()
-{
-  m_InputFilter = nullptr;
-  m_OutputFilter = nullptr;
-  this->m_Dimension = ImageDimension - 1;
-  m_SliceIndex = 0;
-}
+  : m_Dimension(ImageDimension - 1)
+  , m_InputFilter(nullptr)
+  , m_OutputFilter(nullptr)
+{}
 
 template <typename TInputImage,
           typename TOutputImage,
@@ -54,7 +52,7 @@ SliceBySliceImageFilter<TInputImage,
                         TInputFilter,
                         TOutputFilter,
                         TInternalInputImageType,
-                        TInternalOutputImageType>::VerifyInputInformation() ITKv5_CONST
+                        TInternalOutputImageType>::VerifyInputInformation() const
 {
 
   Superclass::VerifyInputInformation();
@@ -290,8 +288,7 @@ SliceBySliceImageFilter<TInputImage,
       // not supported to avoid dealing with singularities, but we still account
       // for the direction matrix when collapsing the origin to an N-1
       // point.
-      typename InputImageType::IndexType originIndex;
-      originIndex.Fill(0);
+      typename InputImageType::IndexType originIndex{};
       originIndex[m_Dimension] = slice;
 
       typename InputImageType::PointType inputOrigin;

@@ -25,25 +25,12 @@ namespace itk
 
 template <typename TInput, typename TLevelSetContainer>
 LevelSetEquationOverlapPenaltyTerm<TInput, TLevelSetContainer>::LevelSetEquationOverlapPenaltyTerm()
+  : m_DomainMapImageFilter(nullptr)
+  , m_CacheImage(nullptr)
 {
   this->m_TermName = "Overlap term";
   this->m_RequiredData.insert("");
-  this->m_DomainMapImageFilter = nullptr;
-  this->m_CacheImage = nullptr;
 }
-
-template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationOverlapPenaltyTerm<TInput, TLevelSetContainer>::Update()
-{}
-
-template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationOverlapPenaltyTerm<TInput, TLevelSetContainer>::UpdatePixel(
-  const LevelSetInputIndexType & itkNotUsed(index),
-  const LevelSetOutputRealType & itkNotUsed(oldValue),
-  const LevelSetOutputRealType & itkNotUsed(newValue))
-{}
 
 template <typename TInput, typename TLevelSetContainer>
 void
@@ -52,12 +39,6 @@ LevelSetEquationOverlapPenaltyTerm<TInput, TLevelSetContainer>::InitializeParame
   this->SetUp();
 }
 
-
-template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationOverlapPenaltyTerm<TInput, TLevelSetContainer>::Initialize(
-  const LevelSetInputIndexType & itkNotUsed(index))
-{}
 
 template <typename TInput, typename TLevelSetContainer>
 auto

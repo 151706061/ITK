@@ -30,9 +30,7 @@
 
 #include "itkImageToImageFilterDetail.h"
 
-namespace itk
-{
-namespace ImageToImageFilterDetail
+namespace itk::ImageToImageFilterDetail
 {
 /**
  *  Call the base class version: ImageToImageFilterDefaultCopyRegion
@@ -57,9 +55,8 @@ ExtractImageFilterCopyRegion(
   const typename BinaryUnsignedIntDispatch<T1, T2>::FirstLessThanSecondType & firstLessThanSecond,
   ImageRegion<T1> &                                                           destRegion,
   const ImageRegion<T2> &                                                     srcRegion,
-  const ImageRegion<T1> &                                                     totalInputExtractionRegion)
+  const ImageRegion<T1> &                                                     itkNotUsed(totalInputExtractionRegion))
 {
-  (void)totalInputExtractionRegion;
   ImageToImageFilterDefaultCopyRegion<T1, T2>(firstLessThanSecond, destRegion, srcRegion);
 }
 
@@ -89,14 +86,14 @@ ExtractImageFilterCopyRegion(const typename BinaryUnsignedIntDispatch<T1, T2>::F
   // Source dimension is less than the destination dimension, so look
   // at the m_TotalExtractionRegion and see what values in size are 0.
   // With these values, lock the destRegion.Index to the corresponding index
-  unsigned int dim;
+
 
   Index<T1>         destIndex;
   Size<T1>          destSize;
   const Index<T2> & srcIndex = srcRegion.GetIndex();
   const Size<T2> &  srcSize = srcRegion.GetSize();
   int               count = 0;
-  for (dim = 0; dim < T1; ++dim)
+  for (unsigned int dim = 0; dim < T1; ++dim)
   {
     // for dimensions to be removed
     if (!totalInputExtractionRegion.GetSize()[dim])
@@ -157,7 +154,6 @@ public:
     ImageRegionCopier<T1, T2>::operator()(destRegion, srcRegion);
   }
 };
-} // end namespace ImageToImageFilterDetail
-} // end namespace itk
+} // namespace itk::ImageToImageFilterDetail
 
 #endif

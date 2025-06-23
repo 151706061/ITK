@@ -81,7 +81,7 @@ MeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueThreadProcessS
   const MovingImagePointType & itkNotUsed(mappedPoint),
   double                       movingImageValue) const
 {
-  double diff = movingImageValue - this->m_FixedImageSamples[fixedImageSample].value;
+  const double diff = movingImageValue - this->m_FixedImageSamples[fixedImageSample].value;
 
   m_PerThread[threadId].m_MSE += diff * diff;
 
@@ -139,13 +139,13 @@ MeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDerivativeT
   double                       movingImageValue,
   const ImageDerivativesType & movingImageGradientValue) const
 {
-  double diff = movingImageValue - this->m_FixedImageSamples[fixedImageSample].value;
+  const double diff = movingImageValue - this->m_FixedImageSamples[fixedImageSample].value;
 
   AlignedPerThreadType & threadS = m_PerThread[threadId];
 
   threadS.m_MSE += diff * diff;
 
-  FixedImagePointType fixedImagePoint = this->m_FixedImageSamples[fixedImageSample].point;
+  const FixedImagePointType fixedImagePoint = this->m_FixedImageSamples[fixedImageSample].point;
 
   // Need to use one of the threader transforms if we're
   // not in thread 0.
@@ -153,27 +153,40 @@ MeanSquaresImageToImageMetric<TFixedImage, TMovingImage>::GetValueAndDerivativeT
   // Use a raw pointer here to avoid the overhead of smart pointers.
   // For instance, Register and UnRegister have mutex locks around
   // the reference counts.
-  TransformType * transform;
+  TransformType * transform = this->m_Transform;
 
   if (threadId > 0)
   {
     transform = this->m_ThreaderTransform[threadId - 1];
   }
+
+  if (this->m_BSplineTransform && this->m_UseCachingOfBSplineWeights)
+  {
+    // using pre-computed weights and indexes to calculate only non zero elements of the derivative
+    for (unsigned int w = 0; w < this->m_NumBSplineWeights; ++w)
+    {
+      const auto precomputedIndex = this->m_BSplineTransformIndicesArray[fixedImageSample][w];
+      const auto precomputedWeight = this->m_BSplineTransformWeightsArray[fixedImageSample][w];
+      for (unsigned int dim = 0; dim < MovingImageDimension; ++dim)
+      {
+        const int par = precomputedIndex + this->m_BSplineParametersOffset[dim];
+        threadS.m_MSEDerivative[par] += 2.0 * diff * precomputedWeight * movingImageGradientValue[dim];
+      }
+    }
+  }
   else
   {
-    transform = this->m_Transform;
-  }
-
-  // Jacobian should be evaluated at the unmapped (fixed image) point.
-  transform->ComputeJacobianWithRespectToParameters(fixedImagePoint, threadS.m_Jacobian);
-  for (unsigned int par = 0; par < this->m_NumberOfParameters; ++par)
-  {
-    double sum = 0.0;
-    for (unsigned int dim = 0; dim < MovingImageDimension; ++dim)
+    // Use generic transform to compute Jacobian at the unmapped (fixed image) point.
+    transform->ComputeJacobianWithRespectToParameters(fixedImagePoint, threadS.m_Jacobian);
+    for (unsigned int par = 0; par < this->m_NumberOfParameters; ++par)
     {
-      sum += 2.0 * diff * threadS.m_Jacobian(dim, par) * movingImageGradientValue[dim];
+      double sum = 0.0;
+      for (unsigned int dim = 0; dim < MovingImageDimension; ++dim)
+      {
+        sum += 2.0 * diff * threadS.m_Jacobian(dim, par) * movingImageGradientValue[dim];
+      }
+      threadS.m_MSEDerivative[par] += sum;
     }
-    threadS.m_MSEDerivative[par] += sum;
   }
 
   return true;

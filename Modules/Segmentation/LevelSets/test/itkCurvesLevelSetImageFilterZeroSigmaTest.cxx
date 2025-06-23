@@ -51,21 +51,17 @@ itkCurvesLevelSetImageFilterZeroSigmaTest(int, char *[])
    * Create an input image.
    * A light square on a dark background.
    */
-  PixelType background = 0;
-  PixelType foreground = 190;
+  constexpr PixelType background = 0;
+  constexpr PixelType foreground = 190;
 
   auto inputImage = ImageType::New();
   inputImage->SetRegions(imageRegion);
   inputImage->Allocate();
   inputImage->FillBuffer(background);
 
-  ImageType::IndexType squareStart;
-  squareStart.Fill(20);
-  ImageType::SizeType squareSize;
-  squareSize.Fill(60);
-  ImageType::RegionType squareRegion;
-  squareRegion.SetIndex(squareStart);
-  squareRegion.SetSize(squareSize);
+  auto                        squareStart = ImageType::IndexType::Filled(20);
+  auto                        squareSize = ImageType::SizeType::Filled(60);
+  const ImageType::RegionType squareRegion{ squareStart, squareSize };
 
   using Iterator = itk::ImageRegionIterator<ImageType>;
   Iterator it(inputImage, squareRegion);

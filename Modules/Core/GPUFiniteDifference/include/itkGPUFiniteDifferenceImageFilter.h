@@ -50,7 +50,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUFiniteDifferenceImageFilter);
 
   /** Input and output image types. */
@@ -87,8 +87,7 @@ public:
   }
 
   /** This method sets the pointer to a FiniteDifferenceFunction object that
-   * will be used by the filter to calculate updates at image pixels.
-   * \returns A FiniteDifferenceObject pointer. */
+   * will be used by the filter to calculate updates at image pixels. */
   void
   SetDifferenceFunction(FiniteDifferenceFunctionType * differenceFunction) override
   {
@@ -123,23 +122,21 @@ public:
   }
 
   /** Set/Get the state of the filter. */
+  /** @ITKStartGrouping */
 #if !defined(ITK_WRAPPING_PARSER)
   itkSetMacro(State, GPUFiniteDifferenceFilterEnum);
   itkGetConstReferenceMacro(State, GPUFiniteDifferenceFilterEnum);
 #endif
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(OutputPixelIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputPixelValueType>));
-  // End concept checking
-#endif
 
   /** Methods to get timers */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(InitTime, TimeProbe);
   itkGetConstReferenceMacro(ComputeUpdateTime, TimeProbe);
   itkGetConstReferenceMacro(ApplyUpdateTime, TimeProbe);
   itkGetConstReferenceMacro(SmoothFieldTime, TimeProbe);
-
+  /** @ITKEndGrouping */
 protected:
   GPUFiniteDifferenceImageFilter();
   ~GPUFiniteDifferenceImageFilter() override;

@@ -40,7 +40,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DOMTestObjectDOMWriter);
 
 protected:
@@ -66,7 +66,7 @@ DOMTestObjectDOMWriter::GenerateData(DOMNodeType * outputdom, const void *) cons
 
   // write child foo
   fn = input->GetFooFileName();
-  DOMNodePointer foo = DOMNodeType::New();
+  const DOMNodePointer foo = DOMNodeType::New();
   foo->SetName("foo");
   foo->SetAttribute("fname", fn);
   outputdom->AddChild(foo);

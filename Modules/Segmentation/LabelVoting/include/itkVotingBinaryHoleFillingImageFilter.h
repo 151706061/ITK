@@ -61,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VotingBinaryHoleFillingImageFilter);
 
   /** Image type alias support */
@@ -80,18 +80,15 @@ public:
    * 62, and if you set up a Majority threshold of 5, that means that the
    * filter will require 67 or more neighbor pixels to be ON in order to switch
    * the current OFF pixel to ON. The default value is 1. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(MajorityThreshold, unsigned int);
   itkSetMacro(MajorityThreshold, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Returns the number of pixels that changed when the filter was executed. */
   itkGetConstReferenceMacro(NumberOfPixelsChanged, SizeValueType);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputPixelType>));
   itkConceptMacro(UnsignedIntConvertibleToInputCheck, (Concept::Convertible<unsigned int, InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   VotingBinaryHoleFillingImageFilter();
@@ -102,6 +99,7 @@ protected:
   /** Make protected the methods SetBirthThreshold() and
    * SetSurvivalThreshold() so users of this filter do not have access to
    * them. */
+  /** @ITKStartGrouping */
   void
   SetBirthThreshold(const unsigned int value) override
   {
@@ -112,7 +110,7 @@ protected:
   {
     this->Superclass::SetSurvivalThreshold(value);
   }
-
+  /** @ITKEndGrouping */
   /** VotingBinaryHoleFillingImageFilter can be implemented as a multithreaded filter.
    * Therefore, this implementation provides a ThreadedGenerateData()
    * routine which is called for each processing thread. The output

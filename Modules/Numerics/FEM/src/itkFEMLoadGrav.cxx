@@ -18,9 +18,7 @@
 
 #include "itkFEMLoadGrav.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 void
@@ -49,7 +47,8 @@ LoadGravConst::CreateAnother() const
   return smartPtr;
 }
 
-vnl_vector<Element::Float> LoadGravConst::GetGravitationalForceAtPoint(vnl_vector<Element::Float>)
+vnl_vector<Element::Float>
+LoadGravConst::GetGravitationalForceAtPoint(vnl_vector<Element::Float>)
 {
   return m_GravityForce;
 }
@@ -132,5 +131,4 @@ LoadGravConst::PrintSelf(std::ostream & os, Indent indent) const
   os << indent << "Gravity Force: " << this->m_GravityForce << std::endl;
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem

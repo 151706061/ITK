@@ -60,9 +60,9 @@ RegularExpressionSeriesFileNames::GetFileNames()
 
   // Process all files in the directory
   itksys::Directory fileDir;
-  if (!fileDir.Load(m_Directory.c_str()))
+  if (!fileDir.Load(m_Directory))
   {
-    itkExceptionMacro("Directory " << m_Directory.c_str() << " cannot be read!");
+    itkExceptionMacro("Directory " << m_Directory << " cannot be read!");
   }
 
   std::vector<std::pair<std::string, std::string>> sortedBySubMatch;
@@ -88,7 +88,7 @@ RegularExpressionSeriesFileNames::GetFileNames()
   }
 
   // Sort the files. The files are sorted by the sub match defined by
-  // m_SubMatch. Sorting can be alpahbetic or numeric.
+  // m_SubMatch. Sorting can be alphabetic or numeric.
   if (m_NumericSort)
   {
     std::sort(sortedBySubMatch.begin(), sortedBySubMatch.end(), lt_pair_numeric_string_string());
@@ -100,10 +100,10 @@ RegularExpressionSeriesFileNames::GetFileNames()
 
   // Now, store the sorted names in a vector
   m_FileNames.clear();
-  std::vector<std::pair<std::string, std::string>>::iterator siter;
-  for (siter = sortedBySubMatch.begin(); siter != sortedBySubMatch.end(); ++siter)
+
+  for (auto & currPair : sortedBySubMatch)
   {
-    m_FileNames.push_back(siter->first);
+    m_FileNames.push_back(currPair.first);
   }
 
   return m_FileNames;

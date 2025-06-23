@@ -26,23 +26,17 @@ namespace itk
 template <typename TFixedImage, typename TMovingImage, typename TDisplacementField>
 DiffeomorphicDemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField>::
   DiffeomorphicDemonsRegistrationFilter()
+  : m_Multiplier(MultiplyByConstantType::New())
+  , m_Exponentiator(FieldExponentiatorType::New())
+  , m_Warper(VectorWarperType::New())
+  , m_Adder(AdderType::New())
 
 {
-  typename DemonsRegistrationFunctionType::Pointer drfp;
-  drfp = DemonsRegistrationFunctionType::New();
-
+  auto drfp = DemonsRegistrationFunctionType::New();
   this->SetDifferenceFunction(drfp);
-
-  m_Multiplier = MultiplyByConstantType::New();
   m_Multiplier->InPlaceOn();
-
-  m_Exponentiator = FieldExponentiatorType::New();
-
-  m_Warper = VectorWarperType::New();
-  FieldInterpolatorPointer VectorInterpolator = FieldInterpolatorType::New();
+  const FieldInterpolatorPointer VectorInterpolator = FieldInterpolatorType::New();
   m_Warper->SetInterpolator(VectorInterpolator);
-
-  m_Adder = AdderType::New();
   m_Adder->InPlaceOn();
 }
 
@@ -172,8 +166,8 @@ void
 DiffeomorphicDemonsRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField>::AllocateUpdateBuffer()
 {
   // The update buffer looks just like the output.
-  DisplacementFieldPointer output = this->GetOutput();
-  DisplacementFieldPointer upbuf = this->GetUpdateBuffer();
+  const DisplacementFieldPointer output = this->GetOutput();
+  const DisplacementFieldPointer upbuf = this->GetUpdateBuffer();
 
   upbuf->SetLargestPossibleRegion(output->GetLargestPossibleRegion());
   upbuf->SetRequestedRegion(output->GetRequestedRegion());

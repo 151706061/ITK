@@ -47,9 +47,8 @@ template <typename TPoint>
 double
 SimpleSignedDistance(const TPoint & p)
 {
-  TPoint center;
-  center.Fill(50);
-  double radius = 19.5;
+  auto             center = itk::MakeFilled<TPoint>(50);
+  constexpr double radius = 19.5;
 
   double accum = 0.0;
   for (unsigned int j = 0; j < TPoint::PointDimension; ++j)
@@ -73,10 +72,9 @@ itkIsoContourDistanceImageFilterTest(int, char *[])
   using PointType = itk::Point<double, ImageDimension>;
 
   // Fill an input image with simple signed distance function
-  auto                image = ImageType::New();
-  ImageType::SizeType size;
-  size.Fill(128);
-  ImageType::RegionType region(size);
+  auto                        image = ImageType::New();
+  auto                        size = ImageType::SizeType::Filled(128);
+  const ImageType::RegionType region(size);
 
   image->SetRegions(region);
   image->Allocate();
@@ -93,7 +91,7 @@ itkIsoContourDistanceImageFilterTest(int, char *[])
     ++iter;
   }
 
-  // Squash up the level sets by mulitplying with a scalar
+  // Squash up the level sets by multiplying with a scalar
   using MultiplierType = itk::ShiftScaleImageFilter<ImageType, ImageType>;
   auto multiplier = MultiplierType::New();
   multiplier->SetInput(image);
@@ -113,9 +111,9 @@ itkIsoContourDistanceImageFilterTest(int, char *[])
     return EXIT_FAILURE;
   }
 
-  ShowProgressObject                                    progressWatch(isocontour);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(isocontour);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   isocontour->AddObserver(itk::ProgressEvent(), command);
 
@@ -179,8 +177,8 @@ itkIsoContourDistanceImageFilterTest(int, char *[])
   auto calculator = CalculatorType::New();
   calculator->SetImage(checker->GetOutput());
   calculator->Compute();
-  double minValue = calculator->GetMinimum();
-  double maxValue = calculator->GetMaximum();
+  const double minValue = calculator->GetMinimum();
+  const double maxValue = calculator->GetMaximum();
 
   std::cout << "Min. product = " << minValue << std::endl;
   std::cout << "Max. product = " << maxValue << std::endl;

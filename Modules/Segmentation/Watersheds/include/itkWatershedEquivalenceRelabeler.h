@@ -20,9 +20,7 @@
 
 #include "itkWatershedSegmenter.h"
 
-namespace itk
-{
-namespace watershed
+namespace itk::watershed
 {
 /**
  * \class EquivalenceRelabeler
@@ -69,12 +67,14 @@ public:
   using DataObjectPointer = DataObject::Pointer;
 
   /**  Define smart pointers for this object.   */
+  /** @ITKStartGrouping */
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
   itkNewMacro(Self);
   itkOverrideGetNameOfClassMacro(EquivalenceRelabeler);
-
+  /** @ITKEndGrouping */
   /** Set/Get the image to relabel.   */
+  /** @ITKStartGrouping */
   void
   SetInputImage(ImageType * img)
   {
@@ -85,7 +85,7 @@ public:
   {
     return static_cast<ImageType *>(this->ProcessObject::GetInput(0));
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the output image */
   void
   SetOutputImage(ImageType * img)
@@ -125,7 +125,7 @@ public:
 protected:
   EquivalenceRelabeler()
   {
-    typename ImageType::Pointer img = static_cast<ImageType *>(this->MakeOutput(0).GetPointer());
+    const typename ImageType::Pointer img = static_cast<ImageType *>(this->MakeOutput(0).GetPointer());
     this->SetNumberOfRequiredOutputs(1);
     this->ProcessObject::SetNthOutput(0, img.GetPointer());
   }
@@ -141,8 +141,7 @@ protected:
   void
   GenerateInputRequestedRegion() override;
 };
-} // end namespace watershed
-} // end namespace itk
+} // namespace itk::watershed
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWatershedEquivalenceRelabeler.hxx"

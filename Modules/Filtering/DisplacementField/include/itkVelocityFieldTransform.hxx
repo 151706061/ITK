@@ -28,14 +28,13 @@ namespace itk
 
 template <typename TParametersValueType, unsigned int VDimension>
 VelocityFieldTransform<TParametersValueType, VDimension>::VelocityFieldTransform()
+  : m_LowerTimeBound(0.0)
+  , m_UpperTimeBound(1.0)
+  , m_NumberOfIntegrationSteps(10)
+
 {
   this->m_FixedParameters.SetSize(VelocityFieldDimension * (VelocityFieldDimension + 3));
   this->m_FixedParameters.Fill(0.0);
-
-  this->m_LowerTimeBound = 0.0;
-  this->m_UpperTimeBound = 1.0;
-
-  this->m_NumberOfIntegrationSteps = 10;
 
   // Setup and assign default interpolator
   using DefaultInterpolatorType = VectorLinearInterpolateImageFunction<VelocityFieldType, ScalarType>;
@@ -48,8 +47,6 @@ VelocityFieldTransform<TParametersValueType, VDimension>::VelocityFieldTransform
   // After assigning this, this->m_Parameter will manage this,
   // deleting when appropriate.
   this->m_Parameters.SetHelper(helper);
-
-  this->m_VelocityFieldSetTime = 0;
 }
 
 template <typename TParametersValueType, unsigned int VDimension>
@@ -72,33 +69,23 @@ VelocityFieldTransform<TParametersValueType, VDimension>::GetInverse(Self * inve
   {
     return false;
   }
-  else
-  {
-    inverse->SetFixedParameters(this->GetFixedParameters());
-    inverse->SetUpperTimeBound(this->m_LowerTimeBound);
-    inverse->SetLowerTimeBound(this->m_UpperTimeBound);
-    inverse->SetDisplacementField(this->m_InverseDisplacementField);
-    inverse->SetInverseDisplacementField(this->m_DisplacementField);
-    inverse->SetInterpolator(this->m_Interpolator);
-    inverse->SetVelocityField(this->m_VelocityField);
-    inverse->SetVelocityFieldInterpolator(this->m_VelocityFieldInterpolator);
-    return true;
-  }
+
+  inverse->SetFixedParameters(this->GetFixedParameters());
+  inverse->SetUpperTimeBound(this->m_LowerTimeBound);
+  inverse->SetLowerTimeBound(this->m_UpperTimeBound);
+  inverse->SetDisplacementField(this->m_InverseDisplacementField);
+  inverse->SetInverseDisplacementField(this->m_DisplacementField);
+  inverse->SetInterpolator(this->m_Interpolator);
+  inverse->SetVelocityField(this->m_VelocityField);
+  inverse->SetVelocityFieldInterpolator(this->m_VelocityFieldInterpolator);
+  return true;
 }
 
 template <typename TParametersValueType, unsigned int VDimension>
 auto
 VelocityFieldTransform<TParametersValueType, VDimension>::GetInverseTransform() const -> InverseTransformBasePointer
 {
-  Pointer inverseTransform = New();
-  if (this->GetInverse(inverseTransform))
-  {
-    return inverseTransform.GetPointer();
-  }
-  else
-  {
-    return nullptr;
-  }
+  return Superclass::InvertTransform(*this);
 }
 
 template <typename TParametersValueType, unsigned int VDimension>
@@ -257,8 +244,8 @@ typename LightObject::Pointer
 VelocityFieldTransform<TParametersValueType, VDimension>::InternalClone() const
 {
   // create a new instance
-  LightObject::Pointer   loPtr = Superclass::InternalClone();
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  LightObject::Pointer         loPtr = Superclass::InternalClone();
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
@@ -270,15 +257,15 @@ VelocityFieldTransform<TParametersValueType, VDimension>::InternalClone() const
   rval->SetParameters(this->GetParameters());
 
   // need the displacement field but GetDisplacementField is non-const.
-  auto *                                       nonConstThis = const_cast<Self *>(this);
-  typename DisplacementFieldType::ConstPointer dispField = nonConstThis->GetDisplacementField();
-  typename DisplacementFieldType::Pointer      cloneDispField = this->CopyDisplacementField(dispField);
+  auto *                                             nonConstThis = const_cast<Self *>(this);
+  const typename DisplacementFieldType::ConstPointer dispField = nonConstThis->GetDisplacementField();
+  const typename DisplacementFieldType::Pointer      cloneDispField = this->CopyDisplacementField(dispField);
   rval->GetModifiableInterpolator()->SetInputImage(cloneDispField);
   rval->SetDisplacementField(cloneDispField);
 
   // now do the inverse -- it actually gets created as a side effect?
-  typename DisplacementFieldType::ConstPointer invDispField = nonConstThis->GetInverseDisplacementField();
-  typename DisplacementFieldType::Pointer      cloneInvDispField = this->CopyDisplacementField(invDispField);
+  const typename DisplacementFieldType::ConstPointer invDispField = nonConstThis->GetInverseDisplacementField();
+  const typename DisplacementFieldType::Pointer      cloneInvDispField = this->CopyDisplacementField(invDispField);
   rval->SetInverseDisplacementField(cloneInvDispField);
 
   // copy the VelocityField
@@ -298,7 +285,7 @@ VelocityFieldTransform<TParametersValueType, VDimension>::InternalClone() const
   rval->SetNumberOfIntegrationSteps(this->GetNumberOfIntegrationSteps());
 
   // copy the interpolator
-  VelocityFieldInterpolatorPointer newInterp =
+  const VelocityFieldInterpolatorPointer newInterp =
     dynamic_cast<VelocityFieldInterpolatorType *>(this->m_VelocityFieldInterpolator->CreateAnother().GetPointer());
   if (newInterp.IsNull())
   {

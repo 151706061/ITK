@@ -119,24 +119,6 @@ LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::GenerateAdvectionImag
 }
 
 template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::Initialize(const LevelSetInputIndexType &)
-{}
-
-template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::Update()
-{}
-
-template <typename TInput, typename TLevelSetContainer>
-void
-LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::UpdatePixel(
-  const LevelSetInputIndexType & itkNotUsed(iP),
-  const LevelSetOutputRealType & itkNotUsed(oldValue),
-  const LevelSetOutputRealType & itkNotUsed(newValue))
-{}
-
-template <typename TInput, typename TLevelSetContainer>
 auto
 LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::AdvectionSpeed(const LevelSetInputIndexType & iP) const
   -> VectorType
@@ -157,7 +139,7 @@ LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::Value(const LevelSetI
 
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
-    LevelSetOutputRealType component = advectionField[dim];
+    const LevelSetOutputRealType component = advectionField[dim];
 
     if (component > LevelSetOutputRealType{})
     {
@@ -183,7 +165,7 @@ LevelSetEquationAdvectionTerm<TInput, TLevelSetContainer>::Value(const LevelSetI
 
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
-    LevelSetOutputRealType component = advectionField[dim];
+    const LevelSetOutputRealType component = advectionField[dim];
 
     if (component > LevelSetOutputRealType{})
     {

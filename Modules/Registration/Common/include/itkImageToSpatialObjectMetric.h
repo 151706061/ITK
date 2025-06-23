@@ -121,17 +121,19 @@ public:
    *  It defines a position in the optimization search space. */
   using ParametersType = Superclass::ParametersType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToSpatialObjectMetric);
 
   /** Get/Set the FixedImage. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(FixedImage, FixedImageType);
   itkGetConstObjectMacro(FixedImage, FixedImageType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the MovingSpatialObject */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(MovingSpatialObject, MovingSpatialObjectType);
   itkGetConstObjectMacro(MovingSpatialObject, MovingSpatialObjectType);
-
+  /** @ITKEndGrouping */
   /** Connect the Interpolator. */
   itkSetObjectMacro(Interpolator, InterpolatorType);
 

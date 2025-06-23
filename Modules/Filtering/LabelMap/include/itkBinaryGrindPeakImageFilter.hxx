@@ -30,7 +30,6 @@ template <typename TInputImage>
 BinaryGrindPeakImageFilter<TInputImage>::BinaryGrindPeakImageFilter()
   : m_ForegroundValue(NumericTraits<InputImagePixelType>::max())
   , m_BackgroundValue(InputImagePixelType{})
-
 {}
 
 template <typename TInputImage>
@@ -41,7 +40,7 @@ BinaryGrindPeakImageFilter<TInputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need the whole input
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -110,7 +109,7 @@ BinaryGrindPeakImageFilter<TInputImage>::PrintSelf(std::ostream & os, Indent ind
   os << indent
      << "BackgroundValue: " << static_cast<typename NumericTraits<InputImagePixelType>::PrintType>(m_BackgroundValue)
      << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

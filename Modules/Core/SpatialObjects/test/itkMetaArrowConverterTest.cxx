@@ -94,7 +94,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
   mPosition[2] = -3;
 
   // length
-  double length = 2.3;
+  constexpr double length = 2.3;
 
   // color
   float color[4];
@@ -105,6 +105,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
 
   // set up itkArrow
   auto itkArrow = SpatialObjectType::New();
+  itkArrow->SetId(0);
   itkArrow->SetDirectionInObjectSpace(direction);
   itkArrow->SetPositionInObjectSpace(position);
   itkArrow->SetLengthInObjectSpace(length);
@@ -120,6 +121,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
 
   // set up metaArrow
   auto * metaArrow = new MetaArrow(Dimensions);
+  metaArrow->ID(2);
   metaArrow->Length(static_cast<float>(length));
   metaArrow->Position((const double *)mPosition);
   metaArrow->Direction((const double *)mDirection);
@@ -127,7 +129,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
   metaArrow->ParentID(itkParent->GetId());
 
   // precision limit for comparing floats and doubles
-  double precisionLimit = .000001;
+  constexpr double precisionLimit = .000001;
 
   //
   // test itk to metaArrow
@@ -139,7 +141,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
   }
 
   // check length
-  double metaLength = newMetaArrow->Length();
+  const double metaLength = newMetaArrow->Length();
 
   // if (metaLength != static_cast<float>(length))
   if (itk::Math::abs(metaLength - length) > precisionLimit)
@@ -213,7 +215,7 @@ itkMetaArrowConverterTest(int argc, char * argv[])
   //
   // test metaArrow to itk
   //
-  SpatialObjectType::Pointer newItkArrow =
+  const SpatialObjectType::Pointer newItkArrow =
     dynamic_cast<SpatialObjectType *>(converter->MetaObjectToSpatialObject(metaArrow).GetPointer());
   newItkArrow->Update();
 
@@ -299,7 +301,8 @@ itkMetaArrowConverterTest(int argc, char * argv[])
   //
   // test reading
   //
-  SpatialObjectType::Pointer reLoad = dynamic_cast<SpatialObjectType *>(converter->ReadMeta(argv[1]).GetPointer());
+  const SpatialObjectType::Pointer reLoad =
+    dynamic_cast<SpatialObjectType *>(converter->ReadMeta(argv[1]).GetPointer());
 
   // check length
   if (itk::Math::abs(reLoad->GetLengthInWorldSpace() - length) > precisionLimit)
@@ -353,6 +356,8 @@ itkMetaArrowConverterTest(int argc, char * argv[])
       itk::Math::abs(reLoadDirectionNorm[2] - directionNorm[2]) > precisionLimit)
   {
     std::cout << "Didn't read direction properly [FAILED]" << std::endl;
+    std::cout << "  Direction: " << reLoadDirectionNorm << std::endl;
+    std::cout << "    vs: " << directionNorm << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[PASSED]  Reading: direction" << std::endl;

@@ -36,7 +36,6 @@ GaussianBlurImageFunction<TInputImage, TOutput>::GaussianBlurImageFunction()
     m_MaximumKernelWidth = 32;
     m_Extent[i] = 1.0f;
   }
-  m_UseImageSpacing = true;
 
   m_GaussianFunction = GaussianFunctionType::New();
   m_GaussianFunction->SetMean(mean);
@@ -69,7 +68,7 @@ GaussianBlurImageFunction<TInputImage, TOutput>::PrintSelf(std::ostream & os, In
     os << indent << "Extent[" << i << "] : " << m_Extent[i] << std::endl;
   }
   os << indent << "MaximumKernelWidth: " << m_MaximumKernelWidth << std::endl;
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
 
   os << indent << "Internal Image : " << m_InternalImage << std::endl;
 }
@@ -79,22 +78,10 @@ template <typename TInputImage, typename TOutput>
 void
 GaussianBlurImageFunction<TInputImage, TOutput>::SetSigma(const double * sigma)
 {
-  unsigned int i;
-
-  for (i = 0; i < Self::ImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Sigma, sigma, Self::ImageDimension))
   {
-    if (sigma[i] != m_Sigma[i])
-    {
-      break;
-    }
-  }
-  if (i < Self::ImageDimension)
-  {
-    for (i = 0; i < Self::ImageDimension; ++i)
-    {
-      m_Sigma[i] = sigma[i];
-    }
     this->RecomputeGaussianKernel();
+    this->Modified();
   }
 }
 
@@ -103,22 +90,10 @@ template <typename TInputImage, typename TOutput>
 void
 GaussianBlurImageFunction<TInputImage, TOutput>::SetSigma(const double sigma)
 {
-  unsigned int i;
-
-  for (i = 0; i < Self::ImageDimension; ++i)
+  if (ContainerFillWithCheck(m_Sigma, sigma, Self::ImageDimension))
   {
-    if (Math::NotExactlyEquals(sigma, m_Sigma[i]))
-    {
-      break;
-    }
-  }
-  if (i < Self::ImageDimension)
-  {
-    for (i = 0; i < Self::ImageDimension; ++i)
-    {
-      m_Sigma[i] = sigma;
-    }
     this->RecomputeGaussianKernel();
+    this->Modified();
   }
 }
 
@@ -127,22 +102,10 @@ template <typename TInputImage, typename TOutput>
 void
 GaussianBlurImageFunction<TInputImage, TOutput>::SetExtent(const double * extent)
 {
-  unsigned int i;
-
-  for (i = 0; i < Self::ImageDimension; ++i)
+  if (ContainerCopyWithCheck(m_Extent, extent, Self::ImageDimension))
   {
-    if (extent[i] != m_Extent[i])
-    {
-      break;
-    }
-  }
-  if (i < Self::ImageDimension)
-  {
-    for (i = 0; i < Self::ImageDimension; ++i)
-    {
-      m_Extent[i] = extent[i];
-    }
     this->RecomputeGaussianKernel();
+    this->Modified();
   }
 }
 
@@ -151,22 +114,10 @@ template <typename TInputImage, typename TOutput>
 void
 GaussianBlurImageFunction<TInputImage, TOutput>::SetExtent(const double extent)
 {
-  unsigned int i;
-
-  for (i = 0; i < Self::ImageDimension; ++i)
+  if (ContainerFillWithCheck(m_Extent, extent, Self::ImageDimension))
   {
-    if (Math::NotExactlyEquals(extent, m_Extent[i]))
-    {
-      break;
-    }
-  }
-  if (i < Self::ImageDimension)
-  {
-    for (i = 0; i < Self::ImageDimension; ++i)
-    {
-      m_Extent[i] = extent;
-    }
     this->RecomputeGaussianKernel();
+    this->Modified();
   }
 }
 
@@ -187,7 +138,7 @@ GaussianBlurImageFunction<TInputImage, TOutput>::RecomputeGaussianKernel()
     gaussianOperator.SetMaximumError(m_MaximumError[direction]);
     gaussianOperator.SetMaximumKernelWidth(m_MaximumKernelWidth);
 
-    if ((m_UseImageSpacing == true) && (this->GetInputImage()))
+    if (m_UseImageSpacing && (this->GetInputImage()))
     {
       if (this->GetInputImage()->GetSpacing()[direction] == 0.0)
       {
@@ -251,8 +202,7 @@ GaussianBlurImageFunction<TInputImage, TOutput>::EvaluateAtIndex(const IndexType
   }
 
   // first direction
-  typename InternalImageType::IndexType ind;
-  ind = index;
+  typename InternalImageType::IndexType ind = index;
 
   // Define the region of the iterator
   typename InternalImageType::RegionType region;
@@ -352,8 +302,7 @@ GaussianBlurImageFunction<TInputImage, TOutput>::RecomputeContinuousGaussianKern
 {
   for (unsigned int direction = 0; direction < Self::ImageDimension; ++direction)
   {
-    typename NeighborhoodType::SizeType size;
-    size.Fill(0);
+    typename NeighborhoodType::SizeType size{};
     size[direction] = static_cast<SizeValueType>(m_Sigma[direction] * m_Extent[direction]);
 
     NeighborhoodType gaussianNeighborhood;
@@ -371,7 +320,7 @@ GaussianBlurImageFunction<TInputImage, TOutput>::RecomputeContinuousGaussianKern
     {
       typename GaussianFunctionType::InputType pt;
       pt[0] = gaussianNeighborhood.GetOffset(i)[direction] - offset[direction];
-      if ((m_UseImageSpacing == true) && (this->GetInputImage()))
+      if (m_UseImageSpacing && (this->GetInputImage()))
       {
         if (this->GetInputImage()->GetSpacing()[direction] == 0.0)
         {

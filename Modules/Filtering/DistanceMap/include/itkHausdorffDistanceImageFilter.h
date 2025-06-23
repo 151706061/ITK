@@ -74,7 +74,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HausdorffDistanceImageFilter);
 
   /** Image related type alias. */
@@ -115,18 +115,16 @@ public:
   GetInput2();
 
   /** Set if image spacing should be used in computing distances. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
-
+  /** @ITKEndGrouping */
   /** Return the computed Hausdorff distance. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(HausdorffDistance, RealType);
   itkGetConstMacro(AverageHausdorffDistance, RealType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(Input1HasNumericTraitsCheck, (Concept::HasNumericTraits<InputImage1PixelType>));
-  // End concept checking
-#endif
 
 protected:
   HausdorffDistanceImageFilter();
@@ -149,7 +147,7 @@ protected:
 private:
   RealType m_HausdorffDistance{};
   RealType m_AverageHausdorffDistance{};
-  bool     m_UseImageSpacing{};
+  bool     m_UseImageSpacing{ true };
 }; // end of class
 } // end namespace itk
 

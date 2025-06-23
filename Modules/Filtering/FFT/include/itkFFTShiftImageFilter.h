@@ -36,7 +36,7 @@ namespace itk
  * twice will not produce the same image as the original one without
  * using SetInverse(true) on one (and only one) of the two filters.
  *
- * https://www.insight-journal.org/browse/publication/125
+ * https://doi.org/10.54294/xd0lzg
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -77,17 +77,18 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FFTShiftImageFilter);
 
   /** Set/Get whether the filter must invert the transform or not.
    * This option has no effect if none of the size of the input image is even,
    * but is required to restore the original image if at least one
    * of the dimensions has an odd size. */
+  /** @ITKStartGrouping */
   itkSetMacro(Inverse, bool);
   itkGetConstReferenceMacro(Inverse, bool);
   itkBooleanMacro(Inverse);
-
+  /** @ITKEndGrouping */
 protected:
   FFTShiftImageFilter();
   ~FFTShiftImageFilter() override = default;

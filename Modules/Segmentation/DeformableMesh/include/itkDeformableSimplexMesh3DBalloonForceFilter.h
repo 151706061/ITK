@@ -67,7 +67,7 @@ public:
   /** Method of creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DeformableSimplexMesh3DBalloonForceFilter);
 
   /** Some type alias. */
@@ -88,9 +88,10 @@ public:
   using GradientIntensityImagePointer = typename GradientIntensityImageType::Pointer;
 
   /** Set/Get the scalar for balloon force. */
+  /** @ITKStartGrouping */
   itkSetMacro(Kappa, double);
   itkGetConstMacro(Kappa, double);
-
+  /** @ITKEndGrouping */
 protected:
   DeformableSimplexMesh3DBalloonForceFilter();
   ~DeformableSimplexMesh3DBalloonForceFilter() override = default;

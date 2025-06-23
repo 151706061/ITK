@@ -25,6 +25,7 @@
 
 namespace itk
 {
+// clang-format off
 namespace Function
 {
 /**
@@ -41,12 +42,11 @@ public:
   inline TOutput
   operator()(const TInput & A) const
   {
-    return static_cast<TOutput>(std::cos(A * m_Factor));
-  }
 
-private:
-  /** Equal to \f$ \frac{\pi}{2 m} \f$ */
-  static const double m_Factor;
+    /** Equal to \f$ \frac{\pi}{2 m} \f$ */
+    static constexpr double factor = Math::pi / (2 * VRadius);
+    return static_cast<TOutput>(std::cos(A * factor));
+  }
 };
 
 /**
@@ -63,12 +63,11 @@ public:
   inline TOutput
   operator()(const TInput & A) const
   {
-    return static_cast<TOutput>(0.54 + 0.46 * std::cos(A * m_Factor));
-  }
 
-private:
-  /** Equal to \f$ \frac{\pi}{m} \f$ */
-  static const double m_Factor;
+    /** Equal to \f$ \frac{\pi}{m} \f$ */
+    static constexpr double factor = Math::pi / VRadius;
+    return static_cast<TOutput>(0.54 + 0.46 * std::cos(A * factor));
+  }
 };
 
 /**
@@ -82,15 +81,14 @@ template <unsigned int VRadius, typename TInput = double, typename TOutput = dou
 class ITK_TEMPLATE_EXPORT WelchWindowFunction
 {
 public:
+  /** Equal to \f$ \frac{1}{m^2} \f$ */
   inline TOutput
   operator()(const TInput & A) const
   {
-    return static_cast<TOutput>(1.0 - A * m_Factor * A);
-  }
 
-private:
-  /** Equal to \f$ \frac{1}{m^2} \f$ */
-  static const double m_Factor;
+    static constexpr double factor = 1.0 / (VRadius * VRadius);
+    return static_cast<TOutput>(1.0 - A * factor * A);
+  }
 };
 
 /**
@@ -112,14 +110,13 @@ public:
     if (A == 0.0)
     {
       return static_cast<TOutput>(1.0);
-    }
-    double z = m_Factor * A;
-    return static_cast<TOutput>(std::sin(z) / z);
-  }
+    } // namespace Function
 
-private:
-  /** Equal to \f$ \frac{\pi}{m} \f$ */
-  static const double m_Factor;
+    /** Equal to \f$ \frac{\pi}{m} \f$ */
+    static constexpr double factor = Math::pi / VRadius;
+    const double z = factor * A;
+    return static_cast<TOutput>(std::sin(z) / z);
+  } // namespace itk
 };
 
 /**
@@ -136,17 +133,17 @@ public:
   inline TOutput
   operator()(const TInput & A) const
   {
-    return static_cast<TOutput>(0.42 + 0.5 * std::cos(A * m_Factor1) + 0.08 * std::cos(A * m_Factor2));
+
+    /** Equal to \f$ \frac{\pi}{m} \f$ */
+    static constexpr double factor1 = Math::pi / VRadius;
+
+    /** Equal to \f$ \frac{2 \pi}{m} \f$  */
+    static constexpr double factor2 = 2.0 * Math::pi / VRadius;
+    return static_cast<TOutput>(0.42 + 0.5 * std::cos(A * factor1) + 0.08 * std::cos(A * factor2));
   }
-
-private:
-  /** Equal to \f$ \frac{\pi}{m} \f$ */
-  static const double m_Factor1;
-
-  /** Equal to \f$ \frac{2 \pi}{m} \f$  */
-  static const double m_Factor2;
 };
 } // namespace Function
+// clang-format on
 
 /**
  * \class WindowedSincInterpolateImageFunction
@@ -163,12 +160,7 @@ private:
  * approximated using a limited support 'windowed' sinc filter.
  *
  * \par
- * This function is based on the following publication:
- *
- * \par
- * Erik H. W. Meijering, Wiro J. Niessen, Josien P. W. Pluim,
- * Max A. Viergever: Quantitative Comparison of Sinc-Approximating
- * Kernels for Medical Image Interpolation. MICCAI 1999, pp. 210-217
+ * This function is based on \cite meijering1999.
  *
  * \par
  * In this work, several 'windows' are estimated. In two dimensions, the
@@ -228,7 +220,7 @@ private:
  * classes.
  *
  * \par
- * The fifth (TCoordRep) is again standard for interpolating functions,
+ * The fifth (TCoordinate) is again standard for interpolating functions,
  * and should be float or double.
  *
  * \par CAVEATS
@@ -262,20 +254,21 @@ template <typename TInputImage,
           unsigned int VRadius,
           typename TWindowFunction = Function::HammingWindowFunction<VRadius>,
           class TBoundaryCondition = ZeroFluxNeumannBoundaryCondition<TInputImage, TInputImage>,
-          class TCoordRep = double>
-class ITK_TEMPLATE_EXPORT WindowedSincInterpolateImageFunction : public InterpolateImageFunction<TInputImage, TCoordRep>
+          class TCoordinate = double>
+class ITK_TEMPLATE_EXPORT WindowedSincInterpolateImageFunction
+  : public InterpolateImageFunction<TInputImage, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(WindowedSincInterpolateImageFunction);
 
   /** Standard class type aliases. */
   using Self = WindowedSincInterpolateImageFunction;
-  using Superclass = InterpolateImageFunction<TInputImage, TCoordRep>;
+  using Superclass = InterpolateImageFunction<TInputImage, TCoordinate>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WindowedSincInterpolateImageFunction);
 
   /** Method for creation through the object factory. */
@@ -321,8 +314,7 @@ public:
   SizeType
   GetRadius() const override
   {
-    SizeType radius;
-    radius.Fill(VRadius);
+    constexpr auto radius = SizeType::Filled(VRadius);
     return radius;
   }
 
@@ -353,11 +345,10 @@ private:
   unsigned int m_WeightOffsetTable[m_OffsetTableSize][ImageDimension]{};
 
   /** The sinc function */
-  inline double
-  Sinc(double x) const
+  static double
+  Sinc(const double x)
   {
-    const double px = itk::Math::pi * x;
-
+    const double px = Math::pi * x;
     return (x == 0.0) ? 1.0 : std::sin(px) / px;
   }
 };

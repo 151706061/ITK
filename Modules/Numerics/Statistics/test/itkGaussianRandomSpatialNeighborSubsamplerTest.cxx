@@ -48,14 +48,10 @@ itkGaussianRandomSpatialNeighborSubsamplerTest(int argc, char * argv[])
   using SamplerType = itk::Statistics::GaussianRandomSpatialNeighborSubsampler<AdaptorType, RegionType>;
   using WriterType = itk::ImageFileWriter<FloatImage>;
 
-  auto     inImage = FloatImage::New();
-  SizeType sz;
-  sz.Fill(35);
-  IndexType idx;
-  idx.Fill(0);
-  RegionType region;
-  region.SetSize(sz);
-  region.SetIndex(idx);
+  auto                inImage = FloatImage::New();
+  auto                sz = SizeType::Filled(35);
+  constexpr IndexType idx{};
+  const RegionType    region{ idx, sz };
 
   inImage->SetRegions(region);
   inImage->AllocateInitialized();
@@ -73,7 +69,7 @@ itkGaussianRandomSpatialNeighborSubsamplerTest(int argc, char * argv[])
   sampler_orig->CanSelectQueryOff();
 
   // test clone mechanism
-  SamplerType::Pointer sampler = sampler_orig->Clone().GetPointer();
+  const SamplerType::Pointer sampler = sampler_orig->Clone().GetPointer();
   if (sampler->GetSample() != sampler_orig->GetSample())
   {
     std::cerr << "Clone did not copy the sample correctly!" << std::endl;

@@ -70,10 +70,10 @@ void
 TransformFactoryBase::RegisterDefaultTransforms()
 {
   //
-  // make sure that the the factory instance has
+  // make sure that the factory instance has
   // been created. All normal paths to this method
   // already do this but this makes certain sure it's done
-  (void)TransformFactoryBase::GetFactory();
+  [[maybe_unused]] auto currentFactory = TransformFactoryBase::GetFactory();
 
   if (!TransformFactoryBasePrivate::DefaultTransformsRegistered)
   {
@@ -98,7 +98,7 @@ TransformFactoryBase::GetFactory()
   if (m_Factory == nullptr)
   {
     // Make and register the factory
-    Pointer p = New();
+    const Pointer p = New();
     m_Factory = p.GetPointer();
     ObjectFactoryBase::RegisterFactory(p);
     p->RegisterDefaultTransforms();

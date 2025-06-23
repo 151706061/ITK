@@ -20,7 +20,7 @@
 #include "itkTestingMacros.h"
 #include "itkMath.h"
 
-const double epsilon = 1e-10;
+constexpr double epsilon = 1e-10;
 
 // function for displaying vectors
 template <typename T>
@@ -33,8 +33,7 @@ PrintVector(const std::vector<T> & v1)
   }
   else
   {
-    typename std::vector<T>::const_iterator it;
-    for (it = v1.begin(); it != v1.end(); ++it)
+    for (auto it = v1.begin(); it != v1.end(); ++it)
     {
       std::cout << *it << ' ';
     }
@@ -118,7 +117,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  double nan = std::numeric_limits<double>::quiet_NaN();
+  constexpr double nan = std::numeric_limits<double>::quiet_NaN();
 
   // Read and Parse the data
   using ReaderType = itk::CSVArray2DFileReader<double>;
@@ -168,11 +167,11 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   reader->Print(std::cout);
 
   using DataFrameObjectType = itk::CSVArray2DDataObject<double>;
-  DataFrameObjectType::Pointer dfo = reader->GetOutput();
+  const DataFrameObjectType::Pointer dfo = reader->GetOutput();
 
   // Test the matrix
   using MatrixType = itk::Array2D<double>;
-  MatrixType test_matrix = dfo->GetMatrix();
+  const MatrixType test_matrix = dfo->GetMatrix();
 
   MatrixType matrix(4, 6);
   matrix[0][0] = nan;
@@ -207,8 +206,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   }
 
   // Test Row Names
-  std::vector<std::string> test_row_names;
-  test_row_names = dfo->GetRowHeaders();
+  const std::vector<std::string> test_row_names = dfo->GetRowHeaders();
 
   std::vector<std::string> row_names;
   row_names.emplace_back("Jan");
@@ -225,8 +223,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   PrintVector(test_row_names);
 
   // Test Column Names
-  std::vector<std::string> test_col_names;
-  test_col_names = dfo->GetColumnHeaders();
+  const std::vector<std::string> test_col_names = dfo->GetColumnHeaders();
 
   std::vector<std::string> col_names;
   col_names.emplace_back("Africa");
@@ -244,8 +241,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
 
 
   // Test a row (using index access)
-  std::vector<double> test_row_1;
-  test_row_1 = dfo->GetRow(1);
+  const std::vector<double> test_row_1 = dfo->GetRow(1);
 
   std::vector<double> row_1;
   row_1.push_back(99);
@@ -262,8 +258,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   PrintVector(test_row_1);
 
   // Test a row (using string access)
-  std::vector<double> test_row_Jan;
-  test_row_Jan = dfo->GetRow("Jan");
+  const std::vector<double> test_row_Jan = dfo->GetRow("Jan");
 
   std::vector<double> row_Jan;
   row_Jan.push_back(nan);
@@ -281,8 +276,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   PrintVector(test_row_Jan);
 
   // Test a column (using index)
-  std::vector<double> test_col_2;
-  test_col_2 = dfo->GetColumn(2);
+  const std::vector<double> test_col_2 = dfo->GetColumn(2);
 
   std::vector<double> col_2;
   col_2.push_back(5);
@@ -299,8 +293,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   PrintVector(col_2);
 
   // Test a column (using string access)
-  std::vector<double> test_col_Africa;
-  test_col_Africa = dfo->GetColumn("Africa");
+  const std::vector<double> test_col_Africa = dfo->GetColumn("Africa");
 
   std::vector<double> col_Africa;
   col_Africa.push_back(nan);
@@ -319,8 +312,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   // Test a row that does not exist
   try
   {
-    std::vector<double> test_row_Oct;
-    test_row_Oct = dfo->GetRow("Oct");
+    const std::vector<double> test_row_Oct = dfo->GetRow("Oct");
     if (!test_row_Oct.empty())
     {
       std::cerr << "Row should be empty! Test Failed!";
@@ -336,8 +328,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
   try
   {
     // Test column that does not exist
-    std::vector<double> test_col_Eur;
-    test_col_Eur = dfo->GetColumn("Eur");
+    const std::vector<double> test_col_Eur = dfo->GetColumn("Eur");
     if (!test_col_Eur.empty())
     {
       std::cerr << "Column should be empty! Test Failed!";
@@ -350,11 +341,8 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
     std::cerr << exp << std::endl;
   }
 
-  double test_item;
-  double actual_item;
-
-  test_item = dfo->GetData(2, 2);
-  actual_item = 9;
+  double test_item = dfo->GetData(2, 2);
+  double actual_item = 9;
   if (!testValue(test_item, actual_item))
   {
     std::cerr << "Wrong value! Test Failed!";
@@ -407,7 +395,7 @@ itkCSVArray2DFileReaderTest(int argc, char * argv[])
 
   try
   {
-    double test_item1 = dfo->GetData("Feb", "Europe");
+    const double test_item1 = dfo->GetData("Feb", "Europe");
     if (!testValue(test_item1, nan))
     {
       std::cerr << "Wrong value! Test failed!";

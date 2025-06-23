@@ -39,7 +39,7 @@ namespace itk
  * The output image may be of any dimension.
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/150
+ * https://doi.org/10.54294/dhogdz
  *
  * \ingroup DataSources
  * \ingroup ITKImageSources
@@ -66,7 +66,7 @@ public:
 
   using SizeType = typename RegionType::SizeType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaborImageSource);
 
   /** Method for creation through the object factory. */
@@ -78,24 +78,28 @@ public:
   /** Type used to store gabor parameters. */
   using ArrayType = FixedArray<double, Self::ImageDimension>;
 
-  /** Set/Get the the standard deviation in each direction. */
+  /** Set/Get the standard deviation in each direction. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sigma, ArrayType);
   itkGetConstReferenceMacro(Sigma, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the mean in each direction. */
+  /** @ITKStartGrouping */
   itkSetMacro(Mean, ArrayType);
   itkGetConstReferenceMacro(Mean, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the modulation frequency of the sine or cosine component. */
+  /** @ITKStartGrouping */
   itkSetMacro(Frequency, double);
   itkGetConstReferenceMacro(Frequency, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get whether the evaluation is performed using the using the imaginary
    * part. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(CalculateImaginaryPart, bool);
   itkGetConstReferenceMacro(CalculateImaginaryPart, bool);
   itkBooleanMacro(CalculateImaginaryPart);
-
+  /** @ITKEndGrouping */
 protected:
   GaborImageSource();
   ~GaborImageSource() override = default;

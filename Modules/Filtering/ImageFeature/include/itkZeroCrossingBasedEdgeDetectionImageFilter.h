@@ -100,7 +100,7 @@ public:
   /** Typedef to describe the output image region type. */
   using OutputImageRegionType = typename TOutputImage::RegionType;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ZeroCrossingBasedEdgeDetectionImageFilter);
 
   /** ImageDimension enumeration   */
@@ -111,17 +111,19 @@ public:
   using ArrayType = FixedArray<double, Self::ImageDimension>;
 
   /** Standard get/set macros for Gaussian filter parameters.  */
+  /** @ITKStartGrouping */
   itkSetMacro(Variance, ArrayType);
   itkGetConstMacro(Variance, const ArrayType);
   itkSetMacro(MaximumError, ArrayType);
   itkGetConstMacro(MaximumError, const ArrayType);
-
+  /** @ITKEndGrouping */
   /** Get/Set the label values for the ZeroCrossingImageFilter */
+  /** @ITKStartGrouping */
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(ForegroundValue, OutputImagePixelType);
   itkSetMacro(ForegroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /** Set the variance parameter needed by the embedded gaussian filter  */
   void
   SetVariance(const typename ArrayType::ValueType v)
@@ -141,15 +143,11 @@ public:
     m_MaximumError.Fill(v);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputImagePixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(SameTypeCheck, (Concept::SameType<InputImagePixelType, OutputImagePixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputImagePixelType>));
   itkConceptMacro(PixelTypeIsFloatingPointCheck, (Concept::IsFloatingPoint<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   ZeroCrossingBasedEdgeDetectionImageFilter();

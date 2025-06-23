@@ -49,7 +49,7 @@ public:
   using typename Superclass::PointType;
   using typename Superclass::TransformType;
   using typename Superclass::BoundingBoxType;
-  using PointContainerType = VectorContainer<IdentifierType, PointType>;
+  using PointContainerType = VectorContainer<PointType>;
   using PointContainerPointer = SmartPointer<PointContainerType>;
 
   using ArrayType = FixedArray<double, TDimension>;
@@ -59,7 +59,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EllipseSpatialObject);
 
   /** Reset the spatial object to its initial condition, yet preserves
@@ -100,13 +100,25 @@ public:
   using Superclass::IsInsideInObjectSpace;
 
 #if !defined(ITK_LEGACY_REMOVE)
-  itkLegacyMacro(void SetRadius(double radius)) { this->SetRadiusInObjectSpace(radius); }
+  itkLegacyMacro(void SetRadius(double radius))
+  {
+    this->SetRadiusInObjectSpace(radius);
+  }
 
-  itkLegacyMacro(void SetRadius(ArrayType radii)) { this->SetRadiusInObjectSpace(radii); }
+  itkLegacyMacro(void SetRadius(ArrayType radii))
+  {
+    this->SetRadiusInObjectSpace(radii);
+  }
 
-  itkLegacyMacro(ArrayType GetRadius() const) { return this->GetRadiusInObjectSpace(); }
+  itkLegacyMacro(ArrayType GetRadius() const)
+  {
+    return this->GetRadiusInObjectSpace();
+  }
 
-  itkLegacyMacro(void SetRadiiInObjectSpace(ArrayType radii)) { this->SetRadiusInObjectSpace(radii); }
+  itkLegacyMacro(void SetRadiiInObjectSpace(ArrayType radii))
+  {
+    this->SetRadiusInObjectSpace(radii);
+  }
 #endif
 protected:
   /** Get the boundaries of a specific object.  This function needs to
@@ -121,7 +133,7 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 private:

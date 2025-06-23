@@ -62,7 +62,7 @@ public:
   /** Standard method for creation through object factory. */
   itkNewMacro(Self);
 
-  /** Run-time class information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GPUGradientAnisotropicDiffusionImageFilter);
 
   /** Extract information from the superclass. */
@@ -71,18 +71,13 @@ public:
   /** Extract information from the superclass. */
   static constexpr unsigned int ImageDimension = GPUSuperclass::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(UpdateBufferHasNumericTraitsCheck, (Concept::HasNumericTraits<typename UpdateBufferType::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   GPUGradientAnisotropicDiffusionImageFilter()
   {
     // Set DiffusionFunction
-    typename GPUGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::Pointer p =
-      GPUGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
+    auto p = GPUGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
     this->SetDifferenceFunction(p);
   }
 

@@ -122,7 +122,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ObjectToObjectOptimizerBaseTestOptimizer);
 
   /* Provide initialization for this class */
@@ -135,10 +135,10 @@ public:
   }
 
   /** Stop condition return string type */
-  const StopConditionReturnStringType
+  StopConditionReturnStringType
   GetStopConditionDescription() const override
   {
-    return std::string("Placeholder test return string");
+    return { "Placeholder test return string" };
   }
 };
 
@@ -171,7 +171,8 @@ itkObjectToObjectOptimizerBaseTest(int, char *[])
   std::cout << "value: " << optimizer->GetCurrentMetricValue() << std::endl;
 
   /* Test set/get of scales */
-  ObjectToObjectOptimizerBaseTestOptimizer::NumberOfParametersType scalesSize = metric->GetNumberOfLocalParameters();
+  const ObjectToObjectOptimizerBaseTestOptimizer::NumberOfParametersType scalesSize =
+    metric->GetNumberOfLocalParameters();
   using ScalesType = ObjectToObjectOptimizerBaseTestOptimizer::ScalesType;
   ScalesType scales(scalesSize);
   scales.Fill(3.19);
@@ -206,12 +207,13 @@ itkObjectToObjectOptimizerBaseTest(int, char *[])
   }
 
   /* Test that weights are init'ed by default to identity */
-  ObjectToObjectOptimizerBaseTestOptimizer::NumberOfParametersType weightsSize = metric->GetNumberOfLocalParameters();
+  const ObjectToObjectOptimizerBaseTestOptimizer::NumberOfParametersType weightsSize =
+    metric->GetNumberOfLocalParameters();
   ITK_TRY_EXPECT_NO_EXCEPTION(optimizer->StartOptimization());
   ScalesType weightsReturn = optimizer->GetWeights();
   if (weightsReturn.Size() != 0 || !optimizer->GetWeightsAreIdentity())
   {
-    std::cerr << "Expected returned weights to be empty, and flag set to idenity. But got: " << weightsReturn
+    std::cerr << "Expected returned weights to be empty, and flag set to identity. But got: " << weightsReturn
               << ", GetWeightsAreIdentity: " << optimizer->GetWeightsAreIdentity() << std::endl;
     return EXIT_FAILURE;
   }

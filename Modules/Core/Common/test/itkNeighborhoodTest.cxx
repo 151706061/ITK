@@ -29,14 +29,12 @@ println(const char * s)
 int
 itkNeighborhoodTest(int, char *[])
 {
-  unsigned int i;
-
   println("TESTING WITH VNL_VECTOR ALLOCATOR");
   itk::Neighborhood<float, 2, vnl_vector<float>> b;
   b.SetRadius(3);
 
   println("Test data access");
-  for (i = 0; i < b.Size(); ++i)
+  for (unsigned int i = 0; i < b.Size(); ++i)
   {
     b[i] = static_cast<float>(i);
   }
@@ -81,11 +79,11 @@ itkNeighborhoodTest(int, char *[])
   q.Print(std::cout);
 
   println("Testing assignment operator");
-  itk::Neighborhood<float, 2> p = q;
+  const itk::Neighborhood<float, 2> p = q;
   p.Print(std::cout);
 
   println("Testing copy constructor");
-  itk::Neighborhood<float, 2> r(q);
+  const itk::Neighborhood<float, 2> r(q);
   r.Print(std::cout);
 
   println("Testing instantiation with itk::Vector");

@@ -26,9 +26,7 @@ dbetai_(double * x, double * pin, double * qin);
 extern "C" double
 dgamma_(double * x);
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 TDistribution::TDistribution()
 {
@@ -76,13 +74,11 @@ TDistribution::GetDegreesOfFreedom() const
 double
 TDistribution::PDF(double x, SizeValueType degreesOfFreedom)
 {
-  auto   dof = static_cast<double>(degreesOfFreedom);
-  double dofplusoneon2 = 0.5 * (dof + 1.0);
-  double dofon2 = 0.5 * dof;
-  double pdf;
-
-  pdf = (dgamma_(&dofplusoneon2) / dgamma_(&dofon2)) /
-        (std::sqrt(dof * itk::Math::pi) * std::pow(1.0 + ((x * x) / dof), dofplusoneon2));
+  auto         dof = static_cast<double>(degreesOfFreedom);
+  double       dofplusoneon2 = 0.5 * (dof + 1.0);
+  double       dofon2 = 0.5 * dof;
+  const double pdf = (dgamma_(&dofplusoneon2) / dgamma_(&dofon2)) /
+                     (std::sqrt(dof * itk::Math::pi) * std::pow(1.0 + ((x * x) / dof), dofplusoneon2));
 
   return pdf;
 }
@@ -101,10 +97,6 @@ TDistribution::PDF(double x, const ParametersType & p)
 double
 TDistribution::CDF(double x, SizeValueType degreesOfFreedom)
 {
-  double bx;
-  double pin, qin;
-  double dof;
-
   // Based on Abramowitz and Stegun 26.7.1, which gives the probability
   // that the absolute value of a random variable with a Student-t
   // distribution is less than or equal to a specified t.
@@ -128,20 +120,18 @@ TDistribution::CDF(double x, SizeValueType degreesOfFreedom)
   //           = 0.5 + 0.5 * P[|x| < t]           (from above)
   //           = 0.5 + 0.5 * (1 - Ix(v/2. 1/2))
   //           = 1 - 0.5 * Ix(v/2, 1/2)
-  //
-  dof = static_cast<double>(degreesOfFreedom);
-  bx = dof / (dof + (x * x));
-  pin = dof / 2.0;
-  qin = 0.5;
+
+  const auto dof = static_cast<double>(degreesOfFreedom);
+  double     bx = dof / (dof + (x * x));
+  double     pin = dof / 2.0;
+  double     qin = 0.5;
 
   if (x >= 0.0)
   {
     return 1.0 - 0.5 * dbetai_(&bx, &pin, &qin);
   }
-  else
-  {
-    return 0.5 * dbetai_(&bx, &pin, &qin);
-  }
+
+  return 0.5 * dbetai_(&bx, &pin, &qin);
 }
 
 double
@@ -162,30 +152,27 @@ TDistribution::InverseCDF(double p, SizeValueType degreesOfFreedom)
   {
     return itk::NumericTraits<double>::NonpositiveMin();
   }
-  else if (p >= 1.0)
+  if (p >= 1.0)
   {
     return itk::NumericTraits<double>::max();
   }
 
-  double x;
-  double dof, dof2, dof3, dof4;
-  double gaussX, gaussX3, gaussX5, gaussX7, gaussX9;
-
   // Based on Abramowitz and Stegun 26.7.5
-  dof = static_cast<double>(degreesOfFreedom);
-  dof2 = dof * dof;
-  dof3 = dof * dof2;
-  dof4 = dof * dof3;
+  const auto   dof = static_cast<double>(degreesOfFreedom);
+  const double dof2 = dof * dof;
+  const double dof3 = dof * dof2;
+  const double dof4 = dof * dof3;
 
-  gaussX = GaussianDistribution::InverseCDF(p);
-  gaussX3 = std::pow(gaussX, 3.0);
-  gaussX5 = std::pow(gaussX, 5.0);
-  gaussX7 = std::pow(gaussX, 7.0);
-  gaussX9 = std::pow(gaussX, 9.0);
+  const double gaussX = GaussianDistribution::InverseCDF(p);
+  const double gaussX3 = std::pow(gaussX, 3.0);
+  const double gaussX5 = std::pow(gaussX, 5.0);
+  const double gaussX7 = std::pow(gaussX, 7.0);
+  const double gaussX9 = std::pow(gaussX, 9.0);
 
-  x = gaussX + (gaussX3 + gaussX) / (4.0 * dof) + (5.0 * gaussX5 + 16.0 * gaussX3 + 3 * gaussX) / (96.0 * dof2) +
-      (3.0 * gaussX7 + 19.0 * gaussX5 + 17.0 * gaussX3 - 15.0 * gaussX) / (384.0 * dof3) +
-      (79.0 * gaussX9 + 776.0 * gaussX7 + 1482.0 * gaussX5 - 1920.0 * gaussX3 - 945.0 * gaussX) / (92160.0 * dof4);
+  double x =
+    gaussX + (gaussX3 + gaussX) / (4.0 * dof) + (5.0 * gaussX5 + 16.0 * gaussX3 + 3 * gaussX) / (96.0 * dof2) +
+    (3.0 * gaussX7 + 19.0 * gaussX5 + 17.0 * gaussX3 - 15.0 * gaussX) / (384.0 * dof3) +
+    (79.0 * gaussX9 + 776.0 * gaussX7 + 1482.0 * gaussX5 - 1920.0 * gaussX3 - 945.0 * gaussX) / (92160.0 * dof4);
 
   // The polynomial approximation above is only accurate for large degrees
   // of freedom.  We'll improve the approximation by a few Newton
@@ -211,10 +198,9 @@ TDistribution::InverseCDF(double p, SizeValueType degreesOfFreedom)
   //
   // Note that f'(x) = - tpdf(x)
   //
-  double delta;
   for (unsigned int newt = 0; newt < 3; ++newt)
   {
-    delta = (p - TDistribution::CDF(x, degreesOfFreedom)) / TDistribution::PDF(x, degreesOfFreedom);
+    const double delta = (p - TDistribution::CDF(x, degreesOfFreedom)) / TDistribution::PDF(x, degreesOfFreedom);
     x += delta;
   }
 
@@ -352,10 +338,8 @@ TDistribution::GetVariance() const
 
       return dof / (dof - 2.0);
     }
-    else
-    {
-      return NumericTraits<double>::quiet_NaN();
-    }
+
+    return NumericTraits<double>::quiet_NaN();
   }
   else
   {
@@ -378,5 +362,4 @@ TDistribution::PrintSelf(std::ostream & os, Indent indent) const
     os << indent << "Degrees of freedom: (unknown)" << std::endl;
   }
 }
-} // end of namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics

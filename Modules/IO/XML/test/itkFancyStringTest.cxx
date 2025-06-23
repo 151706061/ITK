@@ -77,7 +77,7 @@ testFancyStringWithBasicType()
     itk::FancyString s;
 
     // write out
-    DataType dataIn = '*';
+    constexpr DataType dataIn = '*';
     s << dataIn;
 
     // read back
@@ -100,7 +100,7 @@ testFancyStringWithBasicType()
     itk::FancyString s;
 
     // write out
-    DataType dataIn = -1024;
+    constexpr DataType dataIn = -1024;
     s << dataIn;
 
     // read back
@@ -123,7 +123,7 @@ testFancyStringWithBasicType()
     itk::FancyString s;
 
     // write out
-    DataType dataIn = -0.1;
+    constexpr DataType dataIn = -0.1;
     s << dataIn;
 
     // read back
@@ -147,7 +147,6 @@ void
 testFancyStringWithStdVector()
 {
   itk::FancyString svalue;
-  itk::FancyString s;
 
   std::vector<float> dataIn(10, -0.1f);
   svalue << dataIn;
@@ -156,7 +155,7 @@ testFancyStringWithStdVector()
 
   // read all data elements in the string
   std::vector<float> dataOut1;
-  s = svalue;
+  itk::FancyString   s = svalue;
   s.ToData(dataOut1);
   // check successful or not
   if (dataOut1.size() != (dataIn.size() + 1) && dataOut1.back() != 10.0f)
@@ -236,7 +235,6 @@ testFancyStringWithItkArray()
   using DataType = itk::Array<double>;
 
   itk::FancyString svalue;
-  itk::FancyString s;
 
   DataType dataIn(10);
   dataIn.Fill(-0.1);
@@ -245,8 +243,8 @@ testFancyStringWithItkArray()
   svalue.Append(" 10 ");
 
   // read all data elements in the string
-  DataType dataOut1;
-  s = svalue;
+  DataType         dataOut1;
+  itk::FancyString s = svalue;
   s.ToData(dataOut1);
   // check successful or not
   if (dataOut1.GetSize() != (dataIn.GetSize() + 1) && dataOut1[10] != 10.0)
@@ -466,12 +464,12 @@ testFancyStringUnequalOperator()
   }
 
   {
-    itk::FancyString s1{ "Hello World!" };
-    itk::FancyString s2{ "Hello World" };
+    itk::FancyString       s1{ "Hello World!" };
+    const itk::FancyString s2{ "Hello World" };
 
     ITK_TEST_EXPECT_TRUE(s1 != s2);
 
-    itk::FancyString s3{ "Hello world!" };
+    const itk::FancyString s3{ "Hello world!" };
 
     ITK_TEST_EXPECT_TRUE(s1 != s3);
   }
@@ -499,8 +497,8 @@ testFancyStringEqualOperator()
   }
 
   {
-    itk::FancyString s1{ "Hello World!" };
-    itk::FancyString s2{ "Hello World!" };
+    itk::FancyString       s1{ "Hello World!" };
+    const itk::FancyString s2{ "Hello World!" };
 
     ITK_TEST_EXPECT_TRUE(s1 == s2);
   }

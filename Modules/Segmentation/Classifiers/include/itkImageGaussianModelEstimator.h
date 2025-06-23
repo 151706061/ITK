@@ -88,7 +88,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageGaussianModelEstimator);
 
   /** Type definition for the input image. */
@@ -120,9 +120,10 @@ public:
   using MembershipFunctionPointer = typename TMembershipFunction::Pointer;
 
   /** Get/Set the training image. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(TrainingImage, TrainingImageType);
   itkGetModifiableObjectMacro(TrainingImage, TrainingImageType);
-
+  /** @ITKEndGrouping */
 protected:
   ImageGaussianModelEstimator() = default;
   ~ImageGaussianModelEstimator() override = default;

@@ -31,10 +31,9 @@ namespace itk
 
 template <typename TParametersValueType, unsigned int VDimension>
 TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::TimeVaryingBSplineVelocityFieldTransform()
-{
-  this->m_SplineOrder = 3;
-  this->m_TemporalPeriodicity = false;
+  : m_SplineOrder(3)
 
+{
   this->m_VelocityFieldOrigin.Fill(0.0);
   this->m_VelocityFieldSpacing.Fill(1.0);
   this->m_VelocityFieldSize.Fill(1);
@@ -52,8 +51,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Inte
 
   using BSplineFilterType = BSplineControlPointImageFilter<VelocityFieldType, VelocityFieldType>;
 
-  typename BSplineFilterType::ArrayType closeDimensions;
-  closeDimensions.Fill(0);
+  typename BSplineFilterType::ArrayType closeDimensions{};
   if (this->m_TemporalPeriodicity)
   {
     closeDimensions[VDimension] = 1;
@@ -69,7 +67,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Inte
   bspliner->SetCloseDimension(closeDimensions);
   bspliner->Update();
 
-  typename VelocityFieldType::Pointer bsplinerOutput = bspliner->GetOutput();
+  const typename VelocityFieldType::Pointer bsplinerOutput = bspliner->GetOutput();
   bsplinerOutput->DisconnectPipeline();
 
   using IntegratorType = TimeVaryingVelocityFieldIntegrationImageFilter<VelocityFieldType, DisplacementFieldType>;
@@ -87,7 +85,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Inte
   integrator->SetNumberOfIntegrationSteps(this->GetNumberOfIntegrationSteps());
   integrator->Update();
 
-  typename DisplacementFieldType::Pointer displacementField = integrator->GetOutput();
+  const typename DisplacementFieldType::Pointer displacementField = integrator->GetOutput();
   displacementField->DisconnectPipeline();
 
   this->SetDisplacementField(displacementField);
@@ -106,7 +104,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Inte
   inverseIntegrator->SetNumberOfIntegrationSteps(this->GetNumberOfIntegrationSteps());
   inverseIntegrator->Update();
 
-  typename DisplacementFieldType::Pointer inverseDisplacementField = inverseIntegrator->GetOutput();
+  const typename DisplacementFieldType::Pointer inverseDisplacementField = inverseIntegrator->GetOutput();
   inverseDisplacementField->DisconnectPipeline();
 
   this->SetInverseDisplacementField(inverseDisplacementField);
@@ -118,7 +116,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Upda
   const DerivativeType & update,
   ScalarType             factor)
 {
-  NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
+  const NumberOfParametersType numberOfParameters = this->GetNumberOfParameters();
 
   if (update.Size() != numberOfParameters)
   {
@@ -148,7 +146,7 @@ TimeVaryingBSplineVelocityFieldTransform<TParametersValueType, VDimension>::Upda
   adder->SetInput1(this->GetVelocityField());
   adder->SetInput2(importer->GetOutput());
 
-  typename VelocityFieldType::Pointer totalFieldLattice = adder->GetOutput();
+  const typename VelocityFieldType::Pointer totalFieldLattice = adder->GetOutput();
   totalFieldLattice->Update();
 
   this->SetTimeVaryingVelocityFieldControlPointLattice(totalFieldLattice);

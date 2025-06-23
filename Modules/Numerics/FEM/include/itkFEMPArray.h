@@ -23,9 +23,7 @@
 #include "itkFEMException.h"
 #include <vector>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class FEMPArray
@@ -69,7 +67,7 @@ public:
   ClassTypePointer
   Find(int gn);
 
-  ClassTypeConstPointer
+  [[nodiscard]] ClassTypeConstPointer
   Find(int gn) const;
 
   /**
@@ -170,9 +168,8 @@ template <typename T>
 int
 FEMPArray<T>::Renumber()
 {
-  typename Superclass::iterator i;
-  int                           j = 0;
-  for (i = this->begin(); i != this->end(); ++i)
+  int j = 0;
+  for (auto i = this->begin(); i != this->end(); ++i)
   {
     (*i)->SetGlobalNumber(j);
     ++j;
@@ -181,7 +178,6 @@ FEMPArray<T>::Renumber()
   return j;
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMPArray_h

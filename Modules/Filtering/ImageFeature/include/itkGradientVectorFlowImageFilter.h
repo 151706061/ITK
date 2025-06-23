@@ -65,7 +65,7 @@ public:
   /** Method of creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GradientVectorFlowImageFilter);
 
   /** Some type alias. */
@@ -110,14 +110,10 @@ public:
   itkSetMacro(IterationNum, int);
   itkGetConstMacro(IterationNum, int);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename PixelType::ValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck,
                   (Concept::HasNumericTraits<typename TOutputImage::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   GradientVectorFlowImageFilter();

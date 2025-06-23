@@ -24,11 +24,11 @@ namespace itk
 {
 template <typename TInput, typename TLevelSetContainer>
 LevelSetEquationChanAndVeseExternalTerm<TInput, TLevelSetContainer>::LevelSetEquationChanAndVeseExternalTerm()
+  : m_DomainMapImageFilter(nullptr)
+  , m_CacheImage(nullptr)
 {
   this->m_TermName = "External Chan And Vese term";
   this->m_RequiredData.insert("Value");
-  this->m_DomainMapImageFilter = nullptr;
-  this->m_CacheImage = nullptr;
 }
 
 template <typename TInput, typename TLevelSetContainer>
@@ -37,8 +37,8 @@ LevelSetEquationChanAndVeseExternalTerm<TInput, TLevelSetContainer>::ComputeProd
                                                                                     LevelSetOutputRealType &       prod)
 {
   this->ComputeProductTerm(iP, prod);
-  LevelSetPointer        levelSet = this->m_LevelSetContainer->GetLevelSet(this->m_CurrentLevelSetId);
-  LevelSetOutputRealType value = levelSet->Evaluate(iP);
+  const LevelSetPointer        levelSet = this->m_LevelSetContainer->GetLevelSet(this->m_CurrentLevelSetId);
+  const LevelSetOutputRealType value = levelSet->Evaluate(iP);
   prod *= -(1 - this->m_Heaviside->Evaluate(-value));
 }
 
@@ -121,7 +121,7 @@ LevelSetEquationChanAndVeseExternalTerm<TInput, TLevelSetContainer>::UpdatePixel
   this->ComputeProductTerm(iP, prod);
 
   // For each affected h val: h val = new hval (this will dirty some cvals)
-  InputPixelType input = this->m_Input->GetPixel(iP);
+  const InputPixelType input = this->m_Input->GetPixel(iP);
 
   const LevelSetOutputRealType oldH = this->m_Heaviside->Evaluate(-oldValue);
   const LevelSetOutputRealType newH = this->m_Heaviside->Evaluate(-newValue);

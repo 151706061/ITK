@@ -71,9 +71,9 @@ public:
     void
     ThreadedExecution(const DomainType & subdomain, const itk::ThreadIdType threadId) override
     {
+      constexpr double value = 1.0 / 7;
       for (DomainType::IndexValueType i = subdomain[0]; i <= subdomain[1]; ++i)
       {
-        double value = 1.0 / 7;
         this->m_PerThreadCompensatedSum[threadId].AddElement(value);
       }
     }
@@ -86,7 +86,7 @@ public:
 
       for (itk::ThreadIdType i = 0, numWorkUnitsUsed = this->GetNumberOfWorkUnitsUsed(); i < numWorkUnitsUsed; ++i)
       {
-        double sum = this->m_PerThreadCompensatedSum[i].GetSum();
+        const double sum = this->m_PerThreadCompensatedSum[i].GetSum();
         std::cout << i << ": " << sum << std::endl;
         this->m_Associate->m_CompensatedSumOfThreads.AddElement(sum);
         this->m_Associate->m_UncompensatedSumOfThreads += sum;
@@ -98,10 +98,9 @@ public:
   }; // end TestDomainThreader class
 
   CompensatedSummationTest2Associate()
+    : m_ClassDescriptor("enclosing class")
   {
     m_TestDomainThreader = TestDomainThreader::New();
-    m_ClassDescriptor = "enclosing class";
-    m_UncompensatedSumOfThreads = 0.0;
   }
 
   double
@@ -110,7 +109,7 @@ public:
     return this->m_CompensatedSumOfThreads.GetSum();
   }
 
-  double
+  [[nodiscard]] double
   GetUncompensatedSumOfThreads() const
   {
     return this->m_UncompensatedSumOfThreads;
@@ -133,14 +132,15 @@ private:
 
   std::string                       m_ClassDescriptor;
   itk::CompensatedSummation<double> m_CompensatedSumOfThreads;
-  double                            m_UncompensatedSumOfThreads;
+  double                            m_UncompensatedSumOfThreads{ 0.0 };
 };
 
 int
 itkCompensatedSummationTest2(int, char *[])
 {
-  CompensatedSummationTest2Associate                              enclosingClass;
-  CompensatedSummationTest2Associate::TestDomainThreader::Pointer domainThreader = enclosingClass.GetDomainThreader();
+  CompensatedSummationTest2Associate                                    enclosingClass;
+  const CompensatedSummationTest2Associate::TestDomainThreader::Pointer domainThreader =
+    enclosingClass.GetDomainThreader();
 
   /* Check # of threads */
   std::cout << "GetGlobalMaximumNumberOfThreads: "
@@ -151,12 +151,12 @@ itkCompensatedSummationTest2(int, char *[])
   using DomainType = CompensatedSummationTest2Associate::TestDomainThreader::DomainType;
   DomainType domain;
 
-  itk::ThreadIdType maxNumberOfThreads = domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads();
+  const itk::ThreadIdType maxNumberOfThreads = domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads();
   domain[0] = 0;
   domain[1] = maxNumberOfThreads * 10000;
 
   /* Test with single thread. We should get the same result. */
-  itk::ThreadIdType numberOfThreads = 1;
+  constexpr itk::ThreadIdType numberOfThreads = 1;
   domainThreader->SetMaximumNumberOfThreads(numberOfThreads);
   domainThreader->SetNumberOfWorkUnits(numberOfThreads);
   std::cout << "Testing with " << numberOfThreads << " threads and domain " << domain << " ..." << std::endl;
@@ -183,7 +183,7 @@ itkCompensatedSummationTest2(int, char *[])
   }
 
   /* Store result as reference */
-  double referenceSum = enclosingClass.GetCompensatedSumOfThreads();
+  const double referenceSum = enclosingClass.GetCompensatedSumOfThreads();
 
   /* Test with maximum threads. We need at least three threads to see a difference. */
   if (domainThreader->GetMultiThreader()->GetGlobalMaximumNumberOfThreads() > 2)

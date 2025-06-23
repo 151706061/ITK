@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include "itkTestingMacros.h"
+#include "itkArray.h"
 
 namespace
 {
@@ -56,7 +57,9 @@ template <typename TRegistration>
 class PDERegistrationController
 {
 public:
-  PDERegistrationController(TRegistration * o) { m_Process = o; }
+  PDERegistrationController(TRegistration * o)
+    : m_Process(o)
+  {}
   void
   ShowProgress()
   {
@@ -104,7 +107,7 @@ FillWithCircle(TImage *                   image,
   it.GoToBegin();
 
   typename TImage::IndexType index;
-  double                     r2 = itk::Math::sqr(radius);
+  const double               r2 = itk::Math::sqr(radius);
 
   while (!it.IsAtEnd())
   {
@@ -146,7 +149,7 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
 
   if (argc < 2)
   {
-    std::cerr << "Missing parametes." << std::endl;
+    std::cerr << "Missing parameters." << std::endl;
     std::cerr << "Usage: " << itkNameOfTestExecutableMacro(argv) << " WarpedImage" << std::endl;
     return EXIT_FAILURE;
   }
@@ -165,24 +168,18 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   std::cout << "Generate input images and initial field";
   std::cout << std::endl;
 
-  SizeType size;
-  size.Fill(256);
+  auto size = SizeType::Filled(256);
   size[1] = 251;
 
-  IndexType index;
-  index.Fill(0);
+  IndexType index{};
   index[0] = 3;
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const RegionType region{ index, size };
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
+  ImageType::PointType origin{};
   origin[0] = 0.8;
 
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
+  auto spacing = itk::MakeFilled<ImageType::SpacingType>(1.0);
   spacing[1] = 1.2;
 
   auto moving = ImageType::New();
@@ -207,15 +204,14 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   initField->SetOrigin(origin);
   initField->SetSpacing(spacing);
 
-  double    center[ImageDimension];
-  double    radius;
-  PixelType fgnd = 250;
-  PixelType bgnd = 15;
+  double              center[ImageDimension];
+  constexpr PixelType fgnd = 250;
+  constexpr PixelType bgnd = 15;
 
   // fill moving with circle
   center[0] = 128;
   center[1] = 128;
-  radius = 60;
+  double radius = 60;
   FillWithCircle<ImageType>(moving, center, radius, fgnd, bgnd);
 
   // fill fixed with circle
@@ -225,8 +221,7 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   FillWithCircle<ImageType>(fixed, center, radius, fgnd, bgnd);
 
   // fill initial deformation with zero vectors
-  VectorType zeroVec;
-  zeroVec.Fill(0.0);
+  constexpr VectorType zeroVec{};
   FillImage<FieldType>(initField, zeroVec);
 
   //----------------------------------------------------------------
@@ -248,20 +243,30 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   registrator->GetModifiableFixedImagePyramid()->UseShrinkImageFilterOn();
   registrator->GetModifiableMovingImagePyramid()->UseShrinkImageFilterOn();
 
-  constexpr unsigned int numLevel = 3;
-  unsigned int           numIterations[numLevel];
-  numIterations[0] = 64;
+  constexpr unsigned int   numLevel = 3;
+  unsigned int             numIterations[numLevel];
+  itk::Array<unsigned int> numIterationsArray;
 
-  unsigned int ilevel;
-  for (ilevel = 1; ilevel < numLevel; ++ilevel)
+  numIterationsArray.SetSize(numLevel);
+  numIterations[0] = 64;
+  numIterationsArray[0] = numIterations[0];
+
+
+  for (unsigned int ilevel = 1; ilevel < numLevel; ++ilevel)
   {
     numIterations[ilevel] = numIterations[ilevel - 1] / 2;
+    numIterationsArray[ilevel] = numIterations[ilevel];
   }
 
   registrator->SetNumberOfLevels(numLevel);
   ITK_TEST_SET_GET_VALUE(numLevel, registrator->GetNumberOfLevels());
+  registrator->SetNumberOfLevels(numLevel + 2);
+  ITK_TEST_SET_GET_VALUE(numLevel + 2, registrator->GetNumberOfLevels());
 
-  registrator->SetNumberOfIterations(numIterations);
+  registrator->SetNumberOfIterations(numIterationsArray);
+  // NumberOfLevels should now be numLevel because numIterationsArray is of size numLevel.
+  ITK_TEST_SET_GET_VALUE(numLevel, registrator->GetNumberOfLevels());
+
   RegistrationType::NumberOfIterationsType numIterationsArr;
   numIterationsArr.SetData(numIterations, numLevel);
   ITK_TEST_SET_GET_VALUE(numIterationsArr, registrator->GetNumberOfIterations());
@@ -269,7 +274,7 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   // Set the number of iterations to a different value and try the overloaded method with the desired value
   unsigned int numIterations2[numLevel];
   numIterations2[0] = 8;
-  for (ilevel = 1; ilevel < numLevel; ++ilevel)
+  for (unsigned int ilevel = 1; ilevel < numLevel; ++ilevel)
   {
     numIterations2[ilevel] = numIterations2[ilevel - 1] / 2;
   }
@@ -312,8 +317,8 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   using WarperType = itk::WarpImageFilter<ImageType, ImageType, FieldType>;
   auto warper = WarperType::New();
 
-  using CoordRepType = WarperType::CoordRepType;
-  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
+  using CoordinateType = WarperType::CoordinateType;
+  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
   auto interpolator = InterpolatorType::New();
 
 
@@ -369,10 +374,10 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   }
 
   // Exercise error handling
-  bool passed;
+  bool passed = false;
 
   using InternalRegistrationType = RegistrationType::RegistrationType;
-  InternalRegistrationType::Pointer demons = registrator->GetModifiableRegistrationFilter();
+  const InternalRegistrationType::Pointer demons = registrator->GetModifiableRegistrationFilter();
 
   try
   {
@@ -396,7 +401,7 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   }
 
   using FixedImagePyramidType = RegistrationType::FixedImagePyramidType;
-  FixedImagePyramidType::Pointer fixedPyramid = registrator->GetModifiableFixedImagePyramid();
+  const FixedImagePyramidType::Pointer fixedPyramid = registrator->GetModifiableFixedImagePyramid();
 
   try
   {
@@ -421,7 +426,7 @@ itkMultiResolutionPDEDeformableRegistrationTest(int argc, char * argv[])
   }
 
   using MovingImagePyramidType = RegistrationType::MovingImagePyramidType;
-  MovingImagePyramidType::Pointer movingPyramid = registrator->GetModifiableMovingImagePyramid();
+  const MovingImagePyramidType::Pointer movingPyramid = registrator->GetModifiableMovingImagePyramid();
 
   try
   {

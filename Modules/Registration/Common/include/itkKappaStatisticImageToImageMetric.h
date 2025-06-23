@@ -65,7 +65,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KappaStatisticImageToImageMetric);
 
   /** Types transferred from the base class */
@@ -112,17 +112,19 @@ public:
 
   /** This method allows the user to set the foreground value. The default
    *  value is 255. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, RealType);
   itkGetConstMacro(ForegroundValue, RealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get whether this metric returns 2*|A&B|/(|A|+|B|)
    * (ComplementOff, the default) or 1.0 - 2*|A&B|/(|A|+|B|)
    * (ComplementOn). When using an optimizer that minimizes
    * metric values use ComplementOn(). */
+  /** @ITKStartGrouping */
   itkSetMacro(Complement, bool);
   itkBooleanMacro(Complement);
   itkGetConstMacro(Complement, bool);
-
+  /** @ITKEndGrouping */
 protected:
   KappaStatisticImageToImageMetric();
   ~KappaStatisticImageToImageMetric() override = default;

@@ -128,11 +128,11 @@ public:
   // explicitly.
   // TODO: shouldn't it be done with the Clone() method?
   itkSimpleNewMacro(Self);
-  itk::LightObject::Pointer
+  [[nodiscard]] itk::LightObject::Pointer
   CreateAnother() const override
   {
     itk::LightObject::Pointer smartPtr;
-    Pointer                   copyPtr = Self::New().GetPointer();
+    const Pointer             copyPtr = Self::New().GetPointer();
     // THE FOLLOWING LINE IS DIFFERENT FROM THE DEFAULT MACRO!
     copyPtr->m_BulkTransform = this->GetBulkTransform();
     smartPtr = static_cast<Pointer>(copyPtr);
@@ -142,7 +142,7 @@ public:
   /** implement type-specific clone method*/
   itkCloneMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineDeformableTransform);
 
   /** Dimension of the domain space. */
@@ -306,9 +306,10 @@ public:
   /** This method specifies the bulk transform to be applied.
    * The default is the identity transform.
    */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(BulkTransform, BulkTransformType);
   itkGetConstObjectMacro(BulkTransform, BulkTransformType);
-
+  /** @ITKEndGrouping */
   /** Return the region of the grid wholly within the support region */
   itkGetConstReferenceMacro(ValidRegion, RegionType);
 

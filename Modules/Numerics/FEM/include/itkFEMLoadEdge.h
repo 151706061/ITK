@@ -23,9 +23,7 @@
 #include "ITKFEMExport.h"
 #include "vnl/vnl_matrix.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class LoadEdge
@@ -49,7 +47,7 @@ public:
   /** New macro for creation of through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LoadEdge);
 
   /** CreateAnother method will clone the existing instance of this type,
@@ -115,7 +113,6 @@ protected:
    */
   vnl_matrix<Float> m_Force{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMLoadEdge_h

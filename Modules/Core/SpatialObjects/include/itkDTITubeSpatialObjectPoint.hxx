@@ -37,24 +37,6 @@ DTITubeSpatialObjectPoint<TPointDimension>::DTITubeSpatialObjectPoint()
 }
 
 template <unsigned int TPointDimension>
-DTITubeSpatialObjectPoint<TPointDimension>::DTITubeSpatialObjectPoint(const DTITubeSpatialObjectPoint & other)
-  : Superclass(other)
-{
-  m_Fields.clear();
-  const FieldListType & fields = other.GetFields();
-  auto                  it = fields.begin();
-  while (it != fields.end())
-  {
-    this->AddField(it->first.c_str(), it->second);
-    ++it;
-  }
-  for (unsigned int i = 0; i < 6; ++i)
-  {
-    m_TensorMatrix[i] = other.m_TensorMatrix[i];
-  }
-}
-
-template <unsigned int TPointDimension>
 void
 DTITubeSpatialObjectPoint<TPointDimension>::PrintSelf(std::ostream & os, Indent indent) const
 {
@@ -73,23 +55,23 @@ DTITubeSpatialObjectPoint<TPointDimension>::TranslateEnumToChar(DTITubeSpatialOb
   switch (static_cast<int>(name))
   {
     case 0:
-      return std::string("FA");
+      return { "FA" };
     case 1:
-      return std::string("ADC");
+      return { "ADC" };
     case 2:
-      return std::string("GA");
+      return { "GA" };
     default:
       // Just fall through.
       break;
   }
-  return std::string("");
+  return {};
 }
 
 template <unsigned int TPointDimension>
 void
 DTITubeSpatialObjectPoint<TPointDimension>::AddField(const char * name, float value)
 {
-  FieldType field(itksys::SystemTools::LowerCase(name), value);
+  const FieldType field(itksys::SystemTools::LowerCase(name), value);
 
   m_Fields.push_back(field);
 }
@@ -114,7 +96,7 @@ template <unsigned int TPointDimension>
 void
 DTITubeSpatialObjectPoint<TPointDimension>::SetField(DTITubeSpatialObjectPointFieldEnum name, float value)
 {
-  std::string charname = this->TranslateEnumToChar(name);
+  const std::string charname = this->TranslateEnumToChar(name);
 
   if (!charname.empty())
   {
@@ -130,11 +112,11 @@ template <unsigned int TPointDimension>
 void
 DTITubeSpatialObjectPoint<TPointDimension>::AddField(DTITubeSpatialObjectPointFieldEnum name, float value)
 {
-  std::string charname = this->TranslateEnumToChar(name);
+  const std::string charname = this->TranslateEnumToChar(name);
 
   if (!charname.empty())
   {
-    FieldType field(itksys::SystemTools::LowerCase(charname).c_str(), value);
+    const FieldType field(itksys::SystemTools::LowerCase(charname).c_str(), value);
     m_Fields.push_back(field);
   }
   else
@@ -164,7 +146,7 @@ template <unsigned int TPointDimension>
 float
 DTITubeSpatialObjectPoint<TPointDimension>::GetField(DTITubeSpatialObjectPointFieldEnum name) const
 {
-  std::string charname = this->TranslateEnumToChar(name);
+  const std::string charname = this->TranslateEnumToChar(name);
   if (!charname.empty())
   {
     return this->GetField(itksys::SystemTools::LowerCase(charname).c_str());
@@ -173,28 +155,6 @@ DTITubeSpatialObjectPoint<TPointDimension>::GetField(DTITubeSpatialObjectPointFi
   return -1;
 }
 
-template <unsigned int TPointDimension>
-auto
-DTITubeSpatialObjectPoint<TPointDimension>::operator=(const DTITubeSpatialObjectPoint & rhs) -> Self &
-{
-  if (this != &rhs)
-  {
-    Superclass::operator=(rhs);
-    m_Fields.clear();
-    const FieldListType & fields = rhs.GetFields();
-    auto                  it = fields.begin();
-    while (it != fields.end())
-    {
-      this->AddField(it->first.c_str(), it->second);
-      ++it;
-    }
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-      m_TensorMatrix[i] = rhs.m_TensorMatrix[i];
-    }
-  }
-  return *this;
-}
 } // end namespace itk
 
 #endif

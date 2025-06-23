@@ -61,15 +61,11 @@ itkGradientMagnitudeRecursiveGaussianFilterTest(int argc, char * argv[])
 
   auto inputImage = myImageType::New();
 
-  mySizeType size;
-  size.Fill(8);
+  auto size = mySizeType::Filled(8);
 
-  myIndexType start;
-  start.Fill(0);
+  myIndexType start{};
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  myRegionType region{ start, size };
 
   inputImage->SetRegions(region);
   inputImage->AllocateInitialized();
@@ -119,7 +115,7 @@ itkGradientMagnitudeRecursiveGaussianFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, GradientMagnitudeRecursiveGaussianImageFilter, InPlaceImageFilter);
 
 
-  itk::SimpleFilterWatcher watcher(filter);
+  const itk::SimpleFilterWatcher watcher(filter);
 
   auto sigma = static_cast<typename myFilterType::RealType>(std::stod(argv[1]));
   filter->SetSigma(sigma);
@@ -138,7 +134,7 @@ itkGradientMagnitudeRecursiveGaussianFilterTest(int argc, char * argv[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  myGradientImageType::Pointer outputImage = filter->GetOutput();
+  const myGradientImageType::Pointer outputImage = filter->GetOutput();
 
 #ifndef NDEBUG
   using myOutputIteratorType = itk::ImageRegionIteratorWithIndex<myGradientImageType>;

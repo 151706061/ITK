@@ -34,7 +34,7 @@ namespace itk
 class ContourSpatialObjectEnums
 {
 public:
-  /*** \class InterpolationMethodEnum
+  /**
    * \ingroup ITKSpatialObjects
    * Hold interpolation method type
    */
@@ -87,7 +87,7 @@ public:
   using typename Superclass::PointType;
   using typename Superclass::TransformType;
   using typename Superclass::BoundingBoxType;
-  using PointContainerType = VectorContainer<IdentifierType, PointType>;
+  using PointContainerType = VectorContainer<PointType>;
   using PointContainerPointer = SmartPointer<PointContainerType>;
 
   using InterpolationMethodEnum = ContourSpatialObjectEnums::InterpolationMethod;
@@ -104,7 +104,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Method for creation through the object factory. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ContourSpatialObject);
 
   /** Reset the spatial object to its initial condition, yet preserves

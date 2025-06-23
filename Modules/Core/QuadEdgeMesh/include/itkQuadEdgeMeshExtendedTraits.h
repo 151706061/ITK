@@ -34,7 +34,7 @@ namespace itk
  * of many template parameters while still enjoying the benefits of generic
  * programming.
  *
- * \tparam TCoordRep
+ * \tparam TCoordinate
  *    Numerical type with which to represent each coordinate value.
  *
  * \tparam VPointDimension
@@ -60,7 +60,7 @@ namespace itk
 template <typename TPixelType = float,
           unsigned int VPointDimension = 3,
           unsigned int VMaxTopologicalDimension = VPointDimension,
-          typename TCoordRep = float,
+          typename TCoordinate = float,
           typename TInterpolationWeightType = float,
           typename TCellPixelType = TPixelType,
           typename TPData = bool,
@@ -70,7 +70,11 @@ class QuadEdgeMeshExtendedTraits
 public:
   using Self = QuadEdgeMeshExtendedTraits;
   /** Save the template parameters. */
-  using CoordRepType = TCoordRep;
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using PixelType = TPixelType;
   using PrimalDataType = TPData;
   using DualDataType = TDData;
@@ -112,9 +116,9 @@ public:
   /** The type of point used by the mesh. This should never change from
    * this setting, regardless of the mesh type. Points have an entry
    * in the Onext ring */
-  using PointType = QuadEdgeMeshPoint<CoordRepType, VPointDimension, QEPrimal>;
+  using PointType = QuadEdgeMeshPoint<CoordinateType, VPointDimension, QEPrimal>;
 
-  using PointHashType = Point<CoordRepType, VPointDimension>;
+  using PointHashType = Point<CoordinateType, VPointDimension>;
 
   /** The container type for use in storing points. It must conform to
    * the IndexedContainer interface. */
@@ -122,7 +126,7 @@ public:
 
   /** Standard itk cell interface. */
   using CellTraits = QuadEdgeMeshCellTraitsInfo<VPointDimension,
-                                                CoordRepType,
+                                                CoordinateType,
                                                 InterpolationWeightType,
                                                 PointIdentifier,
                                                 CellIdentifier,

@@ -62,7 +62,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NarrowBand);
 
   using NodeContainerType = std::vector<NodeType>;
@@ -153,9 +153,17 @@ public:
     m_NodeContainer.resize(n);
   }
 
-  NodeType & operator[](SizeType n) { return m_NodeContainer[n]; }
+  NodeType &
+  operator[](SizeType n)
+  {
+    return m_NodeContainer[n];
+  }
 
-  const NodeType & operator[](SizeType n) const { return m_NodeContainer[n]; }
+  const NodeType &
+  operator[](SizeType n) const
+  {
+    return m_NodeContainer[n];
+  }
 
   /** Set/Get the narrow band total radius. The narrow band width will be twice
   this value (positive and negative distance to the zero level set).

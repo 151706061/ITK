@@ -101,8 +101,8 @@ public:
       return;
     }
 
-    unsigned int                                             currentLevel = filter->GetCurrentLevel();
-    typename TFilter::ShrinkFactorsPerDimensionContainerType shrinkFactors =
+    const unsigned int                                             currentLevel = filter->GetCurrentLevel();
+    const typename TFilter::ShrinkFactorsPerDimensionContainerType shrinkFactors =
       filter->GetShrinkFactorsPerDimension(currentLevel);
     typename TFilter::SmoothingSigmasArrayType                 smoothingSigmas = filter->GetSmoothingSigmasPerLevel();
     typename TFilter::TransformParametersAdaptorsContainerType adaptors =
@@ -118,8 +118,13 @@ public:
 
 template <unsigned int TDimension>
 int
-PerformCompositeImageRegistration(int itkNotUsed(argc), char * argv[])
+PerformCompositeImageRegistration(int argc, char * argv[])
 {
+  if (argc != 5)
+  {
+    std::cout << "ERROR: incorrect number of arguments" << std::endl;
+    return EXIT_FAILURE;
+  }
   const unsigned int ImageDimension = TDimension;
 
   using PixelType = double;
@@ -131,14 +136,14 @@ PerformCompositeImageRegistration(int itkNotUsed(argc), char * argv[])
   auto fixedImageReader = ImageReaderType::New();
   fixedImageReader->SetFileName(argv[2]);
   fixedImageReader->Update();
-  typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   fixedImage->Update();
   fixedImage->DisconnectPipeline();
 
   auto movingImageReader = ImageReaderType::New();
   movingImageReader->SetFileName(argv[3]);
   movingImageReader->Update();
-  typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
   movingImage->Update();
   movingImage->DisconnectPipeline();
 
@@ -300,7 +305,7 @@ PerformCompositeImageRegistration(int itkNotUsed(argc), char * argv[])
   resampler->SetDefaultPixelValue(0);
   resampler->Update();
 
-  std::string warpedMovingImageFileName = std::string(argv[4]) + std::string("WarpedMovingImage.nii.gz");
+  const std::string warpedMovingImageFileName = std::string(argv[4]) + std::string("WarpedMovingImage.nii.gz");
 
   using WriterType = itk::ImageFileWriter<FixedImageType>;
   auto writer = WriterType::New();
@@ -309,7 +314,7 @@ PerformCompositeImageRegistration(int itkNotUsed(argc), char * argv[])
   writer->Update();
 
   using InverseResampleFilterType = itk::ResampleImageFilter<FixedImageType, MovingImageType>;
-  typename InverseResampleFilterType::Pointer inverseResampler = ResampleFilterType::New();
+  const typename InverseResampleFilterType::Pointer inverseResampler = ResampleFilterType::New();
   inverseResampler->SetTransform(compositeTransform->GetInverseTransform());
   inverseResampler->SetInput(fixedImage);
   inverseResampler->SetSize(movingImage->GetBufferedRegion().GetSize());
@@ -319,7 +324,8 @@ PerformCompositeImageRegistration(int itkNotUsed(argc), char * argv[])
   inverseResampler->SetDefaultPixelValue(0);
   inverseResampler->Update();
 
-  std::string inverseWarpedFixedImageFileName = std::string(argv[4]) + std::string("InverseWarpedFixedImage.nii.gz");
+  const std::string inverseWarpedFixedImageFileName =
+    std::string(argv[4]) + std::string("InverseWarpedFixedImage.nii.gz");
 
   using InverseWriterType = itk::ImageFileWriter<MovingImageType>;
   auto inverseWriter = InverseWriterType::New();

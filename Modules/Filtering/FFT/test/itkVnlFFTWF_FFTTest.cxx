@@ -27,7 +27,15 @@
 // of these dimensions are taken from the array.The data types used are float
 // and double.
 int
-itkVnlFFTWF_FFTTest(int argc, char * argv[])
+itkVnlFFTWF_FFTTest(
+#  ifndef ITK_USE_CUFFTW
+  int    argc,
+  char * argv[]
+#  else
+  int    itkNotUsed(argc),
+  char * itkNotUsed(argv)[]
+#  endif
+)
 {
   using ImageF1 = itk::Image<float, 1>;
   using ImageF2 = itk::Image<float, 2>;
@@ -37,9 +45,13 @@ itkVnlFFTWF_FFTTest(int argc, char * argv[])
   itk::FFTWGlobalConfiguration::SetPlanRigor(FFTW_EXHAUSTIVE);
   itk::FFTWGlobalConfiguration::SetWriteWisdomCache(true);
   itk::FFTWGlobalConfiguration::SetReadWisdomCache(true);
-  if (argc > 1)
+  if (argc == 2)
   {
     itk::FFTWGlobalConfiguration::SetWisdomCacheBase(argv[1]);
+  }
+  else
+  {
+    std::cout << "ERROR: Incorrect number of arguments supplied " << argv[0] << " <wisdom_cache_base>" << std::endl;
   }
   std::cout << "WriteWisdomCache  " << itk::FFTWGlobalConfiguration::GetWriteWisdomCache() << std::endl;
   std::cout << "ReadWisdomCache  " << itk::FFTWGlobalConfiguration::GetReadWisdomCache() << std::endl;
@@ -47,9 +59,6 @@ itkVnlFFTWF_FFTTest(int argc, char * argv[])
   std::cout << "WisdomCacheBase " << itk::FFTWGlobalConfiguration::GetWisdomCacheBase() << std::endl;
   std::cout << "WisdomeFile     " << itk::FFTWGlobalConfiguration::GetWisdomFileDefaultBaseName() << std::endl;
 #  endif
-  // Avoid unused parameter warnings.
-  (void)argc;
-  (void)argv;
 
   unsigned int SizeOfDimensions1[] = { 4, 4, 4 };
   unsigned int SizeOfDimensions2[] = { 3, 5, 4 };

@@ -49,7 +49,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Optimizer);
 
   /**  Parameters type.
@@ -76,9 +76,10 @@ public:
   SetScales(const ScalesType & scales);
 
   /** Get current parameters scaling. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(Scales, ScalesType);
   itkGetConstReferenceMacro(InverseScales, ScalesType);
-
+  /** @ITKEndGrouping */
   /** Get current position of the optimization. */
   itkGetConstReferenceMacro(CurrentPosition, ParametersType);
 
@@ -88,7 +89,7 @@ public:
   {}
 
   /** Get the reason for termination */
-  virtual const std::string
+  virtual std::string
   GetStopConditionDescription() const;
 
 protected:

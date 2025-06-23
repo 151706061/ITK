@@ -25,7 +25,7 @@
 int
 itkImageToVTKImageFilterTest(int, char *[])
 {
-  const int dim = 3;
+  constexpr int dim = 3;
   using ImageType = itk::Image<float, dim>;
   using SourceType = itk::RandomImageSource<ImageType>;
   using SpacingType = SourceType::SpacingType;
@@ -48,8 +48,7 @@ itkImageToVTKImageFilterTest(int, char *[])
   origin[0] = -1.5;
   origin[1] = 0.222;
   origin[2] = 0;
-  DirectionType direction;
-  direction.Fill(0.0);
+  DirectionType direction{};
   direction[0][1] = 1;
   direction[1][0] = -1;
   direction[2][2] = 0.7;

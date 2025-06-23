@@ -55,11 +55,11 @@ itkVNLRoundProfileTest1(int, char *[])
   ArrayType output3;
   ArrayType output4;
 
-  const unsigned long numberOfValues = 1000000L;
+  constexpr unsigned long numberOfValues = 1000000L;
 
-  const double initialValue = -10.0;
+  constexpr double initialValue = -10.0;
 
-  const double valueIncrement = (-initialValue - initialValue) / numberOfValues;
+  constexpr double valueIncrement = (-initialValue - initialValue) / numberOfValues;
 
   std::cout << "Initial Value   = " << initialValue << std::endl;
   std::cout << "Value Increment = " << valueIncrement << std::endl;
@@ -92,10 +92,10 @@ itkVNLRoundProfileTest1(int, char *[])
     // Count the time of simply assigning values in an std::vector
     //
     //
-    ArrayType::const_iterator outItr1src = output1.begin();
-    auto                      outItr2dst = output2.begin();
+    auto outItr1src = output1.begin();
+    auto outItr2dst = output2.begin();
 
-    ArrayType::const_iterator outEnd1 = output1.end();
+    const auto outEnd1 = output1.end();
 
     chronometer.Start("std::vector");
 
@@ -108,8 +108,8 @@ itkVNLRoundProfileTest1(int, char *[])
 
     chronometer.Stop("std::vector");
 
-    ArrayType::const_iterator inpItr = input.begin();
-    ArrayType::const_iterator inputEnd = input.end();
+    auto inpItr = input.begin();
+    auto inputEnd = input.end();
 
     auto outItr1nc = output1.begin();
 
@@ -198,13 +198,13 @@ itkVNLRoundProfileTest1(int, char *[])
   //
   // Now test the correctness of the output
   //
-  ArrayType::const_iterator inpItr = input.begin();
-  ArrayType::const_iterator inputEnd = input.end();
+  auto       inpItr = input.begin();
+  const auto inputEnd = input.end();
 
-  ArrayType::const_iterator outItr1 = output1.begin();
-  ArrayType::const_iterator outItr2 = output2.begin();
+  auto outItr1 = output1.begin();
+  auto outItr2 = output2.begin();
 
-  const double tolerance = 1e-5;
+  constexpr double tolerance = 1e-5;
 
   bool roundUp = true;
   bool roundMismatch = false;

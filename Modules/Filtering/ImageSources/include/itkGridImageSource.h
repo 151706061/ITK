@@ -49,7 +49,7 @@ namespace itk
  * \author Tustison N., Avants B., Gee J. University of Pennsylvania
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/140
+ * https://doi.org/10.54294/ze1ssz
  *
  * \ingroup DataSources
  * \ingroup ITKImageSources
@@ -66,7 +66,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GridImageSource);
 
   /** Method for creation through the object factory. */
@@ -91,33 +91,39 @@ public:
   using ArrayType = FixedArray<RealType, Self::ImageDimension>;
   using BoolArrayType = FixedArray<bool, Self::ImageDimension>;
   using PixelArrayType = vnl_vector<RealType>;
-  using PixelArrayContainerType = VectorContainer<SizeValueType, PixelArrayType>;
+  using PixelArrayContainerType = VectorContainer<PixelArrayType>;
 
   /** Set/Get kernel function used to create the grid. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(KernelFunction, KernelFunctionType);
   itkGetConstReferenceObjectMacro(KernelFunction, KernelFunctionType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the standard deviation of the Gaussians or width of the box
    * functions.*/
+  /** @ITKStartGrouping */
   itkSetMacro(Sigma, ArrayType);
   itkGetConstReferenceMacro(Sigma, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the grid spacing of the peaks. */
+  /** @ITKStartGrouping */
   itkSetMacro(GridSpacing, ArrayType);
   itkGetConstReferenceMacro(GridSpacing, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the grid offset. */
+  /** @ITKStartGrouping */
   itkSetMacro(GridOffset, ArrayType);
   itkGetConstReferenceMacro(GridOffset, ArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the dimensions which are gridded. */
+  /** @ITKStartGrouping */
   itkSetMacro(WhichDimensions, BoolArrayType);
   itkGetConstReferenceMacro(WhichDimensions, BoolArrayType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the scale factor to multiply the true value of the grid. */
+  /** @ITKStartGrouping */
   itkSetMacro(Scale, RealType);
   itkGetConstReferenceMacro(Scale, RealType);
-
+  /** @ITKEndGrouping */
 protected:
   GridImageSource();
   ~GridImageSource() override = default;

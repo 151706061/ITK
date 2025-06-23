@@ -53,13 +53,13 @@ public:
   using typename Superclass::PointType;
   using typename Superclass::BoundingBoxType;
 
-  using PointContainerType = VectorContainer<IdentifierType, PointType>;
+  using PointContainerType = VectorContainer<PointType>;
   using PointContainerPointer = typename PointContainerType::Pointer;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeshSpatialObject);
 
   /** Reset the spatial object to its initial condition, yet preserves
@@ -72,11 +72,12 @@ public:
   SetMesh(MeshType * mesh);
 
   /** Get a pointer to the Mesh currently attached to the object. */
+  /** @ITKStartGrouping */
   MeshType *
   GetMesh();
   const MeshType *
   GetMesh() const;
-
+  /** @ITKEndGrouping */
   /** Test whether a point is inside or outside the object.
    *
    * Returns true if the point is inside, false otherwise.
@@ -91,12 +92,15 @@ public:
   using Superclass::IsInsideInObjectSpace;
 
   /** Returns the latest modified time of the object and its component. */
-  ModifiedTimeType
+  [[nodiscard]] ModifiedTimeType
   GetMTime() const override;
 
 #if !defined(ITK_LEGACY_REMOVE)
   /** \deprecated Return the type of pixel used */
-  itkLegacyMacro(const char * GetPixelTypeName()) { return m_PixelType.c_str(); }
+  itkLegacyMacro(const char * GetPixelTypeName())
+  {
+    return m_PixelType.c_str();
+  }
 #endif
 
   /** Set/Get the precision for the IsInsideInObjectSpace function.
@@ -105,9 +109,10 @@ public:
    *  If the distance from the point to the surface is <= to
    *  m_IsInsidePrecisionInObjectSpace the point is considered inside the mesh.
    *  The default value is 1. */
+  /** @ITKStartGrouping */
   itkSetMacro(IsInsidePrecisionInObjectSpace, double);
   itkGetConstMacro(IsInsidePrecisionInObjectSpace, double);
-
+  /** @ITKEndGrouping */
 protected:
   /** Compute the boundaries of the spatial object. */
   void
@@ -119,7 +124,7 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 private:

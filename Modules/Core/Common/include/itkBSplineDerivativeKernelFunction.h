@@ -54,7 +54,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineDerivativeKernelFunction);
 
   /** Enum of for spline order. */
@@ -95,21 +95,21 @@ private:
   {};
 
   /** Evaluate the function:  zeroth order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<0> &, const TRealValueType & itkNotUsed(u))
   {
     return TRealValueType{ 0.0 };
   }
 
   /** Evaluate the function:  first order spline */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<1> &, const TRealValueType & u)
   {
     if (Math::ExactlyEquals(u, TRealValueType{ -1.0 }))
     {
       return TRealValueType{ 0.5 };
     }
-    else if ((u > TRealValueType{ -1.0 }) && (u < TRealValueType{ 0.0 }))
+    if ((u > TRealValueType{ -1.0 }) && (u < TRealValueType{ 0.0 }))
     {
       return TRealValueType{ 1.0 };
     }
@@ -132,14 +132,14 @@ private:
   }
 
   /** Evaluate the function:  second order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<2> &, const TRealValueType & u)
   {
     if ((u > TRealValueType{ -0.5 }) && (u < TRealValueType{ 0.5 }))
     {
       return (TRealValueType{ -2.0 } * u);
     }
-    else if ((u >= TRealValueType{ 0.5 }) && (u < TRealValueType{ 1.5 }))
+    if ((u >= TRealValueType{ 0.5 }) && (u < TRealValueType{ 1.5 }))
     {
       return (TRealValueType{ -1.5 } + u);
     }
@@ -154,14 +154,14 @@ private:
   }
 
   /** Evaluate the function:  third order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<3> &, const TRealValueType & u)
   {
     if ((u >= TRealValueType{ 0.0 }) && (u < TRealValueType{ 1.0 }))
     {
       return (TRealValueType{ -2.0 } * u + TRealValueType{ 1.5 } * u * u);
     }
-    else if ((u > TRealValueType{ -1.0 }) && (u < TRealValueType{ 0.0 }))
+    if ((u > TRealValueType{ -1.0 }) && (u < TRealValueType{ 0.0 }))
     {
       return (TRealValueType{ -2.0 } * u - TRealValueType{ 1.5 } * u * u);
     }
@@ -180,12 +180,13 @@ private:
   }
 
   /** Evaluate the function:  unimplemented spline order */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const DispatchBase &, const TRealValueType &)
   {
     itkGenericExceptionMacro("Evaluate not implemented for spline order " << SplineOrder);
   }
 };
+
 } // end namespace itk
 
 #endif

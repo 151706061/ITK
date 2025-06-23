@@ -27,14 +27,11 @@ namespace itk
 
 template <typename TOutputImage>
 LandmarkDisplacementFieldSource<TOutputImage>::LandmarkDisplacementFieldSource()
+  : m_KernelTransform(ThinPlateSplineKernelTransform<double, Self::ImageDimension>::New())
 {
   m_OutputSpacing.Fill(1.0);
   m_OutputOrigin.Fill(0.0);
   m_OutputDirection.SetIdentity();
-
-  using DefaultTransformType = ThinPlateSplineKernelTransform<double, Self::ImageDimension>;
-
-  m_KernelTransform = DefaultTransformType::New();
 }
 
 template <typename TOutputImage>
@@ -119,7 +116,7 @@ LandmarkDisplacementFieldSource<TOutputImage>::GenerateData()
   // Create an iterator that will walk the output region for this thread.
   using OutputIterator = ImageRegionIteratorWithIndex<TOutputImage>;
 
-  OutputImageRegionType region = outputPtr->GetRequestedRegion();
+  const OutputImageRegionType region = outputPtr->GetRequestedRegion();
 
   // Define a few indices that will be used to translate from an input pixel
   // to an output pixel
@@ -165,7 +162,7 @@ LandmarkDisplacementFieldSource<TOutputImage>::GenerateOutputInformation()
   Superclass::GenerateOutputInformation();
 
   // get pointers to the input and output
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
   if (!outputPtr)
   {
     return;

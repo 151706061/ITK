@@ -31,10 +31,9 @@ namespace itk
 
 template <typename TInputImage, typename TKernel>
 BinaryClosingByReconstructionImageFilter<TInputImage, TKernel>::BinaryClosingByReconstructionImageFilter()
-{
-  m_ForegroundValue = NumericTraits<InputPixelType>::max();
-  m_FullyConnected = false;
-}
+  : m_ForegroundValue(NumericTraits<InputPixelType>::max())
+
+{}
 
 template <typename TInputImage, typename TKernel>
 void
@@ -44,7 +43,7 @@ BinaryClosingByReconstructionImageFilter<TInputImage, TKernel>::GenerateInputReq
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -70,11 +69,9 @@ BinaryClosingByReconstructionImageFilter<TInputImage, TKernel>::GenerateData()
   }
 
   /** set up erosion and dilation methods */
-  typename BinaryDilateImageFilter<TInputImage, TInputImage, TKernel>::Pointer dilate =
-    BinaryDilateImageFilter<TInputImage, TInputImage, TKernel>::New();
+  auto dilate = BinaryDilateImageFilter<TInputImage, TInputImage, TKernel>::New();
 
-  typename BinaryReconstructionByErosionImageFilter<OutputImageType>::Pointer erode =
-    BinaryReconstructionByErosionImageFilter<OutputImageType>::New();
+  auto erode = BinaryReconstructionByErosionImageFilter<OutputImageType>::New();
 
   // create the pipeline without input and output image
   dilate->ReleaseDataFlagOn();
@@ -114,7 +111,7 @@ BinaryClosingByReconstructionImageFilter<TInputImage, TKernel>::PrintSelf(std::o
   os << indent
      << "ForegroundValue: " << static_cast<typename NumericTraits<InputPixelType>::PrintType>(m_ForegroundValue)
      << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 
 } // end namespace itk

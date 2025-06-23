@@ -18,6 +18,7 @@
 #ifndef itkSymmetricEllipsoidInteriorExteriorSpatialFunction_hxx
 #define itkSymmetricEllipsoidInteriorExteriorSpatialFunction_hxx
 
+#include "itkMath.h"
 #include <cmath>
 
 namespace itk
@@ -35,11 +36,7 @@ auto
 SymmetricEllipsoidInteriorExteriorSpatialFunction<VDimension, TInput>::Evaluate(const InputType & position) const
   -> OutputType
 {
-  double uniqueTerm;    // Term in ellipsoid equation for unique axis
-  double symmetricTerm; // Term in ellipsoid equation for symmetric axes
-
   Vector<double, VDimension> pointVector;
-  Vector<double, VDimension> symmetricVector;
 
   // Project the position onto the major axis, normalize by axis length,
   // and determine whether position is inside ellipsoid.
@@ -47,12 +44,11 @@ SymmetricEllipsoidInteriorExteriorSpatialFunction<VDimension, TInput>::Evaluate(
   {
     pointVector[i] = position[i] - m_Center[i];
   }
-
-  uniqueTerm =
-    std::pow(static_cast<double>(((pointVector * m_Orientation) / (.5 * m_UniqueAxis))), static_cast<double>(2));
-  symmetricVector = pointVector - (m_Orientation * (pointVector * m_Orientation));
-  symmetricTerm =
-    std::pow(static_cast<double>(((symmetricVector.GetNorm()) / (.5 * m_SymmetricAxes))), static_cast<double>(2));
+  // Term in ellipsoid equation for unique axis
+  double uniqueTerm = Math::sqr(static_cast<double>(((pointVector * m_Orientation) / (.5 * m_UniqueAxis))));
+  Vector<double, VDimension> symmetricVector = pointVector - (m_Orientation * (pointVector * m_Orientation));
+  // Term in ellipsoid equation for symmetric axes
+  double symmetricTerm = Math::sqr(static_cast<double>(((symmetricVector.GetNorm()) / (.5 * m_SymmetricAxes))));
 
   if ((uniqueTerm + symmetricTerm) >= 0 && (uniqueTerm + symmetricTerm) <= 1)
   {

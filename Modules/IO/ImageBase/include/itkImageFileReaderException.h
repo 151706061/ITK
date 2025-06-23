@@ -31,23 +31,17 @@ namespace itk
 class ITKIOImageBase_EXPORT ImageFileReaderException : public ExceptionObject
 {
 public:
-  /** Run-time information. */
+  ITK_DEFAULT_COPY_AND_MOVE(ImageFileReaderException);
+
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageFileReaderException);
 
   /** Constructor. */
-  ImageFileReaderException(const char * file,
+  ImageFileReaderException(std::string  file,
                            unsigned int line,
-                           const char * message = "Error in IO",
-                           const char * loc = "Unknown")
-    : ExceptionObject(file, line, message, loc)
-  {}
-
-  /** Constructor. */
-  ImageFileReaderException(const std::string & file,
-                           unsigned int        line,
-                           const char *        message = "Error in IO",
-                           const char *        loc = "Unknown")
-    : ExceptionObject(file, line, message, loc)
+                           std::string  message = "Error in IO",
+                           std::string  location = {})
+    : ExceptionObject(std::move(file), line, std::move(message), std::move(location))
   {}
 
   /** Has to have empty throw(). */

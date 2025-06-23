@@ -51,7 +51,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InvertDisplacementFieldImageFilter);
 
   /** Extract dimension from input image. */
@@ -111,8 +111,10 @@ public:
   }
 
   /** Set/get the initial estimate for the inverse field (optional). */
+  /** @ITKStartGrouping */
   itkSetInputMacro(InverseFieldInitialEstimate, InverseDisplacementFieldType);
   itkGetInputMacro(InverseFieldInitialEstimate, InverseDisplacementFieldType);
+  /** @ITKEndGrouping */
 
   /* Set the interpolator. */
   virtual void

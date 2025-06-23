@@ -30,7 +30,7 @@ namespace itk
  * The transform can be described as:
  * \f$ (\textbf{R}_v + \textbf{S})\textbf{x} \f$ where \f$\textbf{R}_v\f$ is the
  * rotation matrix given the versor, and
- * \f$S=\left( \begin{array}{ccc}s_0-1 & 0 & 0 \\ 0 & s_1-1 & 0 \\ 0 & 0 & s_2-1 \end{array} \right)\ \f$
+ * \f$S=\left( \begin{array}{ccc}s_0-1 & 0 & 0 \\ 0 & s_1-1 & 0 \\ 0 & 0 & s_2-1 \end{array} \right) \f$
  *
  *
  * \note This transform's scale parameters are not related to the
@@ -40,7 +40,7 @@ namespace itk
  * College of Medicine, Department of Psychiatry NeuroImaging Center
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/180
+ * https://doi.org/10.54294/hmb052
  *
  * \ingroup ITKTransform
  */
@@ -59,7 +59,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScaleVersor3DTransform);
 
   /** Dimension of parameters. */
@@ -100,11 +100,12 @@ public:
    * Orthogonality testing is bypassed in this case.
    *
    * \sa MatrixOffsetTransformBase::SetMatrix() */
+  /** @ITKStartGrouping */
   void
   SetMatrix(const MatrixType & matrix) override;
   void
   SetMatrix(const MatrixType & matrix, const TParametersValueType tolerance) override;
-
+  /** @ITKEndGrouping */
   /** Set the transformation from a container of parameters
    * This is typically used by optimizers.
    * There are 9 parameters:
@@ -139,7 +140,10 @@ public:
 
 protected:
   ScaleVersor3DTransform();
-  ScaleVersor3DTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] ScaleVersor3DTransform(const MatrixType &       matrix,
+                                                                      const OutputVectorType & offset);
+#endif
   ScaleVersor3DTransform(unsigned int parametersDimension);
   ~ScaleVersor3DTransform() override = default;
 

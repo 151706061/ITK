@@ -43,7 +43,7 @@ typename SimpleLoggerType::PriorityLevelEnum
 LoggerThreadWrapper<SimpleLoggerType>::GetPriorityLevel() const
 {
   const std::lock_guard<std::mutex> lockGuard(m_Mutex);
-  PriorityLevelEnum                 level = this->m_PriorityLevel;
+  const PriorityLevelEnum           level = this->m_PriorityLevel;
   return level;
 }
 
@@ -62,7 +62,7 @@ typename SimpleLoggerType::PriorityLevelEnum
 LoggerThreadWrapper<SimpleLoggerType>::GetLevelForFlushing() const
 {
   const std::lock_guard<std::mutex> lockGuard(m_Mutex);
-  PriorityLevelEnum                 level = this->m_LevelForFlushing;
+  const PriorityLevelEnum           level = this->m_LevelForFlushing;
   return level;
 }
 
@@ -79,7 +79,7 @@ auto
 LoggerThreadWrapper<SimpleLoggerType>::GetDelay() const -> DelayType
 {
   const std::lock_guard<std::mutex> lockGuard(m_Mutex);
-  DelayType                         delay = this->m_Delay;
+  const DelayType                   delay = this->m_Delay;
   return delay;
 }
 
@@ -95,7 +95,7 @@ LoggerThreadWrapper<SimpleLoggerType>::AddLogOutput(OutputType * output)
 
 template <typename SimpleLoggerType>
 void
-LoggerThreadWrapper<SimpleLoggerType>::Write(PriorityLevelEnum level, std::string const & content)
+LoggerThreadWrapper<SimpleLoggerType>::Write(PriorityLevelEnum level, const std::string & content)
 {
   const std::lock_guard<std::mutex> lockGuard(m_Mutex);
   if (this->m_PriorityLevel >= level)
@@ -154,9 +154,9 @@ LoggerThreadWrapper<SimpleLoggerType>::Flush()
 
 template <typename SimpleLoggerType>
 LoggerThreadWrapper<SimpleLoggerType>::LoggerThreadWrapper()
+  : m_TerminationRequested(false) // ms
+  , m_Delay(300)
 {
-  m_Delay = 300; // ms
-  m_TerminationRequested = false;
   m_Thread = std::thread(&Self::ThreadFunction, this);
 }
 

@@ -44,30 +44,25 @@ bool
 VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::TestHomogeneity(IndexList & Plist)
 {
   auto   num = static_cast<int>(Plist.size());
-  int    i;
-  double getp;
+  double getp = NAN;
   double addp = 0;
   double addpp = 0;
 
   const InputImageType * inputImage = this->GetInput();
 
-  for (i = 0; i < num; ++i)
+  for (int i = 0; i < num; ++i)
   {
     getp = static_cast<double>(inputImage->GetPixel(Plist[i]));
     addp = addp + getp;
     addpp = addpp + getp * getp;
   }
 
-  double savemean, saveSTD;
+  double savemean = 0;
+  double saveSTD = -1;
   if (num > 1)
   {
     savemean = addp / num;
     saveSTD = std::sqrt((addpp - (addp * addp) / (num)) / (num - 1));
-  }
-  else
-  {
-    savemean = 0;
-    saveSTD = -1;
   }
 
   //   // jvm - Mahalanobis distance
@@ -82,10 +77,8 @@ VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::Te
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 template <typename TInputImage, typename TOutputImage, typename TBinaryPriorImage>
@@ -93,7 +86,7 @@ void
 VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::TakeAPrior(
   const BinaryObjectImage * aprior)
 {
-  RegionType region = this->GetInput()->GetRequestedRegion();
+  const RegionType region = this->GetInput()->GetRequestedRegion();
 
   itk::ImageRegionConstIteratorWithIndex<BinaryObjectImage> ait(aprior, region);
   itk::ImageRegionConstIteratorWithIndex<InputImageType>    iit(this->GetInput(), region);
@@ -103,14 +96,16 @@ VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::Ta
   int   num = 0;
   float addp = 0;
   float addpp = 0;
-  float currp;
+  float currp = NAN;
 
-  unsigned int i, j;
-  unsigned int minx = 0, miny = 0, maxx = 0, maxy = 0;
+  unsigned int minx = 0;
+  unsigned int miny = 0;
+  unsigned int maxx = 0;
+  unsigned int maxy = 0;
   bool         status = false;
-  for (i = 0; i < this->m_Size[1]; ++i)
+  for (unsigned int i = 0; i < this->m_Size[1]; ++i)
   {
-    for (j = 0; j < this->m_Size[0]; ++j)
+    for (unsigned int j = 0; j < this->m_Size[0]; ++j)
     {
       if ((status == 0) && (ait.Get()))
       {
@@ -141,22 +136,22 @@ VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::Ta
 
   ait.GoToBegin();
   iit.GoToBegin();
-  for (i = 0; i < miny; ++i)
+  for (unsigned int i = 0; i < miny; ++i)
   {
-    for (j = 0; j < this->m_Size[0]; ++j)
+    for (unsigned int j = 0; j < this->m_Size[0]; ++j)
     {
       ++ait;
       ++iit;
     }
   }
-  for (i = miny; i <= maxy; ++i)
+  for (unsigned int i = miny; i <= maxy; ++i)
   {
-    for (j = 0; j < minx; ++j)
+    for (unsigned int j = 0; j < minx; ++j)
     {
       ++ait;
       ++iit;
     }
-    for (j = minx; j <= maxx; ++j)
+    for (unsigned int j = minx; j <= maxx; ++j)
     {
       if (ait.Get())
       {
@@ -174,7 +169,7 @@ VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::Ta
       ++ait;
       ++iit;
     }
-    for (j = maxx + 1; j < this->m_Size[0]; ++j)
+    for (unsigned int j = maxx + 1; j < this->m_Size[0]; ++j)
     {
       ++ait;
       ++iit;
@@ -183,7 +178,7 @@ VoronoiSegmentationImageFilter<TInputImage, TOutputImage, TBinaryPriorImage>::Ta
 
   m_Mean = addp / num;
   m_STD = std::sqrt((addpp - (addp * addp) / num) / (num - 1));
-  float b_Mean = addb / numb;
+  const float b_Mean = addb / numb;
 
   if (this->GetUseBackgroundInAPrior())
   {

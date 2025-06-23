@@ -43,7 +43,7 @@ template <typename TOutputMesh>
 void
 VTKPolyDataReader<TOutputMesh>::GenerateData()
 {
-  typename OutputMeshType::Pointer outputMesh = this->GetOutput();
+  const typename OutputMeshType::Pointer outputMesh = this->GetOutput();
 
   outputMesh->SetCellsAllocationMethod(MeshEnums::MeshClassCellsAllocationMethod::CellsAllocatedDynamicallyCellByCell);
 
@@ -59,8 +59,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
 
   if (!inputFile.is_open())
   {
-    itkExceptionMacro("Unable to open file\n"
-                      << "inputFilename= " << m_FileName);
+    itkExceptionMacro("Unable to open file\ninputFilename= " << m_FileName);
   }
 
   inputFile.imbue(std::locale::classic());
@@ -117,7 +116,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
   }
   itkDebugMacro("POINTS line" << line);
 
-  std::string pointLine(line, strlen("POINTS "), line.length());
+  const std::string pointLine(line, strlen("POINTS "), line.length());
   itkDebugMacro("pointLine " << pointLine);
 
   // we must use long here because this is the exact type specified by scanf
@@ -179,7 +178,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
 
   itkDebugMacro("POLYGONS line" << line);
 
-  std::string polygonLine(line, strlen("POLYGONS "), line.length());
+  const std::string polygonLine(line, strlen("POLYGONS "), line.length());
   itkDebugMacro("polygonLine " << polygonLine);
 
   //
@@ -216,7 +215,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
   // Load the polygons into the itk::Mesh
   //
 
-  long numberOfCellPoints;
+  long numberOfCellPoints = 0;
   long ids[3]; // need a signed type on input.
 
   for (CellIdentifier i = 0; i < itk::Math::CastWithRangeCheck<CellIdentifier>(numberOfPolygons); ++i)
@@ -234,7 +233,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
       itkExceptionMacro("Error reading file: " << m_FileName << "\nRead keyword DATA");
     }
 
-    int got;
+    int got = 0;
     if ((got = sscanf(line.c_str(), "%ld %ld %ld %ld", &numberOfCellPoints, &ids[0], &ids[1], &ids[2])) != 4)
     {
       itkExceptionMacro("Error reading file: "
@@ -318,7 +317,7 @@ VTKPolyDataReader<TOutputMesh>::GenerateData()
                                                << "\nUnexpected end-of-file while trying to read POINT_DATA.");
     }
 
-    double pointData;
+    double pointData = NAN;
 
     for (PointIdentifier pid = 0; pid < itk::Math::CastWithRangeCheck<PointIdentifier>(numberOfPoints); ++pid)
     {

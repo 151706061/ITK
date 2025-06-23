@@ -493,7 +493,10 @@ bool JPEG2000Codec::CanDecode(TransferSyntax const &ts) const
   return ts == TransferSyntax::JPEG2000Lossless
       || ts == TransferSyntax::JPEG2000
       || ts == TransferSyntax::JPEG2000Part2Lossless
-      || ts == TransferSyntax::JPEG2000Part2;
+      || ts == TransferSyntax::JPEG2000Part2
+      || ts == TransferSyntax::HTJ2KLossless
+      || ts == TransferSyntax::HTJ2KRPCLLossless
+      || ts == TransferSyntax::HTJ2K;
 }
 
 bool JPEG2000Codec::CanCode(TransferSyntax const &ts) const
@@ -826,8 +829,13 @@ std::pair<char *, size_t> JPEG2000Codec::DecodeByStreamsCommon(char *dummy_buffe
 
     // ELSCINT1_JP2vsJ2K.dcm
     // -> prec = 12, bpp = 0, sgnd = 0
-    //assert( wr == Dimensions[0] );
-    //assert( hr == Dimensions[1] );
+    if( wr != Dimensions[0] || hr != Dimensions[1] ) {
+	    gdcmErrorMacro("Invalid dimension");
+	    delete[] raw;
+    opj_destroy_codec(dinfo);
+  opj_image_destroy(image);
+    return std::pair<char*,size_t>(nullptr,0);
+    }
     if( comp->sgnd != PF.GetPixelRepresentation() )
       {
       PF.SetPixelRepresentation( (uint16_t)comp->sgnd );
@@ -1479,7 +1487,8 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
     &image) ? true : false;
   if(!bResult)
   {
-  opj_stream_destroy(cio);
+    opj_destroy_codec(dinfo);
+    opj_stream_destroy(cio);
     return false;
   }
   //image = opj_decode(dinfo, cio);
@@ -1522,6 +1531,8 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
 
   if( !check_comp_valid( image ) )
     {
+    opj_destroy_codec(dinfo);
+    opj_stream_destroy(cio);
     gdcmErrorMacro( "Invalid test failed" );
     return false;
     }
@@ -1543,6 +1554,8 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
     }
   else
     {
+    opj_destroy_codec(dinfo);
+    opj_stream_destroy(cio);
     gdcmErrorMacro( "do not handle precision: " << comp->prec );
     return false;
     }
@@ -1595,6 +1608,8 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
     }
   else if( image->numcomps == 4 )
     {
+    opj_destroy_codec(dinfo);
+    opj_stream_destroy(cio);
     /* Yes this is legal */
     // http://www.crc.ricoh.com/~gormish/jpeg2000conformance/
     // jpeg2000testimages/Part4TestStreams/codestreams_profile0/p0_06.j2k
@@ -1604,6 +1619,8 @@ bool JPEG2000Codec::GetHeaderInfo(const char * dummy_buffer, size_t buf_size, Tr
     }
   else
     {
+    opj_destroy_codec(dinfo);
+    opj_stream_destroy(cio);
     // jpeg2000testimages/Part4TestStreams/codestreams_profile0/p0_13.j2k
     gdcmErrorMacro( "Image is " << image->numcomps << " components which is not supported in DICOM" );
     return false;

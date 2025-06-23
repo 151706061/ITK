@@ -54,7 +54,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetEquationBinaryMaskTerm);
 
   using typename Superclass::InputImageType;
@@ -85,7 +85,8 @@ public:
 
   /** Update the term parameter values at end of iteration */
   void
-  Update() override;
+  Update() override
+  {}
 
   /** Initialize parameters in the terms prior to an iteration */
   void
@@ -93,13 +94,15 @@ public:
 
   /** Initialize term parameters in the dense case by computing for each pixel location */
   void
-  Initialize(const LevelSetInputIndexType & iP) override;
+  Initialize(const LevelSetInputIndexType & itkNotUsed(iP)) override
+  {}
 
   /** Supply updates at pixels to keep the term parameters always updated */
   void
-  UpdatePixel(const LevelSetInputIndexType & iP,
-              const LevelSetOutputRealType & oldValue,
-              const LevelSetOutputRealType & newValue) override;
+  UpdatePixel(const LevelSetInputIndexType & itkNotUsed(iP),
+              const LevelSetOutputRealType & itkNotUsed(oldValue),
+              const LevelSetOutputRealType & itkNotUsed(newValue)) override
+  {}
 
 protected:
   LevelSetEquationBinaryMaskTerm();

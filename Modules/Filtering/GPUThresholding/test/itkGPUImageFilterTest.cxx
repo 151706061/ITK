@@ -22,7 +22,7 @@
  * This program creates a GPU Mean filter and a CPU threshold filter using
  * object factory framework and test pipelining of GPU and CPU filters.
  */
-//#include "pathToOpenCLSourceCode.h"
+// #include "pathToOpenCLSourceCode.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -71,7 +71,7 @@ runGPUImageFilterTest(const std::string & inFile, const std::string & outFile)
   typename InputImageType::SizeType indexRadius;
   indexRadius[0] = 2; // radius along x
   indexRadius[1] = 2; // radius along y
-  if (VImageDimension > 2)
+  if constexpr (VImageDimension > 2)
   {
     indexRadius[2] = 2; // radius along z
   }

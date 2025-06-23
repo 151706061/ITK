@@ -55,13 +55,13 @@ int
 itkHashTableTest(int, char *[])
 {
   println("Testing std::hash");
-  std::hash<const char *> H;
+  constexpr std::hash<const char *> H;
   std::cout << "foo -> " << H("foo") << std::endl;
   std::cout << "bar -> " << H("bar") << std::endl;
-  std::hash<int> H1;
+  constexpr std::hash<int> H1;
   std::cout << "1 -> " << H1(1) << std::endl;
   std::cout << "234 -> " << H1(234) << std::endl;
-  std::hash<char> H2;
+  constexpr std::hash<char> H2;
   std::cout << "a -> " << H2('a') << std::endl;
   std::cout << "Z -> " << H2('Z') << std::endl;
 
@@ -87,11 +87,8 @@ itkHashTableTest(int, char *[])
   }
   Set.rehash(50);
   Set.insert("the horror");
-  auto                        hsh_it = Set.begin();
-  HashSetType::const_iterator hst_const_it;
-  hst_const_it = Set.end();
-  HashSetType SetCopy;
-  SetCopy = Set;
+  auto              hsh_it = Set.begin();
+  const HashSetType SetCopy = Set;
 
   println("Testing std::unordered_map");
   using HashMapType = std::unordered_map<const char *, int, std::hash<const char *>, eqstr>;
@@ -122,13 +119,10 @@ itkHashTableTest(int, char *[])
     std::cout << "Set is empty." << std::endl;
   }
   months.rehash(50);
-  HashMapType::value_type p("psychotic break", 2);
+  constexpr HashMapType::value_type p("psychotic break", 2);
   months.insert(p);
-  auto                        map_it = months.begin();
-  HashMapType::const_iterator map_const_it;
-  map_const_it = months.end();
-  HashMapType MapCopy;
-  MapCopy = months;
+  auto              map_it = months.begin();
+  const HashMapType MapCopy = months;
 
   IgnoreUnusedVariable(hsh_it);
   IgnoreUnusedVariable(map_it);

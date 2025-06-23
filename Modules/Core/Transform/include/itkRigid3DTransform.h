@@ -68,7 +68,7 @@ public:
   /** Run-time type information (and related methods).   */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Rigid3DTransform);
 
   /** Dimension of the space. */
@@ -156,7 +156,10 @@ public:
 
 
 protected:
-  Rigid3DTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] Rigid3DTransform(const MatrixType &       matrix,
+                                                                const OutputVectorType & offset);
+#endif
   Rigid3DTransform(unsigned int paramDim);
   Rigid3DTransform();
   ~Rigid3DTransform() override = default;

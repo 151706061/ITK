@@ -89,7 +89,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TemporalDataObject);
 
   /** Get the type of temporal units we care about (Defaults to Frame)*/
@@ -97,19 +97,21 @@ public:
   GetTemporalUnit() const;
 
   /** Explicitly set temporal units (Defaults to Frame)*/
+  /** @ITKStartGrouping */
   virtual void
   SetTemporalUnitToFrame();
   virtual void
   SetTemporalUnitToRealTime();
   virtual void
   SetTemporalUnitToFrameAndRealTime();
-
+  /** @ITKEndGrouping */
   /** Get/Set the number of frames that the internal buffer can hold */
+  /** @ITKStartGrouping */
   SizeValueType
   GetNumberOfBuffers();
   void
   SetNumberOfBuffers(SizeValueType num);
-
+  /** @ITKEndGrouping */
   virtual void
   SetLargestPossibleTemporalRegion(const TemporalRegionType & region);
   virtual const TemporalRegionType &

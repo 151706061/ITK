@@ -42,7 +42,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineBaseTransform);
 
   /** Dimension of the domain space. */
@@ -257,7 +257,10 @@ public:
 
 #if !defined(ITK_LEGACY_REMOVE)
   /** Get number of weights. */
-  itkLegacyMacro(unsigned long GetNumberOfWeights() const) { return m_WeightsFunction->GetNumberOfWeights(); }
+  itkLegacyMacro(unsigned long GetNumberOfWeights() const)
+  {
+    return m_WeightsFunction->GetNumberOfWeights();
+  }
 #endif
 
   /** Method to transform a vector -
@@ -318,7 +321,7 @@ public:
     return Self::TransformCategoryEnum::BSpline;
   }
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfAffectedWeights() const;
 
   using PhysicalDimensionsType = typename ImageType::SpacingType;
@@ -342,8 +345,10 @@ protected:
   ~BSplineBaseTransform() override = default;
 
   /** Get/Set to allow subclasses to access and manipulate the weights function. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(WeightsFunction, WeightsFunctionType);
   itkGetModifiableObjectMacro(WeightsFunction, WeightsFunctionType);
+  /** @ITKEndGrouping */
 
   /** Wrap flat array into images of coefficients. */
   void

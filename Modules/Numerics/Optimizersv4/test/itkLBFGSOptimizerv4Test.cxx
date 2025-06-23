@@ -61,17 +61,17 @@ public:
   using DerivativeType = Superclass::DerivativeType;
   using MeasureType = Superclass::MeasureType;
 
-  itkLBFGSOptimizerv4TestMetric() { m_HasLocalSupport = false; }
+  itkLBFGSOptimizerv4TestMetric() = default;
 
   MeasureType
   GetValue() const override
   {
-    double x = this->m_Parameters[0];
-    double y = this->m_Parameters[1];
+    const double x = this->m_Parameters[0];
+    const double y = this->m_Parameters[1];
 
     std::cout << "GetValue ( " << x << " , " << y << ") = ";
 
-    double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     std::cout << val << std::endl;
 
@@ -81,8 +81,8 @@ public:
   void
   GetDerivative(DerivativeType & derivative) const override
   {
-    double x = this->m_Parameters[0];
-    double y = this->m_Parameters[1];
+    const double x = this->m_Parameters[0];
+    const double y = this->m_Parameters[1];
 
     std::cout << "GetDerivative ( " << x << " , " << y << ") = ";
 
@@ -148,7 +148,7 @@ public:
 
 private:
   ParametersType m_Parameters;
-  bool           m_HasLocalSupport;
+  bool           m_HasLocalSupport{ false };
 };
 
 
@@ -170,7 +170,7 @@ itkLBFGSOptimizerv4Test(int, char *[])
   auto metric = itkLBFGSOptimizerv4TestMetric::New();
 
   // Set some optimizer parameters
-  bool trace = false;
+  constexpr bool trace = false;
   itkOptimizer->SetTrace(trace);
   ITK_TEST_SET_GET_VALUE(trace, itkOptimizer->GetTrace());
 
@@ -190,10 +190,10 @@ itkLBFGSOptimizerv4Test(int, char *[])
   itkOptimizer->SetDefaultStepLength(defaultStepLength);
   ITK_TEST_SET_GET_VALUE(defaultStepLength, itkOptimizer->GetDefaultStepLength());
 
-  OptimizerType::DerivativeType cachedDerivative{};
+  const OptimizerType::DerivativeType cachedDerivative{};
   ITK_TEST_EXPECT_EQUAL(cachedDerivative, itkOptimizer->GetCachedDerivative());
 
-  OptimizerType::ParametersType cachedCurrentPos{};
+  const OptimizerType::ParametersType cachedCurrentPos{};
   ITK_TEST_EXPECT_EQUAL(cachedCurrentPos, itkOptimizer->GetCachedCurrentPosition());
 
   std::cout << "GetValue() before optimizer starts: " << itkOptimizer->GetValue() << std::endl;
@@ -255,8 +255,7 @@ itkLBFGSOptimizerv4Test(int, char *[])
   std::cout << "Number of evals = " << vnlOptimizer->get_num_evaluations() << std::endl;
   std::cout << std::endl;
 
-  OptimizerType::ParametersType finalPosition;
-  finalPosition = itkOptimizer->GetCurrentPosition();
+  OptimizerType::ParametersType finalPosition = itkOptimizer->GetCurrentPosition();
 
   std::cout << "Solution        = (" << finalPosition[0] << ',' << finalPosition[1] << ')' << std::endl;
 
@@ -266,8 +265,8 @@ itkLBFGSOptimizerv4Test(int, char *[])
   //
   // check results to see if it is within range
   //
-  bool   pass = true;
-  double trueParameters[2] = { 2, -2 };
+  bool             pass = true;
+  constexpr double trueParameters[2] = { 2, -2 };
   for (unsigned int j = 0; j < 2; ++j)
   {
     if (itk::Math::FloatAlmostEqual(finalPosition[j], trueParameters[j]))
@@ -284,16 +283,15 @@ itkLBFGSOptimizerv4Test(int, char *[])
 
   // Get the final value of the optimizer
   std::cout << "Testing GetValue() : ";
-  OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
+  const OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
   if (itk::Math::abs(finalValue + 10.0) > 0.01)
   {
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   //
   // Test stopping when number of iterations reached

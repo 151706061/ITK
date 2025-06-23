@@ -62,7 +62,7 @@ public:
   using Self = ZeroFluxNeumannBoundaryCondition;
   using Superclass = ImageBoundaryCondition<TInputImage, TOutputImage>;
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ZeroFluxNeumannBoundaryCondition);
 
   /** Extract information from the image type. */
@@ -109,7 +109,7 @@ public:
    * \return The necessary input region required to determine the
    * pixel values in the outputRequestedRegion.
    */
-  RegionType
+  [[nodiscard]] RegionType
   GetInputRequestedRegion(const RegionType & inputLargestPossibleRegion,
                           const RegionType & outputRequestedRegion) const override;
 

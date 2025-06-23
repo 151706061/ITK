@@ -32,8 +32,7 @@ itkLineSpatialObjectTest(int, char *[])
   std::cout << "Testing LineSpatialObject:" << std::endl << std::endl;
 
   LineType::LinePointListType list;
-  unsigned int                i;
-  for (i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     LinePointType p;
     p.SetPositionInObjectSpace(i, i + 1, i + 2);
@@ -56,7 +55,7 @@ itkLineSpatialObjectTest(int, char *[])
   p.Print(std::cout);
 
   // Create a Line Spatial Object
-  LinePointer line = LineType::New();
+  const LinePointer line = LineType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(line, LineSpatialObject, PointBasedSpatialObject);
 
@@ -75,18 +74,16 @@ itkLineSpatialObjectTest(int, char *[])
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-  }
+
+  std::cout << "[PASSED]" << std::endl;
 
 
   // Point consistency
   std::cout << "Point consistency: ";
 
-  LineType::LinePointListType::const_iterator it = line->GetPoints().begin();
+  auto it = line->GetPoints().begin();
 
-  i = 0;
+  unsigned int i = 0;
   while (it != line->GetPoints().end())
   {
     for (unsigned int d = 0; d < 3; ++d)
@@ -152,7 +149,7 @@ itkLineSpatialObjectTest(int, char *[])
   // Testing IsEvaluableAt()
   std::cout << "ValueAt: ";
 
-  double value;
+  double value = NAN;
   if (!line->ValueAtInWorldSpace(in, value))
   {
     std::cout << "[FAILED]" << std::endl;
@@ -176,14 +173,13 @@ itkLineSpatialObjectTest(int, char *[])
     pOriginal.SetPositionInObjectSpace(42, 41, 43);
 
     // itk::LineSpatialObjectPoint
-    VectorType normal;
-    normal.Fill(276);
+    auto normal = itk::MakeFilled<VectorType>(276);
     pOriginal.SetNormalInObjectSpace(normal, 0);
 
     // Copy
-    LinePointType pCopy(pOriginal);
+    const LinePointType pCopy(pOriginal);
     // Assign
-    LinePointType pAssign = pOriginal;
+    const LinePointType pAssign = pOriginal;
 
     std::vector<LinePointType> pointVector;
     pointVector.push_back(pCopy);

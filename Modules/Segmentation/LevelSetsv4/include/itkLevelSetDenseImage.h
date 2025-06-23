@@ -58,7 +58,7 @@ public:
   /** Method for creation through object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetDenseImage);
 
   static constexpr unsigned int Dimension = Superclass::Dimension;
@@ -75,11 +75,12 @@ public:
   itkGetModifiableObjectMacro(Image, ImageType);
 
   /** Returns the value of the level set function at a given location inputIndex */
+  /** @ITKStartGrouping */
   OutputType
   Evaluate(const InputType & inputIndex) const override;
   void
   Evaluate(const InputType & inputIndex, LevelSetDataType & data) const override;
-
+  /** @ITKEndGrouping */
 protected:
   LevelSetDenseImage() = default;
 

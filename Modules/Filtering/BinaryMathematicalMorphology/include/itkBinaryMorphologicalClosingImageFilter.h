@@ -40,7 +40,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Binary morphological closing and opening image filters"
  * by Lehmann G.
- * https://www.insight-journal.org/browse/publication/58
+ * https://doi.org/10.54294/bcwtvq
  *
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
@@ -70,7 +70,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryMorphologicalClosingImageFilter);
 
   using InputImageType = TInputImage;
@@ -95,10 +95,11 @@ public:
 
   /** A safe border is added to input image to avoid borders effects
    * and remove it once the closing is done */
+  /** @ITKStartGrouping */
   itkSetMacro(SafeBorder, bool);
   itkGetConstReferenceMacro(SafeBorder, bool);
   itkBooleanMacro(SafeBorder);
-
+  /** @ITKEndGrouping */
 protected:
   BinaryMorphologicalClosingImageFilter();
   ~BinaryMorphologicalClosingImageFilter() override = default;

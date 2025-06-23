@@ -24,9 +24,9 @@ namespace itk
 
 template <typename TImageType>
 PipelineMonitorImageFilter<TImageType>::PipelineMonitorImageFilter()
+  : m_ClearPipelineOnGenerateOutputInformation(true)
+
 {
-  m_NumberOfClearPipeline = 0;
-  m_ClearPipelineOnGenerateOutputInformation = true;
   this->ClearPipelineSavedInformation();
 }
 
@@ -56,7 +56,7 @@ PipelineMonitorImageFilter<TImageType>::VerifyInputFilterExecutedStreaming(int e
   {
     return true;
   }
-  else if (expectedNumber < 0 && static_cast<unsigned int>(-expectedNumber) <= this->GetNumberOfUpdates())
+  if (expectedNumber < 0 && static_cast<unsigned int>(-expectedNumber) <= this->GetNumberOfUpdates())
   {
     return true;
   }
@@ -75,7 +75,7 @@ template <typename TImageType>
 bool
 PipelineMonitorImageFilter<TImageType>::VerifyInputFilterMatchedUpdateOutputInformation()
 {
-  InputImageConstPointer input = this->GetInput();
+  const InputImageConstPointer input = this->GetInput();
   if (input->GetSpacing() != m_UpdatedOutputSpacing)
   {
     itkWarningMacro("The input filter's Spacing does not match UpdateOutputInformation");
@@ -114,9 +114,8 @@ PipelineMonitorImageFilter<TImageType>::VerifyInputFilterBufferedRequestedRegion
 {
   // we expect that the input filter's output image's buffered
   // region is going to match its requested region
-  bool         ret = true;
-  unsigned int i;
-  for (i = 0; i < m_UpdatedBufferedRegions.size(); ++i)
+  bool ret = true;
+  for (unsigned int i = 0; i < m_UpdatedBufferedRegions.size(); ++i)
   {
     if (m_UpdatedBufferedRegions[i] != m_UpdatedRequestedRegions[i])
     {
@@ -221,7 +220,7 @@ PipelineMonitorImageFilter<TImageType>::GenerateOutputInformation()
 
   Superclass::GenerateOutputInformation();
 
-  InputImageConstPointer input = this->GetInput();
+  const InputImageConstPointer input = this->GetInput();
   m_UpdatedOutputOrigin = input->GetOrigin();
   m_UpdatedOutputDirection = input->GetDirection();
   m_UpdatedOutputSpacing = input->GetSpacing();
@@ -273,8 +272,8 @@ void
 PipelineMonitorImageFilter<TImageType>::GenerateData()
 {
   // Get pointers to the input and output
-  InputImagePointer output = this->GetOutput();
-  InputImagePointer input = const_cast<TImageType *>(this->GetInput());
+  const InputImagePointer output = this->GetOutput();
+  const InputImagePointer input = const_cast<TImageType *>(this->GetInput());
 
   // Graft the input Onto the output, so that we run "in-place"
   this->GraftOutput(input);
@@ -300,9 +299,7 @@ PipelineMonitorImageFilter<TImageType>::PrintSelf(std::ostream & os, Indent inde
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent
-     << "ClearPipelineOnGenerateOutputInformation: " << (m_ClearPipelineOnGenerateOutputInformation ? "On" : "Off")
-     << std::endl;
+  itkPrintSelfBooleanMacro(ClearPipelineOnGenerateOutputInformation);
   os << indent << "NumberOfUpdates: " << m_NumberOfUpdates << std::endl;
   os << indent << "NumberOfClearPipeline: " << m_NumberOfClearPipeline << std::endl;
 

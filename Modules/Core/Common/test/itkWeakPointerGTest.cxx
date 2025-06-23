@@ -52,22 +52,22 @@ TEST(WeakPointer, DefaultConstructedEqualsNullptr)
 
 TEST(WeakPointer, CheckNull)
 {
-  WeakPointerType nullPtr;
+  constexpr WeakPointerType nullPtr;
   ASSERT_TRUE(nullPtr.IsNull());
 
-  itk::LightObject::Pointer lightObject = itk::LightObject::New();
-  WeakPointerType           ptr = lightObject.GetPointer();
+  const itk::LightObject::Pointer lightObject = itk::LightObject::New();
+  const WeakPointerType           ptr = lightObject.GetPointer();
   ASSERT_TRUE(ptr.IsNotNull());
 }
 
 
 TEST(WeakPointer, CheckSerialization)
 {
-  WeakPointerType nullPtr;
+  constexpr WeakPointerType nullPtr;
   std::cout << nullPtr << std::endl;
 
-  itk::LightObject::Pointer lightObject = itk::LightObject::New();
-  WeakPointerType           ptr = lightObject.GetPointer();
+  const itk::LightObject::Pointer lightObject = itk::LightObject::New();
+  const WeakPointerType           ptr = lightObject.GetPointer();
   std::cout << ptr << std::endl;
 }
 
@@ -82,8 +82,7 @@ TEST(WeakPointer, ConvertedFromNullptrEqualsNullptr)
 
 TEST(WeakPointer, AssignedFromNullptrEqualsNullptr)
 {
-  WeakPointerType ptr;
-  ptr = nullptr;
+  const WeakPointerType ptr = nullptr;
   ASSERT_EQ(ptr, nullptr);
   ASSERT_TRUE(ptr == nullptr);
   ASSERT_TRUE(nullptr == ptr);

@@ -43,7 +43,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetValue(const Tran
 
   // Get the fixed image
   //
-  FixedImageConstPointer fixedImage = this->m_FixedImage;
+  const FixedImageConstPointer fixedImage = this->m_FixedImage;
   if (!fixedImage)
   {
     itkExceptionMacro("Fixed image has not been assigned");
@@ -57,7 +57,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetValue(const Tran
 
   // Get the moving image
   //
-  MovingImageConstPointer movingImage = this->m_MovingImage;
+  const MovingImageConstPointer movingImage = this->m_MovingImage;
   if (!movingImage)
   {
     itkExceptionMacro("Moving image has not been assigned");
@@ -107,7 +107,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetValue(const Tran
     // the point in the fixed image (physical coordinates)
     //
     //
-    OutputPointType transformedPoint = this->m_Transform->TransformPoint(fixedInputPoint);
+    const OutputPointType transformedPoint = this->m_Transform->TransformPoint(fixedInputPoint);
 
     if (this->m_MovingImageMask && !this->m_MovingImageMask->IsInsideInWorldSpace(transformedPoint))
     {
@@ -160,7 +160,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetDerivative(const
     itkExceptionMacro("The gradient image is null, maybe you forgot to call Initialize()");
   }
 
-  FixedImageConstPointer fixedImage = this->m_FixedImage;
+  const FixedImageConstPointer fixedImage = this->m_FixedImage;
   if (!fixedImage)
   {
     itkExceptionMacro("Fixed image has not been assigned");
@@ -217,7 +217,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetDerivative(const
       ++fixedArea;
     }
 
-    OutputPointType transformedPoint = this->m_Transform->TransformPoint(inputPoint);
+    const OutputPointType transformedPoint = this->m_Transform->TransformPoint(inputPoint);
 
     if (this->m_MovingImageMask && !this->m_MovingImageMask->IsInsideInWorldSpace(transformedPoint))
     {
@@ -245,11 +245,11 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetDerivative(const
 
       // Get the gradient by NearestNeighborInterpolation:
       // which is equivalent to round up the point components.
-      using CoordRepType = typename OutputPointType::CoordRepType;
-      using MovingImageContinuousIndexType = ContinuousIndex<CoordRepType, MovingImageType::ImageDimension>;
+      using CoordinateType = typename OutputPointType::CoordinateType;
+      using MovingImageContinuousIndexType = ContinuousIndex<CoordinateType, MovingImageType::ImageDimension>;
 
       const MovingImageContinuousIndexType tempIndex =
-        this->m_MovingImage->template TransformPhysicalPointToContinuousIndex<CoordRepType>(transformedPoint);
+        this->m_MovingImage->template TransformPhysicalPointToContinuousIndex<CoordinateType>(transformedPoint);
 
       typename MovingImageType::IndexType mappedIndex;
       mappedIndex.CopyWithRound(tempIndex);
@@ -276,7 +276,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::GetDerivative(const
   }
   else
   {
-    double areaSum = static_cast<double>(fixedArea) + static_cast<double>(movingArea);
+    const double areaSum = static_cast<double>(fixedArea) + static_cast<double>(movingArea);
     for (unsigned int par = 0; par < ParametersDimension; ++par)
     {
       derivative[par] = -(areaSum * sum1[par] - 2.0 * intersection * sum2[par]) / (areaSum * areaSum);
@@ -368,7 +368,7 @@ KappaStatisticImageToImageMetric<TFixedImage, TMovingImage>::PrintSelf(std::ostr
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Complement: " << (m_Complement ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(Complement);
   os << indent << "ForegroundValue: " << m_ForegroundValue << std::endl;
 }
 

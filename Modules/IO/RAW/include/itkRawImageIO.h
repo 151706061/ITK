@@ -59,7 +59,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RawImageIO);
 
   /** Pixel type alias support Used to declare pixel type in filters
@@ -86,9 +86,10 @@ public:
   /** The number of dimensions stored in a file. Defaults to two. If two,
    * each file contains one "slice". If three, each file will contain one
    * "volume". */
+  /** @ITKStartGrouping */
   itkSetMacro(FileDimensionality, unsigned long);
   itkGetConstMacro(FileDimensionality, unsigned long);
-
+  /** @ITKEndGrouping */
   /** The different types of ImageIO's can support data of varying
    * dimensionality. For example, some file formats are strictly 2D
    * while others can support 2D, 3D, or even n-D. This method returns
@@ -124,6 +125,7 @@ public:
   Read(void * buffer) override;
 
   /** Set/Get the Data mask. */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(ImageMask, unsigned short);
   void
   SetImageMask(unsigned long val)
@@ -135,7 +137,7 @@ public:
     m_ImageMask = (static_cast<unsigned short>(val));
     this->Modified();
   }
-
+  /** @ITKEndGrouping */
   /** Read a file's header to determine image dimensions, etc. */
   virtual void
   ReadHeader(const std::string = std::string())
@@ -205,7 +207,7 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RawImageIOFactory);
 
   /** Register one factory of this type  */

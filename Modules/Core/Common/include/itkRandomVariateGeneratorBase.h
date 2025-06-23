@@ -20,9 +20,7 @@
 
 #include "itkObject.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class RandomVariateGeneratorBase
  * \brief Defines common interfaces for random variate generators.
@@ -39,7 +37,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RandomVariateGeneratorBase);
 
   /** get a variate using FastNorm function */
@@ -52,7 +50,6 @@ protected:
 
 private:
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

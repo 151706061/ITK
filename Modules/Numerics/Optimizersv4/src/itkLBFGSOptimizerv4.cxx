@@ -31,17 +31,12 @@ LBFGSOptimizerv4::PrintSelf(std::ostream & os, Indent indent) const
   Superclass::PrintSelf(os, indent);
   os << indent << "LineSearchAccuracy: " << m_LineSearchAccuracy << std::endl;
   os << indent << "DefaultStepLength: " << m_DefaultStepLength << std::endl;
-
-  if (this->m_VnlOptimizer)
-  {
-    os << indent << "Vnl LBFGS Failure Code: " << this->m_VnlOptimizer->get_failure_code() << std::endl;
-  }
 }
 
 void
 LBFGSOptimizerv4::VerboseOn()
 {
-  if (m_Verbose == true)
+  if (m_Verbose)
   {
     return;
   }

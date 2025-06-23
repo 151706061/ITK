@@ -9,7 +9,8 @@ Current Maintainers
 
 The current ITK maintainers with a trusted GPG key are:
 
-  * Matt McCormick (@thewtex) <matt.mccormick@kitware.com>
+  * Matt McCormick (@thewtex) <matt@mmmccormick.com>
+  * Pablo Hernandez-Cerdan <pablo.hernandez.cerdan@outlook.com>
   * Brad King (@bradking) <brad.king@kitware.com>
   * Jean-Christophe Fillion-Robin (@jcfr) <jchris.fillionr@kitware.com>
 
@@ -17,7 +18,7 @@ Release Life Cycle
 ------------------
 
 The first release candidate (RC) is the initial branch point, so it does not have
-special steps to create. However, as `master` moves fairly quickly, branches
+special steps to create. However, as `main` moves fairly quickly, branches
 need to be corralled into the `release` branch afterwards.
 
 When releasing a new ITK version, the following steps are be taken:
@@ -36,8 +37,8 @@ When releasing a new ITK version, the following steps are be taken:
     * Tarballs are tested locally.
     * Generate Python packages and ITKPythonBuilds.
     * Tarballs are posted to [ITK GitHub Releases].
-    * Tarballs are archived on the [ITK data.kitware.com Releases].
-    * Tarballs are linked from the ITK [download page].
+    * Tarballs are archived on the [ITKReleases NumFOCUS GDrive].
+    * Tarballs are linked from the [ITK Documentation].
     * Python packages are uploaded to PyPI
     * conda-forge libitk and itk Packages are updated
   * Announcement
@@ -74,7 +75,7 @@ When releasing a new ITK version, the following steps are be taken:
   * **Updating documentation, guides and websites**.
   * **Generate tarballs**
     * Tarballs are posted to [ITK GitHub Releases].
-    * Tarballs are linked from the ITK [download page].
+    * Tarballs are linked from the [ITK Documentation].
   * Announcement
 
 Initial steps
@@ -117,12 +118,12 @@ This ITK [blog post] describes the Linux distributions that package ITK.
 Integrate bug fixes in the release branch
 -----------------------------------------
 
-Update `master` and `release` branches:
+Update `main` and `release` branches:
 
 ```bash
 git fetch upstream
-git checkout master
-git reset --hard upstream/master
+git checkout main
+git reset --hard upstream/main
 git checkout release
 git reset --hard upstream/release
 ```
@@ -145,10 +146,10 @@ Merge bug fix commits in release. The topic branch should be named
 `<bug-name>-for-release`:
   * If topic branch was created from the `release` branch, `checkout` topic
     in new branch.
-  * If topic branch was created on `master`, `cherry-pick` commit (see
+  * If topic branch was created on `main`, `cherry-pick` commit (see
     command line on [GitHub]) on a topic branch created off `release`. The
     commit will be visible twice in the history once release in merged into
-    `master`.
+    `main`.
   * Merge new branch on `release`:
 
 ```bash
@@ -170,12 +171,12 @@ The following must be ensured before tagging the ITK repository:
 ### Increment the version number
 
 If the version number in `ITK/CMake/itkVersion.cmake` is not already set accordingly,
-submit a pull request to update ITK's version number in the `master` branch to
-what the new release is called. Any point beyond that in the `master` branch
+submit a pull request to update ITK's version number in the `main` branch to
+what the new release is called. Any point beyond that in the `main` branch
 could serve as the start of the new release branch.
 
 After creating the release branch, submit another merge request to update the
-master branch's minor version number.
+main branch's minor version number.
 
 Update Zenodo Citation Configuration
 ------------------------------------
@@ -203,10 +204,10 @@ Archive ExternalData
 --------------------
 
 More background on the testing data can be found in the
-[Contributing Upload Binary Data][../docs/contributing/upload_binary_data.md) documentation.
+[Contributing Upload Binary Data](../docs/contributing/upload_binary_data.md) documentation.
 
 The following steps archive data for release on various resources. Both
-[datalad] and [@web3-storage/w3] should be installed locally. And the [kubo]
+[datalad] and [@web3-storage/w3cli] should be installed locally. And the [kubo]
 `ipfs` cli. It is recommended to install and run [ipfs-desktop] and symlink
 the `ipfs` cli it comes with into your PATH.
 
@@ -241,12 +242,24 @@ And fetch new data into the datalad repository.
 ```bash
 cd ~/data/ITKData
 ./ContentLinkSynchronization.sh --create ~/src/ITK
+datalad status
+```
+
+If there is new content, commit it with:
+
+```bash
+datalad save -m "ENH: Pre-updates for ITK-v<itk-release-version>"
 ```
 
 Upload the tree to archival storage with:
 
 ```bash
+rm -rf ~/data/pre-archive && rm -f ~/data/pre-archive.tar.gz
+datalad export-archive ~/data/pre-archive
+tar -xf ~/data/pre-archive.tar.gz -C ~/data/
+cd ~/data/pre-archive
 w3 put . --no-wrap -n ITKData-pre-verify -H
+cd -
 ```
 
 Verify and possibly update CID's in the ITK repository with the CID output
@@ -263,10 +276,19 @@ If there is new content, commit it with:
 datalad save -m "ENH: Updates for ITK-v<itk-release-version>"
 ```
 
+The first time uploading to web3.storage, you will need to create an account,
+[install the w3 cli], and create a space, e.g. with `w3 space create itk` or
+add your DID, obtained with `w3 whoami`, to the shared space.
+
 Upload the repository update to web3.storage:
 
 ```bash
+rm -rf ~/data/itk-archive && rm -f ~/data/itk-archive.tar.gz
+tar -xf ~/data/itk-archive.tar.gz -C ~/data/
+datalad export-archive ~/data/itk-archive
+cd ~/data/itk-archive
 w3 put . --no-wrap -n ITKData-v<itk-release-version> -H
+cd -
 ```
 
 Edit the *README.md* file with the new root CID and push.
@@ -283,30 +305,14 @@ If the [pinata] pinning service is not already available, create it:
 ```bash
 ipfs pin remote service add pinata https://api.pinata.cloud/psa/ PINATA_JWT
 ```
+Where `PINATA_JWT` is the secret key associated to an API key at the
+InsightSoftwareConsortium workspace in pinata.
 
 Then pin the root CID locally and on Pinata:
 
 ```bash
-ipfs pin add /ipfs/bafy<rest-of-cid>
+ipfs pin add /ipfs/bafy<rest-of-cid> --progress
 ipfs pin remote add --service=pinata --name=ITKData-ITK-v<itk-release-version> /ipfs/bafy<rest-of-cid>
-```
-
-### Pin the CID on Kitware's ipfs server
-
-Optionally, pin to Kitware's ipfs server:
-
-```
-ssh ipfs
-export IPFS_PATH=/data/ipfs
-ipfs pin add --progress /ipfs/bafy<rest-of-cid>
-```
-
-### Rsync the data to Kitware's Apache Server
-
-Optionally, rsync the object to Kitware's Apache Server
-
-```bash
-rsync -vrtL ./Objects/CID kitware@web:ITKExternalData/
 ```
 
 ### Push the data to GitHub Pages
@@ -333,7 +339,7 @@ maintainers after an ITK Confab.
 Use the command:
 
 ```bash
-git checkout master
+git checkout main
 git pull
 ```
 
@@ -344,9 +350,12 @@ tree that has been fully tested in the [Dashboard].
     bump the `ITK_VERSION_PATCH` variable in the `CMake/itkVersion.cmake`
     file before tagging.
   * When tagging a **feature release**, make sure to bump the
-   `ITK_VERSION_MINOR` version on the `master` branch after tagging.
+   `ITK_VERSION_MINOR` version on the `main` branch after tagging.
 
 ### Tag with a branch point reference
+
+In the documentation below `$version` examples are `5.4rc03`, `5.4.0`, or
+`5.4.1`.
 
 In the source tree that was just updated, use the command
 
@@ -368,29 +377,29 @@ Note that only trusted GPG key holders may do this step.
 ### Update the release branch
 
 Update the `release` branch only during feature releases after the tag for the
-release. Perform a `fast-forward` merge of `master` into release:
+release. Perform a `fast-forward` merge of `main` into release:
 
 ```bash
 git checkout release
 git reset --hard upstream/release
 git merge --ff-only v$version
 git push upstream release
-git checkout master
+git checkout main
 ```
 
 This will not create a new commit, only move the release branch to the tag,
 i.e. it will be fast forwarded.
 
-For minor releases, merge the release branch into `master` branch as for a
+For minor releases, merge the release branch into `main` branch as for a
 normal commit, and resolve conflicts (arising from mismatch in version number)
-by keeping `master` branch versions.
+by keeping `main` branch versions.
 
-Merge the `release` branch into the current named version branch, e.g. `5.4`.
+Merge the `release` branch into the current named `$major_minor` version branch, e.g. `5.4`.
 
 ```bash
-git checkout $version
+git checkout $major_minor
 git merge --ff-only release
-git push upstream $version
+git push upstream $major_minor
 ```
 
 ### Remote modules
@@ -398,6 +407,14 @@ git push upstream $version
 Add any new remote modules to nightly builds. Some builds may be difficult to add
 due to third-party dependencies.
 
+When a new ITK version is released, experience has shown that the remote
+module packages are not binary compatible across ITK major or minor releases.
+While we attempt to maintain API compatibility between ITK minor releases, the
+ABI generally changes. This can be due to features and bug fixes in the ITK
+source code, but there are also usually build system changes that cause ABI
+changes. Thus, remote module versions should be bumped into a new major
+version when requiring a new ITK major or minor version. The process described
+below ensures appropriate versioning and compatibility of the remotes with ITK.
 
 Update Remote Modules
 ---------------------
@@ -407,14 +424,14 @@ the latest ITK tag, the following steps should be performed:
 
 1. Update the ITK tag used in the `azure-pipelines.yml` CI configuration and
 the `setup.py` Python setup files, and update the remote module Python package
-version to a new major version using the [UpdateRequiredITKVersionInRemoteModules.sh](https://github.com/InsightSoftwareConsortium/ITK/tree/master/Utilities/Maintenance/UpdateRequiredITKVersionInRemoteModules.sh)
+version to a new major version using the [UpdateRequiredITKVersionInRemoteModules.sh](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Utilities/Maintenance/UpdateRequiredITKVersionInRemoteModules.sh)
 script. This will involve merging a new pull request to each remote module
 repository.
 
 2. Upload the new remote module Python wheel to [PyPI].
 
 3. Update the remote modules to their latest commits using the
-[UpdateRemoteModules.sh](https://github.com/InsightSoftwareConsortium/ITK/tree/master/Utilities/Maintenance/UpdateRemoteModules.sh)
+[UpdateRemoteModules.sh](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Utilities/Maintenance/UpdateRemoteModules.sh)
 script.
 
 
@@ -481,6 +498,14 @@ md5sum ./Insight* > MD5SUMS
 sha512sum ./Insight* > SHA512SUMS
 ```
 
+Sign the source and data tarballs.
+
+```
+for ff in Insight*; do gpg --armor --detach-sign $ff; done
+```
+
+The `*.asc` files provide a [signed release].
+
 Generate Python Packages
 ------------------------
 
@@ -500,7 +525,7 @@ documentation for further information.
 
 First, merge the
 [ITKPythonPackage](https://github.com/InsightSoftwareConsortium/ITKPythonPackage)
-`master` branch into the `release` branch.
+`main` branch into the `release` branch.
 
 Next, update the `VERSION` variable in *ITKPythonPackage/itkVersion.py* and
 `ITK_GIT_TAG` in *ITKPythonPackage/CMakeLists.txt*. Commit the update locally
@@ -528,7 +553,7 @@ sudo git clean -fdx
 sudo rm -rf ITK-source
 ./scripts/dockcross-manylinux-build-wheels.sh
 tar cvzf /tmp/dist-linux-manylinux_2_28.tar.gz ./dist
-rm dist/*
+rm -f dist/*
 cd ..
 ./ITKPythonPackage/scripts/dockcross-manylinux-build-tarball.sh
 mv ITKPythonBuilds-linux.tar.zst ITKPythonBuilds-linux-manylinux_2_28.tar.zst
@@ -542,27 +567,51 @@ git cherry-pick origin/manylinux2014
 ./scripts/dockcross-manylinux-build-wheels.sh
 # Create wheel archive
 tar cvzf /tmp/dist-linux-manylinux2014.tar.gz ./dist
-rm dist/*
+rm -f dist/*
 # Create build tarball
 cd ..
 ./ITKPythonPackage/scripts/dockcross-manylinux-build-tarball.sh
 mv ITKPythonBuilds-linux.tar.zst ITKPythonBuilds-linux-manylinux2014.tar.zst
+cd ITKPythonPackage
 git reset --hard HEAD~1
 ```
 
 For Linux ARM builds, the steps are similar, but the wheel build step is:
 
 ```bash
-docker run --privileged --rm tonistiigi/binfmt --install all
-docker run -it -v $(pwd):/work/ quay.io/pypa/manylinux_2_28_aarch64:latest bash
+sudo podman run --privileged --rm tonistiigi/binfmt --install all
+podman run -it -v $(pwd):/work/ quay.io/pypa/manylinux_2_28_aarch64:2024-03-25-9206bd9 bash
 # In the container
 cd /work
-yum install sudo
+# Upgrade GPG keys
+dnf upgrade -y almalinux-release
+# Newer Python.cmake module required for the SABI
+pipx upgrade cmake
+yum install sudo ninja-build
 ./scripts/internal/manylinux-build-wheels.sh
+# Exit the container
+exit
+tar cvzf /tmp/dist-linux-manylinux_2_28_aarch64.tar.gz ./dist
+rm -f dist/*
+cd ..
+./ITKPythonPackage/scripts/dockcross-manylinux-build-tarball.sh
+mv ITKPythonBuilds-linux.tar.zst ITKPythonBuilds-linux-manylinux_2_28_aarch64.tar.zst
 ```
 
+On the macOS build system, we use the same build toolchain, toolchain path, and build
+path as is used in the remote module GitHub Actions builds on the [macos-14 GitHub Action Runner].
 
-Build the wheels for macOS (both amd64 and ARM):
+- Install Xcode 15.0.1 from https://developer.apple.com/downloads/all/
+- Unpack and move to /Applications/Xcode_15.0.1.app
+``` bash
+sudo xcode-select -s /Applications/Xcode_15.0.1.app
+sudo xcodebuild -license
+xcodebuild -version
+# Xcode 15.0.1
+# Build version 15A507
+```
+
+Build the wheels for macOS (both amd64 and ARM).
 
 ```bash
 ssh misty
@@ -673,33 +722,19 @@ Generate Doxygen Documentation
 Note: links to the nightly generated Doxygen can be found in the footer of the
 Doxygen HTML pages. Use the files to upload and create:
 
-  * `InsightDoxygenDocTag-MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.gz`
-  * `InsightDoxygenXml-MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar.gz`
-  * `InsightDoxygenDocHtml-MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar.gz.`
+  * `InsightDoxygenDocTag-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.gz`
+  * `InsightDoxygenXml-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar.gz`
+  * `InsightDoxygenDocHtml-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar.gz.`
 
 Prior to the release, new `Remote` modules should be enabled in the Doxygen
 build's configuration.
 
-Run CMake in the binary build and enable `BUILD_DOXYGEN`, configure and
-generate, then:
+Download the tarballs from the `latest` [ITKDoxygen Release] and rename the files to use
+the current version. Create a new [ITKDoxygen Release] with the files on a
+`v$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION` tag.
 
-```bash
-cd Binaries/ITK
-make Documentation
-cd Utilities
-mv old_doxygen_directory DoxygenInsightToolkit-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION
-tar -cf DoxygenInsightToolkit-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar DoxygenInsightToolkit-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION
-gzip -9 DoxygenInsightToolkit-$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION.tar
-```
-
-Historical note: Before ITK 3.8, the documentation used to be generated in a
-directory called `Documentation/Doxygen`.
-
-Unpackage the Doxygen tarball, then upload to the Kitware web server to serve
-at "https://itk.org/Doxygen$MAJOR_VERSION$MINOR_VERSION/html/". Contact
-Kitware Sys-admin to setup a new rsync target. After the upload is complete,
-verify that routing is set up so the path is not clobbered by the website /
-blog.
+ReadTheDocs will automatically generate a new rendered version based on this
+tagged release.
 
 Update the ITK Software Guide
 -----------------------------
@@ -757,7 +792,7 @@ version in `Superbuild/External-ITK.cmake`.
 Update the CMake minimum version in the example files if necessary.
 
 Rendered versions can be downloaded from the recent `build-test-publish`
-[Documentation GitHub Artifact](https://github.com/InsightSoftwareConsortium/ITKSphinxExamples/actions/workflows/build-test-publish.yml?query=branch%3Amaster).
+[Documentation GitHub Artifact](https://github.com/InsightSoftwareConsortium/ITKSphinxExamples/actions/workflows/build-test-publish.yml?query=branch%3Amain).
 These should be added to a new GitHub Release on the ITKSphinxExamples
 repository with the tag `v$version`.
 
@@ -778,6 +813,33 @@ git archive --format=tar --prefix=${prefix}/ --output=${prefix}.tar ${tag}
 gzip -9 ${prefix}.tar
 git archive --format=zip -9 --prefix=${prefix}/ --output=${prefix}.zip ${tag}
 ```
+
+Release Notes Posts
+-------------------
+
+To get started with the release notes, first use the download link
+cookiecutter to generate [download page](https://github.com/InsightSoftwareConsortium/ITK/blob/main/Documentation/docs/download.md) markdown:
+
+```bash
+pip install cookiecutter
+cookiecutter ~/src/ITK/Utilities/Maintenance/DownloadLinksCookieCutter/
+```
+
+Start with the previous GitHub Release markdown content to produce the
+release notes.
+
+To generate the changelog by running
+
+```bash
+cd ITK
+./Utilities/Maintenance/AuthorsChangesSince.py $old_version
+```
+
+The log is generated at */tmp/AuthorsChangesSince/Changelog.md*.
+
+The count of recent authors is found in the script output, and a list of new authors
+are found at */tmp/AuthorsChangesSince/NewAuthors.txt*.
+
 
 Upload the release artifacts to GitHub
 --------------------------------------
@@ -808,6 +870,10 @@ Upload the release artifacts. These include:
 - InsightToolkit-$version.zip
 - InsightData-$version.tar.gz
 - InsightData-$version.zip
+- InsightToolkit-$version.tar.gz.asc
+- InsightToolkit-$version.zip.asc
+- InsightData-$version.tar.gz.asc
+- InsightData-$version.zip.asc
 - MD5SUMS
 - SHA512SUMS
 - InsightDoxygenDocHtml-$version.tar.gz
@@ -826,12 +892,10 @@ pre-release* box.
 Click *Update release*.
 
 
-Upload the release artifacts to data.kitware.com
+Upload the release artifacts to GDrive
 ------------------------------------------------
 
-Backup and archive the release artifacts in the [data.kitware.com ITK
-Collection Releases
-folder](https://data.kitware.com/#collection/57b5c9e58d777f126827f5a1/folder/5b1ec0378d777f2e622561e9).
+Backup and archive the release artifacts in the [ITKReleases NumFOCUS GDrive].
 
 This should include
 
@@ -850,18 +914,19 @@ a PR.
 Update the Website
 ------------------
 
-The website is managed by Kitware folks. Access is currently granted to the ITK
+Update the [download].
+
+Access is currently granted to the ITK
 maintainer group.
 
   * Add or modify the `Current Release` entries on the
-    [download page](https://itk.org/ITK/resources/software.html).
-  * Update the [documentation page](https://itk.org/ITK/help/documentation.html) with a
-    link to the Doxygen files for the new release.
-  * Update the API documentation with a new link. See [PR 3804](https://github.com/InsightSoftwareConsortium/ITK/pull/3804/commits/fb00e5b22ad0e5e838779965bfe7254edaae18d1) for an example change.
+    [download page]
   * Verify that the links work !
 
-Contact Communications at <comm@kitware.com> in order to update the above pages
-and to produce a press release.
+The itk.org website is managed by Kitware folks. Contact Dženan Zukić <dzenan.zukic@kitware.com>
+in order to create a WordPress blog post for the release with the release
+notes. This will generate a new entry on the https://itk.org landing page for
+the release.
 
 Update Issue Tracker
 --------------------
@@ -883,33 +948,6 @@ This means that a number of ITK developers should download the tarballs or do
 Git checkouts with the release tag, and build the toolkit in as many
 configurations as possible.
 
-Release Notes Posts
--------------------
-
-To get started with the release notes, first use the download link
-cookiecutter to generate [Download page](https://github.com/InsightSoftwareConsortium/ITK/blob/master/Documentation/docs/download.md) markdown:
-
-```bash
-pip install cookiecutter
-cookiecutter ~/src/ITK/Utilities/Maintenance/DownloadLinksCookieCutter/
-```
-
-Start with the previous GitHub Release markdown content to produce the
-release notes.
-
-To generate the changelog by running
-
-```bash
-cd ITK
-./Utilities/Maintenance/AuthorsChangesSince.py $old_version
-```
-
-The log is generated at */tmp/AuthorsChangesSince/Changelog.md*.
-
-The count of recent authors is found in the script output, and a list of new authors
-are found at */tmp/AuthorsChangesSince/NewAuthors.txt*.
-
-
 Announcements
 -------------
 
@@ -918,7 +956,7 @@ For the final release, the release notes produced should be used to
   * Provide the release notes in the [ITK GitHub Releases]
   * Post a message in the [ITK discussion]
   * Create a post in the [Kitware blog]
-  * Add a release note doc in [ITK/Documentation/ReleaseNotes](https://github.com/InsightSoftwareConsortium/ITK/tree/master/Documentation/ReleaseNotes)
+  * Add a release note doc in [ITK/Documentation/ReleaseNotes](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Documentation/ReleaseNotes)
   * Update [ITK's Wikipedia page](https://en.wikipedia.org/wiki/Insight_Segmentation_and_Registration_Toolkit).
   * Send out a summary to Arliss <help@numfocus.org> at NumFOCUS to announce
     the release in the NumFOCUS project update monthly newsletter.
@@ -944,11 +982,12 @@ excellent packaging.
 [Dashboard]: https://open.cdash.org/index.php?project=Insight
 [datalad]: https://www.datalad.org/
 [community]: https://discourse.itk.org/
-[documentation page]: https://www.itk.org/ITK/help/documentation.html
-[download page]: https://itk.org/ITK/resources/software.html
+[documentation page]: https://docs.itk.org/
+[download page]: https://docs.itk.org/en/latest/download.html
 [GitHub]: https://github.com/InsightSoftwareConsortium/ITK
 [IPFS]: https://ipfs.tech/
 [ipfs-desktop]: https://github.com/ipfs/ipfs-desktop/releases
+[ITKDoxygen Release]: https://github.com/InsightSoftwareConsortium/ITKDoxygen/releases
 [ITKPythonPackage]: https://itkpythonpackage.readthedocs.io/en/latest/index.html
 [ITKTestingData]: https://github.com/InsightSoftwareConsortium/ITKTestingData
 [ITK discussion]: https://discourse.itk.org/
@@ -956,14 +995,17 @@ excellent packaging.
 [ITK Open Collective page]: https://opencollective.org/itk
 [ITK issue tracking]: https://issues.itk.org/
 [ITK Software Guide]: https://itk.org/ItkSoftwareGuide.pdf
-[ITK wiki]: https://itk.org/Wiki/ITK
-[ITK Sphinx examples]: https://itk.org/ITKExamples/
+[ITK wiki]: https://insightsoftwareconsortium.github.io/ITKWikiArchive/Wiki/ITK
+[ITK Sphinx examples]: https://examples.itk.org/
+[ITKReleases NumFOCUS GDrive]: https://drive.google.com/drive/folders/1NFEZGTs_axoJUXox3JsRKCqw2QQCY_Ri
 [kubo]: https://github.com/ipfs/kubo
 [pinata]: https://pinata.cloud
-[releases page]: https://itk.org/Wiki/ITK/Releases
-[release schedule]: https://itk.org/Wiki/ITK/Release_Schedule
+[releases page]: https://insightsoftwareconsortium.github.io/ITKWikiArchive/Wiki/ITK/Releases
+[release schedule]: https://insightsoftwareconsortium.github.io/ITKWikiArchive/Wiki/ITK/Release_Schedule
+[signed release]: https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#signed-releases
 [Software Guide]: https://itk.org/ItkSoftwareGuide.pdf
-[@web3-storage/w3]: https://www.npmjs.com/package/@web3-storage/w3
+[@web3-storage/w3cli]: https://www.npmjs.com/package/@web3-storage/w3cli
+[install the w3cli]: https://web3.storage/docs/w3cli/
 
 [kitware]: https://www.kitware.com/
 [public.kitware.com]: public.kitware.com
@@ -973,5 +1015,5 @@ excellent packaging.
 [ResearchGate]: https://www.researchgate.net/project/Insight-Toolkit-ITK
 [SourceForge]: https://sourceforge.net/downloads/itk/itk/
 [ITK GitHub Releases]: https://github.com/InsightSoftwareConsortium/ITK/releases
-[ITK data.kitware.com Releases]: https://data.kitware.com/#item/5b22a47f8d777f2e622564d8
 [ITK GitHub Milestones]: https://github.com/InsightSoftwareConsortium/ITK/milestones
+[macos-14 GitHub Action Runner]: https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md

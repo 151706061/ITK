@@ -28,9 +28,7 @@
 #include <typeinfo>
 #include <string>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class LinearSystemWrapper
@@ -99,7 +97,7 @@ public:
   /**
    * Get the order of the system
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetSystemOrder() const
   {
     return m_Order;
@@ -128,7 +126,7 @@ public:
   /**
    * Get Index of matrices used by system
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfMatrices() const
   {
     return m_NumberOfMatrices;
@@ -147,7 +145,7 @@ public:
   /**
    * Get Index of vectors used by system
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfVectors() const
   {
     return m_NumberOfVectors;
@@ -166,7 +164,7 @@ public:
   /**
    * Get Index of solutions used by system
    */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfSolutions() const
   {
     return m_NumberOfSolutions;
@@ -247,7 +245,7 @@ public:
    * \param j column of the element
    * \param matrixIndex index of matrix to get value from
    */
-  virtual Float
+  [[nodiscard]] virtual Float
   GetMatrixValue(unsigned int i, unsigned int j, unsigned int matrixIndex = 0) const = 0;
 
   /**
@@ -290,7 +288,7 @@ public:
    * \param i row of the element
    * \param vectorIndex index of vector to get value from
    */
-  virtual Float
+  [[nodiscard]] virtual Float
   GetVectorValue(unsigned int i, unsigned int vectorIndex = 0) const = 0;
 
   /**
@@ -542,7 +540,7 @@ public:
    * must be provided: file, lineNumber, location and a detailed description
    * of the exception.
    */
-  FEMExceptionLinearSystem(const char * file,
+  FEMExceptionLinearSystem(std::string  file,
                            unsigned int lineNumber,
                            std::string  location,
                            std::string  moreDescription);
@@ -550,7 +548,7 @@ public:
   /** Virtual destructor needed for subclasses. Has to have empty throw(). */
   ~FEMExceptionLinearSystem() noexcept override;
 
-  /** Type related information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FEMExceptionLinearSystem);
 };
 
@@ -562,7 +560,7 @@ public:
    * must be provided: file, lineNumber, location and a detailed description
    * of the exception, and the invalid index
    */
-  FEMExceptionLinearSystemBounds(const char * file,
+  FEMExceptionLinearSystemBounds(std::string  file,
                                  unsigned int lineNumber,
                                  std::string  location,
                                  std::string  moreDescription,
@@ -572,7 +570,7 @@ public:
    * Constructor. In order to construct this exception object, six parameters
    * must be provided: file, lineNumber, location and a detailed description
    * of the exception, the first index, and the second index   */
-  FEMExceptionLinearSystemBounds(const char * file,
+  FEMExceptionLinearSystemBounds(std::string  file,
                                  unsigned int lineNumber,
                                  std::string  location,
                                  std::string  moreDescription,
@@ -582,10 +580,9 @@ public:
   /** Virtual destructor needed for subclasses. Has to have empty throw(). */
   ~FEMExceptionLinearSystemBounds() noexcept override;
 
-  /** Type related information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FEMExceptionLinearSystemBounds);
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMLinearSystemWrapper_h

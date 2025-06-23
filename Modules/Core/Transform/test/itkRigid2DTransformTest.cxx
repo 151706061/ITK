@@ -23,9 +23,9 @@
 namespace
 {
 bool
-CheckEqual(itk::Point<double, 2> p1, itk::Point<double, 2> p2)
+CheckEqual(const itk::Point<double, 2> & p1, const itk::Point<double, 2> & p2)
 {
-  const double epsilon = 1e-10;
+  constexpr double epsilon = 1e-10;
   for (unsigned int i = 0; i < 2; ++i)
   {
     if (itk::Math::abs(p1[i] - p2[i]) > epsilon)
@@ -48,7 +48,7 @@ itkRigid2DTransformTest(int, char *[])
 
   using TransformType = itk::Rigid2DTransform<double>;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 2;
 
 
@@ -124,12 +124,10 @@ itkRigid2DTransformTest(int, char *[])
 
     {
       // Translate an itk::Point
-      TransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
-      TransformType::InputPointType            p = pInit;
-      TransformType::InputPointType            q;
-      q = p + ioffset;
-      TransformType::OutputPointType r;
-      r = translation->TransformPoint(p);
+      constexpr TransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
+      const TransformType::InputPointType                p = pInit;
+      TransformType::InputPointType                      q = p + ioffset;
+      TransformType::OutputPointType                     r = translation->TransformPoint(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -145,18 +143,15 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is     : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::Point " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::Point " << std::endl;
     }
 
     {
       // Translate an itk::Vector
       TransformType::InputVectorType::ValueType pInit[2] = { 10, 10 };
       TransformType::InputVectorType            p = pInit;
-      TransformType::OutputVectorType           q;
-      q = translation->TransformVector(p);
+      TransformType::OutputVectorType           q = translation->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - p[i]) > epsilon)
@@ -171,18 +166,15 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::Vector " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::Vector " << std::endl;
     }
 
     {
       // Translate an itk::CovariantVector
       TransformType::InputCovariantVectorType::ValueType pInit[2] = { 10, 10 };
       TransformType::InputCovariantVectorType            p = pInit;
-      TransformType::OutputCovariantVectorType           q;
-      q = translation->TransformCovariantVector(p);
+      TransformType::OutputCovariantVectorType           q = translation->TransformCovariantVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - p[i]) > epsilon)
@@ -197,10 +189,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::CovariantVector " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::CovariantVector " << std::endl;
     }
 
 
@@ -209,8 +199,7 @@ itkRigid2DTransformTest(int, char *[])
       TransformType::InputVnlVectorType p;
       p[0] = 11;
       p[1] = 7;
-      TransformType::OutputVnlVectorType q;
-      q = translation->TransformVector(p);
+      TransformType::OutputVnlVectorType q = translation->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - p[i]) > epsilon)
@@ -225,10 +214,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is      : " << q << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an vnl_Vector " << std::endl;
-      }
+
+      std::cout << "Ok translating an vnl_Vector " << std::endl;
     }
   }
 
@@ -269,8 +256,7 @@ itkRigid2DTransformTest(int, char *[])
       return EXIT_FAILURE;
     }
 
-    TransformType::OffsetType ioffset;
-    ioffset.Fill(0.0f);
+    TransformType::OffsetType ioffset{};
 
     rotation->SetOffset(ioffset);
 
@@ -337,15 +323,14 @@ itkRigid2DTransformTest(int, char *[])
 
     {
       // Rotate an itk::Point
-      TransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
-      TransformType::InputPointType            p = pInit;
-      TransformType::InputPointType            q;
+      constexpr TransformType::InputPointType::ValueType pInit[2] = { 10, 10 };
+      TransformType::InputPointType                      p = pInit;
+      TransformType::InputPointType                      q;
 
       q[0] = p[0] * costh + p[1] * sinth;
       q[1] = -p[0] * sinth + p[1] * costh;
 
-      TransformType::OutputPointType r;
-      r = rotation->TransformPoint(p);
+      TransformType::OutputPointType r = rotation->TransformPoint(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -361,10 +346,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is     : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::Point " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::Point " << std::endl;
     }
 
     {
@@ -376,8 +359,7 @@ itkRigid2DTransformTest(int, char *[])
       q[0] = p[0] * costh + p[1] * sinth;
       q[1] = -p[0] * sinth + p[1] * costh;
 
-      TransformType::OutputVectorType r;
-      r = rotation->TransformVector(p);
+      TransformType::OutputVectorType r = rotation->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -393,10 +375,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is     : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an itk::Vector " << std::endl;
-      }
+
+      std::cout << "Ok rotating an itk::Vector " << std::endl;
     }
 
     {
@@ -408,8 +388,7 @@ itkRigid2DTransformTest(int, char *[])
       q[0] = p[0] * costh + p[1] * sinth;
       q[1] = -p[0] * sinth + p[1] * costh;
 
-      TransformType::OutputCovariantVectorType r;
-      r = rotation->TransformCovariantVector(p);
+      TransformType::OutputCovariantVectorType r = rotation->TransformCovariantVector(p);
 
       for (unsigned int i = 0; i < N; ++i)
       {
@@ -426,10 +405,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is             : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::CovariantVector " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::CovariantVector " << std::endl;
     }
 
 
@@ -445,8 +422,7 @@ itkRigid2DTransformTest(int, char *[])
       q[1] = -p[0] * sinth + p[1] * costh;
 
 
-      TransformType::OutputVnlVectorType r;
-      r = rotation->TransformVector(p);
+      TransformType::OutputVnlVectorType r = rotation->TransformVector(p);
       for (unsigned int i = 0; i < N; ++i)
       {
         if (itk::Math::abs(q[i] - r[i]) > epsilon)
@@ -462,10 +438,8 @@ itkRigid2DTransformTest(int, char *[])
         std::cerr << "Reported Result is           : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an vnl_Vector " << std::endl;
-      }
+
+      std::cout << "Ok translating an vnl_Vector " << std::endl;
     }
 
     {
@@ -473,13 +447,11 @@ itkRigid2DTransformTest(int, char *[])
       auto t1 = TransformType::New();
 
       // Set parameters
-      double                          angle0;
-      TransformType::InputPointType   center;
-      TransformType::OutputVectorType translation;
-
-      angle0 = -21.0 / 180.0 * itk::Math::pi;
+      double                        angle0 = -21.0 / 180.0 * itk::Math::pi;
+      TransformType::InputPointType center;
       center[0] = 12.0;
       center[1] = -8.9;
+      TransformType::OutputVectorType translation;
       translation[0] = 67.8;
       translation[1] = -0.2;
 
@@ -498,8 +470,7 @@ itkRigid2DTransformTest(int, char *[])
       TransformType::Pointer t2;
       t1->CloneInverseTo(t2);
 
-      TransformType::InputPointType p3;
-      p3 = t2->TransformPoint(p2);
+      const TransformType::InputPointType p3 = t2->TransformPoint(p2);
 
       std::cout << "Test CloneInverseTo(): ";
       if (!CheckEqual(p1, p3))
@@ -509,8 +480,7 @@ itkRigid2DTransformTest(int, char *[])
 
       auto t2dash = TransformType::New();
       t1->GetInverse(t2dash);
-      TransformType::InputPointType p3dash;
-      p3dash = t2dash->TransformPoint(p2);
+      TransformType::InputPointType p3dash = t2dash->TransformPoint(p2);
 
       std::cout << "Test GetInverse(): ";
       if (!CheckEqual(p1, p3dash))
@@ -537,8 +507,7 @@ itkRigid2DTransformTest(int, char *[])
       TransformType::Pointer t3;
       t1->CloneTo(t3);
 
-      TransformType::InputPointType p4;
-      p4 = t3->TransformPoint(p1);
+      const TransformType::InputPointType p4 = t3->TransformPoint(p1);
 
       std::cout << "Test Clone(): ";
       if (!CheckEqual(p2, p4))
@@ -560,10 +529,9 @@ itkRigid2DTransformTest(int, char *[])
       t1->CloneTo(t5);
       t5->Compose(t4, false);
 
-      TransformType::InputPointType p5, p6, p7;
-      p5 = t1->TransformPoint(p1);
-      p6 = t4->TransformPoint(p5);
-      p7 = t5->TransformPoint(p1);
+      TransformType::InputPointType p5 = t1->TransformPoint(p1);
+      TransformType::InputPointType p6 = t4->TransformPoint(p5);
+      TransformType::InputPointType p7 = t5->TransformPoint(p1);
 
       std::cout << "Test Compose(.,false): ";
       if (!CheckEqual(p6, p7))

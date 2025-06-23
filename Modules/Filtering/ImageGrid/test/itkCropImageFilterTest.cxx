@@ -37,9 +37,9 @@ itkCropImageFilterTest(int, char *[])
   auto inputImage = ImageType::New();
 
   // Fill in the image
-  ImageType::IndexType  index = { { 0, 0 } };
-  ImageType::SizeType   size = { { 8, 12 } };
-  ImageType::RegionType region;
+  constexpr ImageType::IndexType index = { { 0, 0 } };
+  constexpr ImageType::SizeType  size = { { 8, 12 } };
+  ImageType::RegionType          region;
 
   region.SetSize(size);
   region.SetIndex(index);
@@ -56,15 +56,14 @@ itkCropImageFilterTest(int, char *[])
   }
 
   // Create the filter
-  itk::CropImageFilter<ImageType, ImageType>::Pointer cropFilter = itk::CropImageFilter<ImageType, ImageType>::New();
+  const itk::CropImageFilter<ImageType, ImageType>::Pointer cropFilter =
+    itk::CropImageFilter<ImageType, ImageType>::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(cropFilter, CropImageFilter, ExtractImageFilter);
 
-  itk::SimpleFilterWatcher watcher(cropFilter);
+  const itk::SimpleFilterWatcher watcher(cropFilter);
 
   cropFilter->SetInput(inputImage);
-
-  ImageType::RegionType requestedRegion;
 
   ImageType::SizeType extractSize = { { 8, 12 } };
   extractSize[0] = 1;
@@ -80,18 +79,22 @@ itkCropImageFilterTest(int, char *[])
 
   cropFilter->UpdateLargestPossibleRegion();
 
-  requestedRegion = cropFilter->GetOutput()->GetRequestedRegion();
+  // Test all the region types from a CropImageFilter
+  const ImageType::RegionType requestedRegion = cropFilter->GetOutput()->GetRequestedRegion();
+  const ImageType::RegionType bufferedRegion = cropFilter->GetOutput()->GetBufferedRegion();
+  const ImageType::RegionType largestRegion = cropFilter->GetOutput()->GetLargestPossibleRegion();
 
-  if (cropFilter->GetOutput()->GetLargestPossibleRegion().GetSize()[0] != 6 ||
-      cropFilter->GetOutput()->GetLargestPossibleRegion().GetSize()[1] != 10)
+  for (auto & currRegion : { requestedRegion, bufferedRegion, largestRegion })
   {
-    return EXIT_FAILURE;
-  }
+    if (currRegion.GetSize()[0] != 6 || currRegion.GetSize()[1] != 10)
+    {
+      return EXIT_FAILURE;
+    }
 
-  if (cropFilter->GetOutput()->GetLargestPossibleRegion().GetIndex()[0] != 1 ||
-      cropFilter->GetOutput()->GetLargestPossibleRegion().GetIndex()[1] != 1)
-  {
-    return EXIT_FAILURE;
+    if (currRegion.GetIndex()[0] != 1 || currRegion.GetIndex()[1] != 1)
+    {
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;

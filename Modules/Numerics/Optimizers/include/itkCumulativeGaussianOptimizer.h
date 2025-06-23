@@ -64,10 +64,11 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CumulativeGaussianOptimizer);
 
   /** Set and get macros. */
+  /** @ITKStartGrouping */
   itkSetMacro(DifferenceTolerance, double);
   itkGetMacro(DifferenceTolerance, double);
   itkSetMacro(Verbose, bool);
@@ -79,7 +80,7 @@ public:
   itkGetMacro(LowerAsymptote, double);
   itkGetMacro(FinalSampledArray, MeasureType *);
   itkGetMacro(FitError, double);
-
+  /** @ITKEndGrouping */
   void
   SetDataArray(MeasureType * cumGaussianArray);
 
@@ -92,7 +93,7 @@ public:
   PrintArray(MeasureType * array);
 
   /** Report the reason for stopping. */
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
 protected:

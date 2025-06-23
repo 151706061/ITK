@@ -25,7 +25,7 @@ template <typename TInputImage, typename TClassifiedImage>
 MRFImageFilter<TInputImage, TClassifiedImage>::MRFImageFilter()
   : m_ClassifierPtr(nullptr)
 {
-  if (static_cast<int>(InputImageDimension) != static_cast<int>(ClassifiedImageDimension))
+  if constexpr (InputImageDimension != ClassifiedImageDimension)
   {
     std::ostringstream msg;
     msg << "Input image dimension: " << InputImageDimension
@@ -92,8 +92,8 @@ MRFImageFilter<TInputImage, TClassifiedImage>::GenerateInputRequestedRegion()
 {
   // this filter requires that all of the input images
   // are the size of the output requested region
-  InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
-  OutputImagePointer outputPtr = this->GetOutput();
+  const InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   if (inputPtr && outputPtr)
   {
@@ -107,9 +107,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::EnlargeOutputRequestedRegion(Data
 {
   // this filter requires that all of the output images
   // are in the buffer
-  TClassifiedImage * imgData;
-
-  imgData = dynamic_cast<TClassifiedImage *>(output);
+  auto * imgData = dynamic_cast<TClassifiedImage *>(output);
   imgData->SetRequestedRegionToLargestPossibleRegion();
 }
 
@@ -117,8 +115,8 @@ template <typename TInputImage, typename TClassifiedImage>
 void
 MRFImageFilter<TInputImage, TClassifiedImage>::GenerateOutputInformation()
 {
-  typename TInputImage::ConstPointer input = this->GetInput();
-  typename TClassifiedImage::Pointer output = this->GetOutput();
+  const typename TInputImage::ConstPointer input = this->GetInput();
+  const typename TClassifiedImage::Pointer output = this->GetOutput();
   output->SetLargestPossibleRegion(input->GetLargestPossibleRegion());
 }
 
@@ -130,7 +128,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::GenerateData()
   // generate the Gaussian model for the different classes
   // and then generate the initial labelled dataset.
 
-  InputImageConstPointer inputImage = this->GetInput();
+  const InputImageConstPointer inputImage = this->GetInput();
 
   // Give the input image and training image set to the
   // classifier
@@ -144,7 +142,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::GenerateData()
 
   this->ApplyMRFImageFilter();
   // Set the output labelled and allocate the memory
-  LabelledImagePointer outputPtr = this->GetOutput();
+  const LabelledImagePointer outputPtr = this->GetOutput();
 
   // Allocate the output buffer memory
   outputPtr->SetBufferedRegion(outputPtr->GetRequestedRegion());
@@ -233,7 +231,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::SetDefaultMRFNeighborhoodWeight()
 
   // Determine the default neighborhood size
   m_NeighborhoodSize = 1;
-  int neighborhoodRadius = 1; // Default assumes a radius of 1
+  constexpr int neighborhoodRadius = 1; // Default assumes a radius of 1
   for (unsigned int i = 0; i < InputImageDimension; ++i)
   {
     m_NeighborhoodSize *= (2 * neighborhoodRadius + 1);
@@ -307,7 +305,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::SetMRFNeighborhoodWeight(std::vec
 
     if (m_NeighborhoodSize != static_cast<int>(betaMatrix.size()))
     {
-      throw ExceptionObject(__FILE__, __LINE__, "NeighborhoodSize != betaMatrix.szie()", ITK_LOCATION);
+      throw ExceptionObject(__FILE__, __LINE__, "NeighborhoodSize != betaMatrix.size()", ITK_LOCATION);
     }
 
     // Allocate memory for the weights of the 3D MRF algorithm
@@ -333,7 +331,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::Allocate()
   InputImageSizeType inputImageSize = this->GetInput()->GetBufferedRegion().GetSize();
 
   // Get the number of valid pixels in the output MRF image
-  int tmp;
+  int tmp = 0;
   for (unsigned int i = 0; i < InputImageDimension; ++i)
   {
     tmp = static_cast<int>(inputImageSize[i]);
@@ -444,11 +442,11 @@ MRFImageFilter<TInputImage, TClassifiedImage>::ApplyICMLabeller()
   LabelStatusImageFaceListType labelStatusImageFaceList;
 
   // Compute the faces for the neighborhoods in the input/labelled image
-  InputImageConstPointer inputImage = this->GetInput();
+  const InputImageConstPointer inputImage = this->GetInput();
   inputImageFaceList =
     inputImageFacesCalculator(inputImage, inputImage->GetBufferedRegion(), m_InputImageNeighborhoodRadius);
 
-  LabelledImagePointer labelledImage = m_ClassifierPtr->GetClassifiedImage();
+  const LabelledImagePointer labelledImage = m_ClassifierPtr->GetClassifiedImage();
   labelledImageFaceList =
     labelledImageFacesCalculator(labelledImage, labelledImage->GetBufferedRegion(), m_LabelledImageNeighborhoodRadius);
 
@@ -490,8 +488,6 @@ MRFImageFilter<TInputImage, TClassifiedImage>::DoNeighborhoodOperation(
   LabelledImageNeighborhoodIterator &    labelledIter,
   LabelStatusImageNeighborhoodIterator & labelStatusIter)
 {
-  unsigned int index;
-
   // Read the pixel of interest and get its corresponding membership value
   InputImagePixelType * inputPixelVec = imageIter.GetCenterValue();
 
@@ -499,6 +495,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::DoNeighborhoodOperation(
 
   // Reinitialize the neighborhood influence at the beginning of the
   // neighborhood operation
+  unsigned int index = 0;
   for (index = 0; index < m_NeighborInfluence.size(); ++index)
   {
     m_NeighborInfluence[index] = 0;
@@ -523,7 +520,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::DoNeighborhoodOperation(
   // Determine the maximum possible distance
   double maximumDistance = -1e+20;
   int    pixLabel = -1;
-  double tmpPixDistance;
+  double tmpPixDistance = NAN;
   for (index = 0; index < m_NumberOfClasses; ++index)
   {
     tmpPixDistance = m_MahalanobisDistance[index];
@@ -532,7 +529,7 @@ MRFImageFilter<TInputImage, TClassifiedImage>::DoNeighborhoodOperation(
       maximumDistance = tmpPixDistance;
       pixLabel = index;
     } // if
-  }   // for
+  } // for
 
   // Read the current pixel label
   LabelledImagePixelType * previousLabel = labelledIter.GetCenterValue();

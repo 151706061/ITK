@@ -73,8 +73,7 @@ protected:
     {
       auto image = InputImageType::New();
 
-      typename InputImageType::SizeType imageSize;
-      imageSize.Fill(size);
+      auto imageSize = InputImageType::SizeType::Filled(size);
       image->SetRegions(RegionType(imageSize));
       image->Allocate();
       image->FillBuffer(0);
@@ -93,12 +92,12 @@ TEST_F(TileImageFixture, SetGetPrint)
   auto filter = Utils::FilterType::New();
   filter->Print(std::cout);
 
-  typename Utils::FilterType::ConstPointer constfilter = (const Utils::FilterType *)(filter.GetPointer());
+  const typename Utils::FilterType::ConstPointer constfilter = (const Utils::FilterType *)(filter.GetPointer());
 
   EXPECT_STREQ("TileImageFilter", filter->GetNameOfClass());
   EXPECT_STREQ("ImageToImageFilter", filter->Superclass::GetNameOfClass());
 
-  Utils::FilterType::LayoutArrayType layout(99);
+  const Utils::FilterType::LayoutArrayType layout(99);
 
   EXPECT_NO_THROW(filter->SetLayout(layout));
   ITK_EXPECT_VECTOR_NEAR(layout, filter->GetLayout(), 0);
@@ -118,9 +117,9 @@ TEST_F(TileImageFixture, VectorImage)
 
   auto image = ImageType::New();
 
-  typename ImageType::SizeType imageSize = itk::MakeSize(10, 10);
+  const typename ImageType::SizeType imageSize = itk::MakeSize(10, 10);
 
-  const unsigned int numberOfComponents = 5;
+  constexpr unsigned int numberOfComponents = 5;
 
   ImageType::PixelType v(numberOfComponents);
 

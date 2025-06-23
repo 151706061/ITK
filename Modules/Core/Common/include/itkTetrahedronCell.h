@@ -29,10 +29,6 @@ namespace itk
 /** \class TetrahedronCell
  *  \brief TetrahedronCell represents a tetrahedron for a Mesh.
  *
- * \tparam TPixelType The type associated with a point, cell, or boundary
- * for use in storing its data.
- *
- * \tparam TCellTraits Type information of mesh containing cell.
  * \ingroup MeshObjects
  * \ingroup ITKCommon
  */
@@ -45,10 +41,11 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(TetrahedronCell);
 
   /** Standard class type alias. */
+  /** @ITKStartGrouping */
   itkCellCommonTypedefs(TetrahedronCell);
   itkCellInheritedTypedefs(TCellInterface);
-
-  /** Standard part of every itk Object. */
+  /** @ITKEndGrouping */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TetrahedronCell);
 
   /** The type of boundary for this triangle's vertices. */
@@ -73,20 +70,21 @@ public:
   // Standard CellInterface
 
   /** Implement the standard CellInterface. */
-  CellGeometryEnum
+  /** @ITKStartGrouping */
+  [[nodiscard]] CellGeometryEnum
   GetType() const override
   {
     return CellGeometryEnum::TETRAHEDRON_CELL;
   }
   void
   MakeCopy(CellAutoPointer &) const override;
-
+  /** @ITKEndGrouping */
   /** Get the topological dimension of this cell. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetDimension() const override;
 
   /** Get the number of points required to define the cell. */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoints() const override;
 
   /** Get the number of boundary features of the given dimension. */
@@ -168,10 +166,10 @@ public:
   itkCellVisitMacro(CellGeometryEnum::TETRAHEDRON_CELL);
 
   bool
-  EvaluatePosition(CoordRepType *,
+  EvaluatePosition(CoordinateType *,
                    PointsContainer *,
-                   CoordRepType *,
-                   CoordRepType[],
+                   CoordinateType *,
+                   CoordinateType[],
                    double *,
                    InterpolationWeightType *) override;
 

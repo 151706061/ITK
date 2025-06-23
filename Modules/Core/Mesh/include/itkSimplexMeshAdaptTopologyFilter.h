@@ -62,7 +62,7 @@ public:
   /** Method of creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SimplexMeshAdaptTopologyFilter);
 
   using InputMeshType = TInputMesh;
@@ -99,27 +99,23 @@ public:
   {
   public:
     InputMeshPointer                     mesh;
-    double                               totalArea;
-    double                               totalCurvature;
+    double                               totalArea{ 0 };
+    double                               totalCurvature{ 0 };
     double                               minCellSize;
-    double                               maxCellSize;
+    double                               maxCellSize{ 0 };
     typename DoubleValueMapType::Pointer areaMap;
     typename DoubleValueMapType::Pointer curvatureMap;
 
     double minCurvature;
-    double maxCurvature;
+    double maxCurvature{ 0 };
 
     SimplexCellVisitor()
-    {
-      areaMap = DoubleValueMapType::New();
-      curvatureMap = DoubleValueMapType::New();
-      totalArea = 0;
-      totalCurvature = 0;
-      minCellSize = NumericTraits<double>::max();
-      maxCellSize = 0;
-      minCurvature = NumericTraits<double>::max();
-      maxCurvature = 0;
-    }
+      : minCellSize(NumericTraits<double>::max())
+      , areaMap(DoubleValueMapType::New())
+      , curvatureMap(DoubleValueMapType::New())
+      , minCurvature(NumericTraits<double>::max())
+
+    {}
 
     /** \brief visits all polygon cells and computes the area,
      *  NOTE: works for convex polygons only!!!
@@ -129,16 +125,14 @@ public:
     {
       typename InputPolygonType::PointIdIterator it = poly->PointIdsBegin();
 
-      double          meanCurvature = 0;
-      PointIdentifier refPoint = *it;
-      double          val = mesh->GetMeanCurvature(*it++);
+      double                meanCurvature = 0;
+      const PointIdentifier refPoint = *it;
+      double                val = mesh->GetMeanCurvature(*it++);
       meanCurvature += itk::Math::abs(val);
 
       PointIdentifier id1 = *it;
       val = mesh->GetMeanCurvature(*it++);
       meanCurvature += itk::Math::abs(val);
-
-      PointIdentifier id2;
 
       double area = 0;
 
@@ -146,7 +140,7 @@ public:
 
       while (it != poly->PointIdsEnd())
       {
-        id2 = *it;
+        const PointIdentifier id2 = *it;
         area += ComputeArea(refPoint, id1, id2);
         id1 = id2;
         val = mesh->GetMeanCurvature(*it);
@@ -183,11 +177,9 @@ public:
     double
     ComputeArea(PointIdentifier p1, PointIdentifier p2, PointIdentifier p3)
     {
-      InputPointType v1, v2, v3;
-
-      v1.Fill(0);
-      v2.Fill(0);
-      v3.Fill(0);
+      InputPointType v1{};
+      InputPointType v2{};
+      InputPointType v3{};
 
       mesh->GetPoint(p1, &v1);
       mesh->GetPoint(p2, &v2);

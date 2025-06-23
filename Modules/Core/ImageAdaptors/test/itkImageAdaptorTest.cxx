@@ -65,9 +65,7 @@ itkImageAdaptorTest(int, char *[])
   index[0] = 0;
   index[1] = 0;
 
-  myImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const myImageType::RegionType region{ index, size };
 
   auto myImage = myImageType::New();
 
@@ -79,7 +77,7 @@ itkImageAdaptorTest(int, char *[])
 
   // Value to initialize the pixels
   myImageType::PixelType::ComponentType colorInit[3] = { 1.0f, 0.5f, 0.5f };
-  myImageType::PixelType                color = colorInit;
+  const myImageType::PixelType          color = colorInit;
 
   // Initializing all the pixel in the image
   it1.GoToBegin();
@@ -157,8 +155,7 @@ itkImageAdaptorTest(int, char *[])
   }
 
 
-  myImageType::PointType imageOrigin;
-  imageOrigin.Fill(10.0);
+  auto imageOrigin = itk::MakeFilled<myImageType::PointType>(10.0);
   myImage->SetOrigin(imageOrigin);
   if (myImage->GetOrigin() != myAdaptor->GetOrigin())
   {
@@ -186,8 +183,7 @@ itkImageAdaptorTest(int, char *[])
   }
 
 
-  myImageType::SpacingType imageSpacing;
-  imageSpacing.Fill(10.0);
+  auto imageSpacing = itk::MakeFilled<myImageType::SpacingType>(10.0);
 
   myImage->SetSpacing(imageSpacing);
   if (myImage->GetSpacing() != myAdaptor->GetSpacing())

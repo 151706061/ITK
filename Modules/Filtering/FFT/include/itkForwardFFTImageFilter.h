@@ -82,7 +82,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ForwardFFTImageFilter);
 
   /** Customized object creation methods that support configuration-based
@@ -95,7 +95,7 @@ public:
    * size. Defaults to 2 as many implementations work only for sizes that are
    * power of 2.
    */
-  virtual SizeValueType
+  [[nodiscard]] virtual SizeValueType
   GetSizeGreatestPrimeFactor() const;
 
 protected:

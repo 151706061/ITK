@@ -23,9 +23,7 @@
 #include "itkVariableSizeMatrix.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class CovarianceSampleFilter
@@ -62,10 +60,11 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using SampleType = TSample;
 
-  /** Standard Macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(CovarianceSampleFilter);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Type of each measurement vector in sample */
   using MeasurementVectorType = typename SampleType::MeasurementVectorType;
 
@@ -121,12 +120,6 @@ public:
   MeasurementVectorSizeType
   GetMeasurementVectorSize() const;
 
-protected:
-  CovarianceSampleFilter();
-  ~CovarianceSampleFilter() override = default;
-  void
-  PrintSelf(std::ostream & os, Indent indent) const override;
-
   /** DataObject pointer */
   using DataObjectPointer = DataObject::Pointer;
 
@@ -135,11 +128,16 @@ protected:
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType index) override;
 
+protected:
+  CovarianceSampleFilter();
+  ~CovarianceSampleFilter() override = default;
+  void
+  PrintSelf(std::ostream & os, Indent indent) const override;
+
   void
   GenerateData() override;
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkCovarianceSampleFilter.hxx"

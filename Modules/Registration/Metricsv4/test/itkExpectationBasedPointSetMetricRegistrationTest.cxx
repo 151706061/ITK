@@ -75,10 +75,8 @@ itkExpectationBasedPointSetMetricRegistrationTest(int argc, char * argv[])
   using PointType = PointSetType::PointType;
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
 
   // two ellipses, one rotated slightly
@@ -111,11 +109,11 @@ itkExpectationBasedPointSetMetricRegistrationTest(int argc, char * argv[])
   unsigned long count = 0;
   for (float theta = 0; theta < 2.0 * itk::Math::pi; theta += 0.1)
   {
-    PointType fixedPoint;
-    float     radius = 100.0;
+    PointType       fixedPoint;
+    constexpr float radius = 100.0;
     fixedPoint[0] = radius * std::cos(theta);
     fixedPoint[1] = radius * std::sin(theta);
-    if (Dimension > 2)
+    if constexpr (Dimension > 2)
     {
       fixedPoint[2] = radius * std::sin(theta);
     }
@@ -124,7 +122,7 @@ itkExpectationBasedPointSetMetricRegistrationTest(int argc, char * argv[])
     PointType movingPoint;
     movingPoint[0] = fixedPoint[0] + offset[0];
     movingPoint[1] = fixedPoint[1] + offset[1];
-    if (Dimension > 2)
+    if constexpr (Dimension > 2)
     {
       movingPoint[2] = fixedPoint[2] + offset[2];
     }
@@ -150,7 +148,7 @@ itkExpectationBasedPointSetMetricRegistrationTest(int argc, char * argv[])
   // scales estimator
   using RegistrationParameterScalesFromShiftType =
     itk::RegistrationParameterScalesFromPhysicalShift<PointSetMetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
   // needed with pointset metrics
@@ -180,10 +178,12 @@ itkExpectationBasedPointSetMetricRegistrationTest(int argc, char * argv[])
 
   // applying the resultant transform to moving points and verify result
   std::cout << "Fixed\tMoving\tMovingTransformed\tFixedTransformed\tDiff" << std::endl;
-  bool                                             passed = true;
-  PointType::ValueType                             tolerance = 1e-4;
-  AffineTransformType::InverseTransformBasePointer movingInverse = metric->GetMovingTransform()->GetInverseTransform();
-  AffineTransformType::InverseTransformBasePointer fixedInverse = metric->GetFixedTransform()->GetInverseTransform();
+  bool                                                   passed = true;
+  constexpr PointType::ValueType                         tolerance = 1e-4;
+  const AffineTransformType::InverseTransformBasePointer movingInverse =
+    metric->GetMovingTransform()->GetInverseTransform();
+  const AffineTransformType::InverseTransformBasePointer fixedInverse =
+    metric->GetFixedTransform()->GetInverseTransform();
   for (unsigned int n = 0; n < metric->GetNumberOfComponents(); ++n)
   {
     // compare the points in virtual domain

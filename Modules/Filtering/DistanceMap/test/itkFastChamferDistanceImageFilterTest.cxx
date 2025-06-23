@@ -26,9 +26,8 @@ template <typename TPoint>
 double
 SimpleSignedDistance(const TPoint & p)
 {
-  TPoint center;
-  center.Fill(16);
-  double radius = 10;
+  auto             center = itk::MakeFilled<TPoint>(16);
+  constexpr double radius = 10;
 
   double accum = 0.0;
   for (unsigned int j = 0; j < TPoint::PointDimension; ++j)
@@ -42,10 +41,8 @@ SimpleSignedDistance(const TPoint & p)
     {
       return radius;
     }
-    else
-    {
-      return -radius;
-    }
+
+    return -radius;
   }
   else
   {
@@ -67,13 +64,9 @@ FastChamferDistanceImageFilterTest(unsigned int iPositive, unsigned int iNegativ
   using ImageType = itk::Image<PixelType, VDimension>;
   using PointType = itk::Point<double, VDimension>;
 
-  typename ImageType::SizeType size;
-  size.Fill(32);
-  typename ImageType::IndexType index;
-  index.Fill(0);
-  typename ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  auto                                 size = ImageType::SizeType::Filled(32);
+  const typename ImageType::IndexType  index{};
+  const typename ImageType::RegionType region{ index, size };
 
   auto inputImage = ImageType::New();
   inputImage->SetRegions(region);
@@ -97,7 +90,7 @@ FastChamferDistanceImageFilterTest(unsigned int iPositive, unsigned int iNegativ
 
   filter->SetInput(inputImage);
 
-  typename ImageType::Pointer outputImage = filter->GetOutput();
+  const typename ImageType::Pointer outputImage = filter->GetOutput();
 
   try
   {
@@ -126,9 +119,8 @@ FastChamferDistanceImageFilterTest(unsigned int iPositive, unsigned int iNegativ
   std::cout << "Band size: " << band->Size() << std::endl;
 
   // Loop through the band
-  using itNBType = typename NarrowBandType::ConstIterator;
-  itNBType itNB = band->Begin();
-  itNBType itNBend = band->End();
+  auto       itNB = band->Begin();
+  const auto itNBend = band->End();
 
   //  BandNodeType *tmp;
   unsigned int innerpositive = 0;
@@ -221,7 +213,7 @@ itkFastChamferDistanceImageFilterTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  int Dimension = std::stoi(argv[1]);
+  const int Dimension = std::stoi(argv[1]);
 
   std::cout << "Dimension = " << Dimension << std::endl;
   if (Dimension == 1)

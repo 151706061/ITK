@@ -42,7 +42,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalableAffineTransform);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -109,17 +109,18 @@ public:
   }
 
   /** Get the scale of the transform */
-  virtual const double *
+  /** @ITKStartGrouping */
+  [[nodiscard]] virtual const double *
   GetScale() const
   {
     return m_Scale;
   }
-  virtual const double *
+  [[nodiscard]] virtual const double *
   GetScaleComponent() const
   {
     return m_Scale;
   }
-
+  /** @ITKEndGrouping */
   /** Get an inverse of the transform. */
   bool
   GetInverse(Self * inverse) const;
@@ -136,11 +137,15 @@ protected:
    * to values specified by the caller.  If the arguments are
    * omitted, then the AffineTransform is initialized to an identity
    * transformation in the appropriate number of dimensions. */
-  ScalableAffineTransform(const MatrixType & matrix, const OutputVectorType & offset);
+  /** @ITKStartGrouping */
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] ScalableAffineTransform(const MatrixType &       matrix,
+                                                                       const OutputVectorType & offset);
+#endif
   ScalableAffineTransform(unsigned int outputSpaceDimension, unsigned int parametersDimension);
   ScalableAffineTransform(unsigned int parametersDimension);
   ScalableAffineTransform();
-
+  /** @ITKEndGrouping */
   /** Compute the transformation matrix. */
   void
   ComputeMatrix() override;

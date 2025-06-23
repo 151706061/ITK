@@ -41,8 +41,7 @@ namespace itk
  * \ingroup ITKMetricsv4
  * */
 template <typename TDomainPartitioner, typename TImageToImageMetricv4>
-class ITK_TEMPLATE_EXPORT ImageToImageMetricv4GetValueAndDerivativeThreader
-{};
+class ITK_TEMPLATE_EXPORT ImageToImageMetricv4GetValueAndDerivativeThreader{};
 
 /** \class ImageToImageMetricv4GetValueAndDerivativeThreader
  * \brief Specialization for ThreadedImageRegionPartitioner.
@@ -111,6 +110,7 @@ protected:
   /** Get cached values for efficiency. Only valid once threading has started.
    *  These methods should be used in tight loops (inlining helps measurably).
    *  Put these methods here so derived threaders can access them directly. */
+  /** @ITKStartGrouping */
   inline NumberOfParametersType
   GetCachedNumberOfParameters() const
   {
@@ -121,6 +121,7 @@ protected:
   {
     return this->m_CachedNumberOfLocalParameters;
   }
+  /** @ITKEndGrouping */
 };
 
 /** \class ImageToImageMetricv4GetValueAndDerivativeThreader
@@ -186,6 +187,7 @@ protected:
   /** Get cached values for efficiency. Only valid once threading has started.
    *  These methods should be used in tight loops (inlining helps measurably).
    *  Put these methods here so derived threaders can access them directly. */
+  /** @ITKStartGrouping */
   inline NumberOfParametersType
   GetCachedNumberOfParameters() const
   {
@@ -196,6 +198,7 @@ protected:
   {
     return this->m_CachedNumberOfLocalParameters;
   }
+  /** @ITKEndGrouping */
 };
 
 } // end namespace itk

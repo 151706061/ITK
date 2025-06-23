@@ -64,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FlipImageFilter);
 
   /** ImageDimension enumeration */
@@ -85,16 +85,18 @@ public:
 
   /** Set/Get the axis to be flipped. The image is flipped along axes
    * for which array[i] is true. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(FlipAxes, FlipAxesArrayType);
   itkGetConstMacro(FlipAxes, FlipAxesArrayType);
-
+  /** @ITKEndGrouping */
   /** Controls how the output origin is computed. If FlipAboutOrigin is
    * "On", the flip will occur about the origin of the axis, otherwise,
    * the flip will occur about the center of the axis. Default is "On". */
+  /** @ITKStartGrouping */
   itkBooleanMacro(FlipAboutOrigin);
   itkGetConstMacro(FlipAboutOrigin, bool);
   itkSetMacro(FlipAboutOrigin, bool);
-
+  /** @ITKEndGrouping */
   /** FlipImageFilter produces an image with different origin and
    * direction than the input image. As such, FlipImageFilter needs to
    * provide an implementation for GenerateOutputInformation() in

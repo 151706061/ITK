@@ -21,13 +21,13 @@ namespace itk
 {
 
 InitializationBiasedParticleSwarmOptimizer::InitializationBiasedParticleSwarmOptimizer()
+  : m_InertiaCoefficient(0.7298)
+  , m_PersonalCoefficient(1.49609)
+  , m_GlobalCoefficient(1.49609)
+  , m_InitializationCoefficient(1.49609)
 {
   // magic numbers from Wachowiak et al. "An approach to multimodal biomedical
   // image registration utilizing particle swarm optimization"
-  this->m_InertiaCoefficient = 0.7298;
-  this->m_PersonalCoefficient = 1.49609;
-  this->m_GlobalCoefficient = 1.49609;
-  this->m_InitializationCoefficient = 1.49609;
 }
 
 
@@ -44,25 +44,23 @@ InitializationBiasedParticleSwarmOptimizer::PrintSelf(std::ostream & os, Indent 
 void
 InitializationBiasedParticleSwarmOptimizer::UpdateSwarm()
 {
-  unsigned int                                                    j, k, n;
-  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator =
+  const itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator =
     Statistics::MersenneTwisterRandomVariateGenerator::GetInstance();
   ParametersType initialPosition = GetInitialPosition();
 
-  n = static_cast<unsigned int>((GetCostFunction())->GetNumberOfParameters());
+  const auto n = static_cast<unsigned int>((GetCostFunction())->GetNumberOfParameters());
   // linear decrease in the weight of the initial parameter values
-  double initializationCoefficient =
+  const double initializationCoefficient =
     this->m_InitializationCoefficient *
     (1.0 - static_cast<double>(m_IterationIndex) / static_cast<double>(m_MaximalNumberOfIterations));
 
-  for (j = 0; j < m_NumberOfParticles; ++j)
+  for (unsigned int j = 0; j < m_NumberOfParticles; ++j)
   {
-    ParticleData &            p = m_Particles[j];
-    ParametersType::ValueType phi1, phi2, phi3;
-    phi1 = randomGenerator->GetVariateWithClosedRange() * this->m_PersonalCoefficient;
-    phi2 = randomGenerator->GetVariateWithClosedRange() * this->m_GlobalCoefficient;
-    phi3 = randomGenerator->GetVariateWithClosedRange() * initializationCoefficient;
-    for (k = 0; k < n; ++k)
+    ParticleData &                  p = m_Particles[j];
+    const ParametersType::ValueType phi1 = randomGenerator->GetVariateWithClosedRange() * this->m_PersonalCoefficient;
+    const ParametersType::ValueType phi2 = randomGenerator->GetVariateWithClosedRange() * this->m_GlobalCoefficient;
+    const ParametersType::ValueType phi3 = randomGenerator->GetVariateWithClosedRange() * initializationCoefficient;
+    for (unsigned int k = 0; k < n; ++k)
     { // update velocity
       p.m_CurrentVelocity[k] = m_InertiaCoefficient * p.m_CurrentVelocity[k] +
                                phi1 * (p.m_BestParameters[k] - p.m_CurrentParameters[k]) +

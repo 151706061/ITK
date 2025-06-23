@@ -61,7 +61,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TIFFImageIO);
 
   /*-------- This part of the interface deals with reading data. ------ */
@@ -117,6 +117,7 @@ public:
     PackBits,
     JPEG,
     Deflate,
+    AdobeDeflate,
     LZW
   };
   // ETX
@@ -150,6 +151,12 @@ public:
     this->SetCompressor("Deflate");
   }
   void
+  SetCompressionToAdobeDeflate()
+  {
+    this->UseCompressionOn();
+    this->SetCompressor("AdobeDeflate");
+  }
+  void
   SetCompressionToLZW()
   {
     this->UseCompressionOn();
@@ -160,6 +167,7 @@ public:
   /** Set/Get the level of quality for the output images if
    * Compression is JPEG. Settings vary from 1 to 100.
    * 100 is the highest quality. Default is 75 */
+  /** @ITKStartGrouping */
   virtual void
   SetJPEGQuality(int _JPEGQuality)
   {
@@ -170,7 +178,7 @@ public:
   {
     return this->GetCompressionLevel();
   }
-
+  /** @ITKEndGrouping */
 
   /** Get a const ref to the palette of the image. In the case of non palette
    * image or ExpandRGBPalette set to true, a vector of size

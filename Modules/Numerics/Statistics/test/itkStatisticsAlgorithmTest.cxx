@@ -68,7 +68,7 @@ itkStatisticsAlgorithmTest(int, char *[])
 
   for (unsigned int i = 1; i < numberOfSamples; ++i)
   {
-    float value = i + 3;
+    const float value = i + 3;
     measure[0] = value;
     measure[1] = value * value;
     sample->PushBack(measure);
@@ -91,7 +91,7 @@ itkStatisticsAlgorithmTest(int, char *[])
   ITK_TRY_EXPECT_NO_EXCEPTION(
     itk::Statistics::Algorithm::FindSampleBound(constSample, constSample->Begin(), constSample->End(), lower, upper));
 
-  const float epsilon = 1e-5;
+  constexpr float epsilon = 1e-5;
 
   for (unsigned int j = 0; j < measurementVectorSize; ++j)
   {

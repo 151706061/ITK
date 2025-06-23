@@ -18,6 +18,7 @@
 
 #include "itkImageRegistrationMethod.h"
 #include "itkMattesMutualInformationImageToImageMetric.h"
+#include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "itkGradientDescentOptimizer.h"
 
 #include "itkTextOutput.h"
@@ -82,7 +83,6 @@ itkImageRegistrationMethodTest_15(int, char *[])
   bool pass = true;
 
   constexpr unsigned int dimension = 3;
-  unsigned int           j;
 
   using PixelType = float;
 
@@ -120,14 +120,12 @@ itkImageRegistrationMethodTest_15(int, char *[])
    * Set up the two input images.
    * One image scaled and shifted with respect to the other.
    **********************************************************/
-  double displacement[dimension] = { 3, 1, 1 };
-  double scale[dimension] = { 0.90, 1.0, 1.0 };
+  constexpr double displacement[dimension] = { 3, 1, 1 };
+  constexpr double scale[dimension] = { 0.90, 1.0, 1.0 };
 
   FixedImageType::SizeType   size = { { 100, 100, 40 } };
   FixedImageType::IndexType  index = { { 0, 0, 0 } };
-  FixedImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  FixedImageType::RegionType region{ index, size };
 
   fixedImage->SetRegions(region);
   fixedImage->Allocate();
@@ -140,7 +138,7 @@ itkImageRegistrationMethodTest_15(int, char *[])
   using FixedImageIterator = itk::ImageRegionIterator<FixedImageType>;
 
   itk::Point<double, dimension> center;
-  for (j = 0; j < dimension; ++j)
+  for (unsigned int j = 0; j < dimension; ++j)
   {
     center[j] = 0.5 * static_cast<double>(region.GetSize()[j]);
   }
@@ -153,21 +151,21 @@ itkImageRegistrationMethodTest_15(int, char *[])
 
   while (!mIter.IsAtEnd())
   {
-    for (j = 0; j < dimension; ++j)
+    for (unsigned int j = 0; j < dimension; ++j)
     {
       p[j] = mIter.GetIndex()[j];
     }
 
     d = p - center;
 
-    fIter.Set((PixelType)F(d));
+    fIter.Set(static_cast<PixelType>(F(d)));
 
-    for (j = 0; j < dimension; ++j)
+    for (unsigned int j = 0; j < dimension; ++j)
     {
       d[j] = d[j] * scale[j] + displacement[j];
     }
 
-    mIter.Set((PixelType)F(d));
+    mIter.Set(static_cast<PixelType>(F(d)));
 
     ++fIter;
     ++mIter;
@@ -175,7 +173,7 @@ itkImageRegistrationMethodTest_15(int, char *[])
 
   // set the image origin to be center of the image
   double transCenter[dimension];
-  for (j = 0; j < dimension; ++j)
+  for (unsigned int j = 0; j < dimension; ++j)
   {
     transCenter[j] = -0.5 * static_cast<double>(size[j]);
   }
@@ -194,7 +192,7 @@ itkImageRegistrationMethodTest_15(int, char *[])
 
   parametersScales.Fill(1.0);
 
-  for (j = 9; j < 12; ++j)
+  for (unsigned int j = 9; j < 12; ++j)
   {
     parametersScales[j] = 0.0001;
   }
@@ -226,7 +224,7 @@ itkImageRegistrationMethodTest_15(int, char *[])
   region.SetSize(size);
   region.SetIndex(index);
   metric->SetFixedImageRegion(region);
-  metric->ReinitializeSeed(121212);
+  metric->ReinitializeSeed(itk::Statistics::MersenneTwisterRandomVariateGenerator::DefaultSeed);
 
   /******************************************************************
    * Set up the registrator.
@@ -253,11 +251,11 @@ itkImageRegistrationMethodTest_15(int, char *[])
    * Run the registration
    ************************************************************/
   constexpr unsigned int numberOfLoops = 2;
-  unsigned int           iter[numberOfLoops] = { 50, 0 };
-  double                 rates[numberOfLoops] = { 1e-3, 5e-4 };
+  constexpr unsigned int iter[numberOfLoops] = { 50, 0 };
+  constexpr double       rates[numberOfLoops] = { 1e-3, 5e-4 };
 
 
-  for (j = 0; j < numberOfLoops; ++j)
+  for (unsigned int j = 0; j < numberOfLoops; ++j)
   {
 
     try
@@ -297,14 +295,14 @@ itkImageRegistrationMethodTest_15(int, char *[])
 
   std::cout << "True solution is: " << trueParameters << std::endl;
 
-  for (j = 0; j < 9; ++j)
+  for (unsigned int j = 0; j < 9; ++j)
   {
     if (itk::Math::abs(solution[j] - trueParameters[j]) > 0.025)
     {
       pass = false;
     }
   }
-  for (j = 9; j < 12; ++j)
+  for (unsigned int j = 9; j < 12; ++j)
   {
     if (itk::Math::abs(solution[j] - trueParameters[j]) > 1.0)
     {
@@ -342,7 +340,7 @@ F(itk::Vector<double, 3> & v)
   x -= 8;
   y += 3;
   z += 0;
-  double r = std::sqrt(x * x + y * y + z * z);
+  const double r = std::sqrt(x * x + y * y + z * z);
   if (r > 35)
   {
     value = 2 * (itk::Math::abs(x) + 0.8 * itk::Math::abs(y) + 0.5 * itk::Math::abs(z));

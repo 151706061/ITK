@@ -125,7 +125,7 @@ template <unsigned int VDimension>
 auto
 MetaTubeConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectType * spatialObject) -> MetaObjectType *
 {
-  TubeSpatialObjectConstPointer tubeSO = dynamic_cast<const TubeSpatialObjectType *>(spatialObject);
+  const TubeSpatialObjectConstPointer tubeSO = dynamic_cast<const TubeSpatialObjectType *>(spatialObject);
   if (tubeSO.IsNull())
   {
     itkExceptionMacro("Can't downcast SpatialObject to TubeSpatialObject");
@@ -134,8 +134,7 @@ MetaTubeConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectType
   auto * tubeMO = new MetaTube(VDimension);
 
   // fill in the tube information
-  typename TubeSpatialObjectType::TubePointListType::const_iterator it;
-  for (it = tubeSO->GetPoints().begin(); it != tubeSO->GetPoints().end(); ++it)
+  for (auto it = tubeSO->GetPoints().begin(); it != tubeSO->GetPoints().end(); ++it)
   {
     auto * pnt = new TubePnt(VDimension);
 

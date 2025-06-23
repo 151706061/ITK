@@ -23,9 +23,7 @@
 #include "itkGaussianMembershipFunction.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class ExpectationMaximizationMixtureModelEstimatorEnums
  * \brief Contains all enum classes used by ExpectationMaximizationMixtureModelEstimator class.
@@ -34,7 +32,7 @@ namespace Statistics
 class ExpectationMaximizationMixtureModelEstimatorEnums
 {
 public:
-  /** \class TERMINATION_CODE
+  /**
    * \ingroup ITKStatistics
    * Termination status after running optimization */
   enum class TERMINATION_CODE : uint8_t
@@ -45,7 +43,7 @@ public:
 };
 // Define how to print enumeration
 extern ITKStatistics_EXPORT std::ostream &
-                            operator<<(std::ostream & out, const ExpectationMaximizationMixtureModelEstimatorEnums::TERMINATION_CODE value);
+operator<<(std::ostream & out, const ExpectationMaximizationMixtureModelEstimatorEnums::TERMINATION_CODE value);
 
 /**
  * \class ExpectationMaximizationMixtureModelEstimator
@@ -80,7 +78,6 @@ extern ITKStatistics_EXPORT std::ostream &
  * \sphinxexample{Numerics/Statistics/DistributeSamplingUsingGMM,Distribute Sampling Using GMM EM}
  * \endsphinx
  */
-
 template <typename TSample>
 class ITK_TEMPLATE_EXPORT ExpectationMaximizationMixtureModelEstimator : public Object
 {
@@ -91,10 +88,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(ExpectationMaximizationMixtureModelEstimator);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** TSample template argument related type alias */
   using SampleType = TSample;
   using MeasurementType = typename TSample::MeasurementType;
@@ -239,8 +237,7 @@ private:
   MembershipFunctionVectorObjectPointer  m_MembershipFunctionsObject{};
   MembershipFunctionsWeightsArrayPointer m_MembershipFunctionsWeightArrayObject{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkExpectationMaximizationMixtureModelEstimator.hxx"

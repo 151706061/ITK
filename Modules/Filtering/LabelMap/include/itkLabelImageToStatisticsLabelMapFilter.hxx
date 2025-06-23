@@ -24,12 +24,11 @@ namespace itk
 {
 template <typename TInputImage, typename TFeatureImage, typename TOutputImage>
 LabelImageToStatisticsLabelMapFilter<TInputImage, TFeatureImage, TOutputImage>::LabelImageToStatisticsLabelMapFilter()
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_ComputePerimeter(true)
+  , m_NumberOfBins(LabelObjectValuatorType::GetDefaultNumberOfBins())
+  , m_ComputeHistogram(true)
 {
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ComputeFeretDiameter = false;
-  m_ComputePerimeter = true;
-  m_NumberOfBins = LabelObjectValuatorType::GetDefaultNumberOfBins();
-  m_ComputeHistogram = true;
   this->SetNumberOfRequiredInputs(2);
 }
 
@@ -41,7 +40,7 @@ LabelImageToStatisticsLabelMapFilter<TInputImage, TFeatureImage, TOutputImage>::
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());

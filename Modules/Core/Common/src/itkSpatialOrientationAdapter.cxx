@@ -132,8 +132,7 @@ SpatialOrientationAdapter::ToDirectionCosines(const OrientationType & Or)
     (static_cast<uint32_t>(Or) >>
      static_cast<uint32_t>(SpatialOrientationEnums::CoordinateMajornessTerms::ITK_COORDINATE_TertiaryMinor)) &
     0xff);
-  DirectionType direction;
-  direction.Fill(0.0);
+  DirectionType direction{};
   for (unsigned int i = 0; i < DirectionType::ColumnDimensions; ++i)
   {
     switch (terms[i])
@@ -145,25 +144,25 @@ SpatialOrientationAdapter::ToDirectionCosines(const OrientationType & Or)
         direction[0][i] = -1;
         break;
       case CoordinateTerms::ITK_COORDINATE_Anterior:
-        if (DirectionType::RowDimensions > 1)
+        if constexpr (DirectionType::RowDimensions > 1)
         {
           direction[1][i] = 1;
         }
         break;
       case CoordinateTerms::ITK_COORDINATE_Posterior:
-        if (DirectionType::RowDimensions > 1)
+        if constexpr (DirectionType::RowDimensions > 1)
         {
           direction[1][i] = -1;
         }
         break;
       case CoordinateTerms::ITK_COORDINATE_Inferior:
-        if (DirectionType::RowDimensions > 2)
+        if constexpr (DirectionType::RowDimensions > 2)
         {
           direction[2][i] = 1;
         }
         break;
       case CoordinateTerms::ITK_COORDINATE_Superior:
-        if (DirectionType::RowDimensions > 2)
+        if constexpr (DirectionType::RowDimensions > 2)
         {
           direction[2][i] = -1;
         }

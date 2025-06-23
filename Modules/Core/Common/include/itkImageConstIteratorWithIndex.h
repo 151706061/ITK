@@ -144,8 +144,8 @@ public:
    * handle to the image is properly reference counted. */
   ImageConstIteratorWithIndex(const Self & it);
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageConstIteratorWithIndex(const TImage * ptr, const RegionType & region);
 
   /** Default Destructor. */
@@ -157,7 +157,7 @@ public:
   operator=(const Self & it);
 
   /** Get the dimension (size) of the index. */
-  static unsigned int
+  static constexpr unsigned int
   GetImageDimension()
   {
     return ImageDimension;
@@ -216,7 +216,7 @@ public:
 
   /** Get the index. This provides a read only reference to the index.
    * \sa SetIndex */
-  const IndexType &
+  [[nodiscard]] const IndexType &
   GetIndex() const
   {
     return m_PositionIndex;
@@ -224,7 +224,7 @@ public:
 
   /** Get the region that this iterator walks. ImageIterators know the
    * beginning and the end of the region of the image to iterate over. */
-  const RegionType &
+  [[nodiscard]] const RegionType &
   GetRegion() const
   {
     return m_Region;
@@ -240,7 +240,7 @@ public:
   }
 
   /** Get the pixel value */
-  PixelType
+  [[nodiscard]] PixelType
   Get() const
   {
     return m_PixelAccessorFunctor.Get(*m_Position);
@@ -249,7 +249,7 @@ public:
   /** Return a const reference to the pixel
    * This method will provide the fastest access to pixel
    * data, but it will NOT support ImageAdaptors. */
-  const PixelType &
+  [[nodiscard]] const PixelType &
   Value() const
   {
     return *m_Position;
@@ -264,14 +264,14 @@ public:
   GoToReverseBegin();
 
   /** Is the iterator at the beginning of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtReverseEnd() const
   {
     return !m_Remaining;
   }
 
   /** Is the iterator at the end of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtEnd() const
   {
     return !m_Remaining;

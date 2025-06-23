@@ -29,8 +29,8 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>::MovingHistogramImageFilterBase()
+
 {
-  m_PixelsPerTranslation = 0;
   // call again SetKernel in that class, to have the offsets computed for
   // the default kernel. An AnalyzeKernel() method as in the binary
   // morphology class may be a better way to go.
@@ -51,11 +51,10 @@ MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>::SetKernel(co
   auto tmpSEImage = BoolImageType::New();
   tmpSEImage->SetRegions(kernel.GetSize());
   tmpSEImage->Allocate();
-  RegionType                                  tmpSEImageRegion = tmpSEImage->GetRequestedRegion();
-  ImageRegionIteratorWithIndex<BoolImageType> kernelImageIt;
-  kernelImageIt = ImageRegionIteratorWithIndex<BoolImageType>(tmpSEImage, tmpSEImageRegion);
-  KernelIteratorType kernel_it = kernel.Begin();
-  OffsetListType     kernelOffsets;
+  const RegionType                            tmpSEImageRegion = tmpSEImage->GetRequestedRegion();
+  ImageRegionIteratorWithIndex<BoolImageType> kernelImageIt(tmpSEImage, tmpSEImageRegion);
+  KernelIteratorType                          kernel_it = kernel.Begin();
+  OffsetListType                              kernelOffsets;
 
   // create a center index to compute the offset
   IndexType centerIndex;
@@ -108,24 +107,22 @@ MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>::SetKernel(co
   // store the kernel offset list
   m_KernelOffsets = kernelOffsets;
 
-  FixedArray<SizeValueType, ImageDimension> axisCount;
-  axisCount.Fill(0);
+  FixedArray<SizeValueType, ImageDimension> axisCount{};
 
   for (unsigned int axis = 0; axis < ImageDimension; ++axis)
   {
-    OffsetType refOffset;
-    refOffset.Fill(0);
+    OffsetType refOffset{};
     for (int direction = -1; direction <= 1; direction += 2)
     {
       refOffset[axis] = direction;
       for (kernelImageIt.GoToBegin(); !kernelImageIt.IsAtEnd(); ++kernelImageIt)
       {
-        IndexType idx = kernelImageIt.GetIndex();
+        const IndexType idx = kernelImageIt.GetIndex();
 
         if (kernelImageIt.Get())
         {
           // search for added pixel during a translation
-          IndexType nextIdx = idx + refOffset;
+          const IndexType nextIdx = idx + refOffset;
           if (tmpSEImageRegion.IsInside(nextIdx))
           {
             if (!tmpSEImage->GetPixel(nextIdx))
@@ -140,7 +137,7 @@ MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>::SetKernel(co
             axisCount[axis]++;
           }
           // search for removed pixel during a translation
-          IndexType prevIdx = idx - refOffset;
+          const IndexType prevIdx = idx - refOffset;
           if (tmpSEImageRegion.IsInside(prevIdx))
           {
             if (!tmpSEImage->GetPixel(prevIdx))
@@ -162,13 +159,12 @@ MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>::SetKernel(co
   // search for the best axis
   using MapCountType = typename std::set<DirectionCost>;
   MapCountType invertedCount;
-  unsigned int i;
-  for (i = 0; i < ImageDimension; ++i)
+  for (unsigned int i = 0; i < ImageDimension; ++i)
   {
     invertedCount.insert(DirectionCost(i, axisCount[i]));
   }
 
-  i = 0;
+  unsigned int i = 0;
   for (auto it = invertedCount.begin(); it != invertedCount.end(); it++, i++)
   {
     m_Axes[i] = it->m_Dimension;

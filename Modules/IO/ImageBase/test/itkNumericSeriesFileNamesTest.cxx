@@ -24,7 +24,7 @@ int
 itkNumericSeriesFileNamesTest(int, char *[])
 {
 
-  itk::NumericSeriesFileNames::Pointer fit = itk::NumericSeriesFileNames::New();
+  const itk::NumericSeriesFileNames::Pointer fit = itk::NumericSeriesFileNames::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(fit, NumericSeriesFileNames, Object);
 
@@ -59,24 +59,23 @@ itkNumericSeriesFileNamesTest(int, char *[])
   fit->SetIncrementIndex(incrementIndex);
   ITK_TEST_SET_GET_VALUE(incrementIndex, fit->GetIncrementIndex());
 
-  std::string format = "foo.%0200d.png";
+  const std::string format = "foo.%0200d.png";
   fit->SetSeriesFormat(format);
   ITK_TEST_SET_GET_VALUE(format, fit->GetSeriesFormat());
 
-  std::vector<std::string>           names = fit->GetFileNames();
-  std::vector<std::string>::iterator nit;
+  const std::vector<std::string> names = fit->GetFileNames();
 
-  for (nit = names.begin(); nit != names.end(); ++nit)
+  for (auto & name : names)
   {
     // Check for filename truncation
-    if (itksys::SystemTools::GetFilenameLastExtension(*nit) != ".png")
+    if (itksys::SystemTools::GetFilenameLastExtension(name) != ".png")
     {
-      std::cerr << "Generated file name: " << *nit << " does not have the proper extension"
+      std::cerr << "Generated file name: " << name << " does not have the proper extension"
                 << " .png"
                 << " and may have been truncated." << std::endl;
       return EXIT_FAILURE;
     }
-    std::cout << "File: " << nit->c_str() << std::endl;
+    std::cout << "File: " << name.c_str() << std::endl;
   }
 
   // Exercise the PrintSelf method to print the filenames for coverage purposes

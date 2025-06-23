@@ -40,12 +40,11 @@ ParseKernelBandwithSigma(char * kernelBandwithSigmaIn, unsigned int numIndepende
   kernelBandwithSigmaOut.SetSize(numIndependentComponents);
 
   // Get the individual components
-  char *                                     endPtr;
-  unsigned int                               i = 0;
-  typename TFilter::RealArrayType::ValueType value;
+  unsigned int i = 0;
   while (*kernelBandwithSigmaIn && i < numIndependentComponents)
   {
-    value = strtod(kernelBandwithSigmaIn, &endPtr);
+    char *                                     endPtr;
+    typename TFilter::RealArrayType::ValueType value = strtod(kernelBandwithSigmaIn, &endPtr);
     if (kernelBandwithSigmaIn == endPtr)
     {
       (*kernelBandwithSigmaIn)++;
@@ -102,7 +101,7 @@ doDenoising(const std::string & inputFileName,
   // Create filter and initialize
   auto filter = FilterType::New();
 
-  typename FilterType::InputImageType::Pointer inputImage = reader->GetOutput();
+  const typename FilterType::InputImageType::Pointer inputImage = reader->GetOutput();
   filter->SetInput(inputImage);
 
   // Set whether conditional derivatives should be used estimating sigma
@@ -114,9 +113,9 @@ doDenoising(const std::string & inputFileName,
   ITK_TEST_SET_GET_VALUE(patchRadius, filter->GetPatchRadius());
 
   // Instead of directly setting the weights, could also specify type
-  bool useSmoothDiscPatchWeights = true;
+  constexpr bool useSmoothDiscPatchWeights = true;
   ITK_TEST_SET_GET_BOOLEAN(filter, UseSmoothDiscPatchWeights, useSmoothDiscPatchWeights);
-  bool useFastTensorComputations = true;
+  constexpr bool useFastTensorComputations = true;
   ITK_TEST_SET_GET_BOOLEAN(filter, UseFastTensorComputations, useFastTensorComputations);
 
   // Noise model to use
@@ -141,7 +140,7 @@ doDenoising(const std::string & inputFileName,
   ITK_TEST_SET_GET_VALUE(noiseModel, filter->GetNoiseModel());
 
   // Stepsize or weight for smoothing term
-  double smoothingWeight = 1.0;
+  constexpr double smoothingWeight = 1.0;
   filter->SetSmoothingWeight(smoothingWeight);
   ITK_TEST_SET_GET_VALUE(smoothingWeight, filter->GetSmoothingWeight());
 
@@ -178,16 +177,16 @@ doDenoising(const std::string & inputFileName,
   ITK_TEST_SET_GET_VALUE(sampler, filter->GetSampler());
 
   // Automatic estimation of the kernel bandwidth
-  bool kernelBandwidthEstimation = true;
+  constexpr bool kernelBandwidthEstimation = true;
   ITK_TEST_SET_GET_BOOLEAN(filter, KernelBandwidthEstimation, kernelBandwidthEstimation);
 
   // Update bandwidth every 'n' iterations
-  unsigned int kernelBandwidthUpdateFrequency = 3;
+  constexpr unsigned int kernelBandwidthUpdateFrequency = 3;
   filter->SetKernelBandwidthUpdateFrequency(kernelBandwidthUpdateFrequency);
   ITK_TEST_SET_GET_VALUE(kernelBandwidthUpdateFrequency, filter->GetKernelBandwidthUpdateFrequency());
 
   // Use 20% of the pixels for the sigma update calculation
-  double kernelBandwidthFractionPixelsForEstimation = 0.20;
+  constexpr double kernelBandwidthFractionPixelsForEstimation = 0.20;
   filter->SetKernelBandwidthFractionPixelsForEstimation(kernelBandwidthFractionPixelsForEstimation);
   ITK_TEST_SET_GET_VALUE(kernelBandwidthFractionPixelsForEstimation,
                          filter->GetKernelBandwidthFractionPixelsForEstimation());
@@ -206,13 +205,13 @@ doDenoising(const std::string & inputFileName,
   if (filter->GetNoiseModel() == FilterType::NoiseModelEnum::RICIAN ||
       filter->GetNoiseModel() == FilterType::NoiseModelEnum::POISSON)
   {
-    typename ImageT::IndexType::IndexValueType indexValue = 0;
-    typename ImageT::IndexType                 pixelIndex;
-    pixelIndex.Fill(indexValue);
+    const typename ImageT::IndexType::IndexValueType indexValue = 0;
+    auto                                             pixelIndex = ImageT::IndexType::Filled(indexValue);
 
-    typename ImageT::PixelType originalPixelValue = inputImage->GetPixel(pixelIndex);
+    const typename ImageT::PixelType originalPixelValue = inputImage->GetPixel(pixelIndex);
 
-    typename ImageT::PixelType nonpositivePixelValue = itk::NumericTraits<typename ImageT::PixelType>::NonpositiveMin();
+    const typename ImageT::PixelType nonpositivePixelValue =
+      itk::NumericTraits<typename ImageT::PixelType>::NonpositiveMin();
     inputImage->SetPixel(pixelIndex, nonpositivePixelValue);
 
 
@@ -262,9 +261,9 @@ doDenoising(const std::string & inputFileName,
     while (expectedKernelBandwidthSigmaIt != expectedKernelBandwidthSigma.end() &&
            resultKernelBandwidthSigmaIt != resultKernelBandwidthSigma.end())
     {
-      typename FilterType::RealArrayType::ValueType expectedValue = *expectedKernelBandwidthSigmaIt;
-      typename FilterType::RealArrayType::ValueType resultValue = *resultKernelBandwidthSigmaIt;
-      double                                        tolerance = 1e-2 * expectedValue;
+      const typename FilterType::RealArrayType::ValueType expectedValue = *expectedKernelBandwidthSigmaIt;
+      const typename FilterType::RealArrayType::ValueType resultValue = *resultKernelBandwidthSigmaIt;
+      const double                                        tolerance = 1e-2 * expectedValue;
       if (!itk::Math::FloatAlmostEqual(expectedValue, resultValue, 10, tolerance))
       {
         std::cout.precision(static_cast<unsigned int>(itk::Math::abs(std::log10(tolerance))));
@@ -483,7 +482,7 @@ itkPatchBasedDenoisingImageFilterTest(int argc, char * argv[])
                                               kernelBandwidthMultFactor,
                                               noiseModel, noiseModelFidelityWeight );
     }*/
-  else if (numComponents == 3 && numDimensions == 2)
+  if (numComponents == 3 && numDimensions == 2)
   {
     return doDenoising<ThreeComponent2DImage>(inFileName,
                                               outFileName,

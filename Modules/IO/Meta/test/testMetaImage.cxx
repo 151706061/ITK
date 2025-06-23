@@ -29,7 +29,7 @@
 
 template <typename PixelType, unsigned int Dimension>
 int
-ReadWriteCompare(PixelType value, std::string type)
+ReadWriteCompare(PixelType value, const std::string & type)
 {
   std::cout << "Testing: " << type << std::endl;
   using ImageType = itk::Image<PixelType, 3>;
@@ -49,8 +49,9 @@ ReadWriteCompare(PixelType value, std::string type)
     origin[ii] = 3.2;
     size[ii] = 10;
   }
-  typename ImageType::RegionType region(size);
-  typename ImageType::Pointer    img = itk::IOTestHelper::AllocateImageFromRegionAndSpacing<ImageType>(region, spacing);
+  const typename ImageType::RegionType region(size);
+  const typename ImageType::Pointer    img =
+    itk::IOTestHelper::AllocateImageFromRegionAndSpacing<ImageType>(region, spacing);
   { // Fill in entire image
     itk::ImageRegionIterator<ImageType> ri(img, region);
     try
@@ -73,8 +74,7 @@ ReadWriteCompare(PixelType value, std::string type)
   }
   catch (const itk::ExceptionObject & ex)
   {
-    std::string message;
-    message = "Problem found while writing image ";
+    std::string message = "Problem found while writing image ";
     message += filename;
     message += "\n";
     message += ex.GetLocation();
@@ -99,7 +99,7 @@ ReadWriteCompare(PixelType value, std::string type)
 
   // Now compare the two images
   using DiffType = itk::Testing::ComparisonImageFilter<ImageType, ImageType>;
-  typename DiffType::Pointer diff = DiffType::New();
+  const typename DiffType::Pointer diff = DiffType::New();
   diff->SetValidInput(img);
   diff->SetTestInput(input);
   diff->SetDifferenceThreshold(itk::NumericTraits<PixelType>::Zero);
@@ -119,14 +119,13 @@ int
 testMetaImage(int, char *[])
 {
 
-  MetaImage tIm(8, 8, 1, 2, MET_CHAR);
-  MetaImage tImCopy(&tIm);
+  MetaImage       tIm(8, 8, 1, 2, MET_CHAR);
+  const MetaImage tImCopy(&tIm);
 
-  int i;
-  for (i = 0; i < 64; ++i)
+  for (int i = 0; i < 64; ++i)
     tIm.ElementData(i, i);
 
-  for (i = 0; i < 64; ++i)
+  for (int i = 0; i < 64; ++i)
   {
     if (itk::Math::NotExactlyEquals(i, tIm.ElementData(i)))
     {
@@ -140,7 +139,6 @@ testMetaImage(int, char *[])
 
   MetaImage tIm2("test.mha");
 
-  int im2Zero = 0;
   std::cout << "Header size = " << tIm2.HeaderSize() << std::endl;
   tIm2.HeaderSize(tIm2.HeaderSize());
   tIm2.Modality(MET_MOD_CT);
@@ -149,6 +147,7 @@ testMetaImage(int, char *[])
   std::cout << "DimSize = " << tIm2.DimSize() << std::endl;
   std::cout << "Quantity = " << tIm2.Quantity() << std::endl;
   std::cout << "SubQuantity = " << tIm2.SubQuantity() << std::endl;
+  int im2Zero = 0; // NOLINT(misc-const-correctness) Windows build fail if im2Zero is const
   std::cout << "SubQuantity(0) = " << tIm2.SubQuantity(im2Zero) << std::endl;
   std::cout << "SequenceID = " << tIm2.SequenceID() << std::endl;
   std::cout << "SequenceID[0] = " << tIm2.SequenceID(im2Zero) << std::endl;
@@ -203,7 +202,7 @@ testMetaImage(int, char *[])
   }
 
   tIm2.PrintInfo();
-  for (i = 0; i < 64; ++i)
+  for (int i = 0; i < 64; ++i)
   {
     if (itk::Math::NotExactlyEquals(i, tIm.ElementData(i)))
     {
@@ -217,7 +216,7 @@ testMetaImage(int, char *[])
 
   // Testing copy
   std::cout << "Testing copy:";
-  MetaImage imCopy(&tIm2);
+  const MetaImage imCopy(&tIm2);
   std::cout << " [PASSED]" << std::endl;
 
 
@@ -228,10 +227,9 @@ testMetaImage(int, char *[])
     std::cout << "MET_ImageModalityToString: FAIL" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "Modality  = " << modality << std::endl;
-  }
+
+  std::cout << "Modality  = " << modality << std::endl;
+
 
   // Testing Append function
   std::cout << "Testing Append:";

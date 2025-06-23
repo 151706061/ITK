@@ -239,7 +239,7 @@ MattesMutualInformationImageToImageMetricv4GetValueAndDerivativeThreader<
   {
     return false;
   }
-  else if (movingImageValue > this->m_MattesAssociate->m_MovingImageTrueMax)
+  if (movingImageValue > this->m_MattesAssociate->m_MovingImageTrueMax)
   {
     return false;
   }
@@ -449,7 +449,7 @@ MattesMutualInformationImageToImageMetricv4GetValueAndDerivativeThreader<
     JointPDFDerivativesValueType * const accumulatorPdfDPtrStart =
       this->m_MattesAssociate->m_JointPDFDerivatives->GetBufferPointer();
     JointPDFDerivativesValueType *             accumulatorPdfDPtr = accumulatorPdfDPtrStart;
-    JointPDFDerivativesValueType const * const tempThreadPdfDPtrEnd =
+    const JointPDFDerivativesValueType * const tempThreadPdfDPtrEnd =
       accumulatorPdfDPtrStart + histogramTotalElementsSize;
     while (accumulatorPdfDPtr < tempThreadPdfDPtrEnd)
     {

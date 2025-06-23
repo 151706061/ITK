@@ -22,9 +22,7 @@
 #include "itkRigid3DTransform.h"
 #include "itkVersor.h"
 
-namespace itk
-{
-namespace v3
+namespace itk::v3
 {
 /** \class Rigid3DTransform
  * \brief ITK3.x compatible Rigid3DTransform of a vector space (e.g. space coordinates)
@@ -72,7 +70,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
 
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Rigid3DTransform);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -124,15 +122,14 @@ public:
   InverseTransformBasePointer
   GetInverseTransform() const override
   {
-    Pointer inv = New();
-    return this->GetInverse(inv) ? inv.GetPointer() : nullptr;
+    return Superclass::InvertTransform(*this);
   }
 
 protected:
   Rigid3DTransform() = default;
 }; // class Rigid3DTransform
-} // namespace v3
-} // namespace itk
+} // namespace itk::v3
+
 
 #if !defined(ITK_LEGACY_REMOVE)
 #  define itkv3 itk::v3

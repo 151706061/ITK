@@ -120,17 +120,14 @@ typename MultiphaseDenseFiniteDifferenceImageFilter<TInputImage, TFeatureImage, 
     FaceCalculatorType faceCalculator;
     FaceListType       faceList = faceCalculator(levelset, levelset->GetLargestPossibleRegion(), radius);
 
-    void * globalData;
-
     // Ask the function object for a pointer to a data structure it
     // will use to manage any global values it needs.  We'll pass this
     // back to the function object at each calculation and then
     // again so that the function object can use it to determine a
     // time step for this iteration.
-    globalData = df->GetGlobalDataPointer();
+    void * globalData = df->GetGlobalDataPointer();
 
-    typename FaceListType::iterator fIt;
-    for (fIt = faceList.begin(); fIt != faceList.end(); ++fIt)
+    for (auto fIt = faceList.begin(); fIt != faceList.end(); ++fIt)
     {
       // Process the non-boundary region.
       NeighborhoodIteratorType            nD(radius, levelset, *fIt);
@@ -185,12 +182,10 @@ void
 MultiphaseDenseFiniteDifferenceImageFilter<TInputImage, TFeatureImage, TOutputImage, TFunction, TIdCell>::ApplyUpdate(
   TimeStepType dt)
 {
-  double         rms_change_accumulator = 0;
-  double         den = 0;
-  IdCellType     i;
-  InputPixelType val;
+  double rms_change_accumulator = 0;
+  double den = 0;
 
-  for (i = 0; i < this->m_FunctionCount; ++i)
+  for (IdCellType i = 0; i < this->m_FunctionCount; ++i)
   {
     const double img_size = this->m_LevelSet[i]->GetLargestPossibleRegion().GetNumberOfPixels();
     den += img_size;
@@ -203,7 +198,7 @@ MultiphaseDenseFiniteDifferenceImageFilter<TInputImage, TFeatureImage, TOutputIm
   }
 
   // Updating the output image
-  for (i = 0; i < this->m_FunctionCount; ++i)
+  for (IdCellType i = 0; i < this->m_FunctionCount; ++i)
   {
     // NOTE: here this->m_LevelSet[i]->GetRequestedRegion() is used and
     // previously
@@ -218,7 +213,7 @@ MultiphaseDenseFiniteDifferenceImageFilter<TInputImage, TFeatureImage, TOutputIm
 
     while (!u.IsAtEnd())
     {
-      val = static_cast<InputPixelType>(dt) * u.Get();
+      InputPixelType val = static_cast<InputPixelType>(dt) * u.Get();
       o.Set(o.Value() + val);
       rms_change_accumulator += static_cast<double>(itk::Math::sqr(val));
       ++u;
@@ -251,7 +246,7 @@ MultiphaseDenseFiniteDifferenceImageFilter<TInputImage, TFeatureImage, TOutputIm
 
       while (!o.IsAtEnd())
       {
-        val = it.Value();
+        InputPixelType val = it.Value();
         rms_change_accumulator += static_cast<double>(itk::Math::sqr(o.Value() - val));
         o.Set(val);
         ++o;

@@ -54,7 +54,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineKernelFunction);
 
   /** Enum of for spline order. */
@@ -95,7 +95,7 @@ private:
   {};
 
   /** Zeroth order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<0> &, const TRealValueType & u)
   {
     const TRealValueType absValue = itk::Math::abs(u);
@@ -103,7 +103,7 @@ private:
     {
       return TRealValueType{ 1.0 };
     }
-    else if (Math::ExactlyEquals(absValue, TRealValueType{ 0.5 }))
+    if (Math::ExactlyEquals(absValue, TRealValueType{ 0.5 }))
     {
       return TRealValueType{ 0.5 };
     }
@@ -114,7 +114,7 @@ private:
   }
 
   /** First order spline */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<1> &, const TRealValueType & u)
   {
     const TRealValueType absValue = itk::Math::abs(u);
@@ -122,14 +122,12 @@ private:
     {
       return TRealValueType{ 1.0 } - absValue;
     }
-    else
-    {
-      return TRealValueType{ 0.0 };
-    }
+
+    return TRealValueType{ 0.0 };
   }
 
   /** Second order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<2> &, const TRealValueType & u)
   {
     const TRealValueType absValue = itk::Math::abs(u);
@@ -138,7 +136,7 @@ private:
       const TRealValueType sqrValue = itk::Math::sqr(absValue);
       return TRealValueType{ 0.75 } - sqrValue;
     }
-    else if (absValue < TRealValueType{ 1.5 })
+    if (absValue < TRealValueType{ 1.5 })
     {
       const TRealValueType sqrValue = itk::Math::sqr(absValue);
       // NOTE: 1.0/8.0 == 0.125
@@ -152,7 +150,7 @@ private:
   }
 
   /**  Third order spline. */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const Dispatch<3> &, const TRealValueType & u)
   {
     const TRealValueType absValue = itk::Math::abs(u);
@@ -162,7 +160,7 @@ private:
       return (TRealValueType{ 4.0 } - TRealValueType{ 6.0 } * sqrValue + TRealValueType{ 3.0 } * sqrValue * absValue) /
              TRealValueType{ 6.0 };
     }
-    else if (absValue < TRealValueType{ 2.0 })
+    if (absValue < TRealValueType{ 2.0 })
     {
       const TRealValueType sqrValue = itk::Math::sqr(absValue);
       return (TRealValueType{ 8.0 } - TRealValueType{ 12.0 } * absValue + TRealValueType{ 6.0 } * sqrValue -
@@ -176,12 +174,13 @@ private:
   }
 
   /** Unimplemented spline order */
-  inline static TRealValueType
+  static inline TRealValueType
   Evaluate(const DispatchBase &, const TRealValueType &)
   {
     itkGenericExceptionMacro("Evaluate not implemented for spline order " << SplineOrder);
   }
 };
+
 } // end namespace itk
 
 #endif

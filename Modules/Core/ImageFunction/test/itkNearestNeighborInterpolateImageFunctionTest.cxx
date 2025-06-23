@@ -44,11 +44,11 @@ itkNearestNeighborInterpolateImageFunctionTest(int, char *[])
 
   using PointType = itk::Point<float, 2>;
 
-  using CoordRepType = float;
-  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
-  using VectorInterpolatorType = itk::NearestNeighborInterpolateImageFunction<VectorImageType, CoordRepType>;
+  using CoordinateType = float;
+  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
+  using VectorInterpolatorType = itk::NearestNeighborInterpolateImageFunction<VectorImageType, CoordinateType>;
   using VariableVectorInterpolatorType =
-    itk::NearestNeighborInterpolateImageFunction<VariableVectorImageType, CoordRepType>;
+    itk::NearestNeighborInterpolateImageFunction<VariableVectorImageType, CoordinateType>;
 
   using InterpolatedVectorType = VectorInterpolatorType::OutputType;
   using InterpolatedVariableVectorType = VariableVectorInterpolatorType::OutputType;
@@ -58,15 +58,11 @@ itkNearestNeighborInterpolateImageFunctionTest(int, char *[])
   auto variablevectorimage = VariableVectorImageType::New();
   variablevectorimage->SetVectorLength(VectorDimension);
 
-  IndexType start;
-  start.Fill(0);
+  constexpr IndexType start{};
 
-  SizeType size;
-  size.Fill(3);
+  auto size = SizeType::Filled(3);
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const RegionType region{ start, size };
 
   image->SetRegions(region);
   image->Allocate();
@@ -94,8 +90,8 @@ itkNearestNeighborInterpolateImageFunctionTest(int, char *[])
 
   image->Print(std::cout);
 
-  unsigned int maxx = 3;
-  unsigned int maxy = 3;
+  constexpr unsigned int maxx = 3;
+  constexpr unsigned int maxy = 3;
 
   //
   // Fill up the image values with the function
@@ -132,8 +128,7 @@ itkNearestNeighborInterpolateImageFunctionTest(int, char *[])
 
   interpolator->SetInputImage(image);
 
-  typename ImageType::SizeType radius;
-  radius.Fill(0);
+  typename ImageType::SizeType radius{};
   for (unsigned int d = 0; d < Dimension; ++d)
   {
     ITK_TEST_SET_GET_VALUE(radius[d], interpolator->GetRadius()[d]);

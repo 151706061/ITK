@@ -40,8 +40,8 @@ void
 MeanImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  typename OutputImageType::Pointer     output = this->GetOutput();
-  typename InputImageType::ConstPointer input = this->GetInput();
+  const typename OutputImageType::Pointer     output = this->GetOutput();
+  const typename InputImageType::ConstPointer input = this->GetInput();
 
   const auto radius = this->GetRadius();
 
@@ -89,7 +89,7 @@ MeanImageFilter<TInputImage, TOutputImage>::GenerateDataInSubregion(
   {
     neighborhoodRange.SetLocation(index);
 
-    auto sum = InputRealType{};
+    InputRealType sum{};
 
     for (const InputPixelType pixelValue : neighborhoodRange)
     {

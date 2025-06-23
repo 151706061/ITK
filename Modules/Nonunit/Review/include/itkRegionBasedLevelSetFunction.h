@@ -31,28 +31,13 @@ namespace itk
  * This class implements a level set function that computes the speed image by
  * integrating values on the image domain.
  *
- * Based on the paper:
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * Based on the paper \cite chan1999.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * NOTE: The convention followed is
  * inside of the level-set function is negative and outside is positive.
@@ -76,7 +61,7 @@ public:
 
   // itkNewMacro() is not provided since this is an abstract class.
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegionBasedLevelSetFunction);
 
   /** Extract some parameters from the superclass. */
@@ -180,7 +165,7 @@ public:
   void
   UpdateSharedData(bool forceUpdate);
 
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     return new GlobalDataStruct;
@@ -459,12 +444,7 @@ protected:
 
   /** \brief Compute the laplacian term
       \return \f$ \Delta \phi - \div(\frac{\nabla \phi}{|\nabla \phi|}) \f$
-      For details see
-
-      \par REFERENCE
-      Li, C.M. and Xu, C.Y. and Gui, C. and Fox, M.D.
-      "Level Set Evolution without Re-Initialization: A New Variational Formulation",
-      CVPR05. 2005. pp. 430-436.
+      For details see \cite li2005.
   */
 
   /** \brief Compute the laplacian

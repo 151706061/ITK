@@ -44,36 +44,32 @@ public:
       delete this;
     }
   }
-  inline friend std::ostream &
-  operator<<(std::ostream & os, itkTestObject const & o)
+  friend inline std::ostream &
+  operator<<(std::ostream & os, const itkTestObject & o)
   {
-    os << "itkTestObject " << (void const *)&o << ' ' << o.m_ReferenceCount;
+    os << "itkTestObject " << (const void *)&o << ' ' << o.m_ReferenceCount;
     return os;
   }
 
   std::ostream &
   Print(std::ostream & os) const
   {
-    os << "itkTestObject " << (void const *)this << ' ' << this->m_ReferenceCount;
+    os << "itkTestObject " << (const void *)this << ' ' << this->m_ReferenceCount;
     return os;
   }
 
 protected:
-  itkTestObject()
-  {
-    m_ReferenceCount = 0;
-    std::cout << "construct itkTestObject " << *this << std::endl;
-  }
+  itkTestObject() { std::cout << "construct itkTestObject " << *this << std::endl; }
   virtual ~itkTestObject() { std::cout << "destruct itkTestObject " << *this << std::endl; }
 
 private:
-  unsigned int m_ReferenceCount;
+  unsigned int m_ReferenceCount{ 0 };
 };
 
 itkTestObject::Pointer
 itkTestObject::New()
 {
-  return itkTestObject::Pointer(new itkTestObject);
+  return { new itkTestObject };
 }
 
 class itkTestObjectSubClass : public itkTestObject
@@ -88,12 +84,14 @@ public:
 itkTestObjectSubClass::Pointer
 itkTestObjectSubClass::New()
 {
-  return itkTestObjectSubClass::Pointer(new itkTestObjectSubClass);
+  return { new itkTestObjectSubClass };
 }
 
 // This SHOULD NOT be used in ITK, all functions
 // should take raw pointers as arguments
-void TestUpCastPointer(itkTestObject::Pointer) {}
+void
+TestUpCastPointer(itkTestObject::Pointer)
+{}
 
 // Test a function that takes an itkTestObject raw pointer
 void
@@ -105,9 +103,9 @@ int
 itkSmartPointerTest(int, char *[])
 {
   // Create a base class pointer to a child class
-  itkTestObject::Pointer to(itkTestObjectSubClass::New());
+  const itkTestObject::Pointer to(itkTestObjectSubClass::New());
   // test the safe down cast and create a child class Pointer object
-  itkTestObjectSubClass::Pointer sc = dynamic_cast<itkTestObjectSubClass *>(to.GetPointer());
+  const itkTestObjectSubClass::Pointer sc = dynamic_cast<itkTestObjectSubClass *>(to.GetPointer());
   // Test the up cast with a function that takes a pointer
   TestUpCast(sc);
   // Test calling a function that takes a SmartPointer as

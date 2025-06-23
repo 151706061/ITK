@@ -56,18 +56,9 @@ template <typename TInputImage, typename TOutputImage, typename TDistancePixel>
 void
 SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::SetSuperGridSize(unsigned int factor)
 {
-  unsigned int i;
-  for (i = 0; i < ImageDimension; ++i)
-  {
-    if (factor != m_SuperGridSize[i])
-    {
-      break;
-    }
-  }
-  if (i < ImageDimension)
+  if (ContainerFillWithCheck(m_SuperGridSize, factor, ImageDimension))
   {
     this->Modified();
-    m_SuperGridSize.Fill(factor);
   }
 }
 
@@ -285,8 +276,9 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::ThreadedUpdateCluste
       const InputPixelType &                    v = itIn.Get();
       const typename OutputImageType::PixelType l = itOut.Get();
 
-      std::pair<typename UpdateClusterMap::iterator, bool> r = clusterMap.insert(std::make_pair(l, UpdateCluster()));
-      vnl_vector<ClusterComponentType> &                   cluster = r.first->second.cluster;
+      const std::pair<typename UpdateClusterMap::iterator, bool> r =
+        clusterMap.insert(std::make_pair(l, UpdateCluster()));
+      vnl_vector<ClusterComponentType> & cluster = r.first->second.cluster;
       if (r.second)
       {
         cluster.set_size(numberOfClusterComponents);
@@ -330,21 +322,18 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::ThreadedPerturbClust
   const unsigned int numberOfClusterComponents = numberOfComponents + ImageDimension;
 
 
-  itk::Size<ImageDimension> radius;
-  radius.Fill(1);
-  unsigned long center;
+  auto          radius = itk::Size<ImageDimension>::Filled(1);
   unsigned long stride[ImageDimension];
 
 
-  typename InputImageType::SizeType searchRadius;
-  searchRadius.Fill(1);
+  constexpr auto searchRadius = InputImageType::SizeType::Filled(1);
 
 
   using NeighborhoodType = ConstNeighborhoodIterator<TInputImage>;
 
   // get center and dimension strides for iterator neighborhoods
   NeighborhoodType it(radius, inputImage, inputImage->GetLargestPossibleRegion());
-  center = it.Size() / 2;
+  unsigned long    center = it.Size() / 2;
   for (unsigned int i = 0; i < ImageDimension; ++i)
   {
     stride[i] = it.GetStride(i);
@@ -434,13 +423,14 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::ThreadedConnectivity
   const unsigned int     numberOfClusterComponents = numberOfComponents + ImageDimension;
 
   const size_t minSuperSize =
-    std::accumulate(m_SuperGridSize.cbegin(), m_SuperGridSize.cend(), size_t(1), std::multiplies<size_t>()) / 4;
+    std::accumulate(
+      m_SuperGridSize.cbegin(), m_SuperGridSize.cend(), static_cast<size_t>(1), std::multiplies<size_t>()) /
+    4;
 
   ConstantBoundaryCondition<TOutputImage> lbc;
   lbc.SetConstant(NumericTraits<typename OutputImageType::PixelType>::max());
 
-  itk::Size<ImageDimension> radius;
-  radius.Fill(1);
+  auto radius = itk::Size<ImageDimension>::Filled(1);
 
   using NeighborhoodType = ConstNeighborhoodIterator<TOutputImage, ConstantBoundaryCondition<TOutputImage>>;
 
@@ -521,11 +511,13 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::SingleThreadedConnec
   OutputPixelType prevLabel = m_Clusters.size() / numberOfClusterComponents;
 
   const size_t minSuperSize =
-    std::accumulate(m_SuperGridSize.cbegin(), m_SuperGridSize.cend(), size_t(1), std::multiplies<size_t>()) / 4;
+    std::accumulate(
+      m_SuperGridSize.cbegin(), m_SuperGridSize.cend(), static_cast<size_t>(1), std::multiplies<size_t>()) /
+    4;
 
   std::vector<IndexType> indexStack;
 
-  // Next we relabel the remaining regions ( defined by having the a
+  // Next we relabel the remaining regions ( defined by having the
   // label id ) not connected to the SuperPixel centroids. If the
   // region is larger than the minimum superpixel size than it gets
   // a new label, otherwise it just gets the previously encountered
@@ -635,8 +627,7 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::GenerateData()
     for (unsigned int i = 0; i < m_UpdateClusterPerThread.size(); ++i)
     {
       UpdateClusterMap & clusterMap = m_UpdateClusterPerThread[i];
-      for (typename UpdateClusterMap::const_iterator clusterIter = clusterMap.begin(); clusterIter != clusterMap.end();
-           ++clusterIter)
+      for (auto clusterIter = clusterMap.begin(); clusterIter != clusterMap.end(); ++clusterIter)
       {
         const size_t clusterIdx = clusterIter->first;
         clusterCount[clusterIdx] += clusterIter->second.count;
@@ -654,7 +645,7 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::GenerateData()
       ClusterType cluster(numberOfClusterComponents, &m_Clusters[i * numberOfClusterComponents]);
       cluster /= clusterCount[i];
 
-      ClusterType oldCluster(numberOfClusterComponents, &m_OldClusters[i * numberOfClusterComponents]);
+      const ClusterType oldCluster(numberOfClusterComponents, &m_OldClusters[i * numberOfClusterComponents]);
       l1Residual += Distance(cluster, oldCluster);
     }
 
@@ -769,9 +760,7 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::RelabelConnectedRegi
   ConstantBoundaryCondition<TOutputImage> lbc;
   lbc.SetConstant(NumericTraits<typename OutputImageType::PixelType>::max());
 
-  itk::Size<ImageDimension> radius;
-  radius.Fill(1);
-  unsigned long center;
+  auto          radius = itk::Size<ImageDimension>::Filled(1);
   unsigned long stride[ImageDimension];
 
   using NeighborhoodType = NeighborhoodIterator<TOutputImage, ConstantBoundaryCondition<TOutputImage>>;
@@ -779,7 +768,7 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::RelabelConnectedRegi
   NeighborhoodType labelIt(radius, outputImage, outputImage->GetRequestedRegion());
   labelIt.OverrideBoundaryCondition(&lbc);
 
-  center = labelIt.Size() / 2;
+  unsigned long center = labelIt.Size() / 2;
   for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     stride[j] = labelIt.GetStride(j);
@@ -791,7 +780,10 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::RelabelConnectedRegi
   indexStack.clear();
   indexStack.push_back(seed);
   m_MarkerImage->SetPixel(seed, 1);
-  outputImage->SetPixel(seed, outputLabel);
+  if (requiredLabel != outputLabel)
+  {
+    outputImage->SetPixel(seed, outputLabel);
+  }
 
   size_t indexStackCount = 0;
   while (indexStackCount < indexStack.size())
@@ -802,20 +794,19 @@ SLICImageFilter<TInputImage, TOutputImage, TDistancePixel>::RelabelConnectedRegi
     labelIt.SetLocation(idx);
     for (unsigned int j = 0; j < ImageDimension; ++j)
     {
-      unsigned int nIdx = center + stride[j];
-
-      if (markerIter.GetPixel(nIdx) == 0 && labelIt.GetPixel(nIdx) == requiredLabel)
+      for (const auto & nIdx : { center + stride[j], center - stride[j] })
       {
-        indexStack.push_back(labelIt.GetIndex(nIdx));
-        markerIter.SetPixel(nIdx, 1);
-        labelIt.SetPixel(nIdx, outputLabel);
-      }
-      nIdx = center - stride[j];
-      if (markerIter.GetPixel(nIdx) == 0 && labelIt.GetPixel(nIdx) == requiredLabel)
-      {
-        indexStack.push_back(labelIt.GetIndex(nIdx));
-        markerIter.SetPixel(nIdx, 1);
-        labelIt.SetPixel(nIdx, outputLabel);
+        // When run in threaded mode, requiredLabel is the same as outputLabel and only the marker images is modified.
+        // The label image must be checked first to avoid race conditions with the marker image.
+        if (labelIt.GetPixel(nIdx) == requiredLabel && markerIter.GetPixel(nIdx) == 0)
+        {
+          indexStack.push_back(labelIt.GetIndex(nIdx));
+          markerIter.SetPixel(nIdx, 1);
+          if (requiredLabel != outputLabel)
+          {
+            labelIt.SetPixel(nIdx, outputLabel);
+          }
+        }
       }
     }
   }

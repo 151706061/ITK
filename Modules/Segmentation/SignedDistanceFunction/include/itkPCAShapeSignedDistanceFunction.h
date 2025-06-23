@@ -63,21 +63,21 @@ namespace itk
  *
  * \ingroup ITKSignedDistanceFunction
  */
-template <typename TCoordRep, unsigned int VSpaceDimension, typename TImage = Image<double, VSpaceDimension>>
+template <typename TCoordinate, unsigned int VSpaceDimension, typename TImage = Image<double, VSpaceDimension>>
 class ITK_TEMPLATE_EXPORT PCAShapeSignedDistanceFunction
-  : public ShapeSignedDistanceFunction<TCoordRep, VSpaceDimension>
+  : public ShapeSignedDistanceFunction<TCoordinate, VSpaceDimension>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(PCAShapeSignedDistanceFunction);
 
   /** Standard class type aliases. */
   using Self = PCAShapeSignedDistanceFunction;
-  using Superclass = ShapeSignedDistanceFunction<TCoordRep, VSpaceDimension>;
+  using Superclass = ShapeSignedDistanceFunction<TCoordinate, VSpaceDimension>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PCAShapeSignedDistanceFunction);
 
   /** New macro for creation of through the object factory. */
@@ -87,7 +87,7 @@ public:
   static constexpr unsigned int SpaceDimension = Superclass::SpaceDimension;
 
   /** CoordRep type alias support */
-  using typename Superclass::CoordRepType;
+  using typename Superclass::CoordinateType;
 
   /** InputType type alias support */
   using typename Superclass::InputType;
@@ -107,20 +107,20 @@ public:
   using ImagePointerVector = std::vector<ImagePointer>;
 
   /** Transform type alias support */
-  using TransformType = Transform<CoordRepType, Self::SpaceDimension, Self::SpaceDimension>;
+  using TransformType = Transform<CoordinateType, Self::SpaceDimension, Self::SpaceDimension>;
 
   /** Interpolator type alias support */
-  using InterpolatorType = InterpolateImageFunction<ImageType, CoordRepType>;
+  using InterpolatorType = InterpolateImageFunction<ImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
   using InterpolatorPointerVector = std::vector<InterpolatorPointer>;
 
   /** extrapolator type alias support */
-  using ExtrapolatorType = ExtrapolateImageFunction<ImageType, CoordRepType>;
+  using ExtrapolatorType = ExtrapolateImageFunction<ImageType, CoordinateType>;
   using ExtrapolatorPointer = typename ExtrapolatorType::Pointer;
   using ExtrapolatorPointerVector = std::vector<ExtrapolatorPointer>;
 
   /** function type alias support */
-  using FunctionType = ImageFunction<ImageType, double, CoordRepType>;
+  using FunctionType = ImageFunction<ImageType, double, CoordinateType>;
   using FunctionPointer = typename FunctionType::Pointer;
   using FunctionPointerVector = std::vector<FunctionPointer>;
 
@@ -132,8 +132,10 @@ public:
   itkGetConstMacro(NumberOfPrincipalComponents, unsigned int);
 
   /** Set/Get the mean image. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(MeanImage, ImageType);
   itkGetModifiableObjectMacro(MeanImage, ImageType);
+  /** @ITKEndGrouping */
 
   /** Set/Get the principal component images. */
   void
@@ -146,23 +148,27 @@ public:
 
   /** Set/Get the principal component standard deviations. These values corresponds
    * to the square root of the eigenvalues of the principal components. */
+  /** @ITKStartGrouping */
   itkSetMacro(PrincipalComponentStandardDeviations, ParametersType);
   itkGetConstMacro(PrincipalComponentStandardDeviations, ParametersType);
+  /** @ITKEndGrouping */
 
   /** Set/Get transform. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Transform, TransformType);
   itkGetModifiableObjectMacro(Transform, TransformType);
+  /** @ITKEndGrouping */
 
   /** A PCAShape is defined by a set of shape and pose parameters. */
   void
   SetParameters(const ParametersType &) override;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfShapeParameters() const override
   {
     return m_NumberOfPrincipalComponents;
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoseParameters() const override
   {
     return m_Transform ? m_Transform->GetNumberOfParameters() : 0;

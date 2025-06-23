@@ -40,7 +40,7 @@ MetaContourConverter<VDimension>::MetaObjectToSpatialObject(const MetaObjectType
     itkExceptionMacro("Can't downcast MetaObject to MetaContour");
   }
 
-  ContourSpatialObjectPointer contourSO = ContourSpatialObjectType::New();
+  const ContourSpatialObjectPointer contourSO = ContourSpatialObjectType::New();
 
   contourSO->GetProperty().SetName(contourMO->Name());
   contourSO->SetId(contourMO->ID());
@@ -132,7 +132,7 @@ template <unsigned int VDimension>
 auto
 MetaContourConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectType * so) -> MetaObjectType *
 {
-  ContourSpatialObjectConstPointer contourSO = dynamic_cast<const ContourSpatialObjectType *>(so);
+  const ContourSpatialObjectConstPointer contourSO = dynamic_cast<const ContourSpatialObjectType *>(so);
   if (contourSO.IsNull())
   {
     itkExceptionMacro("Can't downcast SpatialObject to ContourSpatialObject");
@@ -141,9 +141,7 @@ MetaContourConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectT
 
 
   // fill in the control points information
-  typename ContourSpatialObjectType::ContourPointListType::const_iterator itCP;
-
-  for (itCP = contourSO->GetControlPoints().begin(); itCP != contourSO->GetControlPoints().end(); ++itCP)
+  for (auto itCP = contourSO->GetControlPoints().begin(); itCP != contourSO->GetControlPoints().end(); ++itCP)
   {
     auto * pnt = new ContourControlPnt(VDimension);
 
@@ -172,18 +170,17 @@ MetaContourConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectT
     contourMO->GetControlPoints().push_back(pnt);
   }
 
-  if (VDimension == 2)
+  if constexpr (VDimension == 2)
   {
     contourMO->ControlPointDim("id x y xp yp v1 v2 r g b a");
   }
-  else if (VDimension == 3)
+  else if constexpr (VDimension == 3)
   {
     contourMO->ControlPointDim("id x y z xp yp zp v1 v2 v3 r gn be a");
   }
 
   // fill in the interpolated points information
-  typename ContourSpatialObjectType::ContourPointListType::const_iterator itI;
-  for (itI = contourSO->GetPoints().begin(); itI != contourSO->GetPoints().end(); ++itI)
+  for (auto itI = contourSO->GetPoints().begin(); itI != contourSO->GetPoints().end(); ++itI)
   {
     auto * pnt = new ContourInterpolatedPnt(VDimension);
 
@@ -201,11 +198,11 @@ MetaContourConverter<VDimension>::SpatialObjectToMetaObject(const SpatialObjectT
     contourMO->GetInterpolatedPoints().push_back(pnt);
   }
 
-  if (VDimension == 2)
+  if constexpr (VDimension == 2)
   {
     contourMO->InterpolatedPointDim("id x y r g b a");
   }
-  else if (VDimension == 3)
+  else if constexpr (VDimension == 3)
   {
     contourMO->InterpolatedPointDim("id x y z r g b a");
   }

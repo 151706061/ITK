@@ -31,7 +31,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Efficient implementation of kernel filtering"
  * by Beare R., Lehmann G
- * https://www.insight-journal.org/browse/publication/160
+ * https://doi.org/10.54294/igq8fn
  *
  *
  * \author Richard Beare
@@ -53,7 +53,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BoxMeanImageFilter);
 
   /** Image related type alias. */
@@ -71,12 +71,7 @@ public:
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimension, (Concept::SameDimension<Self::InputImageDimension, Self::OutputImageDimension>));
-
-  // End concept checking
-#endif
 
 protected:
   BoxMeanImageFilter();

@@ -57,7 +57,7 @@ ConstNeighborhoodIteratorWithOnlyIndex<TImage>::IndexInBounds(const NeighborInde
   {
     return true;
   }
-  else if (this->InBounds()) // Is this whole neighborhood in bounds?
+  if (this->InBounds()) // Is this whole neighborhood in bounds?
   {
     return true;
   }
@@ -108,7 +108,7 @@ ConstNeighborhoodIteratorWithOnlyIndex<TImage>::ComputeInternalIndex(NeighborInd
 {
   OffsetType ans;
   auto       r = static_cast<unsigned long>(n);
-  for (long i = static_cast<long>(Dimension) - 1; i >= 0; --i)
+  for (long i = long{ Dimension } - 1; i >= 0; --i)
   {
     ans[i] = static_cast<OffsetValueType>(r / this->GetStride(i));
     r = r % this->GetStride(i);
@@ -120,35 +120,12 @@ template <typename TImage>
 auto
 ConstNeighborhoodIteratorWithOnlyIndex<TImage>::GetBoundingBoxAsImageRegion() const -> RegionType
 {
-  const IndexValueType zero{};
-  const RegionType     ans(this->GetIndex(zero), this->GetSize());
+  constexpr IndexValueType zero{};
+  const RegionType         ans(this->GetIndex(zero), this->GetSize());
 
   return ans;
 }
 
-
-template <typename TImage>
-ConstNeighborhoodIteratorWithOnlyIndex<TImage>::ConstNeighborhoodIteratorWithOnlyIndex(const Self & orig)
-  : Neighborhood<DummyNeighborhoodPixelType, Dimension>(orig)
-{
-  m_Bound = orig.m_Bound;
-  m_BeginIndex = orig.m_BeginIndex;
-  m_ConstImage = orig.m_ConstImage;
-  m_EndIndex = orig.m_EndIndex;
-  m_Loop = orig.m_Loop;
-  m_Region = orig.m_Region;
-
-  m_NeedToUseBoundaryCondition = orig.m_NeedToUseBoundaryCondition;
-  for (DimensionValueType i = 0; i < Dimension; ++i)
-  {
-    m_InBounds[i] = orig.m_InBounds[i];
-  }
-  m_IsInBoundsValid = orig.m_IsInBoundsValid;
-  m_IsInBounds = orig.m_IsInBounds;
-
-  m_InnerBoundsLow = orig.m_InnerBoundsLow;
-  m_InnerBoundsHigh = orig.m_InnerBoundsHigh;
-}
 
 template <typename TImage>
 ConstNeighborhoodIteratorWithOnlyIndex<TImage>::ConstNeighborhoodIteratorWithOnlyIndex(const SizeType &   radius,
@@ -233,36 +210,6 @@ ConstNeighborhoodIteratorWithOnlyIndex<TImage>::Initialize(const SizeType &   ra
 
   m_IsInBoundsValid = false;
   m_IsInBounds = false;
-}
-
-template <typename TImage>
-ConstNeighborhoodIteratorWithOnlyIndex<TImage> &
-ConstNeighborhoodIteratorWithOnlyIndex<TImage>::operator=(const Self & orig)
-{
-  if (this != &orig)
-  {
-    Superclass::operator=(orig);
-
-    m_Bound = orig.m_Bound;
-    m_ConstImage = orig.m_ConstImage;
-    m_EndIndex = orig.m_EndIndex;
-    m_Loop = orig.m_Loop;
-    m_Region = orig.m_Region;
-    m_BeginIndex = orig.m_BeginIndex;
-
-    m_NeedToUseBoundaryCondition = orig.m_NeedToUseBoundaryCondition;
-
-    m_InnerBoundsLow = orig.m_InnerBoundsLow;
-    m_InnerBoundsHigh = orig.m_InnerBoundsHigh;
-
-    for (DimensionValueType i = 0; i < Dimension; ++i)
-    {
-      m_InBounds[i] = orig.m_InBounds[i];
-    }
-    m_IsInBoundsValid = orig.m_IsInBoundsValid;
-    m_IsInBounds = orig.m_IsInBounds;
-  }
-  return *this;
 }
 
 template <typename TImage>
@@ -401,38 +348,36 @@ ConstNeighborhoodIteratorWithOnlyIndex<TImage>::PrintSelf(std::ostream & os, Ind
 {
   Superclass::PrintSelf(os, indent);
 
-  DimensionValueType i;
-
   os << indent;
   os << "ConstNeighborhoodIteratorWithOnlyIndex {this= " << this;
   os << ", m_Region = { Start = {";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_Region.GetIndex()[i] << ' ';
   }
   os << "}, Size = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_Region.GetSize()[i] << ' ';
   }
   os << "} }";
   os << ", m_BeginIndex = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_BeginIndex[i] << ' ';
   }
   os << "} , m_EndIndex = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_EndIndex[i] << ' ';
   }
   os << "} , m_Loop = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_Loop[i] << ' ';
   }
   os << "}, m_Bound = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_Bound[i] << ' ';
   }
@@ -440,12 +385,12 @@ ConstNeighborhoodIteratorWithOnlyIndex<TImage>::PrintSelf(std::ostream & os, Ind
   os << "}, m_IsInBoundsValid = {" << m_IsInBoundsValid;
 
   os << indent << ",  m_InnerBoundsLow = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_InnerBoundsLow[i] << ' ';
   }
   os << "}, m_InnerBoundsHigh = { ";
-  for (i = 0; i < Dimension; ++i)
+  for (DimensionValueType i = 0; i < Dimension; ++i)
   {
     os << m_InnerBoundsHigh[i] << ' ';
   }

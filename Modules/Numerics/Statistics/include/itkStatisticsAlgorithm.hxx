@@ -20,23 +20,17 @@
 
 #include "itkNumericTraits.h"
 
-namespace itk
-{
-namespace Statistics
-{
-namespace Algorithm
+namespace itk::Statistics::Algorithm
 {
 template <typename TSize>
 inline TSize
 FloorLog(TSize size)
 {
-  TSize k;
-
-  for (k = 0; size != 1; size >>= 1)
+  TSize k = 0;
+  for (; size != 1; size >>= 1)
   {
     ++k;
   }
-
   return k;
 }
 
@@ -143,7 +137,7 @@ Partition(TSubsample *                               sample,
   // partitionValue, that were placed at the end of the list, and move them to
   // the interface between smaller and larger values.
   //
-  int beginOfSectionEqualToPartition = moveToFrontIndex;
+  const int beginOfSectionEqualToPartition = moveToFrontIndex;
   moveToBackIndex = endIndex - 1;
   while (moveToFrontIndex < moveToBackIndex)
   {
@@ -181,9 +175,9 @@ Partition(TSubsample *                               sample,
       sample->Swap(moveToBackIndex, moveToFrontIndex);
     }
   }
-  int endOfSectionEqualToPartition = moveToFrontIndex - 1;
+  const int endOfSectionEqualToPartition = moveToFrontIndex - 1;
 
-  int storeIndex = (beginOfSectionEqualToPartition + endOfSectionEqualToPartition) / 2;
+  const int storeIndex = (beginOfSectionEqualToPartition + endOfSectionEqualToPartition) / 2;
 
   const SampleMeasurementType pivotValue = sample->GetMeasurementVectorByIndex(storeIndex)[activeDimension];
   if (pivotValue != partitionValue)
@@ -194,8 +188,8 @@ Partition(TSubsample *                               sample,
     // partitionValue.
     for (int kk = beginIndex; kk < storeIndex; ++kk)
     {
-      SampleMeasurementType nodeValue = sample->GetMeasurementVectorByIndex(kk)[activeDimension];
-      SampleMeasurementType boundaryValue = sample->GetMeasurementVectorByIndex(storeIndex)[activeDimension];
+      const SampleMeasurementType nodeValue = sample->GetMeasurementVectorByIndex(kk)[activeDimension];
+      const SampleMeasurementType boundaryValue = sample->GetMeasurementVectorByIndex(storeIndex)[activeDimension];
       if (nodeValue > boundaryValue)
       {
         sample->Swap(kk, storeIndex);
@@ -216,7 +210,7 @@ MedianOfThree(const TValue a, const TValue b, const TValue c)
     {
       return b;
     }
-    else if (a < c)
+    if (a < c)
     {
       return c;
     }
@@ -306,20 +300,19 @@ FindSampleBoundAndMean(const TSubsample *                           sample,
     itkGenericExceptionMacro("Length of a sample's measurement vector hasn't been set.");
   }
 
-  Array<double> sum(Dimension);
-
-  MeasurementVectorSizeType dimension;
-  MeasurementVectorType     temp;
+  MeasurementVectorType temp;
   NumericTraits<MeasurementVectorType>::SetLength(temp, Dimension);
   NumericTraits<MeasurementVectorType>::SetLength(mean, Dimension);
 
   min = max = temp = sample->GetMeasurementVectorByIndex(beginIndex);
   double frequencySum = sample->GetFrequencyByIndex(beginIndex);
+
+  Array<double> sum(Dimension);
   sum.Fill(0.0);
 
   while (true)
   {
-    for (dimension = 0; dimension < Dimension; ++dimension)
+    for (MeasurementVectorSizeType dimension = 0; dimension < Dimension; ++dimension)
     {
       if (temp[dimension] < min[dimension])
       {
@@ -342,7 +335,7 @@ FindSampleBoundAndMean(const TSubsample *                           sample,
 
   for (unsigned int i = 0; i < Dimension; ++i)
   {
-    mean[i] = (MeasurementType)(sum[i] / frequencySum);
+    mean[i] = static_cast<MeasurementType>(sum[i] / frequencySum);
   }
 }
 
@@ -357,9 +350,9 @@ QuickSelect(TSubsample *                         sample,
 {
   using SampleMeasurementType = typename TSubsample::MeasurementType;
 
-  int begin = beginIndex;
-  int end = endIndex - 1;
-  int kthIndex = kth + beginIndex;
+  int       begin = beginIndex;
+  int       end = endIndex - 1;
+  const int kthIndex = kth + beginIndex;
 
   SampleMeasurementType tempMedian;
 
@@ -385,7 +378,7 @@ QuickSelect(TSubsample *                         sample,
     // Partition expects the end argument to be one past-the-end of the array.
     // The index pivotNewIndex returned by Partition is in the range
     // [begin,end].
-    int pivotNewIndex = Partition<TSubsample>(sample, activeDimension, begin, end + 1, tempMedian);
+    const int pivotNewIndex = Partition<TSubsample>(sample, activeDimension, begin, end + 1, tempMedian);
 
     if (kthIndex == pivotNewIndex)
     {
@@ -433,7 +426,7 @@ inline typename TSubsample::MeasurementType
 QuickSelect(TSubsample * sample, unsigned int activeDimension, int beginIndex, int endIndex, int kth)
 {
   using SampleMeasurementType = typename TSubsample::MeasurementType;
-  SampleMeasurementType medianGuess = NumericTraits<SampleMeasurementType>::NonpositiveMin();
+  const SampleMeasurementType medianGuess = NumericTraits<SampleMeasurementType>::NonpositiveMin();
   return QuickSelect<TSubsample>(sample, activeDimension, beginIndex, endIndex, kth, medianGuess);
 }
 
@@ -502,7 +495,7 @@ NthElement(TSubsample * sample, unsigned int activeDimension, int beginIndex, in
 
     const auto tempMedian = MedianOfThree<MeasurementType>(v1, v2, v3);
 
-    int cut = UnguardedPartition(sample, activeDimension, beginElement, endElement, tempMedian);
+    const int cut = UnguardedPartition(sample, activeDimension, beginElement, endElement, tempMedian);
 
     if (cut <= nthIndex)
     {
@@ -523,12 +516,9 @@ template <typename TSubsample>
 inline void
 InsertSort(TSubsample * sample, unsigned int activeDimension, int beginIndex, int endIndex)
 {
-  int backwardSearchBegin;
-  int backwardIndex;
-
-  for (backwardSearchBegin = beginIndex + 1; backwardSearchBegin < endIndex; ++backwardSearchBegin)
+  for (int backwardSearchBegin = beginIndex + 1; backwardSearchBegin < endIndex; ++backwardSearchBegin)
   {
-    backwardIndex = backwardSearchBegin;
+    int backwardIndex = backwardSearchBegin;
     while (backwardIndex > beginIndex)
     {
       using SampleMeasurementType = typename TSubsample::MeasurementType;
@@ -553,29 +543,27 @@ inline void
 DownHeap(TSubsample * sample, unsigned int activeDimension, int beginIndex, int endIndex, int node)
 {
   int currentNode = node;
-  int leftChild;
-  int rightChild;
-  int largerChild;
+
 
   using SampleMeasurementType = typename TSubsample::MeasurementType;
-  SampleMeasurementType currentNodeValue = sample->GetMeasurementVectorByIndex(currentNode)[activeDimension];
-  SampleMeasurementType leftChildValue;
-  SampleMeasurementType rightChildValue;
-  SampleMeasurementType largerChildValue;
+  const SampleMeasurementType currentNodeValue = sample->GetMeasurementVectorByIndex(currentNode)[activeDimension];
 
   while (true)
   {
     // location of first child
-    largerChild = leftChild = beginIndex + 2 * (currentNode - beginIndex) + 1;
-    rightChild = leftChild + 1;
+    int       largerChild = beginIndex + 2 * (currentNode - beginIndex) + 1;
+    const int leftChild = largerChild;
+    const int rightChild = leftChild + 1;
     if (leftChild > endIndex - 1)
     {
       // leaf node
       return;
     }
 
-    largerChildValue = rightChildValue = leftChildValue =
-      sample->GetMeasurementVectorByIndex(leftChild)[activeDimension];
+    const auto                  initValue = sample->GetMeasurementVectorByIndex(leftChild)[activeDimension];
+    const SampleMeasurementType leftChildValue = initValue;
+    SampleMeasurementType       rightChildValue = initValue;
+    SampleMeasurementType       largerChildValue = initValue;
 
     if (rightChild < endIndex)
     {
@@ -604,16 +592,13 @@ inline void
 HeapSort(TSubsample * sample, unsigned int activeDimension, int beginIndex, int endIndex)
 {
   // construct a heap
-  int node;
-
-  for (node = beginIndex + (endIndex - beginIndex) / 2 - 1; node >= beginIndex; node--)
+  for (int node = beginIndex + (endIndex - beginIndex) / 2 - 1; node >= beginIndex; node--)
   {
     DownHeap<TSubsample>(sample, activeDimension, beginIndex, endIndex, node);
   }
 
   // sort
-  int newEndIndex;
-  for (newEndIndex = endIndex - 1; newEndIndex >= beginIndex; --newEndIndex)
+  for (int newEndIndex = endIndex - 1; newEndIndex >= beginIndex; --newEndIndex)
   {
     sample->Swap(beginIndex, newEndIndex);
     DownHeap<TSubsample>(sample, activeDimension, beginIndex, newEndIndex, beginIndex);
@@ -632,7 +617,6 @@ IntrospectiveSortLoop(TSubsample * sample,
   using SampleMeasurementType = typename TSubsample::MeasurementType;
 
   int length = endIndex - beginIndex;
-  int cut;
   while (length > sizeThreshold)
   {
     if (depthLimit == 0)
@@ -642,14 +626,15 @@ IntrospectiveSortLoop(TSubsample * sample,
     }
 
     --depthLimit;
-    cut = Partition<TSubsample>(sample,
-                                activeDimension,
-                                beginIndex,
-                                endIndex,
-                                MedianOfThree<SampleMeasurementType>(
-                                  sample->GetMeasurementVectorByIndex(beginIndex)[activeDimension],
-                                  sample->GetMeasurementVectorByIndex(beginIndex + length / 2)[activeDimension],
-                                  sample->GetMeasurementVectorByIndex(endIndex - 1)[activeDimension]));
+    const int cut =
+      Partition<TSubsample>(sample,
+                            activeDimension,
+                            beginIndex,
+                            endIndex,
+                            MedianOfThree<SampleMeasurementType>(
+                              sample->GetMeasurementVectorByIndex(beginIndex)[activeDimension],
+                              sample->GetMeasurementVectorByIndex(beginIndex + length / 2)[activeDimension],
+                              sample->GetMeasurementVectorByIndex(endIndex - 1)[activeDimension]));
     IntrospectiveSortLoop<TSubsample>(sample, activeDimension, cut, endIndex, depthLimit, sizeThreshold);
     endIndex = cut;
     length = endIndex - beginIndex;
@@ -664,8 +649,7 @@ IntrospectiveSort(TSubsample * sample, unsigned int activeDimension, int beginIn
     sample, activeDimension, beginIndex, endIndex, 2 * FloorLog(endIndex - beginIndex), sizeThreshold);
   InsertSort<TSubsample>(sample, activeDimension, beginIndex, endIndex);
 }
-} // end of namespace Algorithm
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics::Algorithm
+// end of namespace Statistics
 
 #endif // #ifndef itkStatisticsAlgorithm_hxx

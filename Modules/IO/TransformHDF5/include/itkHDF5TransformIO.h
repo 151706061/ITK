@@ -101,10 +101,11 @@ public:
 
   using ConstTransformListType = typename TransformIOBaseTemplate<ParametersValueType>::ConstTransformListType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(HDF5TransformIOTemplate);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Determine the file type. Returns true if this ImageIO can read the
    * file specified. */
   bool
@@ -131,37 +132,40 @@ protected:
 
 private:
   /** Read a parameter array from the file location name */
+  /** @ITKStartGrouping */
   ParametersType
   ReadParameters(const std::string & DataSetName) const;
   FixedParametersType
   ReadFixedParameters(const std::string & DataSetName) const;
-
+  /** @ITKEndGrouping */
   /** Write a parameter array to the file location name */
+  /** @ITKStartGrouping */
   void
   WriteParameters(const std::string & name, const ParametersType & parameters);
   void
   WriteFixedParameters(const std::string & name, const FixedParametersType & fixedParameters);
-
+  /** @ITKEndGrouping */
   /** write a string variable */
+  /** @ITKStartGrouping */
   void
   WriteString(const std::string & path, const std::string & value);
   void
   WriteString(const std::string & path, const char * s);
   void
   WriteOneTransform(const int transformIndex, const TransformType * curTransform);
-
+  /** @ITKEndGrouping */
   std::unique_ptr<H5::H5File> m_H5File;
 
   /** Utility function for inferring data storage type
    * from class template.
    * @return H5 code PredType
    */
-  H5::PredType
+  [[nodiscard]] H5::PredType
   GetH5TypeFromString() const;
 };
 
-const std::string ITKIOTransformHDF5_EXPORT
-                  GetTransformName(int);
+std::string ITKIOTransformHDF5_EXPORT
+GetTransformName(int);
 
 /** This helps to meet backward compatibility */
 using HDF5TransformIO = HDF5TransformIOTemplate<double>;

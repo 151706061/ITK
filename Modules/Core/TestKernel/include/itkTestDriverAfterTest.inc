@@ -28,7 +28,7 @@ if (redirectOutputParameters.redirect)
   redirectStream.close();
   }
 
-std::vector< HashPairType >& hashTestList = GetHashTestList();
+std::vector< HashPairType > const& hashTestList = GetHashTestList();
 
 // before the image to image compare we first check md5 hashes
 for(auto & li : hashTestList)
@@ -113,13 +113,13 @@ for ( int ii = 0;
         result = EXIT_FAILURE; //Nonzero indicates failure
       }
     // output the matching baseline
-    std::cout << "<DartMeasurement name=\"BaselineImageName\" type=\"text/string\">"
+    std::cout << R"(<DartMeasurement name="BaselineImageName" type="text/string">)"
               << itksys::SystemTools::GetFilenameName(bestBaseline)
               << "</DartMeasurement>" << std::endl;
     }
   else
     {
-    std::cout << "<DartMeasurement name=\"BaselineImageName\" type=\"text/string\">"
+    std::cout << R"(<DartMeasurement name="BaselineImageName" type="text/string">)"
               << "INVALID_BASELINE_GIVEN"
               << "</DartMeasurement>" << std::endl;
     result = EXIT_FAILURE; //Nonzero indicates failure

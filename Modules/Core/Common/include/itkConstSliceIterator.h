@@ -40,8 +40,7 @@ namespace itk
  *
  * References:
  * Modeled after a slice iterator proposed by Bjarne Stroustrup
- * in C++ Programming Language, Third Edition. Bjarne Stroustrup.  Addison
- * Wesley, Reading, MA. 1997.
+ * in \cite stroustrup1997.
  *
  * \ingroup Iterators
  *
@@ -54,7 +53,6 @@ public:
   /** Constructor. */
   ConstSliceIterator(const TContainer * n, std::slice s)
     : m_ContainerPointer(n)
-    , m_Pos(0)
     , m_Slice(s)
   {}
 
@@ -99,11 +97,19 @@ public:
 
   /** Returns the element at position n of the slice. Sets the
    * iterator to point to position n. */
-  const TPixel & operator[](SizeValueType n) { return this->Loc(m_Pos = n); }
+  const TPixel &
+  operator[](SizeValueType n)
+  {
+    return this->Loc(m_Pos = n);
+  }
 
   /** Dereferences the iterator, returning the value that it points
    * to. */
-  const TPixel & operator*() { return Loc(m_Pos); }
+  const TPixel &
+  operator*()
+  {
+    return Loc(m_Pos);
+  }
 
   /** Returns the logical && of the boolean == of two slice iterator positions,
    * stride, and start locations. */
@@ -128,7 +134,7 @@ public:
 
 private:
   /** Returns the value located at position n of the slice. */
-  const TPixel &
+  [[nodiscard]] const TPixel &
   Loc(SizeValueType n) const
   {
     return (*m_ContainerPointer)[static_cast<SizeValueType>(m_Slice.start() + n * m_Slice.stride())];
@@ -138,7 +144,7 @@ private:
   const TContainer * m_ContainerPointer;
 
   /** Current position within the slice. */
-  SizeValueType m_Pos;
+  SizeValueType m_Pos{ 0 };
 
   /** Slice structure information. */
   std::slice m_Slice;

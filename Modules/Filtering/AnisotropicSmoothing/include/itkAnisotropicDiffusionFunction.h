@@ -119,10 +119,7 @@ namespace itk
  * application is wholly dependent on the results you want from a specific data
  * set and the number or iterations you perform.
  *
- * \par References
- * Pietro Perona and Jitendra Malik, ``Scale-space and edge detection using
- * anisotropic diffusion,'' IEEE Transactions on Pattern Analysis Machine
- * Intelligence, vol. 12, pp. 629-639, 1990.
+ * For additional details see \cite perona1990.
  *
  * \sa VectorAnisotropicDiffusionFunction
  * \sa ScalarAnisotropicDiffusionFunction
@@ -147,7 +144,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AnisotropicDiffusionFunction);
 
   /** Inherit some parameters from the superclass type */
@@ -192,14 +189,14 @@ public:
     m_ConductanceParameter = c;
   }
 
-  const double &
+  [[nodiscard]] const double &
   GetConductanceParameter() const
   {
     return m_ConductanceParameter;
   }
 
   /** Set/Get the average gradient magnitude squared. */
-  const double &
+  [[nodiscard]] const double &
   GetAverageGradientMagnitudeSquared() const
   {
     return m_AverageGradientMagnitudeSquared;
@@ -221,7 +218,7 @@ public:
 
   /** The anisotropic diffusion classes don't use this particular parameter
    * so it's safe to return a null value. */
-  void *
+  [[nodiscard]] void *
   GetGlobalDataPointer() const override
   {
     return nullptr;
@@ -236,11 +233,9 @@ public:
 
 protected:
   AnisotropicDiffusionFunction()
-  {
-    m_AverageGradientMagnitudeSquared = 0.0;
-    m_ConductanceParameter = 1.0; // default value
-    m_TimeStep = 0.125f;          // default value
-  }
+    : m_ConductanceParameter(1.0) // default value
+    , m_TimeStep(0.125f)          // default value
+  {}
 
   ~AnisotropicDiffusionFunction() override = default;
 

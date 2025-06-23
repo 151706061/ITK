@@ -70,7 +70,7 @@ itkExpImageFilterAndAdaptorTest(int, char *[])
   InputIteratorType it(inputImage, inputImage->GetBufferedRegion());
 
   // Initialize the content of Image A
-  const double value = itk::Math::pi / 6.0;
+  constexpr double value = itk::Math::pi / 6.0;
   std::cout << "Content of the Input " << std::endl;
   it.GoToBegin();
   while (!it.IsAtEnd())
@@ -93,7 +93,7 @@ itkExpImageFilterAndAdaptorTest(int, char *[])
   filter->SetNumberOfWorkUnits(1);
 
   // Get the Smart Pointer to the Filter Output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
 
   // Execute the filter
@@ -104,7 +104,7 @@ itkExpImageFilterAndAdaptorTest(int, char *[])
 
   //  Check the content of the result image
   std::cout << "Verification of the output " << std::endl;
-  const OutputImageType::PixelType epsilon = 1e-6;
+  constexpr OutputImageType::PixelType epsilon = 1e-6;
   ot.GoToBegin();
   it.GoToBegin();
   while (!ot.IsAtEnd())
@@ -147,7 +147,7 @@ itkExpImageFilterAndAdaptorTest(int, char *[])
   diffFilter->Update();
 
   // Get the Smart Pointer to the Diff filter Output
-  OutputImageType::Pointer diffImage = diffFilter->GetOutput();
+  const OutputImageType::Pointer diffImage = diffFilter->GetOutput();
 
   //  Check the content of the diff image
   std::cout << "Comparing the results with those of an Adaptor" << std::endl;

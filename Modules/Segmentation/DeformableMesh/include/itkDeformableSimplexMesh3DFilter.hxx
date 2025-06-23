@@ -41,26 +41,19 @@ namespace itk
 
 template <typename TInputMesh, typename TOutputMesh>
 DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::DeformableSimplexMesh3DFilter()
+  : m_Alpha(0.2)
+  , m_Beta(0.01)
+  , m_Gamma(0.05)
+  , m_Damping(0.65)
+  , m_Rigidity(1)
+  , m_Iterations(20)
+  , m_Data(nullptr)
 {
-  m_Step = 0;
-  m_Iterations = 20;
-  m_Alpha = 0.2;
-  m_Beta = 0.01;
-  m_Gamma = 0.05;
-  m_Damping = 0.65;
-  m_Rigidity = 1;
-
-  m_ImageDepth = 0;
-  m_ImageHeight = 0;
-  m_ImageWidth = 0;
-
   this->ProcessObject::SetNumberOfRequiredInputs(1);
 
-  OutputMeshPointer output = OutputMeshType::New();
+  const OutputMeshPointer output = OutputMeshType::New();
   this->ProcessObject::SetNumberOfRequiredOutputs(1);
   this->ProcessObject::SetNthOutput(0, output.GetPointer());
-
-  this->m_Data = nullptr;
 }
 
 template <typename TInputMesh, typename TOutputMesh>
@@ -114,9 +107,8 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::GenerateData()
 
   while (pointItr != points->End())
   {
-    SimplexMeshGeometry * data;
-    IdentifierType        idx = pointItr.Index();
-    data = this->m_Data->GetElement(idx);
+    const IdentifierType  idx = pointItr.Index();
+    SimplexMeshGeometry * data = this->m_Data->GetElement(idx);
     delete data->neighborSet;
     data->neighborSet = nullptr;
     ++pointItr;
@@ -165,10 +157,9 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::Initialize()
 
   while (pointItr != points->End())
   {
-    SimplexMeshGeometry * data;
-    IdentifierType        idx = pointItr.Index();
+    const IdentifierType idx = pointItr.Index();
 
-    data = this->m_Data->GetElement(idx);
+    SimplexMeshGeometry * data = this->m_Data->GetElement(idx);
     data->pos = pointItr.Value();
 
     //        InputMeshType::ArrayType neighbors =
@@ -215,31 +206,22 @@ template <typename TInputMesh, typename TOutputMesh>
 void
 DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeGeometry()
 {
-  PointType           Foot;
-  CovariantVectorType normal;
-  CovariantVectorType z;
-  z.Fill(0.0);
-  VectorType tmp;
-  //   IdentifierType idx = 0;
-
   const InputMeshType *        inputMesh = this->GetInput(0);
   const InputPointsContainer * points = inputMesh->GetPoints();
 
+  CovariantVectorType                z{};
   typename GeometryMapType::Iterator dataIt = this->m_Data->Begin();
-
-  SimplexMeshGeometry * data;
-
   while (dataIt != this->m_Data->End())
   {
     //      idx = dataIt.Index();
-    data = dataIt.Value();
+    SimplexMeshGeometry * data = dataIt.Value();
 
     data->neighbors[0] = points->GetElement(data->neighborIndices[0]);
     data->neighbors[1] = points->GetElement(data->neighborIndices[1]);
     data->neighbors[2] = points->GetElement(data->neighborIndices[2]);
 
     // compute normal
-    normal.Fill(0.0);
+    CovariantVectorType normal{};
 
     z.SetVnlVector(vnl_cross_3d((data->neighbors[1] - data->neighbors[0]).GetVnlVector(),
                                 (data->neighbors[2] - data->neighbors[0]).GetVnlVector()));
@@ -252,14 +234,14 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeGeometry()
     // compute the simplex angle
     data->ComputeGeometry();
 
-    tmp = data->neighbors[0] - data->pos;
+    VectorType tmp = data->neighbors[0] - data->pos;
 
-    double D = 1.0 / (2 * data->sphereRadius); /* */
+    const double D = 1.0 / (2 * data->sphereRadius); /* */
 
-    double tmpNormalProd = dot_product(tmp.GetVnlVector(), data->normal.GetVnlVector());
+    const double tmpNormalProd = dot_product(tmp.GetVnlVector(), data->normal.GetVnlVector());
 
-    double sinphi = 2 * data->circleRadius * D * itk::Math::sgn(tmpNormalProd);
-    double phi = std::asin(sinphi);
+    const double sinphi = 2 * data->circleRadius * D * itk::Math::sgn(tmpNormalProd);
+    const double phi = std::asin(sinphi);
 
     data->phi = phi;
     data->meanCurvature = itk::Math::abs(sinphi / data->circleRadius);
@@ -267,11 +249,10 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeGeometry()
 
     // compute the foot of p projection of p onto the triangle spanned by its
     // neighbors
-    double distance = -tmpNormalProd;
+    const double distance = -tmpNormalProd;
     tmp.SetVnlVector((data->pos).GetVnlVector() - distance * normal.GetVnlVector());
-    Foot.Fill(0.0);
-    Foot += tmp;
 
+    const PointType Foot(tmp.data());
     data->distance = ((data->circleCenter) - Foot).GetNorm();
 
     data->eps = ComputeBarycentricCoordinates(Foot, data);
@@ -293,18 +274,15 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeDisplacement()
   auto * nonConstPoints = const_cast<InputPointsContainer *>(inputMesh->GetPoints());
 
   typename GeometryMapType::Iterator dataIt = this->m_Data->Begin();
-  SimplexMeshGeometry *              data;
-  VectorType                         displacement;
-  displacement.Fill(0.0);
 
   while (dataIt != this->m_Data->End())
   {
-    data = dataIt.Value();
+    SimplexMeshGeometry * data = dataIt.Value();
 
     this->ComputeInternalForce(data);
 
     this->ComputeExternalForce(data, gradientImage);
-
+    VectorType displacement;
     displacement.SetVnlVector(m_Alpha * (data->internalForce).GetVnlVector() + (data->externalForce).GetVnlVector());
 
     data->pos += displacement;
@@ -365,29 +343,32 @@ void
 DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeExternalForce(SimplexMeshGeometry *     data,
                                                                              const GradientImageType * gradientImage)
 {
-  PointType         vec_for, tmp_vec_1, tmp_vec_2, tmp_vec_3;
-  GradientIndexType coord, coord2, tmp_co_1, tmp_co_2, tmp_co_3;
-
+  GradientIndexType coord;
   coord[0] = static_cast<GradientIndexValueType>(data->pos[0]);
   coord[1] = static_cast<GradientIndexValueType>(data->pos[1]);
   coord[2] = static_cast<GradientIndexValueType>(data->pos[2]);
 
+  GradientIndexType coord2;
   coord2[0] = static_cast<GradientIndexValueType>(std::ceil(data->pos[0]));
   coord2[1] = static_cast<GradientIndexValueType>(std::ceil(data->pos[1]));
   coord2[2] = static_cast<GradientIndexValueType>(std::ceil(data->pos[2]));
 
+  GradientIndexType tmp_co_1;
   tmp_co_1[0] = coord2[0];
   tmp_co_1[1] = coord[1];
   tmp_co_1[2] = coord[2];
 
+  GradientIndexType tmp_co_2;
   tmp_co_2[0] = coord[0];
   tmp_co_2[1] = coord2[1];
   tmp_co_2[2] = coord[2];
 
+  GradientIndexType tmp_co_3;
   tmp_co_3[0] = coord[0];
   tmp_co_3[1] = coord[1];
   tmp_co_3[2] = coord2[2];
 
+  PointType vec_for;
   if ((coord[0] >= 0) && (coord[1] >= 0) && (coord[2] >= 0) && (coord2[0] < m_ImageWidth) &&
       (coord2[1] < m_ImageHeight) && (coord2[2] < m_ImageDepth))
   {
@@ -400,12 +381,15 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeExternalForce(Sim
     vec_for[1] = gradient0[1];
     vec_for[2] = gradient0[2];
 
+    PointType tmp_vec_1;
     tmp_vec_1[0] = gradient1[0] - gradient0[0];
     tmp_vec_1[1] = gradient1[1] - gradient0[1];
     tmp_vec_1[2] = gradient1[2] - gradient0[2];
+    PointType tmp_vec_2;
     tmp_vec_2[0] = gradient2[0] - gradient0[0];
     tmp_vec_2[1] = gradient2[1] - gradient0[1];
     tmp_vec_2[2] = gradient2[2] - gradient0[2];
+    PointType tmp_vec_3;
     tmp_vec_3[0] = gradient3[0] - gradient0[0];
     tmp_vec_3[1] = gradient3[1] - gradient0[1];
     tmp_vec_3[2] = gradient3[2] - gradient0[2];
@@ -470,28 +454,20 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::UpdateReferenceMetrics()
   // There is a design flaw here.
   auto * nonConstInputMesh = const_cast<InputMeshType *>(inputMesh);
 
-  double H;
-  double H_N1;
-  double H_N2;
-  double H_N3;
-  double H_Mean;
 
   GeometryMapIterator dataIt = this->m_Data->Begin();
-
-  SimplexMeshGeometry * data;
-
   while (dataIt != this->m_Data->End())
   {
-    data = dataIt->Value();
-    H_N1 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[0])))->meanCurvature;
-    H_N2 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[1])))->meanCurvature;
-    H_N3 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[2])))->meanCurvature;
-    H = data->meanCurvature;
+    SimplexMeshGeometry * data = dataIt->Value();
 
-    H_Mean = (H_N1 + H_N2 + H_N3) / 3.0;
+    const double H_N1 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[0])))->meanCurvature;
+    const double H_N2 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[1])))->meanCurvature;
+    const double H_N3 = ((SimplexMeshGeometry *)(this->m_Data->GetElement(data->neighborIndices[2])))->meanCurvature;
+    const double H = data->meanCurvature;
+
+    const double H_Mean = (H_N1 + H_N2 + H_N3) / 3.0;
 
     PointType deltaH;
-
     deltaH[0] = (H_N1 - H_Mean) / H_Mean;
     deltaH[1] = (H_N2 - H_Mean) / H_Mean;
     deltaH[2] = (H_N3 - H_Mean) / H_Mean;
@@ -500,13 +476,13 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::UpdateReferenceMetrics()
     // deltaH[1] = (H_N2 - H_Mean)/H;
     // deltaH[2] = (H_N3 - H_Mean)/H;
 
-    PointType eps, eps_opt;
+    PointType eps_opt;
     // compute optimal reference metrics
     eps_opt[0] = (1.0 / 3.0) + m_Gamma * deltaH[0];
     eps_opt[1] = (1.0 / 3.0) + m_Gamma * deltaH[1];
     eps_opt[2] = (1.0 / 3.0) + m_Gamma * deltaH[2];
 
-    eps = data->referenceMetrics;
+    PointType eps = data->referenceMetrics;
 
     eps[0] = eps[0] + 0.5 * (eps_opt[0] - eps[0]);
     eps[1] = eps[1] + 0.5 * (eps_opt[1] - eps[1]);
@@ -539,7 +515,7 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::L_Func(const double r,
   {
     eps = -1.0;
   }
-  double tmpSqr = r2 + r2Minusd2 * tanPhi * tanPhi;
+  const double tmpSqr = r2 + r2Minusd2 * tanPhi * tanPhi;
   if (tmpSqr > 0)
   {
     const double denom = eps * (std::sqrt(tmpSqr) + r);
@@ -562,10 +538,13 @@ DeformableSimplexMesh3DFilter<TInputMesh, TOutputMesh>::ComputeBarycentricCoordi
   const PointType b = data->neighbors[1];
   const PointType c = data->neighbors[2];
 
-  VectorType n, na, nb, nc;
+  VectorType n;
   n.SetVnlVector(vnl_cross_3d((b - a).GetVnlVector(), (c - a).GetVnlVector()));
+  VectorType na;
   na.SetVnlVector(vnl_cross_3d((c - b).GetVnlVector(), (p - b).GetVnlVector()));
+  VectorType nb;
   nb.SetVnlVector(vnl_cross_3d((a - c).GetVnlVector(), (p - c).GetVnlVector()));
+  VectorType nc;
   nc.SetVnlVector(vnl_cross_3d((b - a).GetVnlVector(), (p - a).GetVnlVector()));
 
   PointType eps;

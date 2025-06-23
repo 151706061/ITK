@@ -35,9 +35,7 @@ template <typename TInputImage, typename TOutputImage>
 ImageSeriesWriter<TInputImage, TOutputImage>::ImageSeriesWriter()
   : m_ImageIO(nullptr)
   , m_SeriesFormat("%d")
-{
-  m_UseCompression = false;
-}
+{}
 
 //---------------------------------------------------------
 template <typename TInputImage, typename TOutputImage>
@@ -126,7 +124,7 @@ ImageSeriesWriter<TInputImage, TOutputImage>::GenerateNumericFileNames()
   m_FileNames.clear();
 
   // We need two regions. One for the input, one for the output.
-  ImageRegion<TInputImage::ImageDimension> inRegion = inputImage->GetRequestedRegion();
+  const ImageRegion<TInputImage::ImageDimension> inRegion = inputImage->GetRequestedRegion();
 
   SizeValueType fileNumber = this->m_StartIndex;
   char          fileName[IOCommon::ITK_MAXPATHLEN + 1];
@@ -140,8 +138,11 @@ ImageSeriesWriter<TInputImage, TOutputImage>::GenerateNumericFileNames()
 
   for (unsigned int slice = 0; slice < numberOfFiles; ++slice)
   {
-    snprintf(fileName, IOCommon::ITK_MAXPATHLEN + 1, m_SeriesFormat.c_str(), fileNumber);
-    m_FileNames.push_back(fileName);
+    ITK_GCC_PRAGMA_PUSH
+    ITK_GCC_SUPPRESS_Wformat_nonliteral
+    snprintf(fileName, sizeof(fileName), m_SeriesFormat.c_str(), fileNumber);
+    ITK_GCC_PRAGMA_POP
+    m_FileNames.emplace_back(fileName);
     fileNumber += this->m_IncrementIndex;
   }
 }
@@ -222,12 +223,9 @@ ImageSeriesWriter<TInputImage, TOutputImage>::WriteFiles()
   outputImage->SetSpacing(spacing);
   outputImage->SetDirection(direction);
 
-  Index<TInputImage::ImageDimension> inIndex;
-  Size<TInputImage::ImageDimension>  inSize;
 
-  SizeValueType pixelsPerFile = outputImage->GetRequestedRegion().GetNumberOfPixels();
-
-  inSize.Fill(1);
+  const SizeValueType pixelsPerFile = outputImage->GetRequestedRegion().GetNumberOfPixels();
+  auto                inSize = MakeFilled<Size<TInputImage::ImageDimension>>(1);
   for (unsigned int ns = 0; ns < TOutputImage::ImageDimension; ++ns)
   {
     inSize[ns] = outRegion.GetSize()[ns];
@@ -256,7 +254,7 @@ ImageSeriesWriter<TInputImage, TOutputImage>::WriteFiles()
   for (unsigned int slice = 0; slice < m_FileNames.size(); ++slice)
   {
     // Select a "slice" of the image.
-    inIndex = inputImage->ComputeIndex(offset);
+    const Index<TInputImage::ImageDimension> inIndex = inputImage->ComputeIndex(offset);
     inRegion.SetIndex(inIndex);
     inRegion.SetSize(inSize);
 
@@ -354,19 +352,16 @@ ImageSeriesWriter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inden
 
   itkPrintSelfObjectMacro(ImageIO);
 
+  itkPrintSelfBooleanMacro(UserSpecifiedImageIO);
+  for (unsigned int i = 0; i < m_FileNames.size(); ++i)
+  {
+    os << indent << "FileNames[" << i << "]: " << m_FileNames[i] << std::endl;
+  }
+  os << indent << "SeriesFormat: " << m_SeriesFormat << std::endl;
   os << indent << "StartIndex: " << m_StartIndex << std::endl;
   os << indent << "IncrementIndex: " << m_IncrementIndex << std::endl;
-  os << indent << "SeriesFormat: " << m_SeriesFormat << std::endl;
+  itkPrintSelfBooleanMacro(UseCompression);
   os << indent << "MetaDataDictionaryArray: " << m_MetaDataDictionaryArray << std::endl;
-
-  if (m_UseCompression)
-  {
-    os << indent << "Compression: On\n";
-  }
-  else
-  {
-    os << indent << "Compression: Off\n";
-  }
 }
 } // end namespace itk
 

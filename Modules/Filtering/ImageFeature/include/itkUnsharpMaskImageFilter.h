@@ -100,11 +100,9 @@ public:
    */
   itkNewMacro(Self);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ImageDimension>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelType>));
   itkConceptMacro(InternalTypeIsFloatingPoint, (Concept::IsFloatingPoint<TInternalPrecision>));
-#endif
 
   using GaussianType =
     SmoothingRecursiveGaussianImageFilter<TInputImage, Image<TInternalPrecision, TOutputImage::ImageDimension>>;
@@ -112,34 +110,39 @@ public:
   using SigmaArrayType = typename GaussianType::SigmaArrayType;
 
   /** Set/Get Sigma values measured in the units of image spacing. Default: 1.0. */
+  /** @ITKStartGrouping */
   itkSetMacro(Sigmas, SigmaArrayType);
   itkGetConstMacro(Sigmas, SigmaArrayType);
+  /** @ITKEndGrouping */
 
   /** Convenience method for setting all dimensional parameters
    * to the same values. */
   void
   SetSigma(const typename SigmaArrayType::ValueType sigma)
   {
-    SigmaArrayType sigmas;
-    sigmas.Fill(sigma);
+    auto sigmas = MakeFilled<SigmaArrayType>(sigma);
     this->SetSigmas(sigmas); // checks whether it is actually modified
   }
 
   /** Set/Get amount of enhancement. Usual range: 0.1 to 2.0. Default: 0.5. */
+  /** @ITKStartGrouping */
   itkSetMacro(Amount, TInternalPrecision);
   itkGetConstMacro(Amount, TInternalPrecision);
-
+  /** @ITKEndGrouping */
 
   /** Set/Get threshold for enhancement. Default: 0. */
+  /** @ITKStartGrouping */
   itkSetMacro(Threshold, TInternalPrecision);
   itkGetConstMacro(Threshold, TInternalPrecision);
+  /** @ITKEndGrouping */
 
   /** Set/Get whether to clamp values to supported
    * range of output type. Default: On. */
+  /** @ITKStartGrouping */
   itkSetMacro(Clamp, bool);
   itkGetConstMacro(Clamp, bool);
   itkBooleanMacro(Clamp);
-
+  /** @ITKEndGrouping */
 protected:
   UnsharpMaskImageFilter();
   ~UnsharpMaskImageFilter() override = default;
@@ -155,7 +158,7 @@ protected:
   GenerateInputRequestedRegion() override;
 
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
   void
   GenerateData() override;
 
@@ -224,7 +227,7 @@ private:
         {
           return itk::NumericTraits<OutPixelType>::NonpositiveMin();
         }
-        else if (result > itk::NumericTraits<OutPixelType>::max())
+        if (result > itk::NumericTraits<OutPixelType>::max())
         {
           return itk::NumericTraits<OutPixelType>::max();
         }
@@ -233,7 +236,7 @@ private:
       return static_cast<OutPixelType>(result);
     }
   }; // end UnsharpMaskingFunctor
-};   // end UnsharpMaskImageFilter
+}; // end UnsharpMaskImageFilter
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

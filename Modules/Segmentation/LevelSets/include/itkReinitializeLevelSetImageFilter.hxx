@@ -26,18 +26,13 @@ namespace itk
 
 template <typename TLevelSet>
 ReinitializeLevelSetImageFilter<TLevelSet>::ReinitializeLevelSetImageFilter()
-{
-  m_LevelSetValue = 0.0;
-
-  m_Locator = LocatorType::New();
-  m_Marcher = FastMarchingImageFilterType::New();
-
-  m_NarrowBanding = false;
-  m_InputNarrowBandwidth = 12.0;
-  m_OutputNarrowBandwidth = 12.0;
-  m_InputNarrowBand = nullptr;
-  m_OutputNarrowBand = nullptr;
-}
+  : m_Locator(LocatorType::New())
+  , m_Marcher(FastMarchingImageFilterType::New())
+  , m_InputNarrowBandwidth(12.0)
+  , m_OutputNarrowBandwidth(12.0)
+  , m_InputNarrowBand(nullptr)
+  , m_OutputNarrowBand(nullptr)
+{}
 
 template <typename TLevelSet>
 void
@@ -61,7 +56,7 @@ ReinitializeLevelSetImageFilter<TLevelSet>::PrintSelf(std::ostream & os, Indent 
   itkPrintSelfObjectMacro(Locator);
   itkPrintSelfObjectMacro(Marcher);
 
-  os << indent << "Narrowbanding: " << (m_NarrowBanding ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(NarrowBanding);
   os << indent << "InputNarrowBandwidth: " << m_InputNarrowBandwidth << std::endl;
   os << indent << "OutputNarrowBandwidth: " << m_OutputNarrowBandwidth << std::endl;
 
@@ -83,9 +78,7 @@ ReinitializeLevelSetImageFilter<TLevelSet>::EnlargeOutputRequestedRegion(DataObj
 {
   // this filter requires the all of the output image to be in
   // the buffer
-  TLevelSet * imgData;
-
-  imgData = dynamic_cast<TLevelSet *>(output);
+  auto * imgData = dynamic_cast<TLevelSet *>(output);
   if (imgData)
   {
     imgData->SetRequestedRegionToLargestPossibleRegion();
@@ -93,9 +86,8 @@ ReinitializeLevelSetImageFilter<TLevelSet>::EnlargeOutputRequestedRegion(DataObj
   else
   {
     // pointer could not be cast to TLevelSet *
-    itkWarningMacro("itk::ReinitializeLevelSetImageFilter"
-                    << "::EnlargeOutputRequestedRegion cannot cast " << typeid(output).name() << " to "
-                    << typeid(TLevelSet *).name());
+    itkWarningMacro("itk::ReinitializeLevelSetImageFilter::EnlargeOutputRequestedRegion cannot cast "
+                    << typeid(output).name() << " to " << typeid(TLevelSet *).name());
   }
 }
 
@@ -103,7 +95,7 @@ template <typename TLevelSet>
 void
 ReinitializeLevelSetImageFilter<TLevelSet>::AllocateOutput()
 {
-  LevelSetPointer outputPtr = this->GetOutput();
+  const LevelSetPointer outputPtr = this->GetOutput();
 
   // allocate the output buffer memory
   outputPtr->SetBufferedRegion(outputPtr->GetRequestedRegion());
@@ -136,9 +128,9 @@ template <typename TLevelSet>
 void
 ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataFull()
 {
-  LevelSetConstPointer inputPtr = this->GetInput();
-  LevelSetPointer      outputPtr = this->GetOutput();
-  LevelSetPointer      tempLevelSet = m_Marcher->GetOutput();
+  const LevelSetConstPointer inputPtr = this->GetInput();
+  const LevelSetPointer      outputPtr = this->GetOutput();
+  const LevelSetPointer      tempLevelSet = m_Marcher->GetOutput();
 
   // define iterators
   using IteratorType = ImageRegionIterator<LevelSetImageType>;
@@ -146,8 +138,6 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataFull()
 
   ConstIteratorType inputIt(inputPtr, inputPtr->GetBufferedRegion());
   IteratorType      outputIt(outputPtr, outputPtr->GetBufferedRegion());
-
-  IteratorType tempIt;
 
   this->UpdateProgress(0.0);
 
@@ -162,13 +152,10 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataFull()
   m_Marcher->SetTrialPoints(m_Locator->GetOutsidePoints());
   m_Marcher->Update();
 
-  tempIt = IteratorType(tempLevelSet, tempLevelSet->GetBufferedRegion());
-
-  double value;
-
+  IteratorType tempIt = IteratorType(tempLevelSet, tempLevelSet->GetBufferedRegion());
   while (!inputIt.IsAtEnd())
   {
-    value = static_cast<double>(inputIt.Get());
+    auto value = static_cast<double>(inputIt.Get());
     if (value - m_LevelSetValue > 0)
     {
       outputIt.Set(tempIt.Get());
@@ -191,7 +178,7 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataFull()
 
   while (!inputIt.IsAtEnd())
   {
-    value = static_cast<double>(inputIt.Get());
+    auto value = static_cast<double>(inputIt.Get());
     if (value - m_LevelSetValue <= 0)
     {
       value = static_cast<double>(tempIt.Get());
@@ -208,9 +195,9 @@ template <typename TLevelSet>
 void
 ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataNarrowBand()
 {
-  LevelSetConstPointer inputPtr = this->GetInput();
-  LevelSetPointer      outputPtr = this->GetOutput();
-  LevelSetPointer      tempLevelSet = m_Marcher->GetOutput();
+  const LevelSetConstPointer inputPtr = this->GetInput();
+  const LevelSetPointer      outputPtr = this->GetOutput();
+  const LevelSetPointer      tempLevelSet = m_Marcher->GetOutput();
 
   // define iterators
   using IteratorType = ImageRegionIterator<LevelSetImageType>;
@@ -220,19 +207,14 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataNarrowBand()
 
   IteratorType outputIt(outputPtr, outputPtr->GetBufferedRegion());
 
-  PixelType posInfinity;
-  PixelType negInfinity;
-
-  posInfinity = NumericTraits<PixelType>::max();
-  negInfinity = NumericTraits<PixelType>::NonpositiveMin();
+  PixelType posInfinity = NumericTraits<PixelType>::max();
+  PixelType negInfinity = NumericTraits<PixelType>::NonpositiveMin();
 
   // set all internal pixels to minus infinity and
   // all external pixels to positive infinity
-  double value;
-
   while (!inputIt.IsAtEnd())
   {
-    value = static_cast<double>(inputIt.Get());
+    auto value = static_cast<double>(inputIt.Get());
     if (value - m_LevelSetValue <= 0)
     {
       outputIt.Set(negInfinity);
@@ -271,7 +253,7 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataNarrowBand()
   this->UpdateProgress(0.33);
 
   // march outward
-  double stoppingValue = (m_OutputNarrowBandwidth / 2.0) + 2.0;
+  const double stoppingValue = (m_OutputNarrowBandwidth / 2.0) + 2.0;
   m_Marcher->SetStoppingValue(stoppingValue);
   m_Marcher->CollectPointsOn();
   m_Marcher->SetTrialPoints(m_Locator->GetOutsidePoints());
@@ -279,21 +261,13 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataNarrowBand()
 
   NodeContainerPointer procPoints = m_Marcher->GetProcessedPoints();
 
-  typename NodeContainer::ConstIterator pointsIt;
-  typename NodeContainer::ConstIterator pointsEnd;
-
-  pointsIt = procPoints->Begin();
-  pointsEnd = procPoints->End();
-
-  NodeType  node;
-  PixelType inPixel;
-
-  for (; pointsIt != pointsEnd; ++pointsIt)
+  typename NodeContainer::ConstIterator pointsEnd = procPoints->End();
+  for (typename NodeContainer::ConstIterator pointsIt = procPoints->Begin(); pointsIt != pointsEnd; ++pointsIt)
   {
-    node = pointsIt.Value();
-    inPixel = inputPtr->GetPixel(node.GetIndex());
+    NodeType  node = pointsIt.Value();
+    PixelType inPixel = inputPtr->GetPixel(node.GetIndex());
 
-    value = static_cast<double>(inPixel);
+    auto value = static_cast<double>(inPixel);
     if (value - m_LevelSetValue > 0)
     {
       inPixel = tempLevelSet->GetPixel(node.GetIndex());
@@ -309,15 +283,13 @@ ReinitializeLevelSetImageFilter<TLevelSet>::GenerateDataNarrowBand()
   m_Marcher->Update();
 
   procPoints = m_Marcher->GetProcessedPoints();
-  pointsIt = procPoints->Begin();
   pointsEnd = procPoints->End();
-
-  for (; pointsIt != pointsEnd; ++pointsIt)
+  for (typename NodeContainer::ConstIterator pointsIt = procPoints->Begin(); pointsIt != pointsEnd; ++pointsIt)
   {
-    node = pointsIt.Value();
-    inPixel = inputPtr->GetPixel(node.GetIndex());
+    NodeType  node = pointsIt.Value();
+    PixelType inPixel = inputPtr->GetPixel(node.GetIndex());
 
-    value = static_cast<double>(inPixel);
+    auto value = static_cast<double>(inPixel);
     if (value - m_LevelSetValue <= 0)
     {
       inPixel = tempLevelSet->GetPixel(node.GetIndex());

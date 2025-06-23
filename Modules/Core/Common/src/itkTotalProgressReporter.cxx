@@ -26,7 +26,6 @@ TotalProgressReporter::TotalProgressReporter(ProcessObject * filter,
                                              SizeValueType   numberOfUpdates,
                                              float           progressWeight)
   : m_Filter(filter)
-  , m_CurrentPixel(0)
   , m_ProgressWeight(progressWeight)
 {
   // Make sure we have at least one pixel.
@@ -51,7 +50,7 @@ TotalProgressReporter::TotalProgressReporter(ProcessObject * filter,
 //----------------------------------------------------------------------------
 TotalProgressReporter::~TotalProgressReporter()
 {
-  SizeValueType pixelRemnants = m_PixelsPerUpdate - m_PixelsBeforeUpdate;
+  const SizeValueType pixelRemnants = m_PixelsPerUpdate - m_PixelsBeforeUpdate;
 
   if (pixelRemnants != 0 && m_Filter)
   {

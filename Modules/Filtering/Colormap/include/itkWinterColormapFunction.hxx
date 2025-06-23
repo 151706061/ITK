@@ -18,24 +18,21 @@
 #ifndef itkWinterColormapFunction_hxx
 #define itkWinterColormapFunction_hxx
 
-
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 template <typename TScalar, typename TRGBPixel>
 auto
 WinterColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const -> RGBPixelType
 {
   // Map the input scalar between [0, 1].
-  RealType value = this->RescaleInputValue(v);
+  const RealType value = this->RescaleInputValue(v);
 
   // Apply the color map.
-  RealType red = 0.0;
+  constexpr RealType red = 0.0;
 
-  RealType green = value;
+  const RealType green = value;
 
-  RealType blue = 1.0 - 0.5 * value;
+  const RealType blue = 1.0 - 0.5 * value;
 
   // Set the rgb components after rescaling the values.
   RGBPixelType pixel;
@@ -47,7 +44,6 @@ WinterColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const 
 
   return pixel;
 }
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #endif

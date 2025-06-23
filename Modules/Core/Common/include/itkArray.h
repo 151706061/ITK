@@ -78,22 +78,25 @@ public:
    * the array does not manage the memory of the buffer. It merely points to
    * that location and it is the user's responsibility to delete it.
    * If "LetArrayManageMemory" is true, then this class will free the
-   * memory when this object is destroyed. */
-  Array(ValueType * datain, SizeValueType sz, bool LetArrayManageMemory = false);
+   * memory when this object is destroyed.
+   * \note This constructor supports class template argument deduction (CTAD). */
+  Array(TValue * datain, SizeValueType sz, bool LetArrayManageMemory = false);
 
 #if defined(ITK_LEGACY_REMOVE)
   /** Constructor that initializes array with contents from a user supplied
    * const buffer. The pointer to the buffer and the length is specified. By default,
    * the array does a deep copy of the const pointer data, so the array class also
-   * manages memory. */
-  Array(const ValueType * datain, SizeValueType sz);
+   * manages memory.
+   * \note This constructor supports class template argument deduction (CTAD). */
+  Array(const TValue * datain, SizeValueType sz);
 
 #else // defined ( ITK_LEGACY_REMOVE )
   /** Constructor that initializes array with contents from a user supplied
    * buffer. The pointer to the buffer and the length is specified. The array
    * does a deep copy of the const pointer data, so the array class also
-   * manages memory. The 3rd argument is only for backward compatibility. */
-  Array(const ValueType * datain, SizeValueType sz, bool LetArrayManageMemory = false);
+   * manages memory. The 3rd argument is only for backward compatibility.
+   * \note This constructor supports class template argument deduction (CTAD). */
+  Array(const TValue * datain, SizeValueType sz, bool LetArrayManageMemory = false);
 #endif
 
   /** Constructor to initialize an array from another of any data type */
@@ -109,7 +112,7 @@ public:
 
   /** Set all the elements of the array to the specified value */
   void
-  Fill(TValue const & v)
+  Fill(const TValue & v)
   {
     this->fill(v);
   }
@@ -122,19 +125,20 @@ public:
   operator=(const VnlVectorType & rhs);
 
   /** Return the number of elements in the Array  */
-  SizeValueType
+  /** @ITKStartGrouping */
+  [[nodiscard]] SizeValueType
   Size() const
   {
     return static_cast<SizeValueType>(this->size());
   }
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfElements() const
   {
     return static_cast<SizeValueType>(this->size());
   }
-
+  /** @ITKEndGrouping */
   /** Get one element */
-  const TValue &
+  [[nodiscard]] const TValue &
   GetElement(SizeValueType i) const
   {
     return this->operator[](i);
@@ -151,7 +155,7 @@ public:
   void
   SetSize(SizeValueType sz);
 
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetSize() const
   {
     return static_cast<SizeValueType>(this->size());
@@ -196,7 +200,7 @@ public:
 #endif
 
   void
-  Swap(Array & other)
+  Swap(Array & other) noexcept
   {
     using std::swap;
     this->VnlVectorType::swap(other);
@@ -207,6 +211,10 @@ private:
   /** Indicates whether this array manages the memory of its data. */
   bool m_LetArrayManageMemory{ true };
 };
+
+// Deduction guide to avoid compiler warnings (-wctad-maybe-unsupported) when using class template argument deduction.
+template <typename TValue>
+Array(TValue *, typename vnl_vector<TValue>::size_type, bool) -> Array<TValue>;
 
 template <typename TValue>
 std::ostream &
@@ -229,14 +237,14 @@ operator<<(std::ostream & os, const Array<TValue> & arr)
 
 // declaration of specialization
 template <>
-ITKCommon_EXPORT std::ostream & operator<<<double>(std::ostream & os, const Array<double> & arr);
+ITKCommon_EXPORT std::ostream & operator<< <double>(std::ostream & os, const Array<double> & arr);
 template <>
-ITKCommon_EXPORT std::ostream & operator<<<float>(std::ostream & os, const Array<float> & arr);
+ITKCommon_EXPORT std::ostream & operator<< <float>(std::ostream & os, const Array<float> & arr);
 
 
 template <typename T>
 inline void
-swap(Array<T> & a, Array<T> & b)
+swap(Array<T> & a, Array<T> & b) noexcept
 {
   a.Swap(b);
 }

@@ -59,7 +59,7 @@ namespace itk
  * \author Tom Vercauteren, INRIA & Mauna Kea Technologies
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/154
+ * https://doi.org/10.54294/ux2obj
  *
  * \warning This filter assumes that the fixed image type, moving image type
  * and deformation field type all have the same number of dimensions.
@@ -85,7 +85,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastSymmetricForcesDemonsRegistrationFilter);
 
   /** FixedImage image type. */
@@ -104,12 +104,12 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images.
+   * computed over the overlapping region between the two images.
    * This value is calculated for the current iteration */
-  virtual double
+  [[nodiscard]] virtual double
   GetMetric() const;
 
-  const double &
+  [[nodiscard]] const double &
   GetRMSChange() const override;
 
   /** DemonsRegistrationFilterFunction type.
@@ -134,14 +134,14 @@ public:
   virtual void
   SetIntensityDifferenceThreshold(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetIntensityDifferenceThreshold() const;
 
   /** Set/Get the maximum update step length. */
   virtual void
   SetMaximumUpdateStepLength(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetMaximumUpdateStepLength() const;
 
 protected:

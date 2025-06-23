@@ -125,7 +125,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageBase);
 
   /** Type of image dimension */
@@ -174,8 +174,8 @@ public:
   void
   Initialize() override;
 
-  /** Image dimension. The dimension of an image is fixed at construction. */
-  static unsigned int
+  /** Image dimension. The dimension of an image is fixed at compile-time. */
+  static constexpr unsigned int
   GetImageDimension()
   {
     return VImageDimension;
@@ -185,12 +185,13 @@ public:
    * coordinates of the image origin (pixel [0,0]).  It is stored internally
    * as SpacePrecisionType but may be set from float or double.
    * \sa GetOrigin() */
+  /** @ITKStartGrouping */
   itkSetMacro(Origin, PointType);
   virtual void
   SetOrigin(const double origin[VImageDimension]);
   virtual void
   SetOrigin(const float origin[VImageDimension]);
-
+  /** @ITKEndGrouping */
   /** Set the direction cosines of the image. The direction cosines
    * are vectors that point from one pixel to the next.
    *
@@ -249,7 +250,8 @@ public:
    *
    */
   virtual void
-  Allocate(bool initialize = false);
+  Allocate(bool itkNotUsed(initialize) = false)
+  {}
 
   /** Allocates the pixel buffer of the image, zero-initializing its pixels. `AllocateInitialized()` is equivalent to
    * `Allocate(true)`. It is just intended to make the code more readable. */
@@ -328,6 +330,7 @@ public:
   /** Convenience methods to set the LargestPossibleRegion,
    *  BufferedRegion and RequestedRegion. Allocate must still be called.
    */
+  /** @ITKStartGrouping */
   virtual void
   SetRegions(const RegionType & region)
   {
@@ -344,6 +347,7 @@ public:
 
     this->Self::SetRegions(region);
   }
+  /** @ITKEndGrouping */
 
   /** Get the offset table.  The offset table gives increments for
    * moving from one pixel to next in the current row, column, slice,
@@ -433,13 +437,14 @@ public:
    * float. These methods also pre-compute the Index to Physical point
    * transforms of the image.
    * \sa GetSpacing() */
+  /** @ITKStartGrouping */
   virtual void
   SetSpacing(const SpacingType & spacing);
   virtual void
   SetSpacing(const double spacing[VImageDimension]);
   virtual void
   SetSpacing(const float spacing[VImageDimension]);
-
+  /** @ITKEndGrouping */
   /** Returns the index (discrete) of a voxel from a physical point.
    * Floating point index results are rounded to integers
    * \note This specific overload does not figure out whether or not
@@ -455,15 +460,15 @@ public:
       if (image->TransformPhysicalPointToIndex(point, index)) // Et cetera...
      \endcode
    * \sa Transform */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   [[nodiscard]] IndexType
-  TransformPhysicalPointToIndex(const Point<TCoordRep, VImageDimension> & point) const
+  TransformPhysicalPointToIndex(const Point<TCoordinate, VImageDimension> & point) const
   {
     IndexType index;
 
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
-      TCoordRep sum{};
+      TCoordinate sum{};
       for (unsigned int j = 0; j < VImageDimension; ++j)
       {
         sum += this->m_PhysicalPointToIndex[i][j] * (point[j] - this->m_Origin[j]);
@@ -481,9 +486,9 @@ public:
    * overload instead, which has only one parameter (the point), and returns the index.
    *
    * \sa Transform */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   ITK_NODISCARD("Call the overload which has the point as the only parameter and returns the index")
-  bool TransformPhysicalPointToIndex(const Point<TCoordRep, VImageDimension> & point, IndexType & index) const
+  bool TransformPhysicalPointToIndex(const Point<TCoordinate, VImageDimension> & point, IndexType & index) const
   {
     index = TransformPhysicalPointToIndex(point);
 
@@ -507,9 +512,9 @@ public:
      if (image->TransformPhysicalPointToContinuousIndex(point, index)) // Et cetera...
      \endcode
    * \sa Transform */
-  template <typename TIndexRep, typename TCoordRep>
+  template <typename TIndexRep, typename TCoordinate>
   [[nodiscard]] ContinuousIndex<TIndexRep, VImageDimension>
-  TransformPhysicalPointToContinuousIndex(const Point<TCoordRep, VImageDimension> & point) const
+  TransformPhysicalPointToContinuousIndex(const Point<TCoordinate, VImageDimension> & point) const
   {
     ContinuousIndex<TIndexRep, VImageDimension> index;
     Vector<SpacePrecisionType, VImageDimension> cvector;
@@ -534,9 +539,9 @@ public:
    * overload instead, which has only one parameter (the point), and returns the continuous index.
    *
    * \sa Transform */
-  template <typename TCoordRep, typename TIndexRep>
+  template <typename TCoordinate, typename TIndexRep>
   ITK_NODISCARD("Call the overload which has the point as the only parameter and returns the index")
-  bool TransformPhysicalPointToContinuousIndex(const Point<TCoordRep, VImageDimension> &     point,
+  bool TransformPhysicalPointToContinuousIndex(const Point<TCoordinate, VImageDimension> &   point,
                                                ContinuousIndex<TIndexRep, VImageDimension> & index) const
   {
     index = TransformPhysicalPointToContinuousIndex<TIndexRep>(point);
@@ -550,14 +555,14 @@ public:
    * the origin and spacing information comes from)
    * from a continuous index (in the index space)
    * \sa Transform */
-  template <typename TCoordRep, typename TIndexRep>
+  template <typename TCoordinate, typename TIndexRep>
   void
   TransformContinuousIndexToPhysicalPoint(const ContinuousIndex<TIndexRep, VImageDimension> & index,
-                                          Point<TCoordRep, VImageDimension> &                 point) const
+                                          Point<TCoordinate, VImageDimension> &               point) const
   {
     for (unsigned int r = 0; r < VImageDimension; ++r)
     {
-      TCoordRep sum{};
+      TCoordinate sum{};
       for (unsigned int c = 0; c < VImageDimension; ++c)
       {
         sum += this->m_IndexToPhysicalPoint(r, c) * index[c];
@@ -570,11 +575,11 @@ public:
    * the origin and spacing information comes from)
    * from a continuous index (in the index space)
    * \sa Transform */
-  template <typename TCoordRep, typename TIndexRep>
-  [[nodiscard]] Point<TCoordRep, VImageDimension>
+  template <typename TCoordinate, typename TIndexRep>
+  [[nodiscard]] Point<TCoordinate, VImageDimension>
   TransformContinuousIndexToPhysicalPoint(const ContinuousIndex<TIndexRep, VImageDimension> & index) const
   {
-    Point<TCoordRep, VImageDimension> point;
+    Point<TCoordinate, VImageDimension> point;
     TransformContinuousIndexToPhysicalPoint(index, point);
     return point;
   }
@@ -584,9 +589,9 @@ public:
    * from a discrete index (in the index space)
    *
    * \sa Transform */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   void
-  TransformIndexToPhysicalPoint(const IndexType & index, Point<TCoordRep, VImageDimension> & point) const
+  TransformIndexToPhysicalPoint(const IndexType & index, Point<TCoordinate, VImageDimension> & point) const
   {
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
@@ -603,11 +608,11 @@ public:
    * from a discrete index (in the index space)
    *
    * \sa Transform */
-  template <typename TCoordRep>
-  [[nodiscard]] Point<TCoordRep, VImageDimension>
+  template <typename TCoordinate>
+  [[nodiscard]] Point<TCoordinate, VImageDimension>
   TransformIndexToPhysicalPoint(const IndexType & index) const
   {
-    Point<TCoordRep, VImageDimension> point;
+    Point<TCoordinate, VImageDimension> point;
     TransformIndexToPhysicalPoint(index, point);
     return point;
   }
@@ -626,10 +631,10 @@ public:
    *
    * \sa Image
    */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   void
-  TransformLocalVectorToPhysicalVector(const FixedArray<TCoordRep, VImageDimension> & inputGradient,
-                                       FixedArray<TCoordRep, VImageDimension> &       outputGradient) const
+  TransformLocalVectorToPhysicalVector(const FixedArray<TCoordinate, VImageDimension> & inputGradient,
+                                       FixedArray<TCoordinate, VImageDimension> &       outputGradient) const
   {
     const DirectionType & direction = this->GetDirection();
 
@@ -637,13 +642,13 @@ public:
 
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
-      using CoordSumType = typename NumericTraits<TCoordRep>::AccumulateType;
+      using CoordSumType = typename NumericTraits<TCoordinate>::AccumulateType;
       CoordSumType sum{};
       for (unsigned int j = 0; j < VImageDimension; ++j)
       {
         sum += direction[i][j] * inputGradient[j];
       }
-      outputGradient[i] = static_cast<TCoordRep>(sum);
+      outputGradient[i] = static_cast<TCoordinate>(sum);
     }
   }
 
@@ -675,10 +680,10 @@ public:
    * same data.
    *
    */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   void
-  TransformPhysicalVectorToLocalVector(const FixedArray<TCoordRep, VImageDimension> & inputGradient,
-                                       FixedArray<TCoordRep, VImageDimension> &       outputGradient) const
+  TransformPhysicalVectorToLocalVector(const FixedArray<TCoordinate, VImageDimension> & inputGradient,
+                                       FixedArray<TCoordinate, VImageDimension> &       outputGradient) const
   {
     const DirectionType & inverseDirection = this->GetInverseDirection();
 
@@ -686,13 +691,13 @@ public:
 
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
-      using CoordSumType = typename NumericTraits<TCoordRep>::AccumulateType;
+      using CoordSumType = typename NumericTraits<TCoordinate>::AccumulateType;
       CoordSumType sum{};
       for (unsigned int j = 0; j < VImageDimension; ++j)
       {
         sum += inverseDirection[i][j] * inputGradient[j];
       }
-      outputGradient[i] = static_cast<TCoordRep>(sum);
+      outputGradient[i] = static_cast<TCoordinate>(sum);
     }
   }
 
@@ -821,11 +826,12 @@ public:
    * # returned from NumericTraits for the pixel type, and VectorImage
    * returns the vector length set by the user.
    */
+  /** @ITKStartGrouping */
   virtual unsigned int
   GetNumberOfComponentsPerPixel() const;
   virtual void
   SetNumberOfComponentsPerPixel(unsigned int);
-
+  /** @ITKEndGrouping */
 protected:
   ImageBase() = default;
   ~ImageBase() override = default;
@@ -851,16 +857,18 @@ protected:
   /** Origin, spacing, and direction in physical coordinates. This variables are
    * protected for efficiency.  They are referenced frequently by
    * inner loop calculations. */
+  /** @ITKStartGrouping */
   SpacingType   m_Spacing{ MakeFilled<SpacingType>(1.0) };
   PointType     m_Origin{};
   DirectionType m_Direction{ DirectionType::GetIdentity() };
   DirectionType m_InverseDirection{ DirectionType::GetIdentity() };
-
+  /** @ITKEndGrouping */
   /** Matrices intended to help with the conversion of Index coordinates
    *  to PhysicalPoint coordinates */
+  /** @ITKStartGrouping */
   DirectionType m_IndexToPhysicalPoint{ DirectionType::GetIdentity() };
   DirectionType m_PhysicalPointToIndex{ DirectionType::GetIdentity() };
-
+  /** @ITKEndGrouping */
   /** Restores the buffered region to its default state
    *  This method does not call Modify because Initialization is
    *  called by ReleaseData and can not modify the MTime

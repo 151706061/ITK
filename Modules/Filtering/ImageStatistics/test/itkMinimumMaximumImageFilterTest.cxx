@@ -37,13 +37,13 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
   using MinMaxFilterType = itk::MinimumMaximumImageFilter<ImageType>;
 
   /* Define the image size and physical coordinates */
-  SizeType size = { { 20, 20, 20 } };
-  double   origin[3] = { 0.0, 0.0, 0.0 };
-  double   spacing[3] = { 1, 1, 1 };
+  constexpr SizeType size = { { 20, 20, 20 } };
+  constexpr double   origin[3] = { 0.0, 0.0, 0.0 };
+  constexpr double   spacing[3] = { 1, 1, 1 };
 
   int flag = 0; /* Did this test program work? */
 
-  std::cout << "Testing Minimum and Maximum Image Calulator:\n";
+  std::cout << "Testing Minimum and Maximum Image Calculator:\n";
 
   // Allocate a simple test image
   auto                  image = ImageType::New();
@@ -56,8 +56,8 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
   image->SetOrigin(origin);
   image->SetSpacing(spacing);
 
-  float minimum = -52;
-  float maximum = -10;
+  constexpr float minimum = -52;
+  constexpr float maximum = -10;
 
 
   // Initialize the image contents with the minimum value
@@ -88,7 +88,7 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, MinimumMaximumImageFilter, ImageSink);
 
 
-  itk::SimpleFilterWatcher watcher(filter);
+  const itk::SimpleFilterWatcher watcher(filter);
 
   const auto numberOfStreamDivisions = static_cast<unsigned int>(std::stoi(argv[1]));
   filter->SetNumberOfStreamDivisions(numberOfStreamDivisions);
@@ -98,7 +98,7 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
   filter->Update();
 
   // Return minimum of intensity
-  float minimumResult = filter->GetMinimum();
+  const float minimumResult = filter->GetMinimum();
   std::cout << "The Minimum intensity value is : " << minimumResult << std::endl;
 
   if (itk::Math::NotExactlyEquals(minimumResult, minimum))
@@ -109,7 +109,7 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
   }
 
   // Return maximum of intensity
-  float maximumResult = filter->GetMaximum();
+  const float maximumResult = filter->GetMaximum();
   std::cout << "The Maximum intensity value is : " << maximumResult << std::endl;
 
   if (itk::Math::NotExactlyEquals(maximumResult, maximum))
@@ -125,9 +125,7 @@ itkMinimumMaximumImageFilterTest(int argc, char * argv[])
     std::cout << "*** Some tests failed" << std::endl;
     return flag;
   }
-  else
-  {
-    std::cout << "All tests successfully passed" << std::endl;
-    return EXIT_SUCCESS;
-  }
+
+  std::cout << "All tests successfully passed" << std::endl;
+  return EXIT_SUCCESS;
 }

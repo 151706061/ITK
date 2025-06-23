@@ -31,7 +31,7 @@
  *
  * "Grayscale morphological attribute operations"
  * by Beare R.
- * https://www.insight-journal.org/browse/publication/203
+ * https://doi.org/10.54294/ifvjls
  *
  */
 
@@ -86,16 +86,14 @@ AttributeMorphologyBaseImageFilter<TInputImage, TOutputImage, TAttribute, TFunct
 
   SizeValueType buffsize = output->GetRequestedRegion().GetNumberOfPixels();
 
-  SizeType kernelRadius;
-  kernelRadius.Fill(1);
+  constexpr auto kernelRadius = SizeType::Filled(1);
   using FaceCalculatorType = itk::NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<TInputImage>;
   FaceCalculatorType                        faceCalculator;
   typename FaceCalculatorType::FaceListType faceList =
     faceCalculator(input, output->GetRequestedRegion(), kernelRadius);
-  typename FaceCalculatorType::FaceListType::iterator fit;
-  ProgressReporter                                    progress(this, 0, buffsize * 4); // pretend we have 4 steps
+  ProgressReporter progress(this, 0, buffsize * 4); // pretend we have 4 steps
 
-  fit = faceList.begin();
+  auto fit = faceList.begin();
 
   m_SortPixels = make_unique_for_overwrite<OffsetValueType[]>(buffsize);
   m_Parent = make_unique_for_overwrite<OffsetValueType[]>(buffsize);
@@ -108,16 +106,17 @@ AttributeMorphologyBaseImageFilter<TInputImage, TOutputImage, TAttribute, TFunct
   using CRegionIteratorType = ImageRegionConstIteratorWithIndex<TInputImage>;
   CRegionIteratorType RegIt(input, output->GetRequestedRegion());
   // IndexType Origin = RegIt.GetIndex();
-  OffsetValueType pos = 0;
-
-  for (RegIt.GoToBegin(); !RegIt.IsAtEnd(); ++RegIt, ++pos)
   {
-    m_SortPixels[pos] = pos;
-    m_Raw[pos] = RegIt.Get();
+    OffsetValueType pos = 0;
+    for (RegIt.GoToBegin(); !RegIt.IsAtEnd(); ++RegIt, ++pos)
+    {
+      m_SortPixels[pos] = pos;
+      m_Raw[pos] = RegIt.Get();
 
-    m_Parent[pos] = INACTIVE;
-    m_AuxData[pos] = -1; // invalid value;
-    progress.CompletedPixel();
+      m_Parent[pos] = INACTIVE;
+      m_AuxData[pos] = -1; // invalid value;
+      progress.CompletedPixel();
+    }
   }
   progress.CompletedPixel();
   m_CompareOffset.buf = m_Raw.get();
@@ -183,7 +182,7 @@ AttributeMorphologyBaseImageFilter<TInputImage, TOutputImage, TAttribute, TFunct
   // is an integer array. We want this to work with float types
   // write the new image to Raw - note that we aren't putting the
   // result in parent
-  for (pos = buffsize - 1; pos >= 0; --pos)
+  for (OffsetValueType pos = buffsize - 1; pos >= 0; --pos)
   {
     OffsetValueType RPos = m_SortPixels[pos];
     if (m_Parent[RPos] >= 0)
@@ -211,18 +210,14 @@ AttributeMorphologyBaseImageFilter<TInputImage, TOutputImage, TAttribute, TFunct
   OffsetVecType &       Offsets)
 {
   using NeighType = ConstShapedNeighborhoodIterator<TOutputImage>;
-  SizeType KernRad;
-  KernRad.Fill(1);
+  auto      KernRad = SizeType::Filled(1);
   NeighType It(KernRad, this->GetOutput(), this->GetOutput()->GetRequestedRegion());
   setConnectivity(&It, m_FullyConnected);
-  typename NeighType::IndexListType                 OffsetList;
-  typename NeighType::IndexListType::const_iterator LIt;
+  typename NeighType::IndexListType OffsetList = It.GetActiveIndexList();
+  IndexType                         idx = this->GetOutput()->GetRequestedRegion().GetIndex();
+  OffsetValueType                   offset = this->GetOutput()->ComputeOffset(idx);
 
-  OffsetList = It.GetActiveIndexList();
-  IndexType       idx = this->GetOutput()->GetRequestedRegion().GetIndex();
-  OffsetValueType offset = this->GetOutput()->ComputeOffset(idx);
-
-  for (LIt = OffsetList.begin(); LIt != OffsetList.end(); ++LIt)
+  for (auto LIt = OffsetList.begin(); LIt != OffsetList.end(); ++LIt)
   {
     OffsetType O = It.GetOffset(*LIt);
     PosOffsets.push_back(this->GetOutput()->ComputeOffset(idx + O) - offset);
@@ -237,7 +232,7 @@ AttributeMorphologyBaseImageFilter<TInputImage, TOutputImage, TAttribute, TFunct
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent << "Lambda: " << static_cast<typename NumericTraits<AttributeType>::PrintType>(m_Lambda) << std::endl;
 }
 } // end namespace itk

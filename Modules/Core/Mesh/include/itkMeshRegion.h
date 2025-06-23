@@ -56,7 +56,7 @@ public:
   using Self = MeshRegion;
   using Superclass = Region;
 
-  /** Standard part of all itk objects. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MeshRegion);
 
   /** Constructor.  MeshRegion is a lightweight object and is not reference
@@ -68,14 +68,14 @@ public:
   ~MeshRegion() override;
 
   /** Return the region type. Meshes are described with unstructured regions. */
-  RegionEnum
+  [[nodiscard]] RegionEnum
   GetRegionType() const override
   {
     return Superclass::RegionEnum::ITK_UNSTRUCTURED_REGION;
   }
 
   /** Get the number of regions. */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfRegions() const
   {
     return m_NumberOfRegions;
@@ -92,7 +92,7 @@ public:
   }
 
   /** Get the current region. */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetRegion() const
   {
     return m_Region;

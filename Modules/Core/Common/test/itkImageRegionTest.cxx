@@ -26,24 +26,24 @@ itkImageRegionTest(int, char *[])
 
   constexpr unsigned int dimension = 3;
 
-  using TCoordRepType = double;
+  using CoordinateType = double;
   using RegionType = itk::ImageRegion<dimension>;
   using IndexType = RegionType::IndexType;
   using SizeType = RegionType::SizeType;
   using SliceRegionType = RegionType::SliceRegion;
-  using ContinuousIndexType = itk::ContinuousIndex<TCoordRepType, dimension>;
+  using ContinuousIndexType = itk::ContinuousIndex<CoordinateType, dimension>;
 
   using IndexNumericTraits = itk::NumericTraits<IndexType::IndexValueType>;
   using ContinuousIndexNumericTraits = itk::NumericTraits<ContinuousIndexType::ValueType>;
 
   bool passed = true;
 
-  SizeType sizeA = { { 10, 20, 30 } };
-  SizeType sizeB = { { 5, 10, 15 } };
+  constexpr SizeType sizeA = { { 10, 20, 30 } };
+  constexpr SizeType sizeB = { { 5, 10, 15 } };
 
-  IndexType startA = { { 12, 12, 12 } };
-  IndexType startB = { { 14, 14, 14 } };
-  IndexType endA = { { 21, 31, 41 } };
+  constexpr IndexType startA = { { 12, 12, 12 } };
+  constexpr IndexType startB = { { 14, 14, 14 } };
+  constexpr IndexType endA = { { 21, 31, 41 } };
 
   RegionType regionA;
   RegionType regionB;
@@ -68,8 +68,7 @@ itkImageRegionTest(int, char *[])
   // Take slices of a region
   try
   {
-    SliceRegionType sliceA;
-    sliceA = regionA.Slice(0);
+    const SliceRegionType sliceA = regionA.Slice(0);
     std::cout << "regionA.Slice(0): " << sliceA;
   }
   catch (const itk::ExceptionObject & err)
@@ -80,8 +79,7 @@ itkImageRegionTest(int, char *[])
 
   try
   {
-    SliceRegionType sliceA;
-    sliceA = regionA.Slice(1);
+    const SliceRegionType sliceA = regionA.Slice(1);
     std::cout << "regionA.Slice(1): " << sliceA;
   }
   catch (const itk::ExceptionObject & err)
@@ -92,8 +90,7 @@ itkImageRegionTest(int, char *[])
 
   try
   {
-    SliceRegionType sliceA;
-    sliceA = regionA.Slice(2);
+    const SliceRegionType sliceA = regionA.Slice(2);
     std::cout << "regionA.Slice(2): " << sliceA;
   }
   catch (const itk::ExceptionObject & err)
@@ -104,8 +101,7 @@ itkImageRegionTest(int, char *[])
 
   try
   {
-    SliceRegionType sliceA;
-    sliceA = regionA.Slice(20);
+    const SliceRegionType sliceA = regionA.Slice(20);
     std::cout << "regionA.Slice(20): " << sliceA;
     std::cout << "Failed to catch expected exception" << std::endl;
     return EXIT_FAILURE;
@@ -273,21 +269,21 @@ itkImageRegionTest(int, char *[])
     std::cout << "NaN < -1 = " << (indexC[0] < -1.0) << std::endl;
     std::cout << "NaN > -1 = " << (indexC[0] > -1.0) << std::endl;
 
-    TCoordRepType NaN = ContinuousIndexNumericTraits::quiet_NaN();
-    std::cout << "RoundHalfIntegerUp(NaN): " << itk::Math::RoundHalfIntegerUp<TCoordRepType>(NaN) << std::endl;
-    std::cout << "RoundHalfIntegerUp< TCoordRepType >(NaN) < static_cast<TCoordRepType> (0): "
-              << (itk::Math::RoundHalfIntegerUp<TCoordRepType>(NaN) < static_cast<TCoordRepType>(0)) << std::endl;
-    std::cout << "RoundHalfIntegerUp< TCoordRepType >(NaN) > static_cast<TCoordRepType> (0): "
-              << (itk::Math::RoundHalfIntegerUp<TCoordRepType>(NaN) > static_cast<TCoordRepType>(0)) << std::endl;
-    auto rf = itk::Math::RoundHalfIntegerUp<TCoordRepType>(NaN);
-    std::cout << "TCoordRepType = RoundHalfIntegerUp(NaN): " << rf << std::endl;
-    auto rl = itk::Math::RoundHalfIntegerUp<RegionType::IndexValueType, TCoordRepType>(NaN);
+    constexpr CoordinateType NaN = ContinuousIndexNumericTraits::quiet_NaN();
+    std::cout << "RoundHalfIntegerUp(NaN): " << itk::Math::RoundHalfIntegerUp<CoordinateType>(NaN) << std::endl;
+    std::cout << "RoundHalfIntegerUp< CoordinateType >(NaN) < static_cast<CoordinateType> (0): "
+              << (itk::Math::RoundHalfIntegerUp<CoordinateType>(NaN) < static_cast<CoordinateType>(0)) << std::endl;
+    std::cout << "RoundHalfIntegerUp< CoordinateType >(NaN) > static_cast<CoordinateType> (0): "
+              << (itk::Math::RoundHalfIntegerUp<CoordinateType>(NaN) > static_cast<CoordinateType>(0)) << std::endl;
+    auto rf = itk::Math::RoundHalfIntegerUp<CoordinateType>(NaN);
+    std::cout << "CoordinateType = RoundHalfIntegerUp(NaN): " << rf << std::endl;
+    auto rl = itk::Math::RoundHalfIntegerUp<RegionType::IndexValueType, CoordinateType>(NaN);
     std::cout << "RegionType::IndexValueType type = RoundHalfIntegerUp(NaN): " << rl << std::endl;
     std::cout << "static_cast<RegionType::IndexValueType>( NaN ): " << static_cast<RegionType::IndexValueType>(NaN)
               << std::endl;
     std::cout << "NumericTraits<RegionType::IndexValueType>::min(): "
               << itk::NumericTraits<RegionType::IndexValueType>::min() << std::endl;
-    std::cout << "TCoordRepType min(): " << ContinuousIndexNumericTraits::min() << std::endl;
+    std::cout << "CoordinateType min(): " << ContinuousIndexNumericTraits::min() << std::endl;
     std::cout << "...end NaN tests." << std::endl << std::endl;
   }
 
@@ -316,7 +312,7 @@ itkImageRegionTest(int, char *[])
   shrinkRegion.SetSize(shrinkSize);
   RegionType padAndShrinkRegion = shrinkRegion;
 
-  itk::OffsetValueType offsetValueRadius = 4;
+  constexpr itk::OffsetValueType offsetValueRadius = 4;
   padAndShrinkRegion.PadByRadius(offsetValueRadius);
   padAndShrinkRegion.ShrinkByRadius(offsetValueRadius);
   if (shrinkRegion != padAndShrinkRegion)
@@ -354,9 +350,7 @@ itkImageRegionTest(int, char *[])
     std::cout << "ImageRegion test passed." << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "ImageRegion test failed." << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "ImageRegion test failed." << std::endl;
+  return EXIT_FAILURE;
 }

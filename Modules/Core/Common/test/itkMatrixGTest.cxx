@@ -29,15 +29,7 @@ template <typename TMatrix>
 void
 Expect_Matrix_default_constructor_zero_initializes_all_elements()
 {
-#ifndef __clang__
-  // Clang versions before 3.9.0 reject the `const` here (erroneously).
-  // Mac10.10-AppleClang-dbg-x86_64-static produced an error message on an
-  // attempt to build ITK 5 from the master branch (2021-03-31), saying:
-  // > error: default initialization of an object of const type
-  // > 'const itk::Matrix' without a user-provided default constructor
-  const
-#endif
-    TMatrix defaultConstructedMatrix;
+  const TMatrix defaultConstructedMatrix;
 
   for (unsigned int row{}; row < TMatrix::RowDimensions; ++row)
   {
@@ -99,6 +91,23 @@ Expect_Matrix_is_constructible_from_raw_array_of_arrays()
     }
   }
 }
+
+
+template <typename TMatrix>
+void
+Expect_MakeFilled_corresponds_with_Fill_member_function()
+{
+  using ValueType = typename TMatrix::ValueType;
+
+  for (const auto fillValue :
+       { ValueType(), std::numeric_limits<ValueType>::min(), std::numeric_limits<ValueType>::max() })
+  {
+    TMatrix matrixToBeFilled{};
+    matrixToBeFilled.Fill(fillValue);
+
+    EXPECT_EQ(itk::MakeFilled<TMatrix>(fillValue), matrixToBeFilled);
+  }
+}
 } // namespace
 
 
@@ -136,4 +145,35 @@ TEST(Matrix, IsConstructibleFromRawArrayOfArrays)
 {
   Expect_Matrix_is_constructible_from_raw_array_of_arrays<itk::Matrix<float>>();
   Expect_Matrix_is_constructible_from_raw_array_of_arrays<itk::Matrix<double, 2, 3>>();
+}
+
+
+// Tests that the result of MakeFilled corresponds with the resulting matrix after calling its Fill member function.
+TEST(Matrix, MakeFilled)
+{
+  Expect_MakeFilled_corresponds_with_Fill_member_function<itk::Matrix<float>>();
+  Expect_MakeFilled_corresponds_with_Fill_member_function<itk::Matrix<double, 2, 3>>();
+}
+
+
+// Tests that cbegin() and cend() return the same iterators as the corresponding begin() and end() member functions.
+TEST(Matrix, CBeginAndCEnd)
+{
+  const auto check = [](const auto & matrix) {
+    EXPECT_EQ(matrix.cbegin(), matrix.begin());
+    EXPECT_EQ(matrix.cend(), matrix.end());
+  };
+
+  check(itk::Matrix<float>());
+  check(itk::Matrix<double, 2, 3>());
+}
+
+
+// Tests that `size()` is equal to `end() - begin()`.
+TEST(Matrix, SizeIsDifferenceBetweenBeginEnd)
+{
+  const auto check = [](const auto & matrix) { EXPECT_EQ(matrix.size(), matrix.end() - matrix.begin()); };
+
+  check(itk::Matrix<float>());
+  check(itk::Matrix<double, 2, 3>());
 }

@@ -24,9 +24,9 @@
 namespace
 {
 bool
-CheckEqual(itk::Point<double, 2> p1, itk::Point<double, 2> p2)
+CheckEqual(const itk::Point<double, 2> & p1, const itk::Point<double, 2> & p2)
 {
-  const double epsilon = 1e-10;
+  constexpr double epsilon = 1e-10;
 
   for (unsigned int i = 0; i < 2; ++i)
   {
@@ -49,7 +49,7 @@ itkSimilarity2DTransformTest(int, char *[])
   std::cout << "==================================" << std::endl;
   std::cout << "Testing Similarity 2D Transform" << std::endl << std::endl;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 2;
   bool                   Ok = true;
 
@@ -78,20 +78,19 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "Error with Identity transform" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   // Test SetAngle/GetAngle
   auto transform1 = SimilarityTransformType::New();
   auto transform2 = SimilarityTransformType::New();
   transform1->SetIdentity();
-  double angle1 = .125;
+  constexpr double angle1 = .125;
   transform1->SetAngle(angle1);
   transform2->SetMatrix(transform1->GetMatrix());
   std::cout << "Testing SetAngle(" << angle1 << ")/GetAngle():";
-  const double epsilon2 = 1e-5;
+  constexpr double epsilon2 = 1e-5;
   if (itk::Math::abs(transform2->GetAngle() - angle1) > epsilon2)
   {
     std::cerr << "Error with SetAngle/GetAngle:" << std::endl;
@@ -99,10 +98,9 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "transform2->GetAngle: " << transform2->GetAngle() << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   transform1->SetIdentity();
   transform1->SetAngle(-angle1);
@@ -115,10 +113,9 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "transform2->GetAngle: " << transform2->GetAngle() << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
   // Test the Set/Get Parameters
   std::cout << "Testing Set/GetParameters():" << std::endl;
   SimilarityTransformType::ParametersType params(6);
@@ -150,12 +147,12 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "Output:" << outputParams << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   // 15 degrees in radians
+  transform->SetCenter({}); // Explicitly reset center to default values
   transform->SetIdentity();
   const double angle = 15.0 * std::atan(1.0f) / 45.0;
   const double sinth = std::sin(angle);
@@ -185,17 +182,16 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   std::cout << "Testing Translation:";
 
   transform->SetAngle(0);
 
   SimilarityTransformType::OffsetType::ValueType ioffsetInit[2] = { 1, 4 };
-  SimilarityTransformType::OffsetType            ioffset = ioffsetInit;
+  const SimilarityTransformType::OffsetType      ioffset = ioffsetInit;
 
   transform->SetOffset(ioffset);
 
@@ -217,10 +213,9 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "Reported Result is     : " << r << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   // Testing the Jacobian
   std::cout << "Testing Jacobian:";
@@ -237,10 +232,9 @@ itkSimilarity2DTransformTest(int, char *[])
     std::cerr << "Error with Jacobian: " << jacobian0 << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << " [ PASSED ] " << std::endl;
-  }
+
+  std::cout << " [ PASSED ] " << std::endl;
+
 
   {
     // Test instantiation, inverse computation, back transform etc.
@@ -326,7 +320,7 @@ itkSimilarity2DTransformTest(int, char *[])
     parameters[2] = 12.0;
     parameters[3] = -8.9;
     t1->SetParameters(parameters);
-    bool computedInverse = t1->GetInverse(t2);
+    const bool computedInverse = t1->GetInverse(t2);
     if (computedInverse)
     {
       std::cout << "Did not report singular matrix when computed inverse of singular matrix" << std::endl;
@@ -353,10 +347,9 @@ itkSimilarity2DTransformTest(int, char *[])
     t1->CloneTo(t5);
     t5->Compose(t4, false);
 
-    TransformType::InputPointType p5, p6, p7;
-    p5 = t1->TransformPoint(p1);
-    p6 = t4->TransformPoint(p5);
-    p7 = t5->TransformPoint(p1);
+    TransformType::InputPointType p5 = t1->TransformPoint(p1);
+    TransformType::InputPointType p6 = t4->TransformPoint(p5);
+    TransformType::InputPointType p7 = t5->TransformPoint(p1);
 
     std::cout << "Test Compose(.,false): ";
     if (!CheckEqual(p6, p7))
@@ -403,8 +396,8 @@ itkSimilarity2DTransformTest(int, char *[])
       minusPoint = t4->TransformPoint(p1);
       for (unsigned int j = 0; j < 2; ++j)
       {
-        double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
-        double computedDerivative = jacobian[j][k];
+        const double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
+        const double computedDerivative = jacobian[j][k];
         approxJacobian[j][k] = approxDerivative;
         if (itk::Math::abs(approxDerivative - computedDerivative) > 1e-4)
         {
@@ -414,7 +407,7 @@ itkSimilarity2DTransformTest(int, char *[])
           std::cerr << " [ FAILED ] " << std::endl;
           return EXIT_FAILURE;
         } // if
-      }   // for j
+      } // for j
 
     } // for k
 
@@ -512,10 +505,9 @@ itkSimilarity2DTransformTest(int, char *[])
     t1->CloneTo(t5);
     t5->Compose(t4, false);
 
-    TransformType::InputPointType p5, p6, p7;
-    p5 = t1->TransformPoint(p1);
-    p6 = t4->TransformPoint(p5);
-    p7 = t5->TransformPoint(p1);
+    TransformType::InputPointType p5 = t1->TransformPoint(p1);
+    TransformType::InputPointType p6 = t4->TransformPoint(p5);
+    TransformType::InputPointType p7 = t5->TransformPoint(p1);
 
     std::cout << "Test Compose(.,false): ";
     if (!CheckEqual(p6, p7))
@@ -562,8 +554,8 @@ itkSimilarity2DTransformTest(int, char *[])
       minusPoint = t4->TransformPoint(p1);
       for (unsigned int j = 0; j < 2; ++j)
       {
-        double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
-        double computedDerivative = jacobian[j][k];
+        const double approxDerivative = (plusPoint[j] - minusPoint[j]) / (2.0 * delta);
+        const double computedDerivative = jacobian[j][k];
         approxJacobian[j][k] = approxDerivative;
         if (itk::Math::abs(approxDerivative - computedDerivative) > 1e-4)
         {
@@ -573,7 +565,7 @@ itkSimilarity2DTransformTest(int, char *[])
           std::cerr << " [ FAILED ] " << std::endl;
           return EXIT_FAILURE;
         } // if
-      }   // for j
+      } // for j
 
     } // for k
 
@@ -609,9 +601,8 @@ itkSimilarity2DTransformTest(int, char *[])
     ip[0] = 8.0;
     ip[1] = 9.0;
 
-    TransformType::OutputPointType op1, op2;
-    op1 = t1->TransformPoint(ip);
-    op2 = t2->TransformPoint(ip);
+    const TransformType::OutputPointType op1 = t1->TransformPoint(ip);
+    const TransformType::OutputPointType op2 = t2->TransformPoint(ip);
 
     t1->Print(std::cout);
     std::cout << "Test Set/GetMatrix() and Set/GetOffset(): ";

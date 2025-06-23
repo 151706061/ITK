@@ -92,8 +92,8 @@ public:
   /** Default constructor. Needed since we provide a cast constructor. */
   ImageRegionIteratorWithIndex() = default;
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageRegionIteratorWithIndex(TImage * ptr, const RegionType & region);
 
   /** Constructor that can be used to cast from an ImageIterator to an
@@ -123,9 +123,11 @@ public:
 protected:
   /** The construction from a const iterator is declared protected
       in order to enforce const correctness. */
+  /** @ITKStartGrouping */
   ImageRegionIteratorWithIndex(const ImageRegionConstIteratorWithIndex<TImage> & it);
   Self &
   operator=(const ImageRegionConstIteratorWithIndex<TImage> & it);
+  /** @ITKEndGrouping */
 };
 } // end namespace itk
 

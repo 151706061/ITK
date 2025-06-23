@@ -127,7 +127,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GradientDescentOptimizerBasev4TestOptimizer);
 
   /* Provide an override for the pure virtual StartOptimization */
@@ -173,7 +173,7 @@ itkGradientDescentOptimizerBasev4Test(int, char *[])
   auto metric = MetricType::New();
   auto optimizer = GradientDescentOptimizerBasev4TestOptimizer::New();
 
-  bool doEstimateScales = true;
+  constexpr bool doEstimateScales = true;
   ITK_TEST_SET_GET_BOOLEAN(optimizer, DoEstimateScales, doEstimateScales);
 
   optimizer->SetMetric(metric);

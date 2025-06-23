@@ -48,9 +48,8 @@ template <typename TPoint>
 double
 SimpleSignedDistance(const TPoint & p)
 {
-  TPoint center;
-  center.Fill(50);
-  double radius = 19.5;
+  auto             center = itk::MakeFilled<TPoint>(50);
+  constexpr double radius = 19.5;
 
   double accum = 0.0;
   for (unsigned int j = 0; j < TPoint::PointDimension; ++j)
@@ -76,10 +75,9 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
   using PointType = itk::Point<double, ImageDimension>;
 
   // Fill an input image with simple signed distance function
-  auto                image = ImageType::New();
-  ImageType::SizeType size;
-  size.Fill(128);
-  ImageType::RegionType region(size);
+  auto                        image = ImageType::New();
+  auto                        size = ImageType::SizeType::Filled(128);
+  const ImageType::RegionType region(size);
 
   image->SetRegions(region);
   image->Allocate();
@@ -96,7 +94,7 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
     ++iter;
   }
 
-  // Squash up the level sets by mulitplying with a scalar
+  // Squash up the level sets by multiplying with a scalar
   using MultiplierType = itk::ShiftScaleImageFilter<ImageType, ImageType>;
   auto multiplier = MultiplierType::New();
   multiplier->SetInput(image);
@@ -108,9 +106,9 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
   auto reinitializer = ReinitializerType::New();
   reinitializer->SetInput(multiplier->GetOutput());
 
-  ShowProgressObject                                    progressWatch(reinitializer);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(reinitializer);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   reinitializer->AddObserver(itk::ProgressEvent(), command);
 
@@ -144,8 +142,8 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
   calculator->SetImage(difference->GetOutput());
   calculator->Compute();
 
-  double    maxAbsDifference = calculator->GetMaximum();
-  IndexType maxAbsDifferenceIndex = calculator->GetIndexOfMaximum();
+  const double    maxAbsDifference = calculator->GetMaximum();
+  const IndexType maxAbsDifferenceIndex = calculator->GetIndexOfMaximum();
 
   std::cout << "Max. abs. difference = " << maxAbsDifference;
   std::cout << " at " << maxAbsDifferenceIndex << std::endl;
@@ -166,8 +164,8 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
 
   calculator->SetImage(checker->GetOutput());
   calculator->Compute();
-  double minValue = calculator->GetMinimum();
-  double maxValue = calculator->GetMaximum();
+  const double minValue = calculator->GetMinimum();
+  const double maxValue = calculator->GetMaximum();
 
   std::cout << "Min. product = " << minValue << std::endl;
   std::cout << "Max. product = " << maxValue << std::endl;
@@ -191,7 +189,7 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
   reinitializer->Update();
 
   using NodeContainerPointer = ReinitializerType::NodeContainerPointer;
-  NodeContainerPointer nodes = reinitializer->GetOutputNarrowBand();
+  const NodeContainerPointer nodes = reinitializer->GetOutputNarrowBand();
 
   std::cout << "Level set value = " << reinitializer->GetLevelSetValue() << std::endl;
   std::cout << "Narrow banding = " << reinitializer->GetNarrowBanding() << std::endl;
@@ -207,14 +205,14 @@ itkReinitializeLevelSetImageFilterTest(int, char *[])
   using NodeContainerType = ReinitializerType::NodeContainer;
   using ContainerIterator = NodeContainerType::ConstIterator;
 
-  NodeContainerPointer nodes2 = reinitializer->GetOutputNarrowBand();
-  ContainerIterator    nodeIter = nodes2->Begin();
-  ContainerIterator    nodeEnd = nodes2->End();
+  const NodeContainerPointer nodes2 = reinitializer->GetOutputNarrowBand();
+  ContainerIterator          nodeIter = nodes2->Begin();
+  const ContainerIterator    nodeEnd = nodes2->End();
 
   while (nodeIter != nodeEnd)
   {
-    ImageType::IndexType nodeIndex = nodeIter.Value().GetIndex();
-    double               product = image->GetPixel(nodeIndex) * reinitializer->GetOutput()->GetPixel(nodeIndex);
+    const ImageType::IndexType nodeIndex = nodeIter.Value().GetIndex();
+    const double               product = image->GetPixel(nodeIndex) * reinitializer->GetOutput()->GetPixel(nodeIndex);
     if (product < 0.0)
     {
       std::cout << "Product: " << product;

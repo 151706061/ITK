@@ -77,7 +77,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TimeVaryingBSplineVelocityFieldTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -156,25 +156,30 @@ public:
   IntegrateVelocityField() override;
 
   /** Set/Get sampled velocity field origin */
+  /** @ITKStartGrouping */
   itkSetMacro(VelocityFieldOrigin, VelocityFieldPointType);
   itkGetConstMacro(VelocityFieldOrigin, VelocityFieldPointType);
-
+  /** @ITKEndGrouping */
   /** Set/Get sampled velocity field spacing */
+  /** @ITKStartGrouping */
   itkSetMacro(VelocityFieldSpacing, VelocityFieldSpacingType);
   itkGetConstMacro(VelocityFieldSpacing, VelocityFieldSpacingType);
-
+  /** @ITKEndGrouping */
   /** Set/Get sampled velocity field size */
+  /** @ITKStartGrouping */
   itkSetMacro(VelocityFieldSize, VelocityFieldSizeType);
   itkGetConstMacro(VelocityFieldSize, VelocityFieldSizeType);
-
+  /** @ITKEndGrouping */
   /** Set/Get sampled velocity field direction */
+  /** @ITKStartGrouping */
   itkSetMacro(VelocityFieldDirection, VelocityFieldDirectionType);
   itkGetConstMacro(VelocityFieldDirection, VelocityFieldDirectionType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the spline order. */
+  /** @ITKStartGrouping */
   itkSetMacro(SplineOrder, unsigned int);
   itkGetConstMacro(SplineOrder, unsigned int);
-
+  /** @ITKEndGrouping */
 protected:
   TimeVaryingBSplineVelocityFieldTransform();
   ~TimeVaryingBSplineVelocityFieldTransform() override = default;

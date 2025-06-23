@@ -30,9 +30,9 @@ namespace itk
  * \class SymmetricForcesDemonsRegistrationFunction
  *
  * This class encapsulate the PDE which drives the demons registration
- * algorithm (formula (5) in J.-P. Thirions's paper "Fast Non-Rigid Matching of
- * 3D Medical Images", May 1995). It is used by SymmetricForcesDemonsRegistrationFilter
- * to compute the output displacement field which will map a moving image onto a
+ * algorithm (formula 5 in \cite thirion1995). It is used by
+ * SymmetricForcesDemonsRegistrationFilter to compute the output
+ * displacement field which will map a moving image onto a
  * a fixed image.
  *
  * This class was contributed by Corinne Mattmann, ETH Zurich, Switzerland.
@@ -74,7 +74,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SymmetricForcesDemonsRegistrationFunction);
 
   /** MovingImage image type. */
@@ -103,11 +103,15 @@ public:
   using typename Superclass::TimeStepType;
 
   /** Interpolator type. */
-  using CoordRepType = double;
-  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordRepType>;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
+  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
   using PointType = typename InterpolatorType::PointType;
-  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordRepType>;
+  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordinateType>;
 
   /** Covariant vector type. */
   using CovariantVectorType = CovariantVector<double, Self::ImageDimension>;
@@ -170,7 +174,7 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images. */
+   * computed over the overlapping region between the two images. */
   virtual double
   GetMetric() const
   {

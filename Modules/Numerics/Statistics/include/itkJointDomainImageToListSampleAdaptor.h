@@ -24,9 +24,7 @@
 #include "itkImageRegionIterator.h"
 #include "itkListSample.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class ImageJointDomainTraits
  *  \brief This class provides the type definition for the measurement
@@ -107,7 +105,7 @@ public:
   using PointType = typename ImageJointDomainTraitsType::PointType;
   using CoordinateRepType = typename ImageJointDomainTraitsType::CoordinateRepType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(JointDomainImageToListSampleAdaptor);
 
   /** Method for creation through the object factory. */
@@ -175,10 +173,11 @@ public:
   GetMeasurementVector(InstanceIdentifier id) const override;
 
   /** Method to set UsePixelContainer flag */
+  /** @ITKStartGrouping */
   itkSetMacro(UsePixelContainer, bool);
   itkGetConstMacro(UsePixelContainer, bool);
   itkBooleanMacro(UsePixelContainer);
-
+  /** @ITKEndGrouping */
   //  void PrintSelf(std::ostream& os, Indent indent) const override;
 
   /** \class ConstIterator
@@ -195,10 +194,9 @@ public:
     ConstIterator(const JointDomainImageToListSampleAdaptor * adaptor) { *this = adaptor->Begin(); }
 
     ConstIterator(const ConstIterator & iter)
-    {
-      m_InstanceIdentifier = iter.m_InstanceIdentifier;
-      m_Adaptor = iter.m_Adaptor;
-    }
+      : m_InstanceIdentifier(iter.m_InstanceIdentifier)
+      , m_Adaptor(iter.m_Adaptor)
+    {}
 
     ConstIterator &
     operator=(const ConstIterator & iter)
@@ -244,10 +242,9 @@ public:
   protected:
     // This method should only be available to the ListSample class
     ConstIterator(const JointDomainImageToListSampleAdaptor * adaptor, InstanceIdentifier iid)
-    {
-      m_Adaptor = adaptor;
-      m_InstanceIdentifier = iid;
-    }
+      : m_InstanceIdentifier(iid)
+      , m_Adaptor(adaptor)
+    {}
 
   private:
     mutable MeasurementVectorType               m_MeasurementVectorCache;
@@ -295,7 +292,7 @@ public:
   Iterator
   Begin()
   {
-    Iterator iter(this, 0);
+    const Iterator iter(this, 0);
 
     return iter;
   }
@@ -304,7 +301,7 @@ public:
   Iterator
   End()
   {
-    Iterator iter(this, m_Image->GetPixelContainer()->Size());
+    const Iterator iter(this, m_Image->GetPixelContainer()->Size());
 
     return iter;
   }
@@ -344,8 +341,7 @@ private:
 
   PixelContainerConstPointer m_PixelContainer{};
 }; // end of class JointDomainImageToListSampleAdaptor
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkJointDomainImageToListSampleAdaptor.hxx"

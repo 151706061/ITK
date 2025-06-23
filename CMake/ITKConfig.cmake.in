@@ -26,9 +26,6 @@ set(ITK_VERSION_MAJOR "@ITK_VERSION_MAJOR@")
 set(ITK_VERSION_MINOR "@ITK_VERSION_MINOR@")
 set(ITK_VERSION_PATCH "@ITK_VERSION_PATCH@")
 
-# If ITK was built with version 4 compatibility features.
-set(ITKV4_COMPATIBILITY "@ITKV4_COMPATIBILITY@")
-
 # Remove all legacy code completely.
 set(ITK_LEGACY_REMOVE "@ITK_LEGACY_REMOVE@")
 
@@ -51,7 +48,7 @@ set(ITK_BUILD_SHARED "@ITK_BUILD_SHARED_LIBS@")
 set(ITK_LIBRARY_BUILD_TYPE "@ITK_LIBRARY_BUILD_TYPE@")
 
 # Whether ITK links to MSVC's static CRT (/MT and /MTd).
-set(ITK_MSVC_STATIC_CRT "@ITK_MSVC_STATIC_RUNTIME_LIBRARY_value@")
+set(ITK_MSVC_STATIC_CRT "@ITK_MSVC_STATIC_CRT@")
 
 # Whether ITK examples were built.
 set(ITK_BUILD_EXAMPLES "@BUILD_EXAMPLES@")
@@ -117,6 +114,9 @@ set(ITK_USE_GPU "@ITK_USE_GPU@")
 # Wrapping
 set(ITK_WRAPPING "@ITK_WRAPPING@")
 # ITK_WRAP_DOC is disabled by default.
+
+# expose C++ standard used to build ITK for supporting external packages
+set(ITK_CXX_STANDARD CMAKE_CXX_STANDARD)
 
 if( NOT DEFINED ITK_WRAP_PYTHON)
   set(ITK_WRAP_PYTHON "@ITK_WRAP_PYTHON@")

@@ -15,8 +15,9 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-
-#define ITK_LEGACY_TEST
+#ifndef ITK_LEGACY_REMOVE
+#  define ITK_LEGACY_TEST
+#endif
 #include "itkGTest.h"
 #include "itkBSplineTransform.h"
 
@@ -58,8 +59,8 @@ bspline_eq(const itk::BSplineTransform<TParametersValueType, VDimension, VSpline
     using ImageType = typename BSplineType::ImageType;
     using ImageConstIterator = typename itk::ImageRegionConstIterator<ImageType>;
 
-    typename ImageType::Pointer coeffImage1 = bspline1->GetCoefficientImages()[i];
-    typename ImageType::Pointer coeffImage2 = bspline2->GetCoefficientImages()[i];
+    const typename ImageType::Pointer coeffImage1 = bspline1->GetCoefficientImages()[i];
+    const typename ImageType::Pointer coeffImage2 = bspline2->GetCoefficientImages()[i];
 
     ITK_EXPECT_VECTOR_NEAR(coeffImage1->GetOrigin(), coeffImage2->GetOrigin(), tolerance) << description;
     EXPECT_EQ(coeffImage1->GetDirection(), coeffImage2->GetDirection()) << description;
@@ -112,24 +113,23 @@ TEST(ITKBSplineTransform, Copying_Clone)
 
   ASSERT_EQ(coeffImageArray.Size(), 2);
 
-  SizeType      imageSize = itk::MakeSize(10, 10);
-  DirectionType imageDirection; // filled with zeros
+  const SizeType imageSize = itk::MakeSize(10, 10);
+  DirectionType  imageDirection; // filled with zeros
   imageDirection(0, 1) = -1;
   imageDirection(1, 0) = 1;
 
-  VectorType imageSpacing = itk::MakeVector(1.1, 1.2);
+  const VectorType imageSpacing = itk::MakeVector(1.1, 1.2);
 
-  PointType imageOrigin = itk::MakePoint(0.9, 0.8);
+  const PointType imageOrigin = itk::MakePoint(0.9, 0.8);
 
   coeffImageArray[0] = ImageType::New();
 
   unsigned short px_value = 3;
 
-  ImageType::Pointer coeffImage;
   for (unsigned int i = 0; i < Dimension; ++i)
   {
     coeffImageArray[i] = ImageType::New();
-    coeffImage = coeffImageArray[i];
+    const ImageType::Pointer coeffImage = coeffImageArray[i];
 
     coeffImage->SetRegions(RegionType(imageSize));
 

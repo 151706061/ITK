@@ -43,8 +43,7 @@ itkSpatialObjectToImageFilterTest(int, char *[])
   ellipse->Update();
 
   // Center the circle in the image
-  EllipseType::TransformType::OffsetType offset;
-  offset.Fill(25);
+  auto offset = itk::MakeFilled<EllipseType::TransformType::OffsetType>(25);
   ellipse->GetModifiableObjectToParentTransform()->SetOffset(offset);
   ellipse->Update();
 
@@ -55,18 +54,17 @@ itkSpatialObjectToImageFilterTest(int, char *[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(imageFilter, SpatialObjectToImageFilter, ImageSource);
 
-
   imageFilter->SetInput(ellipse);
 
-  SpatialObjectToImageFilterType::ValueType insideValue = 2;
+  constexpr SpatialObjectToImageFilterType::ValueType insideValue = 2;
   imageFilter->SetInsideValue(insideValue);
   ITK_TEST_SET_GET_VALUE(insideValue, imageFilter->GetInsideValue());
 
-  SpatialObjectToImageFilterType::ValueType outsideValue = 0;
+  constexpr SpatialObjectToImageFilterType::ValueType outsideValue = 0;
   imageFilter->SetOutsideValue(0);
   ITK_TEST_SET_GET_VALUE(outsideValue, imageFilter->GetOutsideValue());
 
-  unsigned int childrenDepth = 1;
+  constexpr unsigned int childrenDepth = 1;
   imageFilter->SetChildrenDepth(childrenDepth);
   ITK_TEST_SET_GET_VALUE(childrenDepth, imageFilter->GetChildrenDepth());
 
@@ -85,23 +83,74 @@ itkSpatialObjectToImageFilterTest(int, char *[])
   // Testing spacing
   std::cout << "Testing Spacing: ";
 
-  float  spacingFloat[2];
-  double spacingDouble[2];
-
-  for (unsigned int i = 0; i < 2; ++i)
+  constexpr float  floatCheckValue = 1.5;
+  constexpr double doubleCheckValue = 1.25;
+  constexpr float  vspacingFloat[2] = { floatCheckValue, floatCheckValue };
+  constexpr double vspacingDouble[2] = { doubleCheckValue, doubleCheckValue };
   {
-    spacingFloat[i] = 1.0;
-    spacingDouble[i] = 1.0;
-  }
-  imageFilter->SetSpacing(spacingFloat);
-  imageFilter->SetSpacing(spacingDouble);
-  const double * spacing_result = imageFilter->GetSpacing();
-
-  for (unsigned int i = 0; i < 2; ++i)
-  {
-    if (spacing_result[i] != 1.0)
+    imageFilter->SetSpacing(vspacingFloat);
+    const double * spacing_result = imageFilter->GetSpacing();
+    for (unsigned int i = 0; i < 2; ++i)
     {
-      std::cout << "[FAILURE]" << std::endl;
+      if (spacing_result[i] != floatCheckValue)
+      {
+        std::cout << "[FAILURE] floatCheckValue" << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+  }
+  {
+    imageFilter->SetSpacing(vspacingDouble);
+    const double * spacing_result = imageFilter->GetSpacing();
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      if (spacing_result[i] != doubleCheckValue)
+      {
+        std::cout << "[FAILURE] doubleCheckValue" << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+  }
+  const auto spacing_vector_result = imageFilter->GetSpacingVector();
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    if (spacing_vector_result[i] != doubleCheckValue)
+    {
+      std::cout << "[FAILURE] spacing_vector_result" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+
+  {
+    // NOTE: Passing all zeros does not change the spacing, but the timestamp is modified.
+    constexpr double allzeros[2]{ 0.0, 0.0 };
+    imageFilter->Update();
+    auto preTimestamp = imageFilter->GetTimeStamp();
+    bool exceptionThrown = false;
+    try
+    {
+      imageFilter->SetSpacing(allzeros);
+    }
+    catch (const itk::ExceptionObject &)
+    {
+      exceptionThrown = true;
+    }
+
+    if (!exceptionThrown)
+    {
+      std::cout << "[FAILURE] : Attempting to set spacing values to zero should have thrown an exception." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    auto postTimestamp = imageFilter->GetTimeStamp();
+    if (preTimestamp != postTimestamp)
+    {
+      std::cout << "Time Stamp modified." << std::endl;
+    }
+    else
+    {
+      std::cout << "Time Stamp not modified with passing all zero values to SetSpacing." << std::endl;
       return EXIT_FAILURE;
     }
   }
@@ -111,29 +160,54 @@ itkSpatialObjectToImageFilterTest(int, char *[])
   // Testing Origin
   std::cout << "Testing Origin: ";
 
-  float  originFloat[2];
-  double originDouble[2];
+  constexpr float  voriginFloat[2] = { floatCheckValue, floatCheckValue };
+  constexpr double voriginDouble[2] = { doubleCheckValue, doubleCheckValue };
 
-  for (unsigned int i = 0; i < 2; ++i)
+
   {
-    originFloat[i] = 0.0;
-    originDouble[i] = 0.0;
+    imageFilter->SetOrigin(voriginFloat);
+    const double * origin_result = imageFilter->GetOrigin();
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      if (origin_result[i] != floatCheckValue)
+      {
+        std::cout << "[FAILURE]" << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
   }
-  imageFilter->SetOrigin(originFloat);
-  imageFilter->SetOrigin(originDouble);
-  const double * origin_result = imageFilter->GetOrigin();
+  {
+    imageFilter->SetOrigin(voriginDouble);
+    const double * origin_result = imageFilter->GetOrigin();
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+      if (origin_result[i] != doubleCheckValue)
+      {
+        std::cout << "[FAILURE]" << std::endl;
+        return EXIT_FAILURE;
+      }
+    }
+  }
+
+  const auto origin_point_result = imageFilter->GetOriginPoint();
 
   for (unsigned int i = 0; i < 2; ++i)
   {
-    if (origin_result[i] != 0.0)
+    if (origin_point_result[i] != doubleCheckValue)
     {
       std::cout << "[FAILURE]" << std::endl;
       return EXIT_FAILURE;
     }
   }
 
+
   std::cout << "[PASSED]" << std::endl;
 
+  // Now test with common values
+  constexpr double spacingDouble[2] = { 1.0, 1.0 };
+  constexpr double originDouble[2] = { 0.0, 0.0 };
+  imageFilter->SetSpacing(spacingDouble);
+  imageFilter->SetOrigin(originDouble);
   // Testing PrintSelf
   std::cout << imageFilter << std::endl;
 
@@ -147,7 +221,7 @@ itkSpatialObjectToImageFilterTest(int, char *[])
   // Update the filter
   imageFilter->Update();
 
-  ImageType::Pointer image = imageFilter->GetOutput();
+  const ImageType::Pointer image = imageFilter->GetOutput();
 
   std::cout << "Testing Output Image: ";
 
@@ -171,11 +245,14 @@ itkSpatialObjectToImageFilterTest(int, char *[])
   std::cout << "[PASSED]" << std::endl;
 
   // Test the UseObjectValue
-  bool useObjectValue = true;
+  constexpr bool useObjectValue = true;
   imageFilter->SetUseObjectValue(useObjectValue);
   ITK_TEST_SET_GET_BOOLEAN(imageFilter, UseObjectValue, useObjectValue);
 
   imageFilter->Update();
+
+  std::cout << "Print filter info:" << std::endl;
+  std::cout << imageFilter << std::endl;
 
   std::cout << "Testing SetUseObjectValue: ";
 

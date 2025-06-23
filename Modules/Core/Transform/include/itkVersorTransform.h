@@ -55,7 +55,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods).  */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VersorTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -135,10 +135,14 @@ public:
 
 protected:
   /** Construct an VersorTransform object */
-  VersorTransform(const MatrixType & matrix, const OutputVectorType & offset);
+  /** @ITKStartGrouping */
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] VersorTransform(const MatrixType &       matrix,
+                                                               const OutputVectorType & offset);
+#endif
   VersorTransform(unsigned int parametersDimension);
   VersorTransform();
-
+  /** @ITKEndGrouping */
   /** Destroy an VersorTransform object */
   ~VersorTransform() override = default;
 

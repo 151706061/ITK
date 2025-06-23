@@ -26,25 +26,22 @@ namespace itk
 template <typename TParametersValueType>
 Similarity2DTransform<TParametersValueType>::Similarity2DTransform()
   : Superclass(ParametersDimension)
-{
-  m_Scale = 1.0f;
-}
+  , m_Scale(1.0f)
+{}
 
 
 template <typename TParametersValueType>
 Similarity2DTransform<TParametersValueType>::Similarity2DTransform(unsigned int parametersDimension)
   : Superclass(parametersDimension)
-{
-  m_Scale = 1.0f;
-}
+  , m_Scale(1.0f)
+{}
 
 
 template <typename TParametersValueType>
 Similarity2DTransform<TParametersValueType>::Similarity2DTransform(unsigned int, unsigned int parametersDimension)
   : Superclass(parametersDimension)
-{
-  m_Scale = 1.0f;
-}
+  , m_Scale(1.0f)
+{}
 
 
 template <typename TParametersValueType>
@@ -152,8 +149,7 @@ Similarity2DTransform<TParametersValueType>::ComputeMatrixParameters()
   // https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
   if (m_Scale < std::numeric_limits<TParametersValueType>::min())
   {
-    itkExceptionMacro("Bad Rotation Matrix. Scale cannot be zero.\n"
-                      << "m_Scale : " << m_Scale);
+    itkExceptionMacro("Bad Rotation Matrix. Scale cannot be zero.\nm_Scale : " << m_Scale);
   }
 
   this->SetVarAngle(std::acos(this->GetMatrix()[0][0] / m_Scale));
@@ -260,13 +256,7 @@ template <typename TParametersValueType>
 auto
 Similarity2DTransform<TParametersValueType>::GetInverseTransform() const -> InverseTransformBasePointer
 {
-  Pointer inv = New();
-
-  if (this->GetInverse(inv))
-  {
-    return inv.GetPointer();
-  }
-  return nullptr;
+  return Superclass::InvertTransform(*this);
 }
 
 

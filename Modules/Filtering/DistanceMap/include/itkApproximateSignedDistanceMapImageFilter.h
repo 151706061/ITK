@@ -84,7 +84,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ApproximateSignedDistanceMapImageFilter);
 
   /** standard New() method support */
@@ -105,6 +105,7 @@ public:
   /** Type of input image size and size value */
   using OutputSizeType = typename OutputImageType::SizeType;
   using OutputSizeValueType = typename OutputSizeType::SizeValueType;
+
   /** The dimension of the input image. */
   static constexpr unsigned int InputImageDimension = InputImageType::ImageDimension;
 
@@ -116,18 +117,16 @@ public:
 
   /** Set/Get intensity value representing the interior of objects in the mask.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(InsideValue, InputPixelType);
   itkGetConstMacro(InsideValue, InputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get intensity value representing non-objects in the mask. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutsideValue, InputPixelType);
   itkGetConstMacro(OutsideValue, InputPixelType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<typename InputImageType::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ApproximateSignedDistanceMapImageFilter();

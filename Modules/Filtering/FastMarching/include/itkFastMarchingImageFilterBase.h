@@ -57,9 +57,7 @@ namespace itk
  *
  * Else the output information is copied from the input speed image.
  *
- * Implementation of this class is based on Chapter 8 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999a.
  *
  * For an alternative implementation, see itk::FastMarchingImageFilter.
  *
@@ -86,7 +84,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingImageFilterBase);
 
 
@@ -137,6 +135,7 @@ public:
    * SetOutputSpacing(), SetOutputDirection(), and SetOutputOrigin().
    * Else if the speed image is not nullptr, the output information
    * is copied from the input speed image. */
+  /** @ITKStartGrouping */
   virtual void
   SetOutputSize(const OutputSizeType & size)
   {
@@ -158,7 +157,7 @@ public:
   itkSetMacro(OverrideOutputInformation, bool);
   itkGetConstReferenceMacro(OverrideOutputInformation, bool);
   itkBooleanMacro(OverrideOutputInformation);
-
+  /** @ITKEndGrouping */
 protected:
   FastMarchingImageFilterBase();
 
@@ -187,7 +186,7 @@ protected:
   LabelImagePointer              m_LabelImage{};
   ConnectedComponentImagePointer m_ConnectedComponentImage{};
 
-  IdentifierType
+  [[nodiscard]] IdentifierType
   GetTotalNumberOfNodes() const override;
 
   void
@@ -214,11 +213,12 @@ protected:
   UpdateValue(OutputImageType * oImage, const NodeType & iNode) override;
 
   /** Make sure the given node does not violate any topological constraint*/
+  /** @ITKStartGrouping */
   bool
   CheckTopology(OutputImageType * oImage, const NodeType & iNode) override;
   void
   InitializeOutput(OutputImageType * oImage) override;
-
+  /** @ITKEndGrouping */
   /** Find the nodes were the front will propagate given a node */
   void
   GetInternalNodesUsed(OutputImageType * oImage, const NodeType & iNode, InternalNodeStructureArray & ioNodesUsed);
@@ -236,13 +236,13 @@ protected:
   InitializeIndices2D();
   bool
   IsChangeWellComposed2D(const NodeType &) const;
-  bool
+  [[nodiscard]] bool
   IsCriticalC1Configuration2D(const std::bitset<9> &) const;
-  bool
+  [[nodiscard]] bool
   IsCriticalC2Configuration2D(const std::bitset<9> &) const;
-  bool
+  [[nodiscard]] bool
   IsCriticalC3Configuration2D(const std::bitset<9> &) const;
-  bool
+  [[nodiscard]] bool
   IsCriticalC4Configuration2D(const std::bitset<9> &) const;
 
   Array<unsigned char> m_RotationIndices[4]{};
@@ -251,9 +251,9 @@ protected:
   // Functions/data for the 3-D case
   void
   InitializeIndices3D();
-  bool
+  [[nodiscard]] bool
   IsCriticalC1Configuration3D(const std::bitset<8> &) const;
-  unsigned int
+  [[nodiscard]] unsigned int
   IsCriticalC2Configuration3D(const std::bitset<8> &) const;
   bool
   IsChangeWellComposed3D(const NodeType &) const;

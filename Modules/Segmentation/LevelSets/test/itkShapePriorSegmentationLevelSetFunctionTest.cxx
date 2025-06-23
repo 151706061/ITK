@@ -30,7 +30,7 @@
  * into a simple test filter, derived from DenseFiniteDifferenceImageFilter.
  *
  * Note that this test only tests the shape prior term of the level set
- * evolution. The other terms are excerised in other tests.
+ * evolution. The other terms are exercised in other tests.
  *
  * In this test an initial level set is generated that is perturbed from
  * the shape model used in the level set function. The level set is evolved
@@ -41,9 +41,8 @@
  * The test fails if the overlap is below a certain threshold.
  *
  */
-namespace itk
-{
-namespace SPSLSF
+
+namespace itk::SPSLSF
 {
 
 template <typename TImage>
@@ -74,6 +73,7 @@ public:
 
 protected:
   SimpleTestFilter()
+
   {
     auto function = ShapePriorFunctionType::New();
     function->SetPropagationWeight(0.0);
@@ -81,18 +81,15 @@ protected:
     function->SetCurvatureWeight(0.0);
     function->SetShapePriorWeight(1.0);
 
-    typename ShapePriorFunctionType::RadiusType radius;
-    radius.Fill(1);
+    auto radius = itk::MakeFilled<typename ShapePriorFunctionType::RadiusType>(1);
     function->Initialize(radius);
 
     this->SetDifferenceFunction(function);
-
-    m_NumberOfIterations = 0;
     m_ShapePriorFunction = function;
   }
 
 private:
-  unsigned int                             m_NumberOfIterations;
+  unsigned int                             m_NumberOfIterations{ 0 };
   typename ShapePriorFunctionType::Pointer m_ShapePriorFunction;
 
   bool
@@ -102,15 +99,13 @@ private:
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+
+    return false;
   }
 };
 
-} // namespace SPSLSF
-} // namespace itk
+} // namespace itk::SPSLSF
+
 
 int
 itkShapePriorSegmentationLevelSetFunctionTest(int, char *[])
@@ -121,8 +116,7 @@ itkShapePriorSegmentationLevelSetFunctionTest(int, char *[])
   using ImageType = itk::Image<PixelType, Dimension>;
 
   // create an input level set using the sphere signed distance function
-  ImageType::SizeType size;
-  size.Fill(128);
+  auto                  size = ImageType::SizeType::Filled(128);
   ImageType::RegionType region;
   region.SetSize(size);
 
@@ -132,7 +126,6 @@ itkShapePriorSegmentationLevelSetFunctionTest(int, char *[])
 
   using ShapeFunctionType = itk::SphereSignedDistanceFunction<double, Dimension>;
   auto shape = ShapeFunctionType::New();
-  shape->Initialize();
 
   ShapeFunctionType::ParametersType parameters(shape->GetNumberOfParameters());
   parameters[0] = 10.0;

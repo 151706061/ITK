@@ -40,44 +40,42 @@ public:
 #define GIPL_INT 32
 #define GIPL_FLOAT 64
 #define GIPL_DOUBLE 65
-#define GIPL_C_SHORT 144
-#define GIPL_C_INT 160
-#define GIPL_C_FLOAT 192
-#define GIPL_C_DOUBLE 193
-#define GIPL_SURFACE 200
-#define GIPL_POLYGON 201
+// #define GIPL_C_SHORT 144
+// #define GIPL_C_INT 160
+// #define GIPL_C_FLOAT 192
+// #define GIPL_C_DOUBLE 193
+// #define GIPL_SURFACE 200
+// #define GIPL_POLYGON 201
 
 /*  ORIENTATION DEFINITIONS (flag1)  */
 
-#define UNDEFINED 0
-#define UNDEFINED_PROJECTION 1
-#define AP_PROJECTION 2
-#define LATERAL_PROJECTION 3
-#define OBLIQUE_PROJECTION 4
-#define UNDEFINED_TOMO 8
-#define AXIAL 9
-#define CORONAL 10
-#define SAGITTAL 11
-#define OBLIQUE_TOMO 12
+// #define UNDEFINED 0
+// #define UNDEFINED_PROJECTION 1
+// #define AP_PROJECTION 2
+// #define LATERAL_PROJECTION 3
+// #define OBLIQUE_PROJECTION 4
+// #define UNDEFINED_TOMO 8
+// #define AXIAL 9
+// #define CORONAL 10
+// #define SAGITTAL 11
+// #define OBLIQUE_TOMO 12
 
 /*  FORMAT DEFINITIONS  */
 
-#define FORMAT_GIPL 0
-#define FORMAT_GIPL_STRING "Gipl"
-#define FORMAT_MAYO 1
-#define FORMAT_MAYO_STRING "Mayo"
-#define FORMAT_NM_IGE 2
-#define FORMAT_NM_IGE_STRING "Starcam"
+// #define FORMAT_GIPL 0
+// #define FORMAT_GIPL_STRING "Gipl"
+// #define FORMAT_MAYO 1
+// #define FORMAT_MAYO_STRING "Mayo"
+// #define FORMAT_NM_IGE 2
+// #define FORMAT_NM_IGE_STRING "Starcam"
 
 #define GIPL_MAGIC_NUMBER 0xefffe9b0
 #define GIPL_MAGIC_NUMBER2 0x2ae389b8
 
 GiplImageIO::GiplImageIO()
+  : m_Internal(std::make_unique<GiplImageIOInternals>())
 {
-  m_Internal = new GiplImageIOInternals;
-  m_Internal->m_GzFile = nullptr;
   m_ByteOrder = IOByteOrderEnum::BigEndian;
-  m_IsCompressed = false;
 }
 
 GiplImageIO::~GiplImageIO()
@@ -94,14 +92,13 @@ GiplImageIO::~GiplImageIO()
   {
     m_Ifstream.close();
   }
-  delete m_Internal;
 }
 
 bool
 GiplImageIO::CanReadFile(const char * filename)
 {
   // First check the filename extension
-  bool extensionFound = CheckExtension(filename);
+  const bool extensionFound = CheckExtension(filename);
 
   if (!extensionFound)
   {
@@ -123,8 +120,8 @@ GiplImageIO::CanReadFile(const char * filename)
     }
 
     inputStream.seekg(252);
-    unsigned int magic_number;
-    inputStream.read((char *)&magic_number, static_cast<std::streamsize>(sizeof(unsigned int)));
+    unsigned int magic_number = 0;
+    inputStream.read(reinterpret_cast<char *>(&magic_number), static_cast<std::streamsize>(sizeof(unsigned int)));
 
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
@@ -152,8 +149,9 @@ GiplImageIO::CanReadFile(const char * filename)
     }
 
     gzseek(m_Internal->m_GzFile, 252, SEEK_SET);
-    unsigned int magic_number;
-    gzread(m_Internal->m_GzFile, (char *)&magic_number, static_cast<unsigned int>(sizeof(unsigned int)));
+    unsigned int magic_number = 0;
+    gzread(
+      m_Internal->m_GzFile, reinterpret_cast<char *>(&magic_number), static_cast<unsigned int>(sizeof(unsigned int)));
 
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
@@ -179,14 +177,14 @@ GiplImageIO::CanReadFile(const char * filename)
 bool
 GiplImageIO::CanWriteFile(const char * name)
 {
-  std::string filename = name;
+  const std::string filename = name;
 
   if (filename.empty())
   {
     itkDebugMacro("No filename specified.");
   }
 
-  bool extensionFound = CheckExtension(name);
+  const bool extensionFound = CheckExtension(name);
 
   if (!extensionFound)
   {
@@ -218,7 +216,7 @@ GiplImageIO::Read(void * buffer)
     m_Ifstream.read(p, static_cast<std::streamsize>(this->GetImageSizeInBytes()));
   }
 
-  bool success;
+  bool success = false;
   if (m_IsCompressed)
   {
     if (p != nullptr)
@@ -255,8 +253,6 @@ GiplImageIO::Read(void * buffer)
 void
 GiplImageIO::ReadImageInformation()
 {
-  unsigned int i;
-
   CheckExtension(m_FileName.c_str());
 
   if (m_IsCompressed)
@@ -277,20 +273,21 @@ GiplImageIO::ReadImageInformation()
   unsigned short dims[4];
 
   unsigned int numberofdimension = 0;
-  for (i = 0; i < 4; ++i)
+  for (unsigned short & dim : dims)
   {
-    dims[i] = 0;
+    dim = 0;
   }
 
-  for (i = 0; i < 4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
   {
     if (m_IsCompressed)
     {
-      gzread(m_Internal->m_GzFile, (char *)&dims[i], static_cast<unsigned int>(sizeof(unsigned short)));
+      gzread(
+        m_Internal->m_GzFile, reinterpret_cast<char *>(&dims[i]), static_cast<unsigned int>(sizeof(unsigned short)));
     }
     else
     {
-      m_Ifstream.read((char *)&dims[i], sizeof(unsigned short));
+      m_Ifstream.read(reinterpret_cast<char *>(&dims[i]), sizeof(unsigned short));
     }
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
@@ -316,20 +313,20 @@ GiplImageIO::ReadImageInformation()
 
   this->SetNumberOfDimensions(numberofdimension);
 
-  for (i = 0; i < numberofdimension; ++i)
+  for (unsigned int i = 0; i < numberofdimension; ++i)
   {
     m_Dimensions[i] = dims[i];
   }
 
-  unsigned short image_type;
+  unsigned short image_type = 0;
 
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&image_type, sizeof(unsigned short));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&image_type), sizeof(unsigned short));
   }
   else
   {
-    m_Ifstream.read((char *)&image_type, sizeof(unsigned short));
+    m_Ifstream.read(reinterpret_cast<char *>(&image_type), sizeof(unsigned short));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -370,15 +367,15 @@ GiplImageIO::ReadImageInformation()
   }
 
   float pixdim[4]; /*   10   16  X,Y,Z,T pixel dimensions mm */
-  for (i = 0; i < 4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
   {
     if (m_IsCompressed)
     {
-      gzread(m_Internal->m_GzFile, (char *)&pixdim[i], sizeof(float));
+      gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&pixdim[i]), sizeof(float));
     }
     else
     {
-      m_Ifstream.read((char *)&pixdim[i], sizeof(float));
+      m_Ifstream.read(reinterpret_cast<char *>(&pixdim[i]), sizeof(float));
     }
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
@@ -396,48 +393,48 @@ GiplImageIO::ReadImageInformation()
   }
 
   char line1[80]; /*   26   80  Patient / Text field        */
-  for (i = 0; i < 80; ++i)
+  for (char & it : line1)
   {
     if (m_IsCompressed)
     {
-      gzread(m_Internal->m_GzFile, (char *)&line1[i], static_cast<unsigned int>(sizeof(char)));
+      gzread(m_Internal->m_GzFile, &it, static_cast<unsigned int>(sizeof(char)));
     }
     else
     {
-      m_Ifstream.read((char *)&line1[i], sizeof(char));
+      m_Ifstream.read(&it, sizeof(char));
     }
   }
 
   float matrix[20]; /*  106   80                              */
-  for (i = 0; i < 20; ++i)
+  for (float & it : matrix)
   {
     if (m_IsCompressed)
     {
-      gzread(m_Internal->m_GzFile, (char *)&matrix[i], static_cast<unsigned int>(sizeof(float)));
+      gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&it), static_cast<unsigned int>(sizeof(float)));
     }
     else
     {
-      m_Ifstream.read((char *)&matrix[i], sizeof(float));
+      m_Ifstream.read(reinterpret_cast<char *>(&it), sizeof(float));
     }
 
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
-      ByteSwapper<float>::SwapFromSystemToBigEndian(&matrix[i]);
+      ByteSwapper<float>::SwapFromSystemToBigEndian(&it);
     }
     else if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
     {
-      ByteSwapper<float>::SwapFromSystemToLittleEndian(&matrix[i]);
+      ByteSwapper<float>::SwapFromSystemToLittleEndian(&it);
     }
   }
 
-  char flag1; /*  186    1  Orientation flag (below)    */
+  char flag1 = 0; /*  186    1  Orientation flag (below)    */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&flag1, static_cast<unsigned int>(sizeof(char)));
+    gzread(m_Internal->m_GzFile, &flag1, static_cast<unsigned int>(sizeof(char)));
   }
   else
   {
-    m_Ifstream.read((char *)&flag1, sizeof(char));
+    m_Ifstream.read(&flag1, sizeof(char));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -449,14 +446,14 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<char>::SwapFromSystemToLittleEndian(&flag1);
   }
 
-  char flag2; /*  187    1                              */
+  char flag2 = 0; /*  187    1                              */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&flag2, static_cast<unsigned int>(sizeof(char)));
+    gzread(m_Internal->m_GzFile, &flag2, static_cast<unsigned int>(sizeof(char)));
   }
   else
   {
-    m_Ifstream.read((char *)&flag2, sizeof(char));
+    m_Ifstream.read(&flag2, sizeof(char));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -468,36 +465,36 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<char>::SwapFromSystemToLittleEndian(&flag2);
   }
 
-  double min; /*  188    8  Minimum voxel value         */
+  double min = NAN; /*  188    8  Minimum voxel value         */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&min, static_cast<unsigned int>(sizeof(double)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&min), static_cast<unsigned int>(sizeof(double)));
   }
   else
   {
-    m_Ifstream.read((char *)&min, sizeof(double));
+    m_Ifstream.read(reinterpret_cast<char *>(&min), sizeof(double));
   }
 
-  double max; /*  196    8  Maximum voxel value         */
+  double max = NAN; /*  196    8  Maximum voxel value         */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&max, static_cast<unsigned int>(sizeof(double)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&max), static_cast<unsigned int>(sizeof(double)));
   }
   else
   {
-    m_Ifstream.read((char *)&max, sizeof(double));
+    m_Ifstream.read(reinterpret_cast<char *>(&max), sizeof(double));
   }
 
   double origin[4]; /*  204   32  X,Y,Z,T offset              */
-  for (i = 0; i < 4; ++i)
+  for (unsigned int i = 0; i < 4; ++i)
   {
     if (m_IsCompressed)
     {
-      gzread(m_Internal->m_GzFile, (char *)&origin[i], static_cast<unsigned int>(sizeof(double)));
+      gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&origin[i]), static_cast<unsigned int>(sizeof(double)));
     }
     else
     {
-      m_Ifstream.read((char *)&origin[i], sizeof(double));
+      m_Ifstream.read(reinterpret_cast<char *>(&origin[i]), sizeof(double));
     }
 
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -515,14 +512,14 @@ GiplImageIO::ReadImageInformation()
     }
   }
 
-  float pixval_offset; /*  236    4                              */
+  float pixval_offset = NAN; /*  236    4                              */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&pixval_offset, static_cast<unsigned int>(sizeof(float)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&pixval_offset), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ifstream.read((char *)&pixval_offset, sizeof(float));
+    m_Ifstream.read(reinterpret_cast<char *>(&pixval_offset), sizeof(float));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -534,14 +531,14 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<float>::SwapFromSystemToLittleEndian(&pixval_offset);
   }
 
-  float pixval_cal; /*  240    4                              */
+  float pixval_cal = NAN; /*  240    4                              */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&pixval_cal, static_cast<unsigned int>(sizeof(float)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&pixval_cal), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ifstream.read((char *)&pixval_cal, sizeof(float));
+    m_Ifstream.read(reinterpret_cast<char *>(&pixval_cal), sizeof(float));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -553,14 +550,14 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<float>::SwapFromSystemToLittleEndian(&pixval_cal);
   }
 
-  float user_def1; /*  244    4  Inter-slice Gap             */
+  float user_def1 = NAN; /*  244    4  Inter-slice Gap             */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&user_def1, static_cast<unsigned int>(sizeof(float)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&user_def1), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ifstream.read((char *)&user_def1, sizeof(float));
+    m_Ifstream.read(reinterpret_cast<char *>(&user_def1), sizeof(float));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -572,14 +569,14 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<float>::SwapFromSystemToLittleEndian(&user_def1);
   }
 
-  float user_def2; /*  248    4  User defined field          */
+  float user_def2 = NAN; /*  248    4  User defined field          */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&user_def2, static_cast<unsigned int>(sizeof(float)));
+    gzread(m_Internal->m_GzFile, reinterpret_cast<char *>(&user_def2), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ifstream.read((char *)&user_def2, sizeof(float));
+    m_Ifstream.read(reinterpret_cast<char *>(&user_def2), sizeof(float));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -591,14 +588,15 @@ GiplImageIO::ReadImageInformation()
     ByteSwapper<float>::SwapFromSystemToLittleEndian(&user_def2);
   }
 
-  unsigned int magic_number; /*  252    4 Magic Number                 */
+  unsigned int magic_number = 0; /*  252    4 Magic Number                 */
   if (m_IsCompressed)
   {
-    gzread(m_Internal->m_GzFile, (char *)&magic_number, static_cast<unsigned int>(sizeof(unsigned int)));
+    gzread(
+      m_Internal->m_GzFile, reinterpret_cast<char *>(&magic_number), static_cast<unsigned int>(sizeof(unsigned int)));
   }
   else
   {
-    m_Ifstream.read((char *)&magic_number, sizeof(unsigned int));
+    m_Ifstream.read(reinterpret_cast<char *>(&magic_number), sizeof(unsigned int));
   }
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
@@ -620,11 +618,11 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<char>::SwapRangeFromSystemToLittleEndian((char *)buffer, numberOfPixels);
+        ByteSwapper<char>::SwapRangeFromSystemToLittleEndian(static_cast<char *>(buffer), numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<char>::SwapRangeFromSystemToBigEndian((char *)buffer, numberOfPixels);
+        ByteSwapper<char>::SwapRangeFromSystemToBigEndian(static_cast<char *>(buffer), numberOfPixels);
       }
       break;
     }
@@ -632,11 +630,13 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<unsigned char>::SwapRangeFromSystemToLittleEndian((unsigned char *)buffer, numberOfPixels);
+        ByteSwapper<unsigned char>::SwapRangeFromSystemToLittleEndian(static_cast<unsigned char *>(buffer),
+                                                                      numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<unsigned char>::SwapRangeFromSystemToBigEndian((unsigned char *)buffer, numberOfPixels);
+        ByteSwapper<unsigned char>::SwapRangeFromSystemToBigEndian(static_cast<unsigned char *>(buffer),
+                                                                   numberOfPixels);
       }
       break;
     }
@@ -644,11 +644,11 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<short>::SwapRangeFromSystemToLittleEndian((short *)buffer, numberOfPixels);
+        ByteSwapper<short>::SwapRangeFromSystemToLittleEndian(static_cast<short *>(buffer), numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<short>::SwapRangeFromSystemToBigEndian((short *)buffer, numberOfPixels);
+        ByteSwapper<short>::SwapRangeFromSystemToBigEndian(static_cast<short *>(buffer), numberOfPixels);
       }
       break;
     }
@@ -656,11 +656,13 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<unsigned short>::SwapRangeFromSystemToLittleEndian((unsigned short *)buffer, numberOfPixels);
+        ByteSwapper<unsigned short>::SwapRangeFromSystemToLittleEndian(static_cast<unsigned short *>(buffer),
+                                                                       numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<unsigned short>::SwapRangeFromSystemToBigEndian((unsigned short *)buffer, numberOfPixels);
+        ByteSwapper<unsigned short>::SwapRangeFromSystemToBigEndian(static_cast<unsigned short *>(buffer),
+                                                                    numberOfPixels);
       }
       break;
     }
@@ -668,11 +670,11 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float *)buffer, numberOfPixels);
+        ByteSwapper<float>::SwapRangeFromSystemToLittleEndian(static_cast<float *>(buffer), numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<float>::SwapRangeFromSystemToBigEndian((float *)buffer, numberOfPixels);
+        ByteSwapper<float>::SwapRangeFromSystemToBigEndian(static_cast<float *>(buffer), numberOfPixels);
       }
       break;
     }
@@ -680,11 +682,11 @@ GiplImageIO::SwapBytesIfNecessary(void * buffer, SizeValueType numberOfPixels)
     {
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<double>::SwapRangeFromSystemToLittleEndian((double *)buffer, numberOfPixels);
+        ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(static_cast<double *>(buffer), numberOfPixels);
       }
       else if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<double>::SwapRangeFromSystemToBigEndian((double *)buffer, numberOfPixels);
+        ByteSwapper<double>::SwapRangeFromSystemToBigEndian(static_cast<double *>(buffer), numberOfPixels);
       }
       break;
     }
@@ -707,7 +709,7 @@ GiplImageIO::Write(const void * buffer)
 {
   CheckExtension(m_FileName.c_str());
 
-  unsigned int nDims = this->GetNumberOfDimensions();
+  const unsigned int nDims = this->GetNumberOfDimensions();
 
   if (m_IsCompressed)
   {
@@ -726,7 +728,7 @@ GiplImageIO::Write(const void * buffer)
 
   for (unsigned int i = 0; i < 4; ++i)
   {
-    unsigned short value;
+    unsigned short value = 0;
     if (i < nDims)
     {
       value = this->GetDimensions(i);
@@ -741,11 +743,12 @@ GiplImageIO::Write(const void * buffer)
 
       if (m_IsCompressed)
       {
-        gzwrite(m_Internal->m_GzFile, (char *)&(value), static_cast<unsigned int>(sizeof(unsigned short)));
+        gzwrite(
+          m_Internal->m_GzFile, reinterpret_cast<char *>(&(value)), static_cast<unsigned int>(sizeof(unsigned short)));
       }
       else
       {
-        m_Ofstream.write((char *)&(value), sizeof(unsigned short));
+        m_Ofstream.write(reinterpret_cast<char *>(&(value)), sizeof(unsigned short));
       }
     }
     else
@@ -761,16 +764,17 @@ GiplImageIO::Write(const void * buffer)
       }
       if (m_IsCompressed)
       {
-        gzwrite(m_Internal->m_GzFile, (char *)&(value), static_cast<unsigned int>(sizeof(unsigned short)));
+        gzwrite(
+          m_Internal->m_GzFile, reinterpret_cast<char *>(&(value)), static_cast<unsigned int>(sizeof(unsigned short)));
       }
       else
       {
-        m_Ofstream.write((char *)&value, sizeof(unsigned short));
+        m_Ofstream.write(reinterpret_cast<char *>(&value), sizeof(unsigned short));
       }
     }
   }
 
-  unsigned short image_type;
+  unsigned short image_type = 0;
   switch (m_ComponentType)
   {
     case IOComponentEnum::CHAR:
@@ -803,20 +807,21 @@ GiplImageIO::Write(const void * buffer)
 
   if (m_ByteOrder == IOByteOrderEnum::BigEndian)
   {
-    ByteSwapper<unsigned short>::SwapFromSystemToBigEndian((unsigned short *)&image_type);
+    ByteSwapper<unsigned short>::SwapFromSystemToBigEndian(&image_type);
   }
   if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
   {
-    ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian((unsigned short *)&image_type);
+    ByteSwapper<unsigned short>::SwapFromSystemToLittleEndian(&image_type);
   }
 
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&image_type, static_cast<unsigned int>(sizeof(unsigned short)));
+    gzwrite(
+      m_Internal->m_GzFile, reinterpret_cast<char *>(&image_type), static_cast<unsigned int>(sizeof(unsigned short)));
   }
   else
   {
-    m_Ofstream.write((char *)&image_type, sizeof(unsigned short));
+    m_Ofstream.write(reinterpret_cast<char *>(&image_type), sizeof(unsigned short));
   }
 
   /*   10   16  X,Y,Z,T pixel dimensions mm */
@@ -827,19 +832,19 @@ GiplImageIO::Write(const void * buffer)
       auto value = static_cast<float>(m_Spacing[i]);
       if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<float>::SwapFromSystemToBigEndian((float *)&value);
+        ByteSwapper<float>::SwapFromSystemToBigEndian(static_cast<float *>(&value));
       }
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<float>::SwapFromSystemToLittleEndian((float *)&value);
+        ByteSwapper<float>::SwapFromSystemToLittleEndian(static_cast<float *>(&value));
       }
       if (m_IsCompressed)
       {
-        gzwrite(m_Internal->m_GzFile, (char *)&value, static_cast<unsigned int>(sizeof(float)));
+        gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&value), static_cast<unsigned int>(sizeof(float)));
       }
       else
       {
-        m_Ofstream.write((char *)&value, sizeof(float));
+        m_Ofstream.write(reinterpret_cast<char *>(&value), sizeof(float));
       }
     }
     else
@@ -847,19 +852,19 @@ GiplImageIO::Write(const void * buffer)
       float value = 1.0f;
       if (m_ByteOrder == IOByteOrderEnum::BigEndian)
       {
-        ByteSwapper<float>::SwapFromSystemToBigEndian((float *)&value);
+        ByteSwapper<float>::SwapFromSystemToBigEndian(&value);
       }
       if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
       {
-        ByteSwapper<float>::SwapFromSystemToLittleEndian((float *)&value);
+        ByteSwapper<float>::SwapFromSystemToLittleEndian(&value);
       }
       if (m_IsCompressed)
       {
-        gzwrite(m_Internal->m_GzFile, (char *)&value, static_cast<unsigned int>(sizeof(float)));
+        gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&value), static_cast<unsigned int>(sizeof(float)));
       }
       else
       {
-        m_Ofstream.write((char *)&value, sizeof(float));
+        m_Ofstream.write(reinterpret_cast<char *>(&value), sizeof(float));
       }
     }
   }
@@ -876,11 +881,11 @@ GiplImageIO::Write(const void * buffer)
   {
     if (m_IsCompressed)
     {
-      gzwrite(m_Internal->m_GzFile, (char *)&i, static_cast<unsigned int>(sizeof(char)));
+      gzwrite(m_Internal->m_GzFile, &i, static_cast<unsigned int>(sizeof(char)));
     }
     else
     {
-      m_Ofstream.write((char *)&i, sizeof(char));
+      m_Ofstream.write(&i, sizeof(char));
     }
   }
 
@@ -890,52 +895,52 @@ GiplImageIO::Write(const void * buffer)
     i = 0; // write zeros
     if (m_IsCompressed)
     {
-      gzwrite(m_Internal->m_GzFile, (char *)&i, static_cast<unsigned int>(sizeof(float)));
+      gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&i), static_cast<unsigned int>(sizeof(float)));
     }
     else
     {
-      m_Ofstream.write((char *)&i, sizeof(float));
+      m_Ofstream.write(reinterpret_cast<char *>(&i), sizeof(float));
     }
   }
 
   char flag1 = 0; /*  186    1  Orientation flag (below)    */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&flag1, static_cast<unsigned int>(sizeof(char)));
+    gzwrite(m_Internal->m_GzFile, &flag1, static_cast<unsigned int>(sizeof(char)));
   }
   else
   {
-    m_Ofstream.write((char *)&flag1, sizeof(char));
+    m_Ofstream.write(&flag1, sizeof(char));
   }
 
   char flag2 = 0; /*  187    1                              */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&flag2, static_cast<unsigned int>(sizeof(char)));
+    gzwrite(m_Internal->m_GzFile, &flag2, static_cast<unsigned int>(sizeof(char)));
   }
   else
   {
-    m_Ofstream.write((char *)&flag2, sizeof(char));
+    m_Ofstream.write(&flag2, sizeof(char));
   }
 
   double min = 0; /*  188    8  Minimum voxel value         */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&min, static_cast<unsigned int>(sizeof(double)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&min), static_cast<unsigned int>(sizeof(double)));
   }
   else
   {
-    m_Ofstream.write((char *)&min, sizeof(double));
+    m_Ofstream.write(reinterpret_cast<char *>(&min), sizeof(double));
   }
 
   double max = 0; /*  196    8  Maximum voxel value         */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&max, static_cast<unsigned int>(sizeof(double)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&max), static_cast<unsigned int>(sizeof(double)));
   }
   else
   {
-    m_Ofstream.write((char *)&max, sizeof(double));
+    m_Ofstream.write(reinterpret_cast<char *>(&max), sizeof(double));
   }
 
   double origin[4]; /*  204   32  X,Y,Z,T offset              */
@@ -952,61 +957,61 @@ GiplImageIO::Write(const void * buffer)
 
     if (m_ByteOrder == IOByteOrderEnum::BigEndian)
     {
-      ByteSwapper<double>::SwapFromSystemToBigEndian((double *)&origin[i]);
+      ByteSwapper<double>::SwapFromSystemToBigEndian(&origin[i]);
     }
     if (m_ByteOrder == IOByteOrderEnum::LittleEndian)
     {
-      ByteSwapper<double>::SwapFromSystemToLittleEndian((double *)&origin[i]);
+      ByteSwapper<double>::SwapFromSystemToLittleEndian(&origin[i]);
     }
 
     if (m_IsCompressed)
     {
-      gzwrite(m_Internal->m_GzFile, (char *)&origin[i], static_cast<unsigned int>(sizeof(double)));
+      gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&origin[i]), static_cast<unsigned int>(sizeof(double)));
     }
     else
     {
-      m_Ofstream.write((char *)&origin[i], sizeof(double));
+      m_Ofstream.write(reinterpret_cast<char *>(&origin[i]), sizeof(double));
     }
   }
 
   float pixval_offset = 0; /*  236    4                            */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&pixval_offset, static_cast<unsigned int>(sizeof(float)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&pixval_offset), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ofstream.write((char *)&pixval_offset, sizeof(float));
+    m_Ofstream.write(reinterpret_cast<char *>(&pixval_offset), sizeof(float));
   }
 
   float pixval_cal = 0; /*  240    4                              */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&pixval_cal, static_cast<unsigned int>(sizeof(float)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&pixval_cal), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ofstream.write((char *)&pixval_cal, sizeof(float));
+    m_Ofstream.write(reinterpret_cast<char *>(&pixval_cal), sizeof(float));
   }
 
   float user_def1 = 0; /*  244    4  Inter-slice Gap             */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&user_def1, static_cast<unsigned int>(sizeof(float)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&user_def1), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ofstream.write((char *)&user_def1, sizeof(float));
+    m_Ofstream.write(reinterpret_cast<char *>(&user_def1), sizeof(float));
   }
 
   float user_def2 = 0; /*  248    4  User defined field          */
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&user_def2, static_cast<unsigned int>(sizeof(float)));
+    gzwrite(m_Internal->m_GzFile, reinterpret_cast<char *>(&user_def2), static_cast<unsigned int>(sizeof(float)));
   }
   else
   {
-    m_Ofstream.write((char *)&user_def2, sizeof(float));
+    m_Ofstream.write(reinterpret_cast<char *>(&user_def2), sizeof(float));
   }
 
   unsigned int magic_number = GIPL_MAGIC_NUMBER; /*  252    4 Magic Number
@@ -1022,11 +1027,12 @@ GiplImageIO::Write(const void * buffer)
 
   if (m_IsCompressed)
   {
-    gzwrite(m_Internal->m_GzFile, (char *)&magic_number, static_cast<unsigned int>(sizeof(unsigned int)));
+    gzwrite(
+      m_Internal->m_GzFile, reinterpret_cast<char *>(&magic_number), static_cast<unsigned int>(sizeof(unsigned int)));
   }
   else
   {
-    m_Ofstream.write((char *)&magic_number, sizeof(unsigned int));
+    m_Ofstream.write(reinterpret_cast<char *>(&magic_number), sizeof(unsigned int));
   }
 
   // Actually do the writing
@@ -1104,7 +1110,7 @@ GiplImageIO::PrintSelf(std::ostream & os, Indent indent) const
 bool
 GiplImageIO::CheckExtension(const char * filename)
 {
-  std::string fname = filename;
+  const std::string fname = filename;
 
   if (fname.empty())
   {

@@ -44,8 +44,7 @@ namespace itk
  * \c ExponentialDisplacementImageFilter to yield both the forward and inverse
  * displacement fields.
  *
- * \li J. Ashburner. A Fast Diffeomorphic Image Registration Algorithm.
- * NeuroImage, 38(1):95-113, 2007.
+ * See \cite ashburner2007 for more details.
  *
  * \author Nick Tustison
  * \author Brian Avants
@@ -65,7 +64,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineExponentialDiffeomorphicTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -122,9 +121,10 @@ public:
   /**
    * Set/Get the spline order.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(SplineOrder, SplineOrderType);
   itkGetConstMacro(SplineOrder, SplineOrderType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the control point grid size defining the B-spline estimate of the
    * smoothed velocity field.  In each dimension, the B-spline mesh size is equal
@@ -132,9 +132,10 @@ public:
    * Default = 4 control points in each dimension for a mesh size of 1 in each
    * dimension.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfControlPointsForTheConstantVelocityField, ArrayType);
   itkGetConstMacro(NumberOfControlPointsForTheConstantVelocityField, ArrayType);
-
+  /** @ITKEndGrouping */
   /**
    * Set the control point grid size defining the B-spline estimate of the
    * smoothed update field.  In each dimension, the B-spline mesh size is equal
@@ -142,9 +143,10 @@ public:
    * Default = 4 control points in each dimension for a mesh size of 1 in each
    * dimension.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfControlPointsForTheUpdateField, ArrayType);
   itkGetConstMacro(NumberOfControlPointsForTheUpdateField, ArrayType);
-
+  /** @ITKEndGrouping */
   /**
    * Set the update field mesh size which is used to specify the control point
    * grid size.  The mesh size in each dimension is calculated as the

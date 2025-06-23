@@ -56,12 +56,9 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   size[1] = 8;
   size[2] = 8;
 
-  myIndexType start;
-  start.Fill(0);
+  myIndexType start{};
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const myRegionType region{ start, size };
 
   // Initialize Image A
   inputImage->SetRegions(region);
@@ -89,10 +86,8 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   start[2] = 2;
 
   // Create one iterator for an internal region
-  myRegionType innerRegion;
-  innerRegion.SetSize(size);
-  innerRegion.SetIndex(start);
-  myIteratorType itb(inputImage, innerRegion);
+  const myRegionType innerRegion{ start, size };
+  myIteratorType     itb(inputImage, innerRegion);
 
   // Initialize the content the internal region
   while (!itb.IsAtEnd())
@@ -113,7 +108,7 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, GradientRecursiveGaussianImageFilter, ImageToImageFilter);
 
 
-  itk::SimpleFilterWatcher watcher(filter);
+  const itk::SimpleFilterWatcher watcher(filter);
 
   auto normalizeAcrossScale = static_cast<bool>(std::stoi(argv[1]));
   filter->SetNormalizeAcrossScale(normalizeAcrossScale);
@@ -123,7 +118,7 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   ITK_TEST_SET_GET_BOOLEAN(filter, UseImageDirection, useImageDirection);
 
   // Select the value of Sigma
-  typename myFilterType::ScalarRealType sigma = 2.5;
+  constexpr typename myFilterType::ScalarRealType sigma = 2.5;
   filter->SetSigma(sigma);
   ITK_TEST_SET_GET_VALUE(sigma, filter->GetSigma());
 
@@ -137,7 +132,7 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   // It is important to do it AFTER the filter is Updated
   // Because the object connected to the output may be changed
   // by another during GenerateData() call
-  myGradientImageType::Pointer outputImage = filter->GetOutput();
+  const myGradientImageType::Pointer outputImage = filter->GetOutput();
 
   // Declare Iterator type for the output image
   using myOutputIteratorType = itk::ImageRegionIteratorWithIndex<myGradientImageType>;
@@ -158,8 +153,7 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   //
   // Test with a change in image direction
   //
-  myImageType::DirectionType direction;
-  direction.Fill(0.0);
+  myImageType::DirectionType direction{};
   direction[0][0] = -1.0;
   direction[1][1] = -1.0;
   direction[2][2] = -1.0;
@@ -170,7 +164,7 @@ itkGradientRecursiveGaussianFilterTest(int argc, char * argv[])
   filter2->SetInput(inputImage);
   filter2->SetSigma(2.5);
   filter2->Update();
-  myGradientImageType::Pointer outputFlippedImage = filter2->GetOutput();
+  const myGradientImageType::Pointer outputFlippedImage = filter2->GetOutput();
 
   // compare the output between identity direction and flipped direction
   std::cout << " Result of flipped image " << std::endl;

@@ -79,7 +79,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShrinkImageFilter);
 
   /** Typedef to images */
@@ -104,12 +104,13 @@ public:
 
   /** Set the shrink factors. Values are clamped to
    * a minimum value of 1. Default is 1 for all dimensions. */
+  /** @ITKStartGrouping */
   itkSetMacro(ShrinkFactors, ShrinkFactorsType);
   void
   SetShrinkFactors(unsigned int factor);
   void
   SetShrinkFactor(unsigned int i, unsigned int factor);
-
+  /** @ITKEndGrouping */
   /** Get the shrink factors. */
   itkGetConstReferenceMacro(ShrinkFactors, ShrinkFactorsType);
 
@@ -131,13 +132,9 @@ public:
   void
   GenerateInputRequestedRegion() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToOutputCheck,
                   (Concept::Convertible<typename TInputImage::PixelType, typename TOutputImage::PixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   ShrinkImageFilter();

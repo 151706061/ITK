@@ -63,7 +63,7 @@ itkLabelStatisticsImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, LabelStatisticsImageFilter, ImageSink);
 
 
-  itk::SimpleFilterWatcher filterWatch(filter);
+  const itk::SimpleFilterWatcher filterWatch(filter);
 
   auto useHistograms = static_cast<bool>(std::stoi(argv[3]));
   ITK_TEST_SET_GET_BOOLEAN(filter, UseHistograms, useHistograms);
@@ -93,7 +93,7 @@ itkLabelStatisticsImageFilterTest(int argc, char * argv[])
   using RegionType = FilterType::RegionType;
   using LabelPixelType = FilterType::LabelPixelType;
 
-  LabelPixelType labelValue;
+  LabelPixelType labelValue = 0.0;
 
   std::cout << "There are " << numberOfLabels << " labels" << std::endl;
   std::cout << "There are " << numberOfObjects << " objects" << std::endl;

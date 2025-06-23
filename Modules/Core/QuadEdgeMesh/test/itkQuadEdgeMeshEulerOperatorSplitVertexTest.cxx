@@ -19,6 +19,7 @@
 #include "itkQuadEdgeMeshEulerOperatorSplitVertexFunction.h"
 #include "itkQuadEdgeMeshEulerOperatorJoinVertexFunction.h"
 #include "itkQuadEdgeMeshEulerOperatorsTestHelper.h"
+#include "itkTestingMacros.h"
 
 int
 itkQuadEdgeMeshEulerOperatorSplitVertexTest(int, char *[])
@@ -38,7 +39,7 @@ itkQuadEdgeMeshEulerOperatorSplitVertexTest(int, char *[])
   //
   /////////////////////////////////////////
   std::cout << "Checking SplitVertex." << std::endl;
-  MeshPointer mesh = MeshType::New();
+  const MeshPointer mesh = MeshType::New();
   CreateSquareTriangularMesh<MeshType>(mesh);
 
   auto splitVertex = SplitVertex::New();
@@ -51,7 +52,8 @@ itkQuadEdgeMeshEulerOperatorSplitVertexTest(int, char *[])
   }
   std::cout << "OK" << std::endl;
 
-  (void)splitVertex->GetNameOfClass();
+  ITK_TEST_EXPECT_EQUAL(std::string_view("QuadEdgeMeshEulerOperatorSplitVertexFunction"),
+                        std::string_view(splitVertex->GetNameOfClass()));
 
   splitVertex->SetInput(mesh);
   std::cout << "     "

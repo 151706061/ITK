@@ -25,7 +25,7 @@
 
 template <typename T>
 void
-printPalette(std::vector<T> palette)
+printPalette(const std::vector<T> & palette)
 {
   for (unsigned int i = 0; i < palette.size(); ++i)
   {
@@ -173,10 +173,10 @@ itkTIFFImageIOTestPalette(int argc, char * argv[])
     // case not possible here
   }
 
-  ScalarImageType::Pointer inputImage = reader->GetOutput();
+  const ScalarImageType::Pointer inputImage = reader->GetOutput();
 
   // test writing palette
-  bool writePalette = !expandRGBPalette && isPaletteImage;
+  const bool writePalette = !expandRGBPalette && isPaletteImage;
   std::cerr << "Trying to write the image as " << ((writePalette) ? "palette" : "expanded palette") << std::endl;
   ITK_TEST_SET_GET_BOOLEAN(io, WritePalette, writePalette);
 
@@ -215,8 +215,8 @@ itkTIFFImageIOTestPalette(int argc, char * argv[])
       return EXIT_FAILURE;
     }
     bool   palette_equal = true;
-    size_t i;
-    for (i = 0; i < palette_written.size(); ++i)
+    size_t i = 0;
+    for (; i < palette_written.size(); ++i)
     {
       if (palette_written[i] != palette_read[i])
       {
@@ -230,15 +230,14 @@ itkTIFFImageIOTestPalette(int argc, char * argv[])
       std::cerr << "Palette not written as it was read at position [" << i << "]." << std::endl;
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cout << "Read and written palette are equal" << std::endl;
-    }
+
+    std::cout << "Read and written palette are equal" << std::endl;
   }
 
   // Exercise other methods
-  itk::ImageIOBase::SizeType pixelStride = io->GetPixelStride();
-  std::cout << "PixelStride: " << itk::NumericTraits<itk::ImageIOBase::SizeType>::PrintType(pixelStride) << std::endl;
+  const itk::ImageIOBase::SizeType pixelStride = io->GetPixelStride();
+  std::cout << "PixelStride: " << static_cast<itk::NumericTraits<itk::ImageIOBase::SizeType>::PrintType>(pixelStride)
+            << std::endl;
 
   // ToDo
   // When the palette has made into the Metadata Dictionary (as opposed to the ImageIO):

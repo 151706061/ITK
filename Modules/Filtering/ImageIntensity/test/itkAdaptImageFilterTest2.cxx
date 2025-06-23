@@ -67,9 +67,7 @@ itkAdaptImageFilterTest2(int, char *[])
   index[0] = 0;
   index[1] = 0;
 
-  myVectorImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const myVectorImageType::RegionType region{ index, size };
 
   auto myImage = myVectorImageType::New();
 
@@ -193,9 +191,6 @@ itkAdaptImageFilterTest2(int, char *[])
     std::cout << "AdaptImageFilterTest2 passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "AdaptImageFilterTest2 passed" << std::endl;
-    return EXIT_FAILURE;
-  }
+  std::cout << "AdaptImageFilterTest2 passed" << std::endl;
+  return EXIT_FAILURE;
 }

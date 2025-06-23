@@ -23,20 +23,20 @@
 namespace itk
 {
 // Constructor with default arguments
-template <typename TCoordRep, unsigned int VSpaceDimension>
-SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::SphereSignedDistanceFunction()
+template <typename TCoordinate, unsigned int VSpaceDimension>
+SphereSignedDistanceFunction<TCoordinate, VSpaceDimension>::SphereSignedDistanceFunction()
+  : m_Radius(1.0)
 {
   this->GetParameters().SetSize(SpaceDimension + 1);
   this->GetParameters().Fill(0.0);
   this->GetParameters()[0] = 1.0;
   m_Translation.Fill(0.0);
-  m_Radius = 1.0;
 }
 
 // Set the parameters
-template <typename TCoordRep, unsigned int VSpaceDimension>
+template <typename TCoordinate, unsigned int VSpaceDimension>
 void
-SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::SetParameters(const ParametersType & parameters)
+SphereSignedDistanceFunction<TCoordinate, VSpaceDimension>::SetParameters(const ParametersType & parameters)
 {
   if (parameters != this->GetParameters())
   {
@@ -54,9 +54,9 @@ SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::SetParameters(const Pa
 }
 
 // Print self
-template <typename TCoordRep, unsigned int VSpaceDimension>
+template <typename TCoordinate, unsigned int VSpaceDimension>
 void
-SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::PrintSelf(std::ostream & os, Indent indent) const
+SphereSignedDistanceFunction<TCoordinate, VSpaceDimension>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
@@ -65,9 +65,9 @@ SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::PrintSelf(std::ostream
 }
 
 // Evaluate the signed distance
-template <typename TCoordRep, unsigned int VSpaceDimension>
+template <typename TCoordinate, unsigned int VSpaceDimension>
 auto
-SphereSignedDistanceFunction<TCoordRep, VSpaceDimension>::Evaluate(const PointType & point) const -> OutputType
+SphereSignedDistanceFunction<TCoordinate, VSpaceDimension>::Evaluate(const PointType & point) const -> OutputType
 {
   using RealType = typename NumericTraits<OutputType>::RealType;
   RealType output = 0.0;

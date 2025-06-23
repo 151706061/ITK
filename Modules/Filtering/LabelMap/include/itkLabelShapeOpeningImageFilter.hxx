@@ -24,12 +24,9 @@ namespace itk
 {
 template <typename TInputImage>
 LabelShapeOpeningImageFilter<TInputImage>::LabelShapeOpeningImageFilter()
-{
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_Lambda = 0.0;
-  m_ReverseOrdering = false;
-  m_Attribute = LabelObjectType::NUMBER_OF_PIXELS;
-}
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_Attribute(LabelObjectType::NUMBER_OF_PIXELS)
+{}
 
 template <typename TInputImage>
 void
@@ -39,7 +36,7 @@ LabelShapeOpeningImageFilter<TInputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());

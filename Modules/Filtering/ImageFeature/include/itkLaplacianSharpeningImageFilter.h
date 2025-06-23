@@ -78,7 +78,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods)  */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LaplacianSharpeningImageFilter);
 
   /** Method for creation through the object factory.  */
@@ -86,18 +86,17 @@ public:
 
   /** Set/Get whether or not the filter will use the spacing information of the input image in its calculations. Use
    * this option if derivatives are required in physical space. */
+  /** @ITKStartGrouping */
   itkBooleanMacro(UseImageSpacing);
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ImageDimension>));
-  // End concept checking
-#endif
 
 protected:
-  LaplacianSharpeningImageFilter() { m_UseImageSpacing = true; }
+  LaplacianSharpeningImageFilter()
+    : m_UseImageSpacing(true)
+  {}
 
   ~LaplacianSharpeningImageFilter() override = default;
 

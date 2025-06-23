@@ -38,11 +38,6 @@ ArrowSpatialObject<TDimension>::Clear()
 {
   Superclass::Clear();
 
-  this->GetProperty().SetRed(1);
-  this->GetProperty().SetGreen(0);
-  this->GetProperty().SetBlue(0);
-  this->GetProperty().SetAlpha(1);
-
   m_DirectionInObjectSpace.Fill(0);
   m_DirectionInObjectSpace[0] = 1; // along the x direction by default
   m_PositionInObjectSpace.Fill(0);
@@ -57,7 +52,7 @@ ArrowSpatialObject<TDimension>::ComputeMyBoundingBox()
 {
   itkDebugMacro("Computing Rectangle bounding box");
 
-  PointType pnt = this->GetPositionInObjectSpace();
+  const PointType pnt = this->GetPositionInObjectSpace();
 
   this->GetModifiableMyBoundingBoxInObjectSpace()->SetMinimum(pnt);
   this->GetModifiableMyBoundingBoxInObjectSpace()->SetMaximum(pnt);
@@ -133,7 +128,7 @@ ArrowSpatialObject<TDimension>::GetLengthInWorldSpace() const
   pnt = this->GetObjectToWorldTransform()->TransformPoint(pnt);
   pnt2 = this->GetObjectToWorldTransform()->TransformPoint(pnt2);
 
-  double len = pnt.EuclideanDistanceTo(pnt2);
+  const double len = pnt.EuclideanDistanceTo(pnt2);
 
   return len;
 }
@@ -146,7 +141,7 @@ ArrowSpatialObject<TDimension>::InternalClone() const
   // this to new transform.
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");

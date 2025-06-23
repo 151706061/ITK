@@ -33,7 +33,7 @@
 // class. Hans Johnson pointed out that the current initializer class
 // uses the image information to construct the B-spline grid in contrast
 // to how the image domain resides in physical space. So, for example, if
-// a user initilializes a control point grid from a given image and then
+// a user initializes a control point grid from a given image and then
 // constructs a second control point grid from a permuted version of the
 // given image (using the itkPermuteAxesImageFilter class) the second control
 // point grid will be oriented completely different from the first image
@@ -67,9 +67,9 @@ itkBSplineTransformInitializerTest2(int argc, char * argv[])
   // We first use the passed fixed image to construct the control point
   // grid and save the control point locations.
 
-  FixedImageType::ConstPointer fixedImage = fixedReader->GetOutput();
+  const FixedImageType::ConstPointer fixedImage = fixedReader->GetOutput();
 
-  const unsigned int     SpaceDimension = ImageDimension;
+  constexpr unsigned int SpaceDimension = ImageDimension;
   constexpr unsigned int SplineOrder = 3;
   using CoordinateRepType = double;
 
@@ -89,8 +89,6 @@ itkBSplineTransformInitializerTest2(int argc, char * argv[])
   transformInitializer->SetImage(fixedImage);
   ITK_TEST_SET_GET_VALUE(fixedImage, transformInitializer->GetImage());
 
-  TransformType::CoefficientImageArray coefficientImages;
-
   transformInitializer->InitializeTransform();
 
   TransformType::MeshSizeType meshSize;
@@ -99,7 +97,7 @@ itkBSplineTransformInitializerTest2(int argc, char * argv[])
 
   bsplineTransform->SetTransformDomainMeshSize(meshSize);
 
-  coefficientImages = bsplineTransform->GetCoefficientImages();
+  TransformType::CoefficientImageArray coefficientImages = bsplineTransform->GetCoefficientImages();
 
   std::vector<FixedImageType::PointType> controlPointLocations;
 

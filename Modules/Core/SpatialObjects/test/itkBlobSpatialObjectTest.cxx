@@ -33,8 +33,7 @@ itkBlobSpatialObjectTest(int, char *[])
 
   BlobType::BlobPointListType list;
 
-  unsigned int i;
-  for (i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     BlobPointType p;
     PointType     pnt;
@@ -59,7 +58,7 @@ itkBlobSpatialObjectTest(int, char *[])
   p.Print(std::cout);
 
   // Create a Blob Spatial Object
-  BlobPointer blob = BlobType::New();
+  const BlobPointer blob = BlobType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(blob, BlobSpatialObject, PointBasedSpatialObject);
 
@@ -78,17 +77,16 @@ itkBlobSpatialObjectTest(int, char *[])
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-  }
+
+  std::cout << "[PASSED]" << std::endl;
+
 
   // Point consistency
   std::cout << "Point consistency: ";
 
-  BlobType::BlobPointListType::const_iterator it = blob->GetPoints().begin();
+  auto it = blob->GetPoints().begin();
 
-  i = 0;
+  unsigned int i = 0;
   while (it != blob->GetPoints().end())
   {
     for (unsigned int d = 0; d < 3; ++d)
@@ -180,7 +178,7 @@ itkBlobSpatialObjectTest(int, char *[])
   // Testing IsEvaluableAt()
   std::cout << "ValueAt: ";
 
-  double value;
+  double value = NAN;
   if (!blob->ValueAtInWorldSpace(in, value))
   {
     std::cout << "[FAILED]" << std::endl;

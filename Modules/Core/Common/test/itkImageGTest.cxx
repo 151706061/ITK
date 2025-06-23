@@ -193,8 +193,8 @@ TEST(Image, UnequalWhenPixelValuesDiffer)
 // 'FillBuffer(const TPixel&)' defined but not used [-Wunused-function]
 TEST(Image, FillBufferOfNonEqualityComparableType)
 {
-  const auto ImageDimagion = 2U;
-  const auto image = itk::Image<NonEqualityComparableType, ImageDimagion>::New();
+  constexpr auto ImageDimagion = 2U;
+  const auto     image = itk::Image<NonEqualityComparableType, ImageDimagion>::New();
   image->SetRegions(itk::Size<ImageDimagion>::Filled(1));
   image->Allocate();
 
@@ -203,4 +203,44 @@ TEST(Image, FillBufferOfNonEqualityComparableType)
     image->FillBuffer({ i });
     EXPECT_EQ(image->GetPixel({}).data, i);
   }
+}
+
+template <typename ImageType>
+typename ImageType::Pointer
+generate_image(typename ImageType::SizeType size)
+{
+  const auto image = ImageType::New();
+  image->SetRegions(size);
+  image->Allocate();
+  return image;
+}
+
+TEST(Image, IsXImageGeometry)
+{
+  using ImageType = itk::Image<uint8_t, 2>;
+
+  const auto image1 = generate_image<ImageType>({ 2, 2 });
+
+  constexpr double tol = 1e-8;
+
+
+  auto image2 = generate_image<ImageType>({ 2, 2 });
+  EXPECT_TRUE(image1->IsCongruentImageGeometry(image2.GetPointer(), tol, tol));
+  EXPECT_TRUE(image2->IsCongruentImageGeometry(image1.GetPointer(), tol, tol));
+  EXPECT_TRUE(image1->IsSameImageGeometryAs(image2.GetPointer()));
+  EXPECT_TRUE(image2->IsSameImageGeometryAs(image1.GetPointer()));
+
+  image2 = generate_image<ImageType>({ 2, 3 });
+  EXPECT_TRUE(image1->IsCongruentImageGeometry(image2.GetPointer(), tol, tol));
+  EXPECT_TRUE(image2->IsCongruentImageGeometry(image1.GetPointer(), tol, tol));
+  EXPECT_FALSE(image1->IsSameImageGeometryAs(image2.GetPointer()));
+  EXPECT_FALSE(image2->IsSameImageGeometryAs(image1.GetPointer()));
+
+  image2 = generate_image<ImageType>({ 2, 2 });
+  image2->SetSpacing(ImageType::SpacingType({ 1.0 + tol, 1.0 }));
+  EXPECT_TRUE(image1->IsCongruentImageGeometry(image2.GetPointer(), tol, tol));
+  EXPECT_TRUE(image2->IsCongruentImageGeometry(image1.GetPointer(), tol, tol));
+  EXPECT_FALSE(image1->IsCongruentImageGeometry(image2.GetPointer(), tol * 0.5, tol));
+  EXPECT_FALSE(image2->IsCongruentImageGeometry(image1.GetPointer(), tol * 0.5, tol));
+  EXPECT_TRUE(image1->IsSameImageGeometryAs(image2.GetPointer()));
 }

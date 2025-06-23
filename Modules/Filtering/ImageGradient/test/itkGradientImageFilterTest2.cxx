@@ -109,7 +109,7 @@ itkGradientImageFilterTest2(int argc, char * argv[])
   const std::string infname = argv[1];
   const std::string outfname = argv[2];
 
-  itk::ImageIOBase::Pointer iobase =
+  const itk::ImageIOBase::Pointer iobase =
     itk::ImageIOFactory::CreateImageIO(infname.c_str(), itk::ImageIOFactory::IOFileModeEnum::ReadMode);
 
   if (iobase.IsNull())
@@ -129,7 +129,7 @@ itkGradientImageFilterTest2(int argc, char * argv[])
   {
     return DoIt<itk::Image<float, 2>>(infname, outfname);
   }
-  else if (dimension == 3)
+  if (dimension == 3)
     return DoIt<itk::Image<float, 3>>(infname, outfname);
 
   return EXIT_FAILURE;

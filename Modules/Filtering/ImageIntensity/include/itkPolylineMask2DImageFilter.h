@@ -60,7 +60,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PolylineMask2DImageFilter);
 
   /** Number of dimensions. */
@@ -90,14 +90,10 @@ public:
   void
   SetInput2(const PolylineType * input);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<NDimensions, NOutputDimensions>));
   itkConceptMacro(IntConvertibleOutputCheck, (Concept::Convertible<int, OutputImagePixelType>));
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<OutputImagePixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   PolylineMask2DImageFilter();

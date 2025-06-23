@@ -74,7 +74,7 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConnectedRegionsMeshFilter);
 
   /**
@@ -125,8 +125,10 @@ public:
    * SetExtractionModeToClosestPointRegion() also requires that
    * a point be defined.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ExtractionMode, int);
   itkGetConstMacro(ExtractionMode, int);
+  /** @ITKEndGrouping */
 
   void
   SetExtractionModeToPointSeededRegions()

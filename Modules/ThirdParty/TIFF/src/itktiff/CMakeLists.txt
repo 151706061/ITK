@@ -1,164 +1,256 @@
-project(ITK3P_TIFF)
-include_regular_expression("^(itk|tif|fax|port|uv|tconf|t4|mk|itkjpeg|jpeg|mangle|jconfig|jmorecfg).*$")
+# CMake build for libtiff
+# Run "cmake" to generate the build files for your platform
+#
+# Copyright © 2015 Open Microscopy Environment / University of Dundee
+# Copyright © 2021 Roger Leigh <rleigh@codelibre.net>
+# Written by Roger Leigh <rleigh@codelibre.net>
+#
+# Permission to use, copy, modify, distribute, and sell this software and
+# its documentation for any purpose is hereby granted without fee, provided
+# that (i) the above copyright notices and this permission notice appear in
+# all copies of the software and related documentation, and (ii) the names of
+# Sam Leffler and Silicon Graphics may not be used in any advertising or
+# publicity relating to the software without the specific, prior written
+# permission of Sam Leffler and Silicon Graphics.
+#
+# THE SOFTWARE IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+# WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+#
+# IN NO EVENT SHALL SAM LEFFLER OR SILICON GRAPHICS BE LIABLE FOR
+# ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND,
+# OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+# WHETHER OR NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
+# LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+# OF THIS SOFTWARE.
 
-include_directories(BEFORE ${ITK3P_TIFF_SOURCE_DIR})
-include_directories(BEFORE ${ITK3P_TIFF_BINARY_DIR})
+if(FALSE) # XXX(ITK): ITK handles CMake versions.
+cmake_minimum_required(VERSION 3.9.0)
 
-# library object files common to compression and decompression
-set(common_SRCS
-  tif_aux.c
-  tif_close.c
-  tif_codec.c
-  tif_compress.c
-  tif_color.c
-  tif_dir.c
-  tif_dirinfo.c
-  tif_dirread.c
-  tif_dirwrite.c
-  tif_dumpmode.c
-  tif_error.c
-  tif_extension.c
-  tif_fax3.c
-  tif_flush.c
-  tif_getimage.c
-  tif_luv.c
-  tif_lzw.c
-  tif_next.c
-  tif_open.c
-  tif_packbits.c
-  tif_pixarlog.c
-  tif_predict.c
-  tif_print.c
-  tif_read.c
-  tif_strip.c
-  tif_swab.c
-  tif_tile.c
-  tif_thunder.c
-  tif_version.c
-  tif_warning.c
-  tif_write.c
-  tif_zip.c
-  tif_jpeg.c
-  )
-
-add_definitions(-DJPEG_SUPPORT -DZIP_SUPPORT -D_HPUX_SOURCE)
-
-if(WIN32)
-  if(BUILD_SHARED_LIBS)
-    set(TIFFDLL 1)
-  else(BUILD_SHARED_LIBS)
-    set(TIFFSTATIC 1)
-  endif(BUILD_SHARED_LIBS)
-endif(WIN32)
-
-if(BORLAND)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-8004 -w-8057")
-endif(BORLAND)
-
-include(TestBigEndian)
-include(CheckIncludeFiles)
-include(CheckSymbolExists)
-include(CheckFunctionExists)
-
-# Check if header file exists and add it to the list.
-CHECK_INCLUDE_FILES("assert.h" HAVE_ASSERT_H)
-CHECK_INCLUDE_FILES("dlfcn.h" HAVE_DLFCN_H)
-CHECK_INCLUDE_FILES("fcntl.h" HAVE_FCNTL_H)
-CHECK_INCLUDE_FILES("inttypes.h" HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILES("limits.h" HAVE_LIMITS_H)
-CHECK_INCLUDE_FILES("malloc.h" HAVE_MALLOC_H)
-CHECK_INCLUDE_FILES("memory.h" HAVE_MEMORY_H)
-CHECK_INCLUDE_FILES("stdint.h" HAVE_STDINT_H)
-CHECK_INCLUDE_FILES("stdlib.h" HAVE_STDLIB_H)
-CHECK_INCLUDE_FILES("string.h" HAVE_STRING_H)
-CHECK_INCLUDE_FILES("strings.h" HAVE_STRINGS_H)
-CHECK_INCLUDE_FILES("sys/stat.h" HAVE_SYS_STAT_H)
-CHECK_INCLUDE_FILES("sys/time.h" HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
-CHECK_INCLUDE_FILES("unistd.h" HAVE_UNISTD_H)
-CHECK_INCLUDE_FILES("windows.h" HAVE_WINDOWS_H)
-CHECK_INCLUDE_FILES("strings.h" HAVE_STRINGS_H)
-CHECK_INCLUDE_FILES("ieeefp.h" HAVE_IEEEFP_H)
-CHECK_INCLUDE_FILES("search.h" HAVE_SEARCH_H)
-
-
-CHECK_FUNCTION_EXISTS(floor HAVE_FLOOR)
-CHECK_FUNCTION_EXISTS(getopt HAVE_GETOPT)
-CHECK_FUNCTION_EXISTS(isascii HAVE_ISASCII)
-CHECK_FUNCTION_EXISTS(memmove HAVE_MEMMOVE)
-CHECK_FUNCTION_EXISTS(memset HAVE_MEMSET)
-CHECK_FUNCTION_EXISTS(mmap HAVE_MMAP)
-CHECK_FUNCTION_EXISTS(pow HAVE_POW)
-CHECK_FUNCTION_EXISTS(sqrt HAVE_SQRT)
-CHECK_FUNCTION_EXISTS(strcasecmp HAVE_STRCASECMP)
-CHECK_FUNCTION_EXISTS(strchr HAVE_STRCHR)
-CHECK_FUNCTION_EXISTS(strrchr HAVE_STRRCHR)
-CHECK_FUNCTION_EXISTS(strstr HAVE_STRSTR)
-CHECK_FUNCTION_EXISTS(strtol HAVE_STRTOL)
-CHECK_FUNCTION_EXISTS(strtoul HAVE_STRTOUL)
-
-include(CheckTypeSize)
-
-CHECK_TYPE_SIZE("int" SIZEOF_INT)
-CHECK_TYPE_SIZE("long" SIZEOF_LONG)
-
-TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
-
-configure_file(${ITK3P_TIFF_SOURCE_DIR}/tiffDllConfig.h.in
-  ${ITK3P_TIFF_BINARY_DIR}/itk_tiffDllConfig.h)
-configure_file(${ITK3P_TIFF_SOURCE_DIR}/tif_config.h.in
-  ${ITK3P_TIFF_BINARY_DIR}/itk_tif_config.h)
-
-set(MANGLE_PREFIX itk_tiff)
-configure_file(${ITK3P_TIFF_SOURCE_DIR}/itk_tiff_mangle.h.in
-  ${ITK3P_TIFF_BINARY_DIR}/itk_tiff_mangle.h
-  @ONLY)
-
-if(NOT UNIX)
-  add_definitions( -DTIF_PLATFORM_CONSOLE )
-  set(common_SRCS ${common_SRCS} tif_win32.c tif_fax3sm.c)
-  if(BUILD_SHARED_LIBS)
-    if(NOT BORLAND)
-      if(NOT MINGW)
-        set(common_SRCS ${common_SRCS} itktiff.def)
-      endif(NOT MINGW)
-    endif(NOT BORLAND)
-  endif(BUILD_SHARED_LIBS)
-else()
-  set(TIFF_RIGHT_VERSION 1)
-
-  set(common_SRCS ${common_SRCS} tif_unix.c tif_fax3sm.c)
-  if(NOT CMAKE_CROSSCOMPILING)
-    set_source_files_properties(tif_fax3sm.c GENERATED)
-    add_executable(itkmkg3states mkg3states.c)
-    set_property(TARGET itkmkg3states PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(
-      COMMAND itkmkg3states -c const ${ITK3P_TIFF_BINARY_DIR}/tif_fax3sm.c
-      OUTPUT ${ITK3P_TIFF_BINARY_DIR}/tif_fax3sm.c
-      DEPENDS itkmkg3states
-      )
-  endif()
+# Default policy is from 3.9.0
+cmake_policy(VERSION 3.9.0)
 endif()
 
-add_library(itktiff ${common_SRCS})
-target_link_libraries(itktiff ${ITKZLIB_LIBRARIES} ${ITKJPEG_LIBRARIES})
+# Find CMake modules in cmake/
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-if(UNIX)
-  target_link_libraries(itktiff -lm)
-endif(UNIX)
+if(FALSE) # XXX(ITK): We hard-code the TIFF version that we imported.
+# Read version information from configure.ac.
+include(AutotoolsVersion)
+message(STATUS "Building tiff version ${LIBTIFF_VERSION_FULL}")
+else()
+# Hard-code the version of TIFF used by ITK.
+set(LIBTIFF_MAJOR_VERSION 4)
+set(LIBTIFF_MINOR_VERSION 7)
+set(LIBTIFF_MICRO_VERSION 0)
+set(LIBTIFF_ALPHA_VERSION)
+set(LIBTIFF_VERSION "${LIBTIFF_MAJOR_VERSION}.${LIBTIFF_MINOR_VERSION}.${LIBTIFF_MICRO_VERSION}")
+set(LIBTIFF_VERSION_FULL "${LIBTIFF_VERSION}${LIBTIFF_ALPHA_VERSION}")
+# Package date - get it from file RELEASE-DATE
+set(LIBTIFF_RELEASE_DATE "20240911")
+endif()
 
-# Apply user-defined properties to the library target.
-if(ITK_LIBRARY_PROPERTIES)
-  set_target_properties(itktiff PROPERTIES ${ITK_LIBRARY_PROPERTIES})
-endif(ITK_LIBRARY_PROPERTIES)
+# Project definition
+set(CMAKE_C_STANDARD 99)
+project(tiff
+        VERSION "${LIBTIFF_VERSION}"
+        LANGUAGES C CXX)
 
-install(TARGETS itktiff
-  EXPORT ${ITK3P_INSTALL_EXPORT_NAME}
-  RUNTIME DESTINATION ${ITK3P_INSTALL_RUNTIME_DIR} COMPONENT RuntimeLibraries
-  LIBRARY DESTINATION ${ITK3P_INSTALL_LIBRARY_DIR} COMPONENT RuntimeLibraries
-  ARCHIVE DESTINATION ${ITK3P_INSTALL_ARCHIVE_DIR} COMPONENT Development
-  )
+if(FALSE) # XXX(ITK): Suppress options not relevant to ITK.
+if(NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  # libtiff is being included as a subproject of some other project.
+  set(TIFF_INSTALL_DEFAULT OFF)
+else()
+  set(TIFF_INSTALL_DEFAULT ON)
+  option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+option(tiff-tools "build TIFF tools" ON)
+option(tiff-tests "build TIFF tests" ON)
+option(tiff-contrib "build TIFF contrib" ON)
+option(tiff-docs "build TIFF documentation" ON)
+option(tiff-deprecated "build TIFF deprecated features" OFF)
+option(tiff-install "install TIFF targets" ${TIFF_INSTALL_DEFAULT})
+else()
+set(tiff-deprecated ON)
+set(tiff-install OFF)
+endif()
+
+# Disable deprecated features to ensure clean build
+if (tiff-deprecated)
+  add_definitions(-DTIFF_DISABLE_DEPRECATED)
+endif()
+
+# Autotools compatibility
+include(AutotoolsCompat)
+
+# Compiler checks (warning flags, etc.)
+include(CompilerChecks)
+
+# Linker checks (version script, etc.)
+include(LinkerChecks)
+
+# Processor checks (endianness, fill order, floating point, etc.)
+include(ProcessorChecks)
+
+# Checks for headers
+include(IncludeChecks)
+
+# Checks for functions and other symbols
+include(SymbolChecks)
+
+# Standard installation paths
+include(GNUInstallDirs)
+# Documentation install directory (default to cmake project docdir)
+set(LIBTIFF_DOCDIR "${CMAKE_INSTALL_DOCDIR}")
+
+if(FALSE) # XXX(ITK): ITK handles testing
+# CTest testing
+enable_testing()
+endif()
+
+# Checks for type presence and size
+include(TypeSizeChecks)
+
+# Check for POSIX Large File Support (LFS)
+include(LargeFileSupport)
+
+# Options for internal codec support
+include(InternalCodecs)
+
+# Check for Deflate codec
+include(DeflateCodec)
+
+# Check for PixarLog codec
+include(PixarLogCodec)
+
+# Check for JPEG codec
+include(JPEGCodec)
+
+# Check for JBIG codec
+include(JBIGCodec)
+
+# Check for LERC codec
+include(LERCCodec)
+
+# Check for LZMA codec
+include(LZMACodec)
+
+# Check for ZSTD codec
+include(ZSTDCodec)
+
+# Check for WebP codec
+include(WebPCodec)
+
+# Option for C++ libtiffxx library
+include(CXXLibrary)
+
+# Checks for OpenGL support
+include(OpenGLChecks)
+
+# Windows support
+include(WindowsSupport)
+
+# Orthogonal features
+include(LibraryFeatures)
+
+
+# math.h/libm portability
+find_package(CMath REQUIRED)
+
+if(FALSE) # XXX(ITK): We do not create TIFF releases.
+# Release support
+include(Release)
+endif()
+
+# Process subdirectories
+add_subdirectory(port)
+add_subdirectory(libtiff)
+return() # XXX(ITK): We do not need TIFF project infrastructure.
+if(tiff-tools)
+  add_subdirectory(tools)
+endif()
+if(tiff-tests)
+  add_subdirectory(test)
+endif()
+if(tiff-contrib)
+  add_subdirectory(contrib)
+endif()
+add_subdirectory(build)
+if(tiff-docs)
+  add_subdirectory(doc)
+endif()
+
+# pkg-config support
+include(PkgConfig)
+
+message(STATUS "")
+message(STATUS "Libtiff is now configured for ${CMAKE_SYSTEM}")
+message(STATUS "")
+if (NOT LIBTIFF_RELEASE_VERSION STREQUAL LIBTIFF_VERSION_FULL)
+  message(STATUS "  Libtiff release version      ${LIBTIFF_RELEASE_VERSION} is not equal to build version!")
+endif()
+message(STATUS "  Libtiff build version:       ${LIBTIFF_VERSION_FULL}")
+message(STATUS "  Libtiff library version:     ${SO_VERSION}")
+message(STATUS "  Libtiff release date:        ${LIBTIFF_RELEASE_DATE}")
+message(STATUS "")
+message(STATUS "  Installation directory:             ${prefix}")
+message(STATUS "  Documentation directory:            ${LIBTIFF_DOCDIR}")
+message(STATUS "  C compiler:                         ${CMAKE_C_COMPILER}")
+message(STATUS "  C++ compiler:                       ${CMAKE_CXX_COMPILER}")
+message(STATUS "  Build shared libraries:             ${BUILD_SHARED_LIBS}")
+message(STATUS "  Build tools:                        ${tiff-tools}")
+message(STATUS "  Build tests:                        ${tiff-tests}")
+message(STATUS "  Build contrib:                      ${tiff-contrib}")
+message(STATUS "  Build docs:                         ${tiff-docs}")
+message(STATUS "  Build deprecated features:          ${tiff-deprecated}")
+message(STATUS "  Enable linker symbol versioning:    ${HAVE_LD_VERSION_SCRIPT}")
+message(STATUS "  Support Microsoft Document Imaging: ${mdi}")
+message(STATUS "  Use win32 IO:                       ${USE_WIN32_FILEIO}")
+message(STATUS "")
+message(STATUS " Support for internal codecs:")
+message(STATUS "  CCITT Group 3 & 4 algorithms:       ${ccitt}")
+message(STATUS "  Macintosh PackBits algorithm:       ${packbits}")
+message(STATUS "  LZW algorithm:                      ${lzw}")
+message(STATUS "  ThunderScan 4-bit RLE algorithm:    ${thunder}")
+message(STATUS "  NeXT 2-bit RLE algorithm:           ${next}")
+message(STATUS "  LogLuv high dynamic range encoding: ${logluv}")
+message(STATUS "")
+message(STATUS " Support for external codecs:")
+message(STATUS "  ZLIB support:                       Requested:${zlib} Availability:${ZLIB_FOUND} Support:${ZLIB_SUPPORT}")
+if(ZLIB_SUPPORT)
+  message(STATUS "  libdeflate support:                 Requested:${libdeflate} Availability:${DEFLATE_FOUND} Support:${LIBDEFLATE_SUPPORT}")
+else()
+  message(STATUS "  libdeflate support:                 Requested:${libdeflate} Availability:${DEFLATE_FOUND} Support:${LIBDEFLATE_SUPPORT} (Depends on ZLIB Support)")
+endif()
+if(ZLIB_SUPPORT)
+  message(STATUS "  Pixar log-format algorithm:         Requested:${pixarlog} Availability:${ZLIB_FOUND} Support:${PIXARLOG_SUPPORT}")
+else()
+  message(STATUS "  Pixar log-format algorithm:         Requested:${pixarlog} Availability:${ZLIB_FOUND} Support:${PIXARLOG_SUPPORT} (Depends on ZLIB Support)")
+endif()
+message(STATUS "  JPEG support:                       Requested:${jpeg} Availability:${JPEG_FOUND} Support:${JPEG_SUPPORT}")
+if(JPEG_SUPPORT)
+  message(STATUS "  Old JPEG support:                   Requested:${old-jpeg} Availability:${JPEG_SUPPORT} Support:${OJPEG_SUPPORT}")
+else()
+  message(STATUS "  Old JPEG support:                   Requested:${old-jpeg} Availability:${JPEG_SUPPORT} Support:${OJPEG_SUPPORT} (Depends on JPEG Support)")
+endif()
+if(JPEG_SUPPORT AND HAVE_JPEGTURBO_DUAL_MODE_8_12)
+  message(STATUS "  JPEG 8/12 bit dual mode:            Support: yes (libjpeg turbo >= 3.0 dual mode)")
+else()
+  message(STATUS "  JPEG 8/12 bit dual mode:            Requested:${jpeg12} Availability:${JPEG12_FOUND} Support:${JPEG_DUAL_MODE_8_12}")
+endif()
+message(STATUS "  ISO JBIG support:                   Requested:${jbig} Availability:${JBIG_FOUND} Support:${JBIG_SUPPORT}")
+if(ZLIB_SUPPORT)
+  message(STATUS "  LERC support:                       Requested:${lerc} Availability:${LERC_FOUND} Support:${LERC_SUPPORT}")
+else()
+  message(STATUS "  LERC support:                       Requested:${lerc} Availability:${LERC_FOUND} Support:${LERC_SUPPORT} (Depends on ZLIB Support)")
+endif()
+message(STATUS "  LZMA2 support:                      Requested:${lzma} Availability:${liblzma_FOUND} Support:${LZMA_SUPPORT}")
+message(STATUS "  ZSTD support:                       Requested:${zstd} Availability:${ZSTD_USABLE} Support:${ZSTD_SUPPORT}")
+message(STATUS "  WEBP support:                       Requested:${webp} Availability:${WebP_FOUND} Support:${WEBP_SUPPORT}")
+message(STATUS "")
+message(STATUS "  C++ support:                        ${cxx} (requested) ${CXX_SUPPORT} (availability)")
+message(STATUS "")
+# message(STATUS "  X Athena Widgets support:           ${HAVE_XAW}")
+message(STATUS "  OpenGL support:                     Requested:${tiff-opengl} Availability:${HAVE_OPENGL} Support:${OPENGL_SUPPORT}")
+message(STATUS "")

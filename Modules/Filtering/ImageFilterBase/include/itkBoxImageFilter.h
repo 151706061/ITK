@@ -51,7 +51,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BoxImageFilter);
 
   /** Image related type alias. */
@@ -70,7 +70,7 @@ public:
   static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
   /** n-dimensional Kernel radius. */
   using RadiusType = typename TInputImage::SizeType;
-  using RadiusValueType = typename TInputImage::SizeValueType;
+  using RadiusValueType = SizeValueType;
 
   virtual void
   SetRadius(const RadiusType & radius);

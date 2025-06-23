@@ -35,7 +35,7 @@ get_default_num_threads()
 #if __TBB_MIC_OFFLOAD
 #  pragma offload target(mic) out(default_num_threads)
 #endif // __TBB_MIC_OFFLOAD
-  static const size_t default_num_threads =
+  const static size_t default_num_threads =
     tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism);
   return static_cast<int>(default_num_threads);
 }
@@ -47,14 +47,10 @@ namespace itk
 TBBMultiThreader::TBBMultiThreader()
 {
   ThreadIdType defaultThreads = std::max(1u, GetGlobalDefaultNumberOfThreads());
-#if defined(ITKV4_COMPATIBILITY)
-  m_NumberOfWorkUnits = defaultThreads;
-#else
   if (defaultThreads > 1) // one work unit for only one thread
   {
     m_NumberOfWorkUnits = 16 * defaultThreads;
   }
-#endif
 }
 
 TBBMultiThreader::~TBBMultiThreader() = default;
@@ -182,7 +178,7 @@ struct TBBImageRegionSplitter : public itk::ImageIORegion
   {
     // The following if statement is primarily used to ensure use of
     // is_splittable_in_proportion to avoid unused variable warning.
-    if (TBBImageRegionSplitter::is_splittable_in_proportion == true)
+    if (TBBImageRegionSplitter::is_splittable_in_proportion)
     {
       *this = region; // most things will be the same
       for (int d = static_cast<int>(this->GetImageDimension()) - 1; d >= 0;
@@ -209,7 +205,7 @@ struct TBBImageRegionSplitter : public itk::ImageIORegion
     itkGenericExceptionMacro("An ImageIORegion could not be split. Region: " << region);
   }
 
-  bool
+  [[nodiscard]] bool
   empty() const
   {
     for (unsigned int d = 0; d < this->GetImageDimension(); ++d)
@@ -222,7 +218,7 @@ struct TBBImageRegionSplitter : public itk::ImageIORegion
     return false;
   }
 
-  bool
+  [[nodiscard]] bool
   is_divisible() const
   {
     for (unsigned int d = 0; d < this->GetImageDimension(); ++d)

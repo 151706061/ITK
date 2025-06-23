@@ -19,7 +19,7 @@
 #include "itkImageFileWriter.h"
 #include "itkIOCommon.h"
 #include "itkMetaDataObject.h"
-#include "itkSpatialOrientationAdapter.h"
+#include "itkAnatomicalOrientation.h"
 #include "itkTestingMacros.h"
 
 int
@@ -38,29 +38,24 @@ itkReadWriteImageWithDictionaryTest(int argc, char * argv[])
   // Create the 16x16 input image
   auto inputImage = ImageType::New();
 
-  ImageType::SizeType size;
-  size.Fill(16);
-  ImageType::IndexType index;
-  index.Fill(0);
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  auto                           size = ImageType::SizeType::Filled(16);
+  constexpr ImageType::IndexType index{};
+  const ImageType::RegionType    region{ index, size };
   inputImage->SetRegions(region);
   inputImage->Allocate();
   inputImage->FillBuffer(0);
 
-  inputImage->SetDirection(itk::SpatialOrientationAdapter().ToDirectionCosines(
-    itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP));
+  inputImage->SetDirection(itk::AnatomicalOrientation::CreateFromPositiveStringEncoding("LSA").GetAsDirection());
 
   // Add some metadata in the dictionary
   itk::MetaDataDictionary & inputDictionary = inputImage->GetMetaDataDictionary();
-  std::string               voxelunitstr = "mm. "; // try to follow analyze format (length matters)
+  const std::string         voxelunitstr = "mm. "; // try to follow analyze format (length matters)
   itk::EncapsulateMetaData<std::string>(inputDictionary, itk::ITK_VoxelUnits, voxelunitstr);
-  std::string datestr = "26-05-2010"; // try to follow analyze format (length matters)
+  const std::string datestr = "26-05-2010"; // try to follow analyze format (length matters)
   itk::EncapsulateMetaData<std::string>(inputDictionary, itk::ITK_ExperimentDate, datestr);
-  std::string timestr = "13-44-00.0"; // try to follow analyze format (length matters)
+  const std::string timestr = "13-44-00.0"; // try to follow analyze format (length matters)
   itk::EncapsulateMetaData<std::string>(inputDictionary, itk::ITK_ExperimentTime, timestr);
-  std::string patientstr = "patientid "; // try to follow analyze format (length matters)
+  const std::string patientstr = "patientid "; // try to follow analyze format (length matters)
   itk::EncapsulateMetaData<std::string>(inputDictionary, itk::ITK_PatientID, patientstr);
 
   // Write the image down
@@ -76,7 +71,7 @@ itkReadWriteImageWithDictionaryTest(int argc, char * argv[])
   reader->SetFileName(argv[1]);
   reader->Update();
 
-  ImageType::Pointer outputImage = reader->GetOutput();
+  const ImageType::Pointer outputImage = reader->GetOutput();
 
   // Compare the metadatas
   int numMissingMetaData = 0;
@@ -164,7 +159,7 @@ itkReadWriteImageWithDictionaryTest(int argc, char * argv[])
   int numWrongMetaData2 = 0;
   int numAddedMetaData2 = 0;
 
-  for (itk::MetaDataDictionary::ConstIterator it = inputDictionary.Begin(); it != inputDictionary.End(); ++it)
+  for (auto it = inputDictionary.Begin(); it != inputDictionary.End(); ++it)
   {
     if (!outputDictionary.HasKey(it->first))
     {
@@ -173,7 +168,7 @@ itkReadWriteImageWithDictionaryTest(int argc, char * argv[])
     }
     else
     {
-      itk::MetaDataDictionary::ConstIterator it2 = outputDictionary.Find(it->first);
+      const auto it2 = outputDictionary.Find(it->first);
       if (it->second->GetMetaDataObjectTypeInfo() != it2->second->GetMetaDataObjectTypeInfo())
       {
         std::cout << "input_meta=" << it->second;
@@ -183,7 +178,7 @@ itkReadWriteImageWithDictionaryTest(int argc, char * argv[])
     }
   }
 
-  for (itk::MetaDataDictionary::ConstIterator it = outputDictionary.Begin(); it != outputDictionary.End(); ++it)
+  for (auto it = outputDictionary.Begin(); it != outputDictionary.End(); ++it)
   {
     if (!inputDictionary.HasKey(it->first))
     {

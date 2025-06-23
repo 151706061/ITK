@@ -49,7 +49,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = DiscreteLevelSetImage<TOutput, VDimension>;
 
-  /** Run-time type information */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetSparseImage);
 
   static constexpr unsigned int Dimension = Superclass::Dimension;
@@ -99,10 +99,11 @@ public:
   SetLayer(LayerIdType value, const LayerType & layer);
 
   /** Set/Get the label map for computing the sparse representation */
+  /** @ITKStartGrouping */
   virtual void
   SetLabelMap(LabelMapType * labelMap);
   itkGetModifiableObjectMacro(LabelMap, LabelMapType);
-
+  /** @ITKEndGrouping */
   /** Graft data object as level set object */
   void
   Graft(const DataObject * data) override;

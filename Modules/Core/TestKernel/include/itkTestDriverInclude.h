@@ -52,7 +52,7 @@
 #include "itkIntTypes.h"
 #include "itkWin32Header.h"
 
-#define ITK_TEST_DIMENSION_MAX 6
+constexpr int ITK_TEST_DIMENSION_MAX = 6;
 
 extern int
 RegressionTestImage(const char *       testImageFilename,
@@ -66,7 +66,7 @@ RegressionTestImage(const char *       testImageFilename,
                     double             directionTolerance = 1.0e-6);
 
 extern int
-HashTestImage(const char * testImageFilename, const std::string md5hash);
+HashTestImage(const char * testImageFilename, const std::string & md5hash);
 
 
 extern std::map<std::string, int>
@@ -125,7 +125,7 @@ extern void
 usage();
 
 extern int
-ProcessArguments(int * ac, ArgumentStringType * av, ProcessedOutputType * processedOutput = nullptr);
+ProcessArguments(int * argc, ArgumentStringType * argv, ProcessedOutputType * processedOutput = nullptr);
 
 
 /// Get the PixelType and ComponentType from fileName
@@ -160,6 +160,6 @@ extern std::map<std::string, int>
 RegressionTestBaselines(char * baselineFilename);
 
 // Needed for explicit instantiate
-//#include "itkTestingComparisonImageFilter.hxx"
+// #include "itkTestingComparisonImageFilter.hxx"
 
 #endif

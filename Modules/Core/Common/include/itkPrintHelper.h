@@ -21,13 +21,19 @@
 
 #include <iostream>
 #include <iterator>
+
+// Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=112467
+#if defined(ITK_WRAPPING_PARSER) && defined(__GNUC__) && !defined(__clang__)
+#  define __clang__
+#  define ITK_CASTXML_GCC_VECTOR_WORKAROUND
+#endif
 #include <vector>
+#if defined(ITK_CASTXML_GCC_VECTOR_WORKAROUND)
+#  undef __clang__
+#  undef ITK_CASTXML_GCC_VECTOR_WORKAROUND
+#endif
 
-
-namespace itk
-{
-
-namespace print_helper
+namespace itk::print_helper
 {
 
 template <typename T>
@@ -44,7 +50,6 @@ operator<<(std::ostream & os, const std::vector<T> & v)
   return os << v.back() << ')';
 }
 
-} // end namespace print_helper
-} // end namespace itk
+} // namespace itk::print_helper
 
 #endif // itkPrintHelper_h

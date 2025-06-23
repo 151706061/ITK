@@ -50,10 +50,8 @@ itkVectorConnectedComponentImageFilterTest(int argc, char * argv[])
   // create an image of vectors
   auto                  image = ImageType::New();
   ImageType::RegionType region;
-  ImageType::SizeType   size;
-  size.Fill(100);
-  ImageType::IndexType index;
-  index.Fill(0);
+  auto                  size = ImageType::SizeType::Filled(100);
+  ImageType::IndexType  index{};
 
   region.SetSize(size);
   region.SetIndex(index);
@@ -62,7 +60,7 @@ itkVectorConnectedComponentImageFilterTest(int argc, char * argv[])
 
   size = region.GetSize();
   index = region.GetIndex();
-  unsigned int width = size[0];
+  const unsigned int width = size[0];
   size[0] = width / 2;
   size[1] = width / 2;
 
@@ -171,7 +169,7 @@ itkVectorConnectedComponentImageFilterTest(int argc, char * argv[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, VectorConnectedComponentImageFilter, ConnectedComponentFunctorImageFilter);
 
 
-  typename VectorFilterType::InputValueType distanceThreshold = 0.01;
+  constexpr typename VectorFilterType::InputValueType distanceThreshold = 0.01;
   filter->SetDistanceThreshold(distanceThreshold);
   ITK_TEST_SET_GET_VALUE(distanceThreshold, filter->GetDistanceThreshold());
 
@@ -198,7 +196,7 @@ itkVectorConnectedComponentImageFilterTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  // The following just ensures that this filter can be intantiated
+  // The following just ensures that this filter can be instantiated
   // with VectorImages
   using VectorImageType = itk::VectorImage<float, 2>;
   using VectorImageFilterType =

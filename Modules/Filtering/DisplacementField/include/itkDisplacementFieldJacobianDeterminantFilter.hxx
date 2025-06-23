@@ -33,9 +33,8 @@ namespace itk
 template <typename TInputImage, typename TRealType, typename TOutputImage>
 DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>::
   DisplacementFieldJacobianDeterminantFilter()
+  : m_RequestedNumberOfWorkUnits(this->GetNumberOfWorkUnits())
 {
-  m_UseImageSpacing = true;
-  m_RequestedNumberOfWorkUnits = this->GetNumberOfWorkUnits();
   m_NeighborhoodRadius.Fill(1);
   m_DerivativeWeights.Fill(1.0);
   m_HalfDerivativeWeights.Fill(0.5);
@@ -76,7 +75,7 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
 
   // Only reset the weights if they were previously set to the image spacing,
   // otherwise, the user may have provided their own weightings.
-  if (f == false && m_UseImageSpacing == true)
+  if (f == false && m_UseImageSpacing)
   {
     for (unsigned int i = 0; i < ImageDimension; ++i)
     {
@@ -97,8 +96,8 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
-  OutputImagePointer outputPtr = this->GetOutput();
+  const InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -107,8 +106,7 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(m_NeighborhoodRadius);
@@ -119,21 +117,19 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
     inputPtr->SetRequestedRegion(inputRequestedRegion);
     return;
   }
-  else
-  {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
 
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion(inputRequestedRegion);
+  // Couldn't crop the region (requested region is outside the largest
+  // possible region).  Throw an exception.
 
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    e.SetLocation(ITK_LOCATION);
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-  }
+  // store what we tried to request (prior to trying to crop)
+  inputPtr->SetRequestedRegion(inputRequestedRegion);
+
+  // build an exception
+  InvalidRequestedRegionError e(__FILE__, __LINE__);
+  e.SetLocation(ITK_LOCATION);
+  e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
+  e.SetDataObject(inputPtr);
+  throw e;
 }
 
 template <typename TInputImage, typename TRealType, typename TOutputImage>
@@ -145,23 +141,24 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
   // Set the weights on the derivatives.
   // Are we using image spacing in the calculations?  If so we must update now
   // in case our input image has changed.
-  if (m_UseImageSpacing == true)
+  if (m_UseImageSpacing)
   {
+    const auto & spacing = this->GetInput()->GetSpacing();
+
     for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      if (static_cast<TRealType>(this->GetInput()->GetSpacing()[i]) == 0.0)
+      if (static_cast<TRealType>(spacing[i]) == 0.0)
       {
         itkExceptionMacro("Image spacing in dimension " << i << " is zero.");
       }
-      m_DerivativeWeights[i] = static_cast<TRealType>(1.0 / static_cast<TRealType>(this->GetInput()->GetSpacing()[i]));
+      m_DerivativeWeights[i] = static_cast<TRealType>(1.0 / static_cast<TRealType>(spacing[i]));
       m_HalfDerivativeWeights[i] = 0.5 * m_DerivativeWeights[i];
     }
   }
   //
   // cast might not be necessary, but CastImageFilter is optimized for
   // the case where the InputImageType == OutputImageType
-  typename CastImageFilter<TInputImage, RealVectorImageType>::Pointer caster =
-    CastImageFilter<TInputImage, RealVectorImageType>::New();
+  auto caster = CastImageFilter<TInputImage, RealVectorImageType>::New();
   caster->SetInput(this->GetInput());
   caster->Update();
   m_RealValuedInputImage = caster->GetOutput();
@@ -177,8 +174,8 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
   ImageRegionIterator<TOutputImage>                     it;
 
   // Find the data-set boundary "faces"
-  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<RealVectorImageType>                        bC;
-  typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<RealVectorImageType>::FaceListType faceList =
+  NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<RealVectorImageType>                              bC;
+  const typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<RealVectorImageType>::FaceListType faceList =
     bC(dynamic_cast<const RealVectorImageType *>(m_RealValuedInputImage.GetPointer()),
        outputRegionForThread,
        m_NeighborhoodRadius);
@@ -236,7 +233,7 @@ DisplacementFieldJacobianDeterminantFilter<TInputImage, TRealType, TOutputImage>
 
   os << indent << "DerivativeWeights: " << m_DerivativeWeights << std::endl;
   os << indent << "HalfDerivativeWeights: " << m_HalfDerivativeWeights << std::endl;
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
   os << indent << "RequestedNumberOfThreads: "
      << static_cast<typename NumericTraits<ThreadIdType>::PrintType>(m_RequestedNumberOfWorkUnits) << std::endl;
   os << indent << "RealValuedInputImage: " << m_RealValuedInputImage.GetPointer() << std::endl;

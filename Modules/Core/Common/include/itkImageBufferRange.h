@@ -317,7 +317,8 @@ private:
 
 
     /**  Returns a reference to the current pixel. */
-    reference operator*() const noexcept
+    reference
+    operator*() const noexcept
     {
       assert(m_InternalPixelPointer != nullptr);
 
@@ -472,7 +473,11 @@ private:
 
 
     /** Returns it[n] for iterator 'it' and integer value 'n'. */
-    reference operator[](const difference_type n) const noexcept { return *(*this + n); }
+    reference
+    operator[](const difference_type n) const noexcept
+    {
+      return *(*this + n);
+    }
   };
 
   static constexpr bool IsImageTypeConst = std::is_const_v<TImage>;
@@ -568,14 +573,14 @@ public:
 
 
   /** Returns an iterator to the first pixel. */
-  iterator
+  [[nodiscard]] iterator
   begin() const noexcept
   {
     return IteratorInitializer{ m_OptionalAccessorFunctor, m_ImageBufferPointer };
   }
 
   /** Returns an 'end iterator' for this range. */
-  iterator
+  [[nodiscard]] iterator
   end() const noexcept
   {
     return IteratorInitializer{
@@ -586,42 +591,42 @@ public:
 
   /** Returns a const iterator to the first pixel.
    * Provides only read-only access to the pixel data. */
-  const_iterator
+  [[nodiscard]] const_iterator
   cbegin() const noexcept
   {
     return this->begin();
   }
 
   /** Returns a const 'end iterator' for this range. */
-  const_iterator
+  [[nodiscard]] const_iterator
   cend() const noexcept
   {
     return this->end();
   }
 
   /** Returns a reverse 'begin iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rbegin() const noexcept
   {
     return reverse_iterator(this->end());
   }
 
   /** Returns a reverse 'end iterator' for this range. */
-  reverse_iterator
+  [[nodiscard]] reverse_iterator
   rend() const noexcept
   {
     return reverse_iterator(this->begin());
   }
 
   /** Returns a const reverse 'begin iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crbegin() const noexcept
   {
     return this->rbegin();
   }
 
   /** Returns a const reverse 'end iterator' for this range. */
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   crend() const noexcept
   {
     return this->rend();
@@ -629,7 +634,7 @@ public:
 
 
   /** Returns the size of the range, that is the number of pixels. */
-  size_t
+  [[nodiscard]] size_t
   size() const noexcept
   {
     return m_NumberOfPixels;
@@ -637,7 +642,7 @@ public:
 
 
   /** Tells whether the range is empty. */
-  bool
+  [[nodiscard]] bool
   empty() const noexcept
   {
     return m_NumberOfPixels == 0;
@@ -648,7 +653,8 @@ public:
    * \note The return type QualifiedIterator<false>::reference is equivalent to
    * iterator::reference.
    */
-  typename QualifiedIterator<false>::reference operator[](const size_t n) const noexcept
+  typename QualifiedIterator<false>::reference
+  operator[](const size_t n) const noexcept
   {
     assert(n < this->size());
     assert(n <= static_cast<size_t>(std::numeric_limits<ptrdiff_t>::max()));
@@ -660,7 +666,7 @@ public:
 
 // Deduction guide to avoid compiler warnings (-wctad-maybe-unsupported) when using class template argument deduction.
 template <typename TImage>
-ImageBufferRange(TImage &)->ImageBufferRange<TImage>;
+ImageBufferRange(TImage &) -> ImageBufferRange<TImage>;
 
 
 /** Creates a range to iterate over the pixels of the specified image.
@@ -675,10 +681,8 @@ MakeImageBufferRange(TImage * const image)
   {
     return {};
   }
-  else
-  {
-    return ImageBufferRange<TImage>{ *image };
-  }
+
+  return ImageBufferRange<TImage>{ *image };
 }
 
 

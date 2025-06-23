@@ -43,7 +43,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
 
   itkNewMacro(Self);
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(QuadEdgeMeshEulerOperatorCreateCenterVertexFunction);
 
   /** Type of QuadEdge with which to apply slicing. */
@@ -54,7 +54,11 @@ public:
 
   using PointIdentifier = typename MeshType::PointIdentifier;
   using PointType = typename MeshType::PointType;
-  using CoordRepType = typename MeshType::CoordRepType;
+  using CoordinateType = typename MeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using VectorType = typename MeshType::VectorType;
 
   /** Evaluate at the specified input position */
@@ -68,7 +72,9 @@ public:
   }
 
 protected:
-  QuadEdgeMeshEulerOperatorCreateCenterVertexFunction() { this->m_NewPointID = (PointIdentifier)0; }
+  QuadEdgeMeshEulerOperatorCreateCenterVertexFunction()
+    : m_NewPointID((PointIdentifier)0)
+  {}
 
   ~QuadEdgeMeshEulerOperatorCreateCenterVertexFunction() override = default;
 

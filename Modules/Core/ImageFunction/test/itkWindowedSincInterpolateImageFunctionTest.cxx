@@ -37,12 +37,12 @@ enum
 
 using PixelType = unsigned char;
 using ImageType = itk::Image<PixelType, ImageDimension>;
-using CoordRepType = itk::SpacePrecisionType;
+using CoordinateType = itk::SpacePrecisionType;
 using WindowFunctionType = itk::Function::HammingWindowFunction<2>;
 using BoundaryConditionType = itk::ConstantBoundaryCondition<ImageType>;
 
 using InterpolatorType =
-  itk::WindowedSincInterpolateImageFunction<ImageType, 2, WindowFunctionType, BoundaryConditionType, CoordRepType>;
+  itk::WindowedSincInterpolateImageFunction<ImageType, 2, WindowFunctionType, BoundaryConditionType, CoordinateType>;
 
 using IndexType = InterpolatorType::IndexType;
 using PointType = InterpolatorType::PointType;
@@ -60,7 +60,7 @@ TestGeometricPoint(const InterpolatorType * interp, const PointType & point, boo
 
   std::cout << " Point: " << point;
 
-  bool bvalue = interp->IsInsideBuffer(point);
+  const bool bvalue = interp->IsInsideBuffer(point);
   std::cout << " Inside: " << bvalue << std::endl;
 
   if (bvalue != isInside)
@@ -71,7 +71,7 @@ TestGeometricPoint(const InterpolatorType * interp, const PointType & point, boo
 
   if (isInside)
   {
-    OutputType value = interp->Evaluate(point);
+    const OutputType value = interp->Evaluate(point);
     std::cout << " Value: " << value << std::endl;
 
     if (itk::Math::abs(value - trueValue) > 1e-9)
@@ -98,7 +98,7 @@ TestContinuousIndex(const InterpolatorType *    interp,
 
   std::cout << " Index: " << index;
 
-  bool bvalue = interp->IsInsideBuffer(index);
+  const bool bvalue = interp->IsInsideBuffer(index);
   std::cout << " Inside: " << bvalue << std::endl;
 
   if (bvalue != isInside)
@@ -109,7 +109,7 @@ TestContinuousIndex(const InterpolatorType *    interp,
 
   if (isInside)
   {
-    OutputType value = interp->EvaluateAtContinuousIndex(index);
+    const OutputType value = interp->EvaluateAtContinuousIndex(index);
     std::cout << " Value: " << value << std::endl;
 
     if (itk::Math::abs(value - trueValue) > 1e-9)
@@ -139,15 +139,15 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
   using PointType = SincInterpolate::PointType;
   using OutputType = SincInterpolate::OutputType;
   using ContinuousIndexType = SincInterpolate::ContinuousIndexType;
-  using CoordRepType = SincInterpolate::CoordRepType;
+  using CoordinateType = SincInterpolate::CoordinateType;
 
   using InterpolatorType = SincInterpolate::InterpolatorType;
 
-  const unsigned int ImageDimension = SincInterpolate::ImageDimension;
+  constexpr unsigned int ImageDimension = SincInterpolate::ImageDimension;
 
-  ImageType::SizeType size = { { 20, 40, 80 } };
-  double              origin[3] = { 0.5, 0.5, 0.5 };
-  double              spacing[3] = { 0.1, 0.05, 0.025 };
+  constexpr ImageType::SizeType size = { { 20, 40, 80 } };
+  constexpr double              origin[3] = { 0.5, 0.5, 0.5 };
+  constexpr double              spacing[3] = { 0.1, 0.05, 0.025 };
 
 
   // Create a test image
@@ -163,23 +163,18 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
 
   // Write in a simple linear pattern
   using Iterator = itk::ImageRegionIteratorWithIndex<ImageType>;
-  Iterator iter(image, region);
 
-  IndexType      index;
-  unsigned short value;
-  PixelType      pixel;
-
-  for (; !iter.IsAtEnd(); ++iter)
+  for (Iterator iter(image, region); !iter.IsAtEnd(); ++iter)
   {
-    index = iter.GetIndex();
-    value = 0;
+    IndexType      index = iter.GetIndex();
+    unsigned short value = 0;
 
     for (unsigned int j = 0; j < ImageDimension; ++j)
     {
       value += index[j];
     }
 
-    pixel = value;
+    const PixelType pixel = value;
 
     iter.Set(pixel);
   }
@@ -197,15 +192,15 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
   /* Test evaluation at continuous indices and corresponding
      gemetric points */
   std::cout << "Evaluate at: " << std::endl;
-  OutputType          output;
+  OutputType          output = NAN;
   ContinuousIndexType cindex;
   PointType           point;
-  bool                passed;
+  bool                passed = false;
 
   // an integer position inside the image
   {
-    CoordRepType darray[3] = { 10, 20, 40 };
-    output = OutputType(70);
+    CoordinateType darray[3] = { 10, 20, 40 };
+    output = static_cast<OutputType>(70);
     cindex = ContinuousIndexType(darray);
     passed = SincInterpolate::TestContinuousIndex(interp, cindex, true, output);
   }
@@ -225,8 +220,8 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
 
   // position at the image border
   {
-    CoordRepType darray[3] = { 0, 20, 40 };
-    output = OutputType(60);
+    CoordinateType darray[3] = { 0, 20, 40 };
+    output = static_cast<OutputType>(60);
     cindex = ContinuousIndexType(darray);
     passed = SincInterpolate::TestContinuousIndex(interp, cindex, true, output);
   }
@@ -246,9 +241,9 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
 
   // position near image border
   {
-    double       epsilon = 1.0e-10;
-    CoordRepType darray[3] = { 19 - epsilon, 20, 40 };
-    output = OutputType(79);
+    constexpr double epsilon = 1.0e-10;
+    CoordinateType   darray[3] = { 19 - epsilon, 20, 40 };
+    output = static_cast<OutputType>(79);
     cindex = ContinuousIndexType(darray);
     passed = SincInterpolate::TestContinuousIndex(interp, cindex, true, output);
   }
@@ -268,8 +263,8 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
 
   // position outside the image
   {
-    CoordRepType darray[3] = { 20, 20, 40 };
-    output = OutputType(1);
+    CoordinateType darray[3] = { 20, 20, 40 };
+    output = static_cast<OutputType>(1);
     cindex = ContinuousIndexType(darray);
     passed = SincInterpolate::TestContinuousIndex(interp, cindex, false, output);
   }
@@ -289,8 +284,8 @@ itkWindowedSincInterpolateImageFunctionTest(int, char *[])
 
   // at non-integer position
   {
-    CoordRepType darray[3] = { 5.25, 12.5, 42.0 };
-    output = OutputType(59.75);
+    CoordinateType darray[3] = { 5.25, 12.5, 42.0 };
+    output = static_cast<OutputType>(59.75);
     cindex = ContinuousIndexType(darray);
     passed = SincInterpolate::TestContinuousIndex(interp, cindex, true, output);
   }

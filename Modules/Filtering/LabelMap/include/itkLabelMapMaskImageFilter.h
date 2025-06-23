@@ -37,7 +37,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa LabelMapToBinaryImageFilter, LabelMapToLabelImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
@@ -83,7 +83,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelMapMaskImageFilter);
 
   /** Set the feature image */
@@ -119,36 +119,41 @@ public:
    * Set/Get the value used as "background" in the output image.
    * Defaults to PixelType{}.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, OutputImagePixelType);
   itkGetConstMacro(BackgroundValue, OutputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * The label to mask or to not mask, depending on the value of the Negated ivar.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Label, InputImagePixelType);
   itkGetConstMacro(Label, InputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the Label should be masked or not.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Negated, bool);
   itkGetConstReferenceMacro(Negated, bool);
   itkBooleanMacro(Negated);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the image size should be adjusted to the masked image or not.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(Crop, bool);
   itkGetConstReferenceMacro(Crop, bool);
   itkBooleanMacro(Crop);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the border added to the mask before the crop. The default is 0 on
    * all the axes.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(CropBorder, SizeType);
   itkGetConstReferenceMacro(CropBorder, SizeType);
-
+  /** @ITKEndGrouping */
 protected:
   LabelMapMaskImageFilter();
   ~LabelMapMaskImageFilter() override = default;

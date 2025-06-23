@@ -47,7 +47,7 @@ public:
 };
 // Define how to print enumeration
 extern ITKOptimizers_EXPORT std::ostream &
-                            operator<<(std::ostream & out, const RegularStepGradientDescentBaseOptimizerEnums::StopCondition value);
+operator<<(std::ostream & out, const RegularStepGradientDescentBaseOptimizerEnums::StopCondition value);
 
 /** \class RegularStepGradientDescentBaseOptimizer
  * \brief Implement a gradient descent optimizer
@@ -69,7 +69,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegularStepGradientDescentBaseOptimizer);
 
   using StopConditionEnum = RegularStepGradientDescentBaseOptimizerEnums::StopCondition;
@@ -84,6 +84,7 @@ public:
   static constexpr StopConditionEnum Unknown = StopConditionEnum::Unknown;
 #endif
   /** Specify whether to minimize or maximize the cost function. */
+  /** @ITKStartGrouping */
   itkSetMacro(Maximize, bool);
   itkGetConstReferenceMacro(Maximize, bool);
   itkBooleanMacro(Maximize);
@@ -107,7 +108,7 @@ public:
   {
     SetMaximize(true);
   }
-
+  /** @ITKEndGrouping */
   /** Start optimization. */
   void
   StartOptimization() override;
@@ -123,6 +124,7 @@ public:
   StopOptimization();
 
   /** Set/Get parameters to control the optimization process. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumStepLength, double);
   itkSetMacro(MinimumStepLength, double);
   itkSetMacro(RelaxationFactor, double);
@@ -138,9 +140,9 @@ public:
   itkGetConstReferenceMacro(StopCondition, StopConditionEnum);
   itkGetConstReferenceMacro(Value, MeasureType);
   itkGetConstReferenceMacro(Gradient, DerivativeType);
-
+  /** @ITKEndGrouping */
   /** Get the reason for termination */
-  const std::string
+  std::string
   GetStopConditionDescription() const override;
 
 protected:

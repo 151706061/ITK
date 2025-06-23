@@ -21,9 +21,7 @@
 #include "itkSubsamplerBase.h"
 #include "itkImageRegion.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class RegionConstrainedSubsampler
@@ -63,7 +61,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegionConstrainedSubsampler);
 
   /** type alias alias for the source data container */
@@ -119,7 +117,7 @@ protected:
    * This does a complete copy of the subsampler state
    * to the new subsampler
    */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
   RegionConstrainedSubsampler();
@@ -134,8 +132,7 @@ protected:
   bool       m_SampleRegionInitialized{};
 }; // end of class RegionConstrainedSubsampler
 
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkRegionConstrainedSubsampler.hxx"

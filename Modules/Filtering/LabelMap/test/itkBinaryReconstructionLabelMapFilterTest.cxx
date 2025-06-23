@@ -63,14 +63,14 @@ itkBinaryReconstructionLabelMapFilterTest(int argc, char * argv[])
   using LabelReconstructionType = itk::BinaryReconstructionLabelMapFilter<LabelMapType, ImageType>;
   auto reconstruction = LabelReconstructionType::New();
 
-  int fg = std::stoi(argv[4]);
+  const int fg = std::stoi(argv[4]);
   reconstruction->SetForegroundValue(fg);
   ITK_TEST_SET_GET_VALUE(fg, reconstruction->GetForegroundValue());
 
   reconstruction->SetInput(i2l->GetOutput());
   reconstruction->SetMarkerImage(reader2->GetOutput());
 
-  itk::SimpleFilterWatcher watcher(reconstruction, "filter");
+  const itk::SimpleFilterWatcher watcher(reconstruction, "filter");
   reconstruction->Update();
   reconstruction->GetOutput()->PrintLabelObjects();
 
@@ -97,10 +97,10 @@ itkBinaryReconstructionLabelMapFilterTest(int argc, char * argv[])
                       obtainedAttributeSet.end(),
                       std::inserter(diff, diff.begin()));
 
-  if (diff.size() != 0)
+  if (!diff.empty())
   {
     std::cerr << "Error" << std::endl;
-    std::cerr << " Obtained attribute set differs from expected atribute set" << std::endl;
+    std::cerr << " Obtained attribute set differs from expected attribute set" << std::endl;
     for (auto it1 = attributeSet.cbegin(), it2 = obtainedAttributeSet.cbegin();
          it1 != attributeSet.cend() || it2 != obtainedAttributeSet.cend();
          ++it1, ++it2)

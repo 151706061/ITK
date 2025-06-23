@@ -54,7 +54,7 @@ public:
   itkNewMacro(Self);
 
   // Pure virtual functions that all Metrics must provide
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfParameters() const override
   {
     return 5;
@@ -73,7 +73,7 @@ public:
     derivative.Fill(0.0);
   }
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfLocalParameters() const override
   {
     return 0;
@@ -164,7 +164,7 @@ public:
     this->SetNumberOfRandomSamples(1000);
     this->SampleVirtualDomain();
 
-    itk::SizeValueType numPara = this->GetTransform()->GetNumberOfParameters();
+    const itk::SizeValueType numPara = this->GetTransform()->GetNumberOfParameters();
     parameterScales.SetSize(numPara);
 
     ParametersType norms(numPara);
@@ -177,7 +177,7 @@ public:
     // checking each sample point
     for (itk::SizeValueType c = 0; c < numSamples; ++c)
     {
-      VirtualPointType point = this->m_SamplePoints[c];
+      const VirtualPointType point = this->m_SamplePoints[c];
 
       ParametersType squaredNorms(numPara);
       this->ComputeSquaredJacobianNorms(point, squaredNorms);
@@ -200,7 +200,7 @@ public:
   double
   EstimateStepScale(const ParametersType & step) override
   {
-    double norm = step.two_norm();
+    const double norm = step.two_norm();
     return norm;
   }
 
@@ -231,12 +231,11 @@ itkRegistrationParameterScalesEstimatorTest(int, char *[])
   using MovingImageType = itk::Image<PixelType, ImageDimension>;
   using VirtualImageType = itk::Image<PixelType, ImageDimension>;
 
-  auto                      fixedImage = FixedImageType::New();
-  auto                      movingImage = MovingImageType::New();
-  VirtualImageType::Pointer virtualImage = fixedImage;
+  auto                            fixedImage = FixedImageType::New();
+  auto                            movingImage = MovingImageType::New();
+  const VirtualImageType::Pointer virtualImage = fixedImage;
 
-  MovingImageType::SizeType size;
-  size.Fill(100);
+  auto size = MovingImageType::SizeType::Filled(100);
 
   movingImage->SetRegions(size);
   fixedImage->SetRegions(size);
@@ -266,7 +265,7 @@ itkRegistrationParameterScalesEstimatorTest(int, char *[])
 
   // Scales for the affine transform from max squared norm of transform jacobians
   using RegistrationParameterScalesEstimatorTestType = RegistrationParameterScalesEstimatorTest<MetricType>;
-  RegistrationParameterScalesEstimatorTestType::Pointer jacobianScaleEstimator =
+  const RegistrationParameterScalesEstimatorTestType::Pointer jacobianScaleEstimator =
     RegistrationParameterScalesEstimatorTestType::New();
 
   jacobianScaleEstimator->SetMetric(metric);
@@ -391,9 +390,7 @@ itkRegistrationParameterScalesEstimatorTest(int, char *[])
     std::cout << "Test passed" << std::endl;
     return EXIT_SUCCESS;
   }
-  else
-  {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-  }
+
+  std::cout << "Test failed" << std::endl;
+  return EXIT_FAILURE;
 }

@@ -64,7 +64,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Rigid2DTransform);
 
   /** New macro for creation of through a Smart Pointer */
@@ -192,6 +192,7 @@ public:
   /** Set/Get the angle of rotation in radians. These methods
    * are old and are retained for backward compatibility.
    * Instead, use SetAngle() and GetAngle(). */
+  /** @ITKStartGrouping */
   void
   SetRotation(TParametersValueType angle)
   {
@@ -202,7 +203,7 @@ public:
   {
     return m_Angle;
   }
-
+  /** @ITKEndGrouping */
   /** Set the transformation from a container of parameters
    * This is typically used by optimizers.
    * There are 3 parameters. The first one represents the

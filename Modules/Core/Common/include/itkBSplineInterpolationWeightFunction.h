@@ -44,9 +44,9 @@ namespace itk
  * \ingroup Functions ImageInterpolators
  * \ingroup ITKCommon
  */
-template <typename TCoordRep = float, unsigned int VSpaceDimension = 2, unsigned int VSplineOrder = 3>
+template <typename TCoordinate = float, unsigned int VSpaceDimension = 2, unsigned int VSplineOrder = 3>
 class ITK_TEMPLATE_EXPORT BSplineInterpolationWeightFunction
-  : public FunctionBase<ContinuousIndex<TCoordRep, VSpaceDimension>,
+  : public FunctionBase<ContinuousIndex<TCoordinate, VSpaceDimension>,
                         FixedArray<double, Math::UnsignedPower(VSplineOrder + 1, VSpaceDimension)>>
 {
 public:
@@ -54,7 +54,7 @@ public:
 
   /** Standard class type aliases. */
   using Self = BSplineInterpolationWeightFunction;
-  using Superclass = FunctionBase<ContinuousIndex<TCoordRep, VSpaceDimension>,
+  using Superclass = FunctionBase<ContinuousIndex<TCoordinate, VSpaceDimension>,
                                   FixedArray<double, Math::UnsignedPower(VSplineOrder + 1, VSpaceDimension)>>;
 
   using Pointer = SmartPointer<Self>;
@@ -63,7 +63,7 @@ public:
   /** New macro for creation of through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BSplineInterpolationWeightFunction);
 
   /** Space dimension. */
@@ -83,7 +83,7 @@ public:
   using SizeType = Size<VSpaceDimension>;
 
   /** ContinuousIndex type alias support. */
-  using ContinuousIndexType = ContinuousIndex<TCoordRep, VSpaceDimension>;
+  using ContinuousIndexType = ContinuousIndex<TCoordinate, VSpaceDimension>;
 
   /** The support region size: a hypercube of length SplineOrder + 1 */
   static constexpr SizeType SupportSize{ SizeType::Filled(VSplineOrder + 1) };
@@ -106,31 +106,23 @@ public:
 
 #if !defined(ITK_LEGACY_REMOVE)
   /** Get support region size. */
-  itkLegacyMacro(SizeType GetSupportSize() const) { return Self::SupportSize; };
+  itkLegacyMacro(SizeType GetSupportSize() const)
+  {
+    return Self::SupportSize;
+  }
 
   /** Get number of weights. */
-  itkLegacyMacro(unsigned int GetNumberOfWeights() const) { return Self::NumberOfWeights; }
+  itkLegacyMacro(unsigned int GetNumberOfWeights() const)
+  {
+    return Self::NumberOfWeights;
+  }
 #endif
 
 protected:
   BSplineInterpolationWeightFunction() = default;
   ~BSplineInterpolationWeightFunction() override = default;
-
-private:
-  /** Lookup table type. */
-  using TableType = FixedArray<IndexType, NumberOfWeights>;
-
-  /** Table mapping linear offset to indices. */
-  const TableType m_OffsetToIndexTable{ [] {
-    TableType     table;
-    // Note: Copied the constexpr value `SupportSize` to a local variable, to prevent a GCC
-    // (Ubuntu 7.5.0-3ubuntu1~18.04) link error, "undefined reference to `SupportSize`", and Clang
-    // (Mac10.13-AppleClang-dbg-x86_64-static) "Undefined symbols for architecture x86_64".
-    const auto    supportSize = SupportSize;
-    std::copy_n(ZeroBasedIndexRange<SpaceDimension>(supportSize).cbegin(), NumberOfWeights, table.begin());
-    return table;
-  }() };
 };
+
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

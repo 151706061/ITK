@@ -31,10 +31,7 @@ namespace itk
  * This class encapsulates the smoothing kernel used for statistical density
  * estimation and nonparametric regression. The basic idea of the kernel
  * approach is to weight observations by a smooth function (the kernel)
- * to created a smoothed approximation.
- *
- * Reference:
- * Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
+ * to create a smoothed approximation \cite silverman1986.
  *
  * \ingroup Functions
  * \ingroup ITKCommon
@@ -51,18 +48,14 @@ public:
 
   using RealType = TRealValueType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KernelFunctionBase);
 
   /** Evaluate the function. Subclasses must implement this. */
   TRealValueType
   Evaluate(const TRealValueType & u) const override = 0;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(TRealValueTypeIsFloatingPointCheck, (Concept::IsFloatingPoint<TRealValueType>));
-  // End concept checking
-#endif
 
 protected:
   KernelFunctionBase() = default;

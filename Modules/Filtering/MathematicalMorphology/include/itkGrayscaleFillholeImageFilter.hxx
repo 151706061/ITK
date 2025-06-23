@@ -27,11 +27,7 @@
 namespace itk
 {
 template <typename TInputImage, typename TOutputImage>
-GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::GrayscaleFillholeImageFilter()
-
-{
-  m_FullyConnected = false;
-}
+GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::GrayscaleFillholeImageFilter() = default;
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -41,7 +37,7 @@ GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedR
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -70,16 +66,14 @@ GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::GenerateData()
   //
 
   // compute the maximum pixel value in the input
-  typename MinimumMaximumImageCalculator<TInputImage>::Pointer calculator =
-    MinimumMaximumImageCalculator<TInputImage>::New();
+  auto calculator = MinimumMaximumImageCalculator<TInputImage>::New();
   calculator->SetImage(this->GetInput());
   calculator->ComputeMaximum();
 
-  InputImagePixelType maxValue;
-  maxValue = calculator->GetMaximum();
+  const InputImagePixelType maxValue = calculator->GetMaximum();
 
   // allocate a marker image
-  InputImagePointer markerPtr = InputImageType::New();
+  const InputImagePointer markerPtr = InputImageType::New();
   markerPtr->SetRegions(this->GetInput()->GetRequestedRegion());
   markerPtr->CopyInformation(this->GetInput());
   markerPtr->Allocate();
@@ -110,8 +104,7 @@ GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Delegate to a geodesic erosion filter.
   //
   //
-  typename ReconstructionByErosionImageFilter<TInputImage, TInputImage>::Pointer erode =
-    ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
+  auto erode = ReconstructionByErosionImageFilter<TInputImage, TInputImage>::New();
 
   // Create a process accumulator for tracking the progress of this minipipeline
   auto progress = ProgressAccumulator::New();
@@ -144,7 +137,7 @@ GrayscaleFillholeImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream 
   Superclass::PrintSelf(os, indent);
 
   os << indent << "Number of iterations used to produce current output: " << m_NumberOfIterationsUsed << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

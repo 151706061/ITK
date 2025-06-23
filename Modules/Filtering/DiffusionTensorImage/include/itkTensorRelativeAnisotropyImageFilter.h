@@ -89,7 +89,7 @@ public:
   using InputPixelType = typename TInputImage::PixelType;
   using InputValueType = typename InputPixelType::ValueType;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TensorRelativeAnisotropyImageFilter);
 
   /** Method for creation through the object factory. */
@@ -102,11 +102,7 @@ public:
     this->Superclass::PrintSelf(os, indent);
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputValueType>));
-  // End concept checking
-#endif
 
 protected:
   TensorRelativeAnisotropyImageFilter() = default;

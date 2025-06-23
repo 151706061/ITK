@@ -52,7 +52,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SphereMeshSource);
 
   /** Hold on to the type information specified by the template parameters. */
@@ -76,9 +76,10 @@ public:
 
   /** All these parameter setting function are public temporarily to make the
    * test easier */
+  /** @ITKStartGrouping */
   itkSetMacro(ResolutionX, unsigned int);
   itkSetMacro(ResolutionY, unsigned int);
-
+  /** @ITKEndGrouping */
   itkSetMacro(Center, OPointType);
   itkSetMacro(Scale, OPointType);
 

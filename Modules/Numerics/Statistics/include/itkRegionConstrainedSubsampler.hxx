@@ -18,17 +18,14 @@
 #ifndef itkRegionConstrainedSubsampler_hxx
 #define itkRegionConstrainedSubsampler_hxx
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 template <typename TSample, typename TRegion>
 RegionConstrainedSubsampler<TSample, TRegion>::RegionConstrainedSubsampler()
+
 {
   this->m_RequestMaximumNumberOfResults = true;
-  this->m_RegionConstraintInitialized = false;
-  this->m_SampleRegionInitialized = false;
 }
 
 template <typename TSample, typename TRegion>
@@ -37,7 +34,7 @@ RegionConstrainedSubsampler<TSample, TRegion>::InternalClone() const
 {
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
@@ -115,7 +112,6 @@ RegionConstrainedSubsampler<TSample, TRegion>::PrintSelf(std::ostream & os, Inde
   os << std::endl;
 }
 
-} // end namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #endif

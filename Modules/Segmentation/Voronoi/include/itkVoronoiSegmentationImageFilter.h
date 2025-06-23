@@ -41,10 +41,7 @@ namespace itk
  * The parameters can also be automatically set by given a prior, as a binary
  * image.
  *
- * Detail information about this algorithm can be found in:
- *  " Semi-automated color segmentation of anatomical tissue,"
- *   C. Imelinska, M. Downes, and W. Yuan
- *  Computerized Medical Imaging and Graphics, Vor.24, pp 173-180, 2000.
+ * Detailed information about this algorithm can be found in \cite imelinska2000.
  *
  * \ingroup HybridSegmentation
  * \ingroup ITKVoronoi
@@ -65,7 +62,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VoronoiSegmentationImageFilter);
 
   /** Convenient type alias. */
@@ -76,18 +73,21 @@ public:
   using typename Superclass::InputImageType;
 
   /** Set/Get the Estimation of the mean pixel value for the object. */
+  /** @ITKStartGrouping */
   itkSetMacro(Mean, double);
   itkGetConstMacro(Mean, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the estimation of the STD of the pixel value for the
    *  object. */
+  /** @ITKStartGrouping */
   itkSetMacro(STD, double);
   itkGetConstMacro(STD, double);
-
+  /** @ITKEndGrouping */
   /** Set/Get the Tolerance of Mean for classifying the regions. */
+  /** @ITKStartGrouping */
   itkSetMacro(MeanTolerance, double);
   itkGetConstMacro(MeanTolerance, double);
-
+  /** @ITKEndGrouping */
   /** Set the Tolerance of STD for classifying the regions. */
   itkSetMacro(STDTolerance, double);
 
@@ -101,10 +101,11 @@ public:
   itkGetConstMacro(MeanPercentError, double);
 
   /** Set/Get the STD percent error. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(STDPercentError, double);
   void
   SetSTDPercentError(double x);
-
+  /** @ITKEndGrouping */
   /** Take a prior from other segmentation node, should be an
    * binary object. */
   void
@@ -114,12 +115,8 @@ public:
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
   itkConceptMacro(IntConvertibleToOutputCheck, (Concept::Convertible<int, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   VoronoiSegmentationImageFilter() = default;

@@ -41,11 +41,7 @@ namespace itk
  *
  * These parameters can also be automatically set by providing a binary image prior.
  *
- * Detailed information about this algorithm can be found in:
- *  " Semi-automated color segmentation of anatomical tissue,"
- *   C. Imelinska, M. Downes, and W. Yuan
- *  Computerized Medical Imaging and Graphics, Vol.24, pp 173-180, 2000.
- *
+ * Detailed information about this algorithm can be found in \cite imelinska2000.
  *
  * \ingroup HybridSegmentation
  * \ingroup ITKVoronoi
@@ -63,7 +59,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VoronoiSegmentationRGBImageFilter);
 
   /** Method for creation through the object factory. */
@@ -81,6 +77,7 @@ public:
   using RGBHCVImage = Image<RGBHCVPixel>;
 
   /** \todo Document. */
+  /** @ITKStartGrouping */
   void
   SetMeanPercentError(const double x[6]);
   void
@@ -149,13 +146,14 @@ public:
       x[i] = m_STDTolerance[i];
     }
   }
-
+  /** @ITKEndGrouping */
   /** Maximum value of the RGB, needed for color space conversions.
    * default as 8 bit per channel, if it is different, need to be
    * set before doing anything. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaxValueOfRGB, double);
   itkGetConstMacro(MaxValueOfRGB, double);
-
+  /** @ITKEndGrouping */
   /** Set the three channels to test the mean and STD respectively
    * 0:red, 1:green, 2:blue, 3:hue, 4:chroma, 5:value. */
   void
@@ -204,13 +202,9 @@ public:
   static constexpr unsigned int InputImageDimension = TInputImage::ImageDimension;
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, OutputImageDimension>));
   itkConceptMacro(IntConvertibleToOutputCheck, (Concept::Convertible<int, typename TOutputImage::PixelType>));
   itkConceptMacro(PixelDimensionCheck, (Concept::SameDimension<PixelType::Dimension, 3u>));
-  // End concept checking
-#endif
 
 protected:
   VoronoiSegmentationRGBImageFilter();

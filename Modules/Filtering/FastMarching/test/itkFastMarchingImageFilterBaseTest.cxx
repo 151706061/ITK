@@ -39,11 +39,10 @@ FastMarchingImageFilterBaseTestFunction()
   using FastMarchingImageFilterType = itk::FastMarchingImageFilterBase<ImageType, ImageType>;
   auto fastMarchingFilter = FastMarchingImageFilterType::New();
 
-  bool overrideOutputInformation = true;
+  constexpr bool overrideOutputInformation = true;
   ITK_TEST_SET_GET_BOOLEAN(fastMarchingFilter, OverrideOutputInformation, overrideOutputInformation);
 
-  typename FastMarchingImageFilterType::OutputSizeType outputSize;
-  outputSize.Fill(32);
+  auto outputSize = FastMarchingImageFilterType::OutputSizeType::Filled(32);
   fastMarchingFilter->SetOutputSize(outputSize);
   ITK_TEST_SET_GET_VALUE(outputSize, fastMarchingFilter->GetOutputSize());
 
@@ -52,8 +51,7 @@ FastMarchingImageFilterBaseTestFunction()
   fastMarchingFilter->SetOutputRegion(outputRegion);
   ITK_TEST_SET_GET_VALUE(outputRegion, fastMarchingFilter->GetOutputRegion());
 
-  typename FastMarchingImageFilterType::OutputSpacingType outputSpacing;
-  outputSpacing.Fill(1.0);
+  auto outputSpacing = itk::MakeFilled<typename FastMarchingImageFilterType::OutputSpacingType>(9876.0);
   fastMarchingFilter->SetOutputSpacing(outputSpacing);
   ITK_TEST_SET_GET_VALUE(outputSpacing, fastMarchingFilter->GetOutputSpacing());
 
@@ -62,8 +60,7 @@ FastMarchingImageFilterBaseTestFunction()
   fastMarchingFilter->SetOutputDirection(outputDirection);
   ITK_TEST_SET_GET_VALUE(outputDirection, fastMarchingFilter->GetOutputDirection());
 
-  typename FastMarchingImageFilterType::OutputPointType outputOrigin;
-  outputOrigin.Fill(0.0);
+  const auto outputOrigin = itk::MakeFilled<typename FastMarchingImageFilterType::OutputPointType>(1234.0);
   fastMarchingFilter->SetOutputOrigin(outputOrigin);
   ITK_TEST_SET_GET_VALUE(outputOrigin, fastMarchingFilter->GetOutputOrigin());
 
@@ -85,7 +82,7 @@ itkFastMarchingImageFilterBaseTest(int, char *[])
   // Exercise basic object methods
   // Done outside the helper function in the test because GCC is limited
   // when calling overloaded base class functions.
-  const unsigned int Dimension = 2;
+  constexpr unsigned int Dimension = 2;
   using PixelType = float;
   using ImageType = itk::Image<PixelType, Dimension>;
 

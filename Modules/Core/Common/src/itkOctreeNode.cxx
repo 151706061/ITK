@@ -25,16 +25,9 @@ namespace itk
  * ====================================================================================
  * ====================================================================================
  */
-OctreeNode::OctreeNode()
-{
-  m_Parent = nullptr;
-  m_Branch = nullptr;
-}
+OctreeNode::OctreeNode() = default;
 
-OctreeNode::~OctreeNode()
-{
-  this->RemoveChildren();
-}
+OctreeNode::~OctreeNode() { this->RemoveChildren(); }
 
 OctreeNode &
 OctreeNode::GetChild(const LeafIdentifierEnum ChildID) const
@@ -85,7 +78,6 @@ OctreeNode::SetBranch(OctreeNodeBranch * NewBranch)
 
 /**
  * \brief Determines if the current node is colored
- * \param void
  * \return  bool true if this node is colored
  */
 bool
@@ -99,10 +91,8 @@ OctreeNode::IsNodeColored() const
 
     return this->m_Branch >= first && this->m_Branch <= last;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 void

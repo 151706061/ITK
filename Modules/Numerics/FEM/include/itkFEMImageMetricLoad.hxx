@@ -18,10 +18,7 @@
 #ifndef itkFEMImageMetricLoad_hxx
 #define itkFEMImageMetricLoad_hxx
 
-
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 // Overload the CreateAnother() method.
 template <typename TMoving, typename TFixed>
@@ -125,12 +122,11 @@ ImageMetricLoad<TMoving, TFixed>::InitializeMetric()
 
 template <typename TMoving, typename TFixed>
 ImageMetricLoad<TMoving, TFixed>::ImageMetricLoad()
+  : m_Metric(nullptr)
+  , m_Sign(1.0)
+  , m_SolutionIndex(1)
+  , m_Transform(nullptr)
 {
-  m_Metric = nullptr;
-  m_Transform = nullptr;
-  m_SolutionIndex = 1;
-  m_SolutionIndex2 = 0;
-  m_Sign = 1.0;
   for (unsigned int i = 0; i < ImageDimension; ++i)
   {
     m_MetricRadius[i] = 1;
@@ -509,11 +505,10 @@ ImageMetricLoad<TMoving, TFixed>::MetricFiniteDiff(VectorType Gpos, VectorType G
     tindex[k] = static_cast<long>(Gpos[k] + 0.5) - static_cast<long>(regionRadius[k]) / 2;
   }
 
-  unsigned int                  row;
   typename ImageType::IndexType difIndex[ImageDimension][2];
 
   typename MetricBaseType::MeasureType dPixL, dPixR;
-  for (row = 0; row < ImageDimension; ++row)
+  for (unsigned int row = 0; row < ImageDimension; ++row)
   {
     difIndex[row][0] = tindex;
     difIndex[row][1] = tindex;
@@ -576,9 +571,6 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
 
   VectorType chebycoefs; // gradient direction
   chebycoefs.set_size(ImageDimension);
-  double chebycoefs0 = 0.0; // the constant term
-  double datatotal = 0.0;
-  double a0norm = 1.0;
   double a1norm = 1.0 / 2.0;
 
   double met, ind1, ind2;
@@ -588,7 +580,6 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
   inds[2] = 1.0;
   for (unsigned int k = 0; k < ImageDimension; ++k)
   {
-    a0norm /= 3.0;
     if (k < ImageDimension - 1)
     {
       a1norm /= 3.0;
@@ -621,7 +612,7 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
     tindex[k] = static_cast<long>(Gpos[k] + 0.5) - static_cast<long>(regionRadius[k]) / 2;
   }
 
-  if (ImageDimension == 2)
+  if constexpr (ImageDimension == 2)
   {
     double measure[3][3];
     for (int row = -1; row < 2; ++row)
@@ -654,8 +645,6 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
         }
         catch (...)
         {}
-
-        datatotal += measure[row + 1][col + 1];
       }
     }
     for (unsigned int cb1 = 0; cb1 < 3; ++cb1)
@@ -670,7 +659,7 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
       }
     }
   }
-  else if (ImageDimension == 3)
+  else if constexpr (ImageDimension == 3)
   {
     double measure3D[3][3][3];
     for (int row = -1; row < 2; ++row)
@@ -706,8 +695,6 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
           }
           catch (...)
           {}
-
-          datatotal += measure3D[row + 1][col + 1][z + 1];
         }
       }
     }
@@ -724,9 +711,6 @@ ImageMetricLoad<TMoving, TFixed>::GetPolynomialFitToMetric(VectorType Gpos, Vect
       }
     }
   }
-
-  chebycoefs0 = a0norm * datatotal;
-  //  std::cout << " cb " << chebycoefs << std::endl;
   return chebycoefs;
 }
 
@@ -850,7 +834,6 @@ ImageMetricLoad<TMoving, TFixed>::PrintSelf(std::ostream & os, Indent indent) co
   os << indent << "Energy: " << this->m_Energy << std::endl;
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif

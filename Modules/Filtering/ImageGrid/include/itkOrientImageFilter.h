@@ -20,7 +20,7 @@
 
 #include "itkPermuteAxesImageFilter.h"
 #include "itkFlipImageFilter.h"
-#include "itkSpatialOrientationAdapter.h"
+#include "itkAnatomicalOrientation.h"
 #include <map>
 #include <string>
 
@@ -36,26 +36,24 @@ namespace itk
  * of human anatomy, and the even wider variety of image processing software,
  * it is often necessary to re-orient image volume data.
  *
- * OrientImageFilter depends on a set of constants that describe all possible
- * labeled according to the following scheme:
- * Directions are labeled in terms of following pairs:
+ * OrientImageFilter depends on representations of the orientation defined in the
+ * AnatomicalOrientation class. The orientation is represented by the following anatomical terms with respect to the
+ * subject or patient:
  *   - Left and Right (Subject's left and right)
  *   - Anterior and Posterior (Subject's front and back)
  *   - Inferior and Superior (Subject's bottom and top, i.e. feet and head)
  *
- * The initials of these directions are used in a 3 letter code in the
- * enumerated type itk::SpatialOrientationEnums::ValidCoordinateOrientations.
- * The initials are given fastest moving index first, second fastest second,
- * third fastest third.
- * Examples:
- *  - ITK_COORDINATE_ORIENTATION_RIP
- *    -# Right to Left varies fastest (0th pixel on Subject's right)
- *    -# Inferior to Superior varies second fastest
- *    -# Posterior to Anterior varies slowest.
- *  - ITK_COORDINATE_ORIENTATION_LSA
- *    -# Left to Right varies fastest (0th pixel on Subject's left)
- *    -# Superior to Inferior varies second fastest
- *    -# Anterior to Posterior varies slower
+ * An AnatomicalOrientation object can be constructed unambiguously with the following syntax:
+ *
+   \code
+       AnatomicalOrientation(AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                             AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior,
+                             AnatomicalOrientation::CoordinateEnum::InferiorToSuperior);
+   \endcode
+ *
+ *
+ * The orientations were previously defined in the itk::SpatialOrientation class. However,
+ * the 3 letter code is ambiguous with label and the direction the axis is increasing.
  *
  * In order to use this filter, you need to supply an input
  * image, the current orientation of the input image (set with
@@ -70,72 +68,6 @@ namespace itk
  * for the itk::Image object and the Image.Direction direction cosine
  * matrix created from the file.
  *
- * As an example, if you wished to keep all images within your program in the
- * orientation corresponding to the Analyze file format's 'CORONAL' orientation
- * you could do something like the following
- *
-   \code
-   // DEPRECATED -- using metadata for orientation is no longer supported
-   //
-   #include "itkAnalyzeImageIO.h"
-   #include "itkMetaDataObject.h"
-   #include "itkImage.h"
-   #include "itkOrientImageFilter.h"
-   using ImageType = itk::Image<unsigned char,3>;
-   using ImageReaderType = itk::ImageFileReader< TestImageType >;
-   ImageType::Pointer ReadAnalyzeFile(const char *path)
-   {
-     itk::AnalyzeImageIO::Pointer io = itk::AnalyzeImageIO::New();
-     auto fileReader = ImageReaderType::New();
-     fileReader->SetImageIO(io);
-     fileReader->SetFileName(path);
-     fileReader->Update();
-     ImageType::Pointer rval = fileReader->GetOutput();
-
-   // DEPRECATED -- use direction cosines
-   //
-    itk::SpatialOrientation::ValidCoordinateOrientationFlags fileOrientation;
-    itk::ExposeMetaData<itk::SpatialOrientation::ValidCoordinateOrientationFlags>
-      (rval->GetMetaDataDictionary(),itk::ITK_CoordinateOrientation,fileOrientation);
-     itk::OrientImageFilter<ImageType,ImageType>::Pointer orienter =
-       itk::OrientImageFilter<ImageType,ImageType>::New();
-     orienter->SetGivenCoordinateOrientation(fileOrientation); // deprecated
-
-     orienter->SetDesiredCoordinateOrientation(itk::SpatialOrientation::ITK_COORDINATE_ORIENTATION_RIP);
-     orienter->SetInput(rval);
-     orienter->Update();
-     rval = orienter->GetOutput();
-     return rval;
-   }
-   \endcode
- *
- * Or, using the direction cosines of the image,
-   \code
-   #include "itkAnalyzeImageIO.h"
-   #include "itkImage.h"
-   #include "itkOrientImageFilter.h"
-   using ImageType = itk::Image<unsigned char,3>;
-   using ImageReaderType = itk::ImageFileReader< ImageType >;
-   ImageType::Pointer ReadAnalyzeFile(const char *path)
-   {
-     itk::AnalyzeImageIO::Pointer io = itk::AnalyzeImageIO::New();
-     auto fileReader = ImageReaderType::New();
-     fileReader->SetImageIO(io);
-     fileReader->SetFileName(path);
-     fileReader->Update();
-     ImageType::Pointer rval = fileReader->GetOutput();
-
-     itk::OrientImageFilter<ImageType,ImageType>::Pointer orienter =
-       itk::OrientImageFilter<ImageType,ImageType>::New();
-     orienter->UseImageDirectionOn();
-     orienter->SetDesiredCoordinateOrientation(
-       itk::SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP);
-     orienter->SetInput(rval);
-     orienter->Update();
-     rval = orienter->GetOutput();
-     return rval;
-   }
-   \endcode
  * \ingroup ITKImageGrid
  */
 template <typename TInputImage, typename TOutputImage>
@@ -161,7 +93,7 @@ public:
   using OutputImageConstPointer = typename OutputImageType::ConstPointer;
   using OutputImageRegionType = typename OutputImageType::RegionType;
   using OutputImagePixelType = typename OutputImageType::PixelType;
-  using CoordinateOrientationCode = SpatialOrientationEnums::ValidCoordinateOrientations;
+  using CoordinateOrientationCode = AnatomicalOrientation;
 
   /** Axes permuter type. */
   using PermuterType = PermuteAxesImageFilter<TInputImage>;
@@ -178,18 +110,20 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(OrientImageFilter);
 
   /** Set/Get the orientation codes to define the coordinate transform. */
+  /** @ITKStartGrouping */
   itkGetEnumMacro(GivenCoordinateOrientation, CoordinateOrientationCode);
   void
   SetGivenCoordinateOrientation(CoordinateOrientationCode newCode);
+  /** @ITKEndGrouping */
 
   inline void
   SetGivenCoordinateDirection(const typename TInputImage::DirectionType & GivenDirection)
   {
-    SetGivenCoordinateOrientation(itk::SpatialOrientationAdapter().FromDirectionCosines(GivenDirection));
+    SetGivenCoordinateOrientation(AnatomicalOrientation(GivenDirection));
   }
 
   itkGetEnumMacro(DesiredCoordinateOrientation, CoordinateOrientationCode);
@@ -199,18 +133,22 @@ public:
   inline void
   SetDesiredCoordinateDirection(const typename TOutputImage::DirectionType & DesiredDirection)
   {
-    SetDesiredCoordinateOrientation(itk::SpatialOrientationAdapter().FromDirectionCosines(DesiredDirection));
+    SetDesiredCoordinateOrientation(AnatomicalOrientation(DesiredDirection));
   }
 
   /** Controls how the GivenCoordinateOrientation is determined.
    * If set to On, the direction cosines determine the coordinate
    * orientation. If set to Off, the user must use the
    * SetGivenCoordinateOrientation method to establish the
-   * orientation. For compatibility with the original API, the default value
+   * orientation.
+   *
+   * For compatibility with the original API, the default value
    * is Off. */
+  /** @ITKStartGrouping */
   itkBooleanMacro(UseImageDirection);
   itkGetConstMacro(UseImageDirection, bool);
   itkSetMacro(UseImageDirection, bool);
+  /** @ITKEndGrouping */
 
   /** Get axes permute order. */
   itkGetConstReferenceMacro(PermuteOrder, PermuteOrderArrayType);
@@ -222,35 +160,37 @@ public:
    *  These methods allow a limited selection of slice orientations
    *  without having to specify the SpatialOrientation.
    *
-   *  SetDesiredCoordinateOrientationToAxial is equivalent to
-   *  SetDesiredCoordinateOrientation (ITK_COORDINATE_ORIENTATION_RAI).
+   *  SetDesiredCoordinateOrientationToAxial is equivalent to AnatomicalOrientation::PositiveEnum::LPS.
    *
-   *  SetDesiredCoordinateOrientationToCoronal is equivalent to
-   *  SetDesiredCoordinateOrientation (ITK_COORDINATE_ORIENTATION_RSA).
+   *  SetDesiredCoordinateOrientationToCoronal is equivalent to AnatomicalOrientation::PositiveEnum::LIP.
    *
-   *  SetDesiredCoordinateOrientationToSagittal is equivalent to
-   *  SetDesiredCoordinateOrientation (ITK_COORDINATE_ORIENTATION_ASL).
+   *  SetDesiredCoordinateOrientationToSagittal is equivalent to AnatomicalOrientation::PositiveEnum::PIR.
    */
+  /** @ITKStartGrouping */
   void
   SetDesiredCoordinateOrientationToAxial()
   {
-    this->SetDesiredCoordinateOrientation(
-      SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RAI);
+    this->SetDesiredCoordinateOrientation({ AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                                            AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior,
+                                            AnatomicalOrientation::CoordinateEnum::InferiorToSuperior });
   }
 
   void
   SetDesiredCoordinateOrientationToCoronal()
   {
-    this->SetDesiredCoordinateOrientation(
-      SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RSA);
+    this->SetDesiredCoordinateOrientation({ AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                                            AnatomicalOrientation::CoordinateEnum::SuperiorToInferior,
+                                            AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior });
   }
 
   void
   SetDesiredCoordinateOrientationToSagittal()
   {
-    this->SetDesiredCoordinateOrientation(
-      SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_ASL);
+    this->SetDesiredCoordinateOrientation({ AnatomicalOrientation::CoordinateEnum::AnteriorToPosterior,
+                                            AnatomicalOrientation::CoordinateEnum::SuperiorToInferior,
+                                            AnatomicalOrientation::CoordinateEnum::LeftToRight });
   }
+  /** @ITKEndGrouping */
 
   /** OrientImageFilter produces an image which is a different
    * dimensionality than its input image, in general. As such,
@@ -258,17 +198,13 @@ public:
    * GenerateOutputInformation() in order to inform the pipeline
    * execution model. The original documentation of this method is
    * below.
-   * \sa ProcessObject::GenerateOutputInformaton() */
+   * \sa ProcessObject::GenerateOutputInformation() */
   void
   GenerateOutputInformation() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputConvertibleToOutput, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
   itkConceptMacro(SameDimension, (Concept::SameDimension<Self::InputImageDimension, Self::OutputImageDimension>));
   itkConceptMacro(DimensionShouldBe3, (Concept::SameDimension<Self::InputImageDimension, 3>));
-  // End concept checking
-#endif
 
 protected:
   OrientImageFilter();
@@ -286,10 +222,13 @@ protected:
   void
   EnlargeOutputRequestedRegion(DataObject * itkNotUsed(output)) override;
 
+  void
+  VerifyPreconditions() const override;
+
   /*** Member functions used by GenerateData: */
   void
-  DeterminePermutationsAndFlips(const SpatialOrientationEnums::ValidCoordinateOrientations fixed_orient,
-                                const SpatialOrientationEnums::ValidCoordinateOrientations moving_orient);
+  DeterminePermutationsAndFlips(const CoordinateOrientationCode fixed_orient,
+                                const CoordinateOrientationCode moving_orient);
 
   /** Returns true if a permute is required. Returns false otherwise. */
   bool
@@ -305,22 +244,19 @@ protected:
   GenerateData() override;
 
 private:
-  std::string
-  GetMajorAxisFromPatientRelativeDirectionCosine(double x, double y, double z);
-
-  CoordinateOrientationCode m_GivenCoordinateOrientation{
-    SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP
-  };
+  CoordinateOrientationCode m_GivenCoordinateOrientation{ AnatomicalOrientation::CoordinateEnum::RightToLeft,
+                                                          AnatomicalOrientation::CoordinateEnum::InferiorToSuperior,
+                                                          AnatomicalOrientation::CoordinateEnum::PosteriorToAnterior };
   CoordinateOrientationCode m_DesiredCoordinateOrientation{
-    SpatialOrientationEnums::ValidCoordinateOrientations::ITK_COORDINATE_ORIENTATION_RIP
+    AnatomicalOrientation::CoordinateEnum::RightToLeft,
+    AnatomicalOrientation::CoordinateEnum::InferiorToSuperior,
+    AnatomicalOrientation::CoordinateEnum::PosteriorToAnterior
   };
   bool m_UseImageDirection{ false };
 
   PermuteOrderArrayType m_PermuteOrder{};
-  FlipAxesArrayType     m_FlipAxes{};
+  FlipAxesArrayType     m_FlipAxes{ false };
 
-  std::map<std::string, CoordinateOrientationCode> m_StringToCode{};
-  std::map<CoordinateOrientationCode, std::string> m_CodeToString{};
 }; // end of class
 } // end namespace itk
 

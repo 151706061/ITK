@@ -21,9 +21,7 @@
 #include "itkRegionConstrainedSubsampler.h"
 #include "itkImageHelper.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class SpatialNeighborSubsampler
@@ -60,7 +58,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SpatialNeighborSubsampler);
 
   /** Method for creation through the object factory. */
@@ -89,11 +87,12 @@ public:
   using ImageHelperType = ImageHelper<Self::ImageDimension, Self::ImageDimension>;
 
   /** Method to set the radius */
+  /** @ITKStartGrouping */
   void
   SetRadius(const RadiusType & radius);
   void
   SetRadius(unsigned int radius);
-
+  /** @ITKEndGrouping */
   /** Method to get the radius */
   itkGetConstReferenceMacro(Radius, RadiusType);
 
@@ -114,7 +113,7 @@ protected:
    * This does a complete copy of the subsampler state
    * to the new subsampler
    */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
   SpatialNeighborSubsampler();
@@ -127,8 +126,7 @@ protected:
   bool       m_RadiusInitialized{};
 }; // end of class SpatialNeighborSubsampler
 
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkSpatialNeighborSubsampler.hxx"

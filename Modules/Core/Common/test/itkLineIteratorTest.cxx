@@ -42,15 +42,11 @@ itkLineIteratorTest(int argc, char * argv[])
 
 
   // Set up a test image
-  ImageType::RegionType::IndexType index;
-  index.Fill(0);
+  constexpr ImageType::RegionType::IndexType index{};
 
-  ImageType::RegionType::SizeType size;
-  size.Fill(200);
+  auto size = ImageType::RegionType::SizeType::Filled(200);
 
-  ImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const ImageType::RegionType region{ index, size };
 
   auto output = ImageType::New();
   output->SetRegions(region);
@@ -118,8 +114,7 @@ itkLineIteratorTest(int argc, char * argv[])
   endIndex.Fill(189);
   LineIteratorType it(output, startIndex, endIndex);
 
-  std::vector<IndexType>::iterator itBaseline;
-  itBaseline = baselineIndex.begin();
+  auto itBaseline = baselineIndex.begin();
   while (!it.IsAtEnd())
   {
     it.Set(255);

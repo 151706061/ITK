@@ -77,8 +77,7 @@ RegionalMinimaImageFilter<TInputImage, TOutputImage>::GenerateData()
   OutputImageType *      output = this->GetOutput();
 
   // Delegate to the valued filter to find the minima
-  typename ValuedRegionalMinimaImageFilter<TInputImage, TInputImage>::Pointer regionalMin =
-    ValuedRegionalMinimaImageFilter<TInputImage, TInputImage>::New();
+  auto regionalMin = ValuedRegionalMinimaImageFilter<TInputImage, TInputImage>::New();
   regionalMin->SetInput(input);
   regionalMin->SetFullyConnected(m_FullyConnected);
   progress->RegisterInternalFilter(regionalMin, 0.67f);
@@ -134,7 +133,7 @@ RegionalMinimaImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & o
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent << "FlatIsMinima: " << m_FlatIsMinima << std::endl;
   os << indent
      << "ForegroundValue: " << static_cast<typename NumericTraits<OutputImagePixelType>::PrintType>(m_ForegroundValue)

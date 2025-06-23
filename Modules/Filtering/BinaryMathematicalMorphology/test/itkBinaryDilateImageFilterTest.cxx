@@ -56,9 +56,7 @@ itkBinaryDilateImageFilterTest(int, char *[])
   start[0] = 0;
   start[1] = 0;
 
-  myRegionType region;
-  region.SetIndex(start);
-  region.SetSize(size);
+  const myRegionType region{ start, size };
 
   // Initialize Image
   inputImage->SetRegions(region);
@@ -123,7 +121,7 @@ itkBinaryDilateImageFilterTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, BinaryDilateImageFilter, BinaryMorphologyImageFilter);
 
 
-  itk::SimpleFilterWatcher filterWatcher(filter);
+  const itk::SimpleFilterWatcher filterWatcher(filter);
 
   // Create the structuring element
   myKernelType           ball;
@@ -142,7 +140,7 @@ itkBinaryDilateImageFilterTest(int, char *[])
 
 
   // Get the Smart Pointer to the Filter Output
-  myImageType::Pointer outputImage = filter->GetOutput();
+  const myImageType::Pointer outputImage = filter->GetOutput();
 
   // Execute the filter
   ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());

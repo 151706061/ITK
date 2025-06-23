@@ -56,7 +56,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \ingroup ImageObjects
  * \ingroup LabeledImageObject
@@ -82,7 +82,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LabelMap);
 
   using LabelObjectType = TLabelObject;
@@ -150,11 +150,12 @@ public:
    * This method throws an exception if the label doesn't exist in this image,
    * or if the label is the background one.
    */
+  /** @ITKStartGrouping */
   LabelObjectType *
   GetLabelObject(const LabelType & label);
   const LabelObjectType *
   GetLabelObject(const LabelType & label) const;
-
+  /** @ITKEndGrouping */
   /**
    * Return true is the image contains the label given in parameter and false
    * otherwise. If the label is the background one, true is also returned, so
@@ -169,11 +170,12 @@ public:
    * inefficient.
    * This method throws an exception if the index doesn't exist in this image.
    */
+  /** @ITKStartGrouping */
   LabelObjectType *
   GetNthLabelObject(const SizeValueType & pos);
   const LabelObjectType *
   GetNthLabelObject(const SizeValueType & pos) const;
-
+  /** @ITKEndGrouping */
   /**
    * Return the pixel value at a given index in the image. If the given index
    * is contained in several objects, only the smallest label of those objects
@@ -279,7 +281,7 @@ public:
   GetLabels() const;
 
   /**
-   * Return the the label objects available in the label map
+   * Return the label objects available in the label map
    */
   LabelObjectVectorType
   GetLabelObjects() const;
@@ -287,9 +289,10 @@ public:
   /**
    * Set/Get the background label
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(BackgroundValue, LabelType);
   itkSetMacro(BackgroundValue, LabelType);
-
+  /** @ITKEndGrouping */
   /**
    * Print all the objects stored in that collection - a convenient method
    * for prototyping.
@@ -320,19 +323,19 @@ public:
     ConstIterator() = default;
 
     ConstIterator(const Self * lm)
+      : m_Begin(lm->m_LabelObjectContainer.begin())
+      , m_End(lm->m_LabelObjectContainer.end())
     {
-      m_Begin = lm->m_LabelObjectContainer.begin();
-      m_End = lm->m_LabelObjectContainer.end();
       m_Iterator = m_Begin;
     }
 
-    const LabelObjectType *
+    [[nodiscard]] const LabelObjectType *
     GetLabelObject() const
     {
       return m_Iterator->second;
     }
 
-    const LabelType &
+    [[nodiscard]] const LabelType &
     GetLabel() const
     {
       return m_Iterator->first;
@@ -367,7 +370,7 @@ public:
       m_Iterator = m_Begin;
     }
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       return m_Iterator == m_End;
@@ -391,9 +394,9 @@ public:
     Iterator() = default;
 
     Iterator(Self * lm)
+      : m_Begin(lm->m_LabelObjectContainer.begin())
+      , m_End(lm->m_LabelObjectContainer.end())
     {
-      m_Begin = lm->m_LabelObjectContainer.begin();
-      m_End = lm->m_LabelObjectContainer.end();
       m_Iterator = m_Begin;
     }
 
@@ -403,7 +406,7 @@ public:
       return m_Iterator->second;
     }
 
-    const LabelType &
+    [[nodiscard]] const LabelType &
     GetLabel() const
     {
       return m_Iterator->first;
@@ -438,7 +441,7 @@ public:
       m_Iterator = m_Begin;
     }
 
-    bool
+    [[nodiscard]] bool
     IsAtEnd() const
     {
       return m_Iterator == m_End;

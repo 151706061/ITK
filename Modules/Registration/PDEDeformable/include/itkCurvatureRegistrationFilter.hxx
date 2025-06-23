@@ -33,8 +33,7 @@ template <typename TFixedImage, typename TMovingImage, typename TDisplacementFie
 CurvatureRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField, TImageForceFunction>::
   CurvatureRegistrationFilter()
 {
-  typename RegistrationFunctionType::Pointer drfp;
-  drfp = RegistrationFunctionType::New();
+  auto drfp = RegistrationFunctionType::New();
 
   this->SetDifferenceFunction(static_cast<FiniteDifferenceFunctionType *>(drfp.GetPointer()));
 
@@ -203,7 +202,7 @@ CurvatureRegistrationFilter<TFixedImage, TMovingImage, TDisplacementField, TImag
 {
   // unused dt parameter
   (void)dt;
-  DisplacementFieldPointer update = this->GetUpdateBuffer();
+  const DisplacementFieldPointer update = this->GetUpdateBuffer();
 
   ImageRegionConstIterator<DisplacementFieldType>   itInDeformation;
   ImageRegionIterator<DisplacementFieldType>        itOutDeformation;

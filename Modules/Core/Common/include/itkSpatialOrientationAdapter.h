@@ -43,15 +43,15 @@ Max3(double x, double y, double z)
 {
   constexpr double obliquityThresholdCosineValue = 0.001;
 
-  double absX = itk::Math::abs(x);
-  double absY = itk::Math::abs(y);
-  double absZ = itk::Math::abs(z);
+  const double absX = itk::Math::abs(x);
+  const double absY = itk::Math::abs(y);
+  const double absZ = itk::Math::abs(z);
 
   if ((absX > obliquityThresholdCosineValue) && (absX > absY) && (absX > absZ))
   {
     return 0;
   }
-  else if ((absY > obliquityThresholdCosineValue) && (absY > absX) && (absY > absZ))
+  if ((absY > obliquityThresholdCosineValue) && (absY > absX) && (absY > absZ))
   {
     return 1;
   }

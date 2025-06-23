@@ -22,9 +22,7 @@
 #include "itkMacro.h"
 #include "itkObjectFactory.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class Subsample
@@ -50,7 +48,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Subsample);
 
   /** standard New() method support */
@@ -75,27 +73,12 @@ public:
    * object */
   using InstanceIdentifierHolder = std::vector<InstanceIdentifier>;
 
-// Disable clang warning false positive.
-// <https://llvm.org/bugs/show_bug.cgi?id=22582>
-#if defined(__clang__) && defined(__has_warning)
-#  if __has_warning("-Winconsistent-missing-override")
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Winconsistent-missing-override"
-#  endif
-#endif
-
   /** Get the Id Holder */
   const InstanceIdentifierHolder &
   GetIdHolder() const
   {
     return this->m_IdHolder;
   }
-
-#if defined(__clang__) && defined(__has_warning)
-#  if __has_warning("-Winconsistent-missing-override")
-#    pragma clang diagnostic pop
-#  endif
-#endif
 
   /** Plug in the actual sample data */
   void
@@ -158,20 +141,13 @@ public:
     ConstIterator(const Self * sample) { *this = sample->Begin(); }
 
     ConstIterator(const ConstIterator & iter)
-    {
-      m_Iter = iter.m_Iter;
-      m_Subsample = iter.m_Subsample;
-      m_Sample = iter.m_Sample;
-    }
+      : m_Iter(iter.m_Iter)
+      , m_Subsample(iter.m_Subsample)
+      , m_Sample(iter.m_Sample)
+    {}
 
     ConstIterator &
-    operator=(const ConstIterator & iter)
-    {
-      m_Iter = iter.m_Iter;
-      m_Subsample = iter.m_Subsample;
-      m_Sample = iter.m_Sample;
-      return *this;
-    }
+    operator=(const ConstIterator & iter) = default;
 
     bool
     operator==(const ConstIterator & it) const
@@ -188,19 +164,19 @@ public:
       return *this;
     }
 
-    AbsoluteFrequencyType
+    [[nodiscard]] AbsoluteFrequencyType
     GetFrequency() const
     {
       return m_Sample->GetFrequency(*m_Iter);
     }
 
-    const MeasurementVectorType &
+    [[nodiscard]] const MeasurementVectorType &
     GetMeasurementVector() const
     {
       return m_Sample->GetMeasurementVector(*m_Iter);
     }
 
-    InstanceIdentifier
+    [[nodiscard]] InstanceIdentifier
     GetInstanceIdentifier() const
     {
       return (m_Iter - m_Subsample->GetIdHolder().begin());
@@ -270,7 +246,7 @@ public:
   Iterator
   Begin()
   {
-    Iterator iter(m_IdHolder.begin(), this);
+    const Iterator iter(m_IdHolder.begin(), this);
 
     return iter;
   }
@@ -280,7 +256,7 @@ public:
   Iterator
   End()
   {
-    Iterator iter(m_IdHolder.end(), this);
+    const Iterator iter(m_IdHolder.end(), this);
 
     return iter;
   }
@@ -288,7 +264,7 @@ public:
   ConstIterator
   Begin() const
   {
-    ConstIterator iter(m_IdHolder.begin(), this);
+    const ConstIterator iter(m_IdHolder.begin(), this);
 
     return iter;
   }
@@ -296,7 +272,7 @@ public:
   ConstIterator
   End() const
   {
-    ConstIterator iter(m_IdHolder.end(), this);
+    const ConstIterator iter(m_IdHolder.end(), this);
 
     return iter;
   }
@@ -313,8 +289,7 @@ private:
   unsigned int               m_ActiveDimension{};
   TotalAbsoluteFrequencyType m_TotalFrequency{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkSubsample.hxx"

@@ -40,19 +40,19 @@ namespace itk
  *
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = float>
-class ITK_TEMPLATE_EXPORT BinaryThresholdImageFunction : public ImageFunction<TInputImage, bool, TCoordRep>
+template <typename TInputImage, typename TCoordinate = float>
+class ITK_TEMPLATE_EXPORT BinaryThresholdImageFunction : public ImageFunction<TInputImage, bool, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(BinaryThresholdImageFunction);
 
   /** Standard class type aliases. */
   using Self = BinaryThresholdImageFunction;
-  using Superclass = ImageFunction<TInputImage, bool, TCoordRep>;
+  using Superclass = ImageFunction<TInputImage, bool, TCoordinate>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryThresholdImageFunction);
 
   /** Method for creation through the object factory. */
@@ -122,7 +122,7 @@ public:
   bool
   EvaluateAtIndex(const IndexType & index) const override
   {
-    PixelType value = this->GetInputImage()->GetPixel(index);
+    const PixelType value = this->GetInputImage()->GetPixel(index);
 
     return (m_Lower <= value && value <= m_Upper);
   }

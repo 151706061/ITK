@@ -39,7 +39,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/811
+ * https://doi.org/10.54294/efycla
  *
  * \sa HistogramThresholdImageFilter
  *
@@ -67,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(OtsuThresholdImageFilter);
 
   using InputImageType = TInputImage;
@@ -102,10 +102,11 @@ public:
 
   /** Should the threshold value be mid-point of the bin or the maximum?
    * Default is to return bin maximum. */
+  /** @ITKStartGrouping */
   itkSetMacro(ReturnBinMidpoint, bool);
   itkGetConstReferenceMacro(ReturnBinMidpoint, bool);
   itkBooleanMacro(ReturnBinMidpoint);
-
+  /** @ITKEndGrouping */
 protected:
   OtsuThresholdImageFilter() { this->SetCalculator(CalculatorType::New()); }
   ~OtsuThresholdImageFilter() override = default;
@@ -119,7 +120,7 @@ protected:
   }
 
   void
-  VerifyPreconditions() ITKv5_CONST override
+  VerifyPreconditions() const override
   {
     Superclass::VerifyPreconditions();
     if (dynamic_cast<const CalculatorType *>(Superclass::GetCalculator()) == nullptr)
@@ -128,13 +129,8 @@ protected:
     }
   }
 
-
 private:
-#if defined(ITKV4_COMPATIBILITY)
-  bool m_ReturnBinMidpoint{ true };
-#else
   bool m_ReturnBinMidpoint{ false };
-#endif
 };
 
 } // end namespace itk

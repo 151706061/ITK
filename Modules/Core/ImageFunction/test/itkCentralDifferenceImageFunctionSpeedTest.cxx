@@ -29,11 +29,11 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  int  imageSize = std::stoi(argv[1]);
-  int  reps = std::stoi(argv[2]);
-  bool doEAI = std::stoi(argv[3]);
-  bool doEACI = std::stoi(argv[4]);
-  bool doE = std::stoi(argv[5]);
+  const int  imageSize = std::stoi(argv[1]);
+  const int  reps = std::stoi(argv[2]);
+  const bool doEAI = std::stoi(argv[3]);
+  const bool doEACI = std::stoi(argv[4]);
+  const bool doE = std::stoi(argv[5]);
 
   std::cout << "imageSize: " << imageSize << " reps: " << reps << " doEAI, doEACI, doE: " << doEAI << ", " << doEACI
             << ", " << doE << std::endl;
@@ -42,10 +42,9 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
   using PixelType = unsigned int;
   using ImageType = itk::Image<PixelType, ImageDimension>;
 
-  auto                image = ImageType::New();
-  ImageType::SizeType size;
-  size.Fill(imageSize);
-  ImageType::RegionType region(size);
+  auto                        image = ImageType::New();
+  auto                        size = ImageType::SizeType::Filled(imageSize);
+  const ImageType::RegionType region(size);
 
   image->SetRegions(region);
   image->Allocate();
@@ -64,18 +63,15 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
   }
 
   // set up central difference calculator
-  using CoordRepType = float;
-  using FunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordRepType>;
+  using CoordinateType = float;
+  using FunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordinateType>;
   using OutputType = FunctionType::OutputType;
 
   auto function = FunctionType::New();
 
   function->SetInputImage(image);
 
-  ImageType::IndexType index;
-
-  OutputType total;
-  total.Fill(0);
+  OutputType total{};
 
   std::cout << "UseImageDirection: " << function->GetUseImageDirection() << std::endl;
 
@@ -85,10 +81,10 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
     iter.GoToBegin();
     while (!iter.IsAtEnd())
     {
-      index = iter.GetIndex();
+      ImageType::IndexType index = iter.GetIndex();
       if (doEAI)
       {
-        OutputType indexOutput = function->EvaluateAtIndex(index);
+        const OutputType indexOutput = function->EvaluateAtIndex(index);
         total += indexOutput;
       }
 
@@ -97,7 +93,7 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
         FunctionType::ContinuousIndexType cindex;
         cindex[0] = index[0] + 0.1;
         cindex[1] = index[1] + 0.1;
-        OutputType continuousIndexOutput = function->EvaluateAtContinuousIndex(cindex);
+        const OutputType continuousIndexOutput = function->EvaluateAtContinuousIndex(cindex);
         total += continuousIndexOutput;
       }
 
@@ -105,7 +101,7 @@ itkCentralDifferenceImageFunctionSpeedTest(int argc, char * argv[])
       {
         FunctionType::PointType point;
         image->TransformIndexToPhysicalPoint(index, point);
-        OutputType pointOutput = function->Evaluate(point);
+        const OutputType pointOutput = function->Evaluate(point);
         total += pointOutput;
       }
 

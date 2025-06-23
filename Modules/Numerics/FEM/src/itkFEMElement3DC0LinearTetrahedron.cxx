@@ -18,9 +18,7 @@
 
 #include "itkFEMElement3DC0LinearTetrahedron.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 void
@@ -142,7 +140,7 @@ Element3DC0LinearTetrahedron::GetLocalFromGlobalCoordinates(const VectorType & g
                 (y - y0) * ((x1 - x0) * (z2 - z0) - (z1 - z0) * (x2 - x0)) +
                 (z - z0) * ((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0)));
 
-  const double FEM_TETRA_EPSILON = 1e-5;
+  constexpr double FEM_TETRA_EPSILON = 1e-5;
 
   if (localPt[0] < (0.0 - FEM_TETRA_EPSILON) || localPt[0] > (1.0 + FEM_TETRA_EPSILON) ||
       localPt[1] < (0.0 - FEM_TETRA_EPSILON) || localPt[1] > (1.0 + FEM_TETRA_EPSILON) ||
@@ -202,5 +200,4 @@ Element3DC0LinearTetrahedron::PrintSelf(std::ostream & os, Indent indent) const
   Superclass::PrintSelf(os, indent);
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem

@@ -62,7 +62,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianDerivativeImageFunction);
 
   /** InputImageType type alias support */
@@ -77,7 +77,7 @@ public:
   static constexpr unsigned int ImageDimension2 = ImageDimension;
 #endif
 
-  using ContinuousIndexType = ContinuousIndex<SpacePrecisionType, Self::ImageDimension>;
+  using ContinuousIndexType = typename Superclass::ContinuousIndexType;
 
   using NeighborhoodType = Neighborhood<InputPixelType, Self::ImageDimension>;
   using OperatorNeighborhoodType = Neighborhood<TOutput, Self::ImageDimension>;
@@ -96,7 +96,7 @@ public:
 
   /** Point type alias support */
   // using PointType = Point< TOutput, Self::ImageDimension >;
-  using PointType = typename InputImageType::PointType;
+  using PointType = typename Superclass::PointType;
 
   /** Evaluate the function at the specified point. */
   OutputType
@@ -114,6 +114,7 @@ public:
    * UseImageSpacing controls the extent of the computations.
    * Set UseImageSpacing to true to set the units to physical units of the image.
    * Set UseImageSpacing to false to set the units of pixels. */
+  /** @ITKStartGrouping */
   void
   SetUseImageSpacing(const bool val)
   {
@@ -121,11 +122,12 @@ public:
     {
       this->m_UseImageSpacing = val;
       this->RecomputeGaussianKernel();
+      this->Modified();
     }
   }
   itkBooleanMacro(UseImageSpacing);
   itkGetMacro(UseImageSpacing, bool);
-
+  /** @ITKEndGrouping */
   /** The variance for the discrete Gaussian kernel. Sets the variance
    * independently for each dimension, but see also
    * SetVariance(const double v). The default is 0.0 in each dimension.
@@ -137,7 +139,7 @@ public:
   void
   SetSigma(const double sigma);
 
-  const double *
+  [[nodiscard]] const double *
   GetSigma() const
   {
     return m_Sigma;
@@ -150,7 +152,7 @@ public:
   void
   SetExtent(const double extent);
 
-  const double *
+  [[nodiscard]] const double *
   GetExtent() const
   {
     return m_Extent;

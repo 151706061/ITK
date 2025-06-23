@@ -100,7 +100,7 @@ namespace itk
  * derivative values are summed during computation.  Specify these weights
  * using the SetComponentWeights method.  The argument to this method is a C
  * array of TRealValue type.
-
+ *
  * \par Constraints
  * The filter requires an image with at least two dimensions and a vector
  * length of at least 2.  The theory supports extension to scalar images, but
@@ -117,12 +117,8 @@ namespace itk
  * 3D solver is), so it cannot multithread for data other than 3D in
  * UsePrincipleComponents=On mode.
  *
- * \par References
+ * For algorithmic details see \cite sapiro1996.
  *
- * [1] G. Sapiro and D. Ringach, "Anisotropic Diffusion of Multivalued Images
- * with Application to Color Filtering," IEEE Transactions on Image Processing,
- * Vol 5, No. 11 pp. 1582-1586, 1996
-
  * \ingroup GradientFilters
  *
  * \sa Image
@@ -148,7 +144,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorGradientMagnitudeImageFilter);
 
   /** Extract some information from the image types.  Dimensionality
@@ -199,11 +195,12 @@ public:
       if you want to calculate the gradient in the space in which the data was
       acquired; use Off to ignore image spacing and to calculate the gradient
       in the image space. Default is On. */
+  /** @ITKStartGrouping */
   void
   SetUseImageSpacing(bool);
   itkGetConstMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_FUTURE_LEGACY_REMOVE)
   /** Set the derivative weights according to the spacing of the input image
       (1/spacing). Use this option if you want to calculate the gradient in the
@@ -235,23 +232,26 @@ public:
 
   /** Directly Set/Get the array of weights used in the gradient calculations.
       Note that calling UseImageSpacingOn will clobber these values. */
+  /** @ITKStartGrouping */
   itkSetMacro(DerivativeWeights, DerivativeWeightsType);
   itkGetConstReferenceMacro(DerivativeWeights, DerivativeWeightsType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the array of weightings for the different components of the
       vector.  Default values are 1.0. */
+  /** @ITKStartGrouping */
   itkSetMacro(ComponentWeights, ComponentWeightsType);
   itkGetConstReferenceMacro(ComponentWeights, ComponentWeightsType);
-
+  /** @ITKEndGrouping */
   /** Set/Get principle components calculation mode.  When this is set to TRUE/ON,
       the gradient calculation will involve a principle component analysis of
       the partial derivatives of the color components.  When this value is set
       to FALSE/OFF, the calculation is done as a square root of weighted sum of the
       derivatives squared.  Default is UsePrincipleComponents = true. */
+  /** @ITKStartGrouping */
   itkSetMacro(UsePrincipleComponents, bool);
   itkGetConstMacro(UsePrincipleComponents, bool);
   itkBooleanMacro(UsePrincipleComponents);
-
+  /** @ITKEndGrouping */
 #if !defined(ITK_FUTURE_LEGACY_REMOVE)
   /** \deprecated Use VectorGradientMagnitudeImageFilter::UsePrincipleComponentsOn instead. */
   void
@@ -273,13 +273,9 @@ public:
   static int
   CubicSolver(const double *, double *);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<InputImageDimension, ImageDimension>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename InputPixelType::ValueType>));
   itkConceptMacro(RealTypeHasNumericTraitsCheck, (Concept::HasNumericTraits<RealType>));
-  // End concept checking
-#endif
 
 protected:
   VectorGradientMagnitudeImageFilter();
@@ -317,16 +313,14 @@ protected:
   TRealType
   NonPCEvaluateAtNeighborhood(const ConstNeighborhoodIteratorType & it) const
   {
-    unsigned int i, j;
-    TRealType    dx, sum, accum;
-
-    accum = TRealType{};
-    for (i = 0; i < ImageDimension; ++i)
+    TRealType accum{};
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      sum = TRealType{};
-      for (j = 0; j < VectorDimension; ++j)
+      auto sum = TRealType{};
+      for (unsigned int j = 0; j < VectorDimension; ++j)
       {
-        dx = m_DerivativeWeights[i] * m_SqrtComponentWeights[j] * 0.5 * (it.GetNext(i)[j] - it.GetPrevious(i)[j]);
+        TRealType dx =
+          m_DerivativeWeights[i] * m_SqrtComponentWeights[j] * 0.5 * (it.GetNext(i)[j] - it.GetPrevious(i)[j]);
         sum += dx * dx;
       }
       accum += sum;
@@ -338,19 +332,18 @@ protected:
   EvaluateAtNeighborhood3D(const ConstNeighborhoodIteratorType & it) const
   {
     // WARNING:  ONLY CALL THIS METHOD WHEN PROCESSING A 3D IMAGE
-    unsigned int i, j;
-    double       Lambda[3];
-    double       CharEqn[3];
-    double       ans;
+    double Lambda[3];
+    double CharEqn[3];
+    double ans = NAN;
 
     vnl_matrix<TRealType>                        g(ImageDimension, ImageDimension);
     vnl_vector_fixed<TRealType, VectorDimension> d_phi_du[TInputImage::ImageDimension];
 
     // Calculate the directional derivatives for each vector component using
     // central differences.
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      for (j = 0; j < VectorDimension; ++j)
+      for (unsigned int j = 0; j < VectorDimension; ++j)
       {
         d_phi_du[i][j] =
           m_DerivativeWeights[i] * m_SqrtComponentWeights[j] * 0.5 * (it.GetNext(i)[j] - it.GetPrevious(i)[j]);
@@ -358,9 +351,9 @@ protected:
     }
 
     // Calculate the symmetric metric tensor g
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      for (j = i; j < ImageDimension; ++j)
+      for (unsigned int j = i; j < ImageDimension; ++j)
       {
         g[j][i] = g[i][j] = dot_product(d_phi_du[i], d_phi_du[j]);
       }
@@ -378,7 +371,7 @@ protected:
                  g[2][0] * (g[1][1] * g[0][2] - g[0][1] * g[1][2]);
 
     // Find the eigenvalues of g
-    int numberOfDistinctRoots = this->CubicSolver(CharEqn, Lambda);
+    const int numberOfDistinctRoots = this->CubicSolver(CharEqn, Lambda);
 
     // Define gradient magnitude as the difference between two largest
     // eigenvalues.  Other definitions may be appropriate here as well.
@@ -451,16 +444,14 @@ protected:
   TRealType
   EvaluateAtNeighborhood(const ConstNeighborhoodIteratorType & it) const
   {
-    unsigned int i, j;
-
     vnl_matrix<TRealType>                        g(ImageDimension, ImageDimension);
     vnl_vector_fixed<TRealType, VectorDimension> d_phi_du[TInputImage::ImageDimension];
 
     // Calculate the directional derivatives for each vector component using
     // central differences.
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      for (j = 0; j < VectorDimension; ++j)
+      for (unsigned int j = 0; j < VectorDimension; ++j)
       {
         d_phi_du[i][j] =
           m_DerivativeWeights[i] * m_SqrtComponentWeights[j] * 0.5 * (it.GetNext(i)[j] - it.GetPrevious(i)[j]);
@@ -468,16 +459,16 @@ protected:
     }
 
     // Calculate the symmetric metric tensor g
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
-      for (j = i; j < ImageDimension; ++j)
+      for (unsigned int j = i; j < ImageDimension; ++j)
       {
         g[j][i] = g[i][j] = dot_product(d_phi_du[i], d_phi_du[j]);
       }
     }
 
     // Find the eigenvalues of g
-    vnl_symmetric_eigensystem<TRealType> E(g);
+    const vnl_symmetric_eigensystem<TRealType> E(g);
 
     // Return the difference in length between the first two principle axes.
     // Note that other edge strength metrics may be appropriate here instead..
@@ -490,11 +481,12 @@ protected:
   /** These weights are used to scale
       vector component values when they are combined to produce  a scalar.  The
       square root */
+  /** @ITKStartGrouping */
   ComponentWeightsType m_ComponentWeights = ComponentWeightsType::Filled(1);
   ComponentWeightsType m_SqrtComponentWeights = ComponentWeightsType::Filled(1);
-
+  /** @ITKEndGrouping */
 private:
-  bool m_UseImageSpacing{};
+  bool m_UseImageSpacing{ true };
   bool m_UsePrincipleComponents{};
 
   ThreadIdType m_RequestedNumberOfWorkUnits{};

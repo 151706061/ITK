@@ -32,13 +32,7 @@ namespace itk
  *  This class computers the KL-metric by comparing the histograms
  *  of the testing histogram formed by the overlap of intensities in
  *  the images, to a training histogram. It is based on the
- *  following paper:
- *
- *  Albert C.S. Chung, William M. Wells III, Alexander Norbash, and
- *  W. Eric L.  Grimson, Multi-modal Image Registration by
- *  Minimising Kullback-Leibler Distance, In Medical Image Computing
- *  and Computer-Assisted Intervention - MICCAI 2002, LNCS 2489,
- *  pp. 525 - 532.
+ *  algorithm described in \cite chung2002.
  *
  *  The metric is given by KL(P_test||P_train)
  *  = Sum_{i1,i2} P_test(i1,i2) std::log(P_test(i1,i2)/P_train(i1,i2))
@@ -84,7 +78,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KullbackLeiblerCompareHistogramImageToImageMetric);
 
   /** Types transferred from the base class */
@@ -120,13 +114,14 @@ public:
   itkGetConstReferenceMacro(Epsilon, double);
 
   /** Return the number of parameters required by the Transform */
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfParameters() const override
   {
     return this->GetTransform()->GetNumberOfParameters();
   }
 
   /** Forms the histogram of the training images to prepare to evaluate the */
+
   /** metric. Must set all parameters first */
   void
   Initialize() override;
@@ -134,11 +129,12 @@ public:
 protected:
   /** Constructor is protected to ensure that \c New() function is used to
       create instances. */
+  /** @ITKStartGrouping */
   KullbackLeiblerCompareHistogramImageToImageMetric();
   ~KullbackLeiblerCompareHistogramImageToImageMetric() override = default;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
-
+  /** @ITKEndGrouping */
   /** Form the Histogram for the Training data */
   void
   FormTrainingHistogram();

@@ -28,10 +28,9 @@ namespace itk
 {
 template <typename TInputImage, typename TMaskImage, typename TOutputImage>
 StochasticFractalDimensionImageFilter<TInputImage, TMaskImage, TOutputImage>::StochasticFractalDimensionImageFilter()
+  : m_MaskImage(nullptr)
 {
   this->m_NeighborhoodRadius.Fill(2);
-
-  this->m_MaskImage = nullptr;
 }
 
 template <typename TInputImage, typename TMaskImage, typename TOutputImage>
@@ -76,8 +75,6 @@ StochasticFractalDimensionImageFilter<TInputImage, TMaskImage, TOutputImage>::Ge
 
   typename FaceCalculatorType::FaceListType faceList = faceCalculator(inputImage, region, this->m_NeighborhoodRadius);
 
-  typename FaceCalculatorType::FaceListType::iterator fit;
-
   typename InputImageType::SpacingType spacing = inputImage->GetSpacing();
 
   RealType minSpacing = spacing[0];
@@ -94,7 +91,7 @@ StochasticFractalDimensionImageFilter<TInputImage, TMaskImage, TOutputImage>::Ge
   std::vector<RealType> distancesFrequency;
   std::vector<RealType> averageAbsoluteIntensityDifference;
 
-  for (fit = faceList.begin(); fit != faceList.end(); ++fit)
+  for (auto fit = faceList.begin(); fit != faceList.end(); ++fit)
   {
     ConstNeighborhoodIteratorType It(this->m_NeighborhoodRadius, inputImage, *fit);
 
@@ -115,7 +112,7 @@ StochasticFractalDimensionImageFilter<TInputImage, TMaskImage, TOutputImage>::Ge
 
       for (unsigned int i = 0; i < It.GetNeighborhood().Size(); ++i)
       {
-        bool           IsInBounds1;
+        bool           IsInBounds1 = false;
         InputPixelType pixel1 = It.GetPixel(i, IsInBounds1);
 
         if (!IsInBounds1)
@@ -135,7 +132,7 @@ StochasticFractalDimensionImageFilter<TInputImage, TMaskImage, TOutputImage>::Ge
               continue;
             }
 
-            bool           IsInBounds2;
+            bool           IsInBounds2 = false;
             InputPixelType pixel2 = It.GetPixel(j, IsInBounds2);
 
             if (!IsInBounds2)

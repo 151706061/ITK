@@ -79,7 +79,6 @@ namespace itk
  */
 template <typename TInputImage1, typename TInputImage2 = TInputImage1, typename TOutputImage = TInputImage1>
 class ITK_TEMPLATE_EXPORT AddImageFilter : public BinaryGeneratorImageFilter<TInputImage1, TInputImage2, TOutputImage>
-
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(AddImageFilter);
@@ -98,17 +97,13 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AddImageFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(Input1Input2OutputAdditiveOperatorsCheck,
                   (Concept::AdditiveOperators<typename TInputImage1::PixelType,
                                               typename TInputImage2::PixelType,
                                               typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   AddImageFilter()

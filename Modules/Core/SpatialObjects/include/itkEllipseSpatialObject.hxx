@@ -67,13 +67,12 @@ template <unsigned int TDimension>
 bool
 EllipseSpatialObject<TDimension>::IsInsideInObjectSpace(const PointType & point) const
 {
-  double d;
   double r = 0;
   for (unsigned int i = 0; i < TDimension; ++i)
   {
     if (m_RadiusInObjectSpace[i] > 0.0)
     {
-      d = point[i] - m_CenterInObjectSpace[i];
+      double d = point[i] - m_CenterInObjectSpace[i];
       r += (d * d) / (m_RadiusInObjectSpace[i] * m_RadiusInObjectSpace[i]);
     }
     else if (point[i] != 0.0 || m_RadiusInObjectSpace[i] < 0)
@@ -118,7 +117,7 @@ EllipseSpatialObject<TDimension>::InternalClone() const
 {
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("Downcast to type " << this->GetNameOfClass() << " failed.");

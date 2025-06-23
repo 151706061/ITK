@@ -27,9 +27,7 @@
 #include "itkSimpleDataObjectDecorator.h"
 #include "itkNumericTraitsArrayPixel.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class KdTreeBasedKmeansEstimator
@@ -83,7 +81,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(KdTreeBasedKmeansEstimator);
 
   /** Types for the KdTree data structure */
@@ -121,17 +119,22 @@ public:
   GetOutput() const;
 
   /**  Set the position to initialize the optimization. */
+  /** @ITKStartGrouping */
   itkSetMacro(Parameters, ParametersType);
   itkGetConstMacro(Parameters, ParametersType);
+  /** @ITKEndGrouping */
 
   /** Set/Get maximum iteration limit. */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumIteration, int);
   itkGetConstMacro(MaximumIteration, int);
+  /** @ITKEndGrouping */
 
   /** Set/Get the termination threshold for the squared sum
    * of changes in centroid positions after one iteration */
   itkSetMacro(CentroidPositionChangesThreshold, double);
   itkGetConstMacro(CentroidPositionChangesThreshold, double);
+
   /** Set/Get the pointer to the KdTree */
   void
   SetKdTree(TKdTree * tree);
@@ -188,7 +191,7 @@ protected:
     virtual ~CandidateVector() = default;
 
     /** returns the number of candidate = k */
-    int
+    [[nodiscard]] int
     Size() const
     {
       return static_cast<int>(m_Candidates.size());
@@ -216,10 +219,8 @@ protected:
     void
     GetCentroids(InternalParametersType & centroids)
     {
-      unsigned int i;
-
       centroids.resize(this->Size());
-      for (i = 0; i < static_cast<unsigned int>(this->Size()); ++i)
+      for (unsigned int i = 0; i < static_cast<unsigned int>(this->Size()); ++i)
       {
         centroids[i] = m_Candidates[i].Centroid;
       }
@@ -230,13 +231,11 @@ protected:
     void
     UpdateCentroids()
     {
-      unsigned int i, j;
-
-      for (i = 0; i < static_cast<unsigned int>(this->Size()); ++i)
+      for (unsigned int i = 0; i < static_cast<unsigned int>(this->Size()); ++i)
       {
         if (m_Candidates[i].Size > 0)
         {
-          for (j = 0; j < m_MeasurementVectorSize; ++j)
+          for (unsigned int j = 0; j < m_MeasurementVectorSize; ++j)
           {
             m_Candidates[i].Centroid[j] =
               m_Candidates[i].WeightedCentroid[j] / static_cast<double>(m_Candidates[i].Size);
@@ -246,7 +245,11 @@ protected:
     }
 
     /** gets the index-th candidates */
-    Candidate & operator[](int index) { return m_Candidates[index]; }
+    Candidate &
+    operator[](int index)
+    {
+      return m_Candidates[index];
+    }
 
   private:
     /** internal storage for the candidates */
@@ -306,15 +309,20 @@ protected:
 private:
   /** current number of iteration */
   int m_CurrentIteration{ 0 };
+
   /** maximum number of iteration. termination criterion */
   int m_MaximumIteration{ 100 };
+
   /** sum of squared centroid position changes at the current iteration */
   double m_CentroidPositionChanges{ 0.0 };
+
   /** threshold for the sum of squared centroid position changes.
    * termination criterion */
   double m_CentroidPositionChangesThreshold{ 0.0 };
+
   /** pointer to the k-d tree */
   typename TKdTree::Pointer m_KdTree{};
+
   /** pointer to the euclidean distance function */
   typename EuclideanDistanceMetric<ParameterType>::Pointer m_DistanceMetric{};
 
@@ -331,8 +339,7 @@ private:
   MeasurementVectorSizeType             m_MeasurementVectorSize{ 0 };
   MembershipFunctionVectorObjectPointer m_MembershipFunctionsObject{};
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkKdTreeBasedKmeansEstimator.hxx"

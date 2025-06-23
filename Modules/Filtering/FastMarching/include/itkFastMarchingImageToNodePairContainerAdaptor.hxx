@@ -35,7 +35,6 @@ FastMarchingImageToNodePairContainerAdaptor<TInput, TOutput, TImage>::FastMarchi
   , m_ForbiddenPoints(nullptr)
   , m_AliveValue(OutputPixelType{})
   , m_TrialValue(OutputPixelType{})
-
 {}
 
 template <typename TInput, typename TOutput, typename TImage>
@@ -125,8 +124,7 @@ FastMarchingImageToNodePairContainerAdaptor<TInput, TOutput, TImage>::SetPointsF
 {
   if (iLabel == Traits::Alive || iLabel == Traits::InitialTrial || iLabel == Traits::Forbidden)
   {
-    NodePairContainerPointer nodes = NodePairContainerType::New();
-    nodes->Initialize();
+    const NodePairContainerPointer nodes = NodePairContainerType::New();
 
     using IteratorType = ImageRegionConstIteratorWithIndex<ImageType>;
     IteratorType it(image, image->GetBufferedRegion());
@@ -142,7 +140,7 @@ FastMarchingImageToNodePairContainerAdaptor<TInput, TOutput, TImage>::SetPointsF
         {
           nodes->push_back(NodePairType(it.GetIndex(), iValue));
         } // end if image iterator > zero
-      }   // end for each pixel
+      } // end for each pixel
     }
     else
     {
@@ -153,7 +151,7 @@ FastMarchingImageToNodePairContainerAdaptor<TInput, TOutput, TImage>::SetPointsF
         {
           nodes->push_back(NodePairType(it.GetIndex(), iValue));
         } // end if image iterator > zero
-      }   // end for each pixel
+      } // end for each pixel
     }
 
     switch (iLabel)

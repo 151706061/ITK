@@ -18,16 +18,12 @@
 #ifndef itkImageToListSampleAdaptor_hxx
 #define itkImageToListSampleAdaptor_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TImage>
 ImageToListSampleAdaptor<TImage>::ImageToListSampleAdaptor()
-{
-  m_Image = nullptr;
-}
+  : m_Image(nullptr)
+{}
 
 template <typename TImage>
 auto
@@ -56,7 +52,8 @@ ImageToListSampleAdaptor<TImage>::Size() const -> InstanceIdentifier
 }
 
 template <typename TImage>
-inline auto ImageToListSampleAdaptor<TImage>::GetFrequency(InstanceIdentifier) const -> AbsoluteFrequencyType
+inline auto
+ImageToListSampleAdaptor<TImage>::GetFrequency(InstanceIdentifier) const -> AbsoluteFrequencyType
 {
   if (m_Image.IsNull())
   {
@@ -123,7 +120,6 @@ ImageToListSampleAdaptor<TImage>::GetTotalFrequency() const -> TotalAbsoluteFreq
 
   return this->Size();
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

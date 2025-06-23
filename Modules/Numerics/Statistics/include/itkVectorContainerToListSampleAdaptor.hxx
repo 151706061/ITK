@@ -18,16 +18,12 @@
 #ifndef itkVectorContainerToListSampleAdaptor_hxx
 #define itkVectorContainerToListSampleAdaptor_hxx
 
-
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TVectorContainer>
 VectorContainerToListSampleAdaptor<TVectorContainer>::VectorContainerToListSampleAdaptor()
-{
-  this->m_VectorContainer = nullptr;
-}
+  : m_VectorContainer(nullptr)
+{}
 
 template <typename TVectorContainer>
 void
@@ -63,8 +59,8 @@ VectorContainerToListSampleAdaptor<TVectorContainer>::GetMeasurementVector(Insta
 }
 
 template <typename TVectorContainer>
-inline auto VectorContainerToListSampleAdaptor<TVectorContainer>::GetFrequency(InstanceIdentifier) const
-  -> AbsoluteFrequencyType
+inline auto
+VectorContainerToListSampleAdaptor<TVectorContainer>::GetFrequency(InstanceIdentifier) const -> AbsoluteFrequencyType
 {
   if (this->m_VectorContainer.IsNull())
   {
@@ -84,7 +80,6 @@ VectorContainerToListSampleAdaptor<TVectorContainer>::GetTotalFrequency() const 
   }
   return this->Size();
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

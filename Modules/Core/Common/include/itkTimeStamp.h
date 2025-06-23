@@ -95,13 +95,14 @@ public:
   Modified();
 
   /** Return this object's Modified time.  */
-  ModifiedTimeType
+  [[nodiscard]] ModifiedTimeType
   GetMTime() const
   {
     return m_ModifiedTime;
   }
 
   /** Support comparisons of time stamp objects directly.  */
+  /** @ITKStartGrouping */
   bool
   operator>(TimeStamp & ts) const
   {
@@ -112,7 +113,7 @@ public:
   {
     return (m_ModifiedTime < ts.m_ModifiedTime);
   }
-
+  /** @ITKEndGrouping */
   /** Allow for typecasting to unsigned long.  */
   operator ModifiedTimeType() const { return m_ModifiedTime; }
 

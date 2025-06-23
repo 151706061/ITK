@@ -59,7 +59,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SegmentationRegion);
 
   /** Type definition for a segmentation region label. */
@@ -74,13 +74,15 @@ public:
 
   /** Set/Get the region with parameter values
    * defining the region. */
+  /** @ITKStartGrouping */
   itkSetMacro(RegionLabel, RegionLabelType);
   itkGetConstReferenceMacro(RegionLabel, RegionLabelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the area of the region. */
+  /** @ITKStartGrouping */
   itkSetMacro(RegionArea, double);
   itkGetConstReferenceMacro(RegionArea, double);
-
+  /** @ITKEndGrouping */
 protected:
   SegmentationRegion();
   ~SegmentationRegion() override;

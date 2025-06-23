@@ -38,8 +38,6 @@ itkMultiResolutionImageRegistrationMethodTest(int, char *[])
 
   itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
 
-  bool pass;
-
   constexpr unsigned int dimension = 3;
 
   // Fixed Image Type
@@ -86,10 +84,9 @@ itkMultiResolutionImageRegistrationMethodTest(int, char *[])
   ITK_EXERCISE_BASIC_OBJECT_METHODS(registration, MultiResolutionImageRegistrationMethod, ProcessObject);
 
 
-  FixedImageType::SizeType size;
-  size.Fill(8);
+  auto size = FixedImageType::SizeType::Filled(8);
 
-  FixedImageType::RegionType region(size);
+  const FixedImageType::RegionType region(size);
   fixedImage->SetRegions(region);
   fixedImage->Allocate();
   fixedImage->FillBuffer(3.0);
@@ -125,7 +122,7 @@ itkMultiResolutionImageRegistrationMethodTest(int, char *[])
   registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
   ITK_TEST_SET_GET_VALUE(fixedImage->GetBufferedRegion(), registration->GetFixedImageRegion());
 
-  itk::SizeValueType numberOfLevels = 2;
+  constexpr itk::SizeValueType numberOfLevels = 2;
   registration->SetNumberOfLevels(numberOfLevels);
   ITK_TEST_SET_GET_VALUE(numberOfLevels, registration->GetNumberOfLevels());
 
@@ -135,8 +132,8 @@ itkMultiResolutionImageRegistrationMethodTest(int, char *[])
   registration->SetInitialTransformParameters(initialParameters);
   ITK_TEST_SET_GET_VALUE(initialParameters, registration->GetInitialTransformParameters());
 
-  typename ParametersType::ValueType initialTransformParametersOfNextLevelVal(0.0);
-  ParametersType                     initialTransformParametersOfNextLevel(1, initialTransformParametersOfNextLevelVal);
+  constexpr typename ParametersType::ValueType initialTransformParametersOfNextLevelVal(0.0);
+  const ParametersType initialTransformParametersOfNextLevel(1, initialTransformParametersOfNextLevelVal);
   registration->SetInitialTransformParametersOfNextLevel(initialTransformParametersOfNextLevel);
   ITK_TEST_SET_GET_VALUE(initialTransformParametersOfNextLevel,
                          registration->GetInitialTransformParametersOfNextLevel());
@@ -148,7 +145,7 @@ itkMultiResolutionImageRegistrationMethodTest(int, char *[])
   /****************************************************
    * Test out initialization errors
    ****************************************************/
-
+  bool pass = false;
 #define TEST_INITIALIZATION_ERROR(ComponentName, badComponent, goodComponent) \
   registration->Set##ComponentName(badComponent);                             \
   try                                                                         \

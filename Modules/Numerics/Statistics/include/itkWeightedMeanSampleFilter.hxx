@@ -23,9 +23,7 @@
 #include "itkCompensatedSummation.h"
 #include "itkMeasurementVectorTraits.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 WeightedMeanSampleFilter<TSample>::WeightedMeanSampleFilter()
@@ -83,8 +81,8 @@ WeightedMeanSampleFilter<TSample>::ComputeMeanWithWeights()
 
   WeightValueType totalWeight{};
 
-  typename SampleType::ConstIterator iter = input->Begin();
-  typename SampleType::ConstIterator end = input->End();
+  typename SampleType::ConstIterator       iter = input->Begin();
+  const typename SampleType::ConstIterator end = input->End();
 
   for (unsigned int sampleVectorIndex = 0; iter != end; ++iter, ++sampleVectorIndex)
   {
@@ -180,7 +178,6 @@ WeightedMeanSampleFilter<TSample>::ComputeMeanWithWeightingFunction()
 
   decoratedOutput->Set(output);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

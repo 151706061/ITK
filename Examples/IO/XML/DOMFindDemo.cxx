@@ -60,10 +60,10 @@ main(int argc, char * argv[])
   try
   {
     // read a DOM object from an XML file
-    itk::DOMNodeXMLReader::Pointer reader = itk::DOMNodeXMLReader::New();
+    auto reader = itk::DOMNodeXMLReader::New();
     reader->SetFileName(argv[1]);
     reader->Update();
-    itk::DOMNode::Pointer dom = reader->GetOutput();
+    const itk::DOMNode::Pointer dom = reader->GetOutput();
 
     // the following code demonstrates the DOM function Find("QueryString");
     // it navigates through the loaded XML document by typing a query string
@@ -73,7 +73,7 @@ main(int argc, char * argv[])
     do
     {
       std::cout << "query = \"" << query << "\"" << std::endl;
-      itk::DOMNode::Pointer dom2 = dom1->Find(query);
+      const itk::DOMNode::Pointer dom2 = dom1->Find(query);
       if ((itk::DOMNode *)dom2 == nullptr)
       {
         std::cout << "invalid query!" << std::endl;
@@ -90,7 +90,7 @@ main(int argc, char * argv[])
     } while (query != "...");
 
     // write the sliced child DOM object to an XML file
-    itk::DOMNodeXMLWriter::Pointer writer = itk::DOMNodeXMLWriter::New();
+    auto writer = itk::DOMNodeXMLWriter::New();
     writer->SetInput(dom1);
     writer->SetFileName(argv[2]);
     writer->Update();

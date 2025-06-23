@@ -18,17 +18,14 @@
 #ifndef itkJetColormapFunction_hxx
 #define itkJetColormapFunction_hxx
 
-
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 template <typename TScalar, typename TRGBPixel>
 auto
 JetColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const -> RGBPixelType
 {
   // Map the input scalar between [0, 1].
-  RealType value = this->RescaleInputValue(v);
+  const RealType value = this->RescaleInputValue(v);
 
   // Apply the color mapping.
   RealType red = -itk::Math::abs(3.95 * (value - 0.7460)) + 1.5;
@@ -50,7 +47,6 @@ JetColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const -> 
 
   return pixel;
 }
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #endif

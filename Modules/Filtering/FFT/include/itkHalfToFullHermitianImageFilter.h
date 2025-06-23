@@ -72,16 +72,17 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HalfToFullHermitianImageFilter);
 
   /** Extract the dimensionality of the input and output images. */
   static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
 
   /** Was the original truncated dimension size in the x-dimension odd? */
+  /** @ITKStartGrouping */
   itkSetGetDecoratedInputMacro(ActualXDimensionIsOdd, bool);
   itkBooleanMacro(ActualXDimensionIsOdd);
-
+  /** @ITKEndGrouping */
 protected:
   HalfToFullHermitianImageFilter();
   ~HalfToFullHermitianImageFilter() override = default;

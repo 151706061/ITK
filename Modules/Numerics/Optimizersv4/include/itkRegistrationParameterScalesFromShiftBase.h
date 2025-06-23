@@ -53,14 +53,16 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RegistrationParameterScalesFromShiftBase);
 
   /** Type of scales */
   using typename Superclass::ScalesType;
+
   /** Type of parameters of the optimizer */
   using typename Superclass::ParametersType;
   using ParametersValueType = typename ParametersType::ValueType;
+
   /** Type of float */
   using typename Superclass::FloatType;
 
@@ -84,9 +86,10 @@ public:
   EstimateLocalStepScales(const ParametersType & step, ScalesType & localStepScales) override;
 
   /** Set/get small parameter variation */
+  /** @ITKStartGrouping */
   itkSetMacro(SmallParameterVariation, ParametersValueType);
   itkGetConstMacro(SmallParameterVariation, ParametersValueType);
-
+  /** @ITKEndGrouping */
 protected:
   RegistrationParameterScalesFromShiftBase();
   ~RegistrationParameterScalesFromShiftBase() override = default;

@@ -31,16 +31,6 @@
 namespace itk
 {
 template <typename TInputMesh>
-MeshFileWriter<TInputMesh>::MeshFileWriter()
-{
-  m_MeshIO = nullptr;
-  m_UseCompression = false;
-  m_FactorySpecifiedMeshIO = false;
-  m_UserSpecifiedMeshIO = false;
-  m_FileTypeIsBINARY = false;
-}
-
-template <typename TInputMesh>
 void
 MeshFileWriter<TInputMesh>::SetInput(const InputMeshType * input)
 {
@@ -111,7 +101,7 @@ MeshFileWriter<TInputMesh>::Write()
   {
     MeshFileWriterException e(__FILE__, __LINE__);
     std::ostringstream      msg;
-    msg << " Could not create IO object for file " << m_FileName.c_str() << std::endl
+    msg << " Could not create IO object for file " << m_FileName << std::endl
         << "  Tried to create one of the following:" << std::endl;
     {
       for (auto & allobject : ObjectFactoryBase::CreateAllInstance("itkMeshIOBase"))
@@ -249,7 +239,7 @@ MeshFileWriter<TInputMesh>::WritePoints()
   const InputMeshType * input = this->GetInput();
 
   itkDebugMacro("Writing points: " << m_FileName);
-  SizeValueType pointsBufferSize = input->GetNumberOfPoints() * TInputMesh::PointDimension;
+  const SizeValueType pointsBufferSize = input->GetNumberOfPoints() * TInputMesh::PointDimension;
   using ValueType = typename TInputMesh::PointType::ValueType;
   const auto buffer = make_unique_for_overwrite<ValueType[]>(pointsBufferSize);
   CopyPointsToBuffer(buffer.get());
@@ -262,7 +252,7 @@ MeshFileWriter<TInputMesh>::WriteCells()
 {
   itkDebugMacro("Writing cells: " << m_FileName);
 
-  SizeValueType cellsBufferSize = m_MeshIO->GetCellBufferSize();
+  const SizeValueType cellsBufferSize = m_MeshIO->GetCellBufferSize();
   using PointIdentifierType = typename TInputMesh::PointIdentifier;
   const auto buffer = make_unique_for_overwrite<PointIdentifierType[]>(cellsBufferSize);
   CopyCellsToBuffer(buffer.get());
@@ -341,15 +331,13 @@ MeshFileWriter<TInputMesh>::CopyCellsToBuffer(Output * data)
   const typename InputMeshType::CellsContainer * cells = this->GetInput()->GetCells();
 
   // Define required variables
-  typename TInputMesh::PointIdentifier const * ptIds;
-  typename TInputMesh::CellType *              cellPtr;
 
   // For each cell
   SizeValueType                                    index{};
   typename TInputMesh::CellsContainerConstIterator cter = cells->Begin();
   while (cter != cells->End())
   {
-    cellPtr = cter.Value();
+    typename TInputMesh::CellType * cellPtr = cter.Value();
 
     // Write the cell type
     switch (cellPtr->GetType())
@@ -391,8 +379,8 @@ MeshFileWriter<TInputMesh>::CopyCellsToBuffer(Output * data)
     // The second element is number of points for each cell
     data[index++] = cellPtr->GetNumberOfPoints();
     // Others are point identifiers in the cell
-    ptIds = cellPtr->GetPointIds();
-    unsigned int numberOfPoints = cellPtr->GetNumberOfPoints();
+    const typename TInputMesh::PointIdentifier * ptIds = cellPtr->GetPointIds();
+    const unsigned int                           numberOfPoints = cellPtr->GetNumberOfPoints();
     for (unsigned int ii = 0; ii < numberOfPoints; ++ii)
     {
       data[index++] = static_cast<Output>(ptIds[ii]);
@@ -414,7 +402,7 @@ MeshFileWriter<TInputMesh>::CopyPointDataToBuffer(Output * data)
   // TODO? NumericTraitsVariableLengthVectorPixel should define ZeroValue()
   // Should define NumericTraitsArrayPixel
 
-  unsigned int numberOfComponents =
+  const unsigned int numberOfComponents =
     MeshConvertPixelTraits<typename TInputMesh::PixelType>::GetNumberOfComponents(pointData->Begin().Value());
 
   SizeValueType                                          index = 0;
@@ -443,7 +431,7 @@ MeshFileWriter<TInputMesh>::CopyCellDataToBuffer(Output * data)
   // TODO? NumericTraitsVariableLengthVectorPixel should define ZeroValue()
   // Should define NumericTraitsArrayPixel
 
-  unsigned int numberOfComponents =
+  const unsigned int numberOfComponents =
     MeshConvertPixelTraits<typename TInputMesh::CellPixelType>::GetNumberOfComponents(cellData->Begin().Value());
   SizeValueType                                         index = 0;
   typename TInputMesh::CellDataContainer::ConstIterator cter = cellData->Begin();
@@ -464,35 +452,14 @@ MeshFileWriter<TInputMesh>::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "File Name: " << (m_FileName.data() ? m_FileName.data() : "(none)") << std::endl;
+  os << indent << "FileName: " << m_FileName << std::endl;
 
-  os << indent << "Mesh IO: ";
-  if (m_MeshIO.IsNull())
-  {
-    os << "(none)\n";
-  }
-  else
-  {
-    os << m_MeshIO << '\n';
-  }
+  itkPrintSelfObjectMacro(MeshIO);
 
-  if (m_UseCompression)
-  {
-    os << indent << "Compression: On\n";
-  }
-  else
-  {
-    os << indent << "Compression: Off\n";
-  }
-
-  if (m_FactorySpecifiedMeshIO)
-  {
-    os << indent << "FactorySpecifiedMeshIO: On\n";
-  }
-  else
-  {
-    os << indent << "FactorySpecifiedMeshIO: Off\n";
-  }
+  itkPrintSelfBooleanMacro(UserSpecifiedMeshIO);
+  itkPrintSelfBooleanMacro(FactorySpecifiedMeshIO);
+  itkPrintSelfBooleanMacro(UseCompression);
+  itkPrintSelfBooleanMacro(FileTypeIsBINARY);
 }
 } // end namespace itk
 

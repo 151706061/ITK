@@ -23,6 +23,9 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+#include <random>
+
 // Test template instantiations for various template arguments:
 template class itk::IndexRange<1, true>;
 template class itk::IndexRange<1, false>;
@@ -43,13 +46,16 @@ namespace
 {
 template <unsigned int VDimension>
 itk::Index<VDimension>
-GenerateRandomIndex()
+GenerateRandomIndex(std::mt19937 & randomNumberEngine)
 {
   itk::Index<VDimension> index;
 
+  std::uniform_int_distribution<itk::IndexValueType> randomNumberDistribution(
+    std::numeric_limits<itk::IndexValueType>::min(), std::numeric_limits<itk::IndexValueType>::max());
+
   for (itk::IndexValueType & indexValue : index)
   {
-    indexValue = std::rand();
+    indexValue = randomNumberDistribution(randomNumberEngine);
   }
   return index;
 }
@@ -89,16 +95,16 @@ ExpectRangeIsEmptyWhenDefaultConstructed()
 
 template <unsigned int VDimension>
 void
-ExpectRangeIsEmptyWhenRegionSizeIsZero()
+ExpectRangeIsEmptyWhenRegionSizeIsZero(std::mt19937 & randomNumberEngine)
 {
-  const itk::Size<VDimension> zeroSize{ { 0 } };
+  static constexpr itk::Size<VDimension> zeroSize{ { 0 } };
 
   // Test when both the region index and the region size are zero:
-  EXPECT_TRUE(ZeroBasedIndexRange<VDimension>{ zeroSize }.empty());
-  EXPECT_TRUE(ImageRegionIndexRange<VDimension>{ zeroSize }.empty());
+  static_assert(ZeroBasedIndexRange<VDimension>{ zeroSize }.empty());
+  static_assert(ImageRegionIndexRange<VDimension>{ zeroSize }.empty());
 
   // Now do the test for an arbitrary (random) region index:
-  const itk::Index<VDimension>       randomRegionIndex = GenerateRandomIndex<VDimension>();
+  const itk::Index<VDimension>       randomRegionIndex = GenerateRandomIndex<VDimension>(randomNumberEngine);
   const itk::ImageRegion<VDimension> zeroSizedImageRegion{ randomRegionIndex, zeroSize };
 
   EXPECT_TRUE(ImageRegionIndexRange<VDimension>{ zeroSizedImageRegion }.empty());
@@ -115,9 +121,9 @@ ExpectRangeBeginIsEnd(const TRange & range)
 
 template <unsigned int VDimension>
 void
-ExpectRangeBeginIsEndWhenSizeHasZeroValue()
+ExpectRangeBeginIsEndWhenSizeHasZeroValue(std::mt19937 & randomNumberEngine)
 {
-  const itk::Index<VDimension> randomIndex = GenerateRandomIndex<VDimension>();
+  const itk::Index<VDimension> randomIndex = GenerateRandomIndex<VDimension>(randomNumberEngine);
 
   for (unsigned int i{}; i < VDimension; ++i)
   {
@@ -143,12 +149,12 @@ TEST(IndexRange, EquivalentBeginOrEndIteratorsCompareEqual)
 {
   using RangeType = IndexRange<2, true>;
 
-  RangeType range(RangeType::SizeType{ { 1, 2 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 1, 2 } });
 
-  const RangeType::iterator       begin = range.begin();
-  const RangeType::iterator       end = range.end();
-  const RangeType::const_iterator cbegin = range.cbegin();
-  const RangeType::const_iterator cend = range.cend();
+  static constexpr RangeType::iterator       begin = range.begin();
+  static constexpr RangeType::iterator       end = range.end();
+  static constexpr RangeType::const_iterator cbegin = range.cbegin();
+  static constexpr RangeType::const_iterator cend = range.cend();
 
   // An iterator object compares equal to itself:
   EXPECT_EQ(begin, begin);
@@ -175,10 +181,9 @@ TEST(IndexRange, EquivalentBeginOrEndIteratorsCompareEqual)
 TEST(IndexRange, BeginAndEndDoNotCompareEqualWhenSizeIsGreaterThanZero)
 {
   using RangeType = IndexRange<2, true>;
-  RangeType range(RangeType::SizeType{ { 1, 2 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 1, 2 } });
 
-  EXPECT_TRUE(!range.empty());
-  EXPECT_FALSE(range.empty());
+  static_assert(!range.empty());
 
   EXPECT_FALSE(range.begin() == range.end());
   EXPECT_NE(range.begin(), range.end());
@@ -190,7 +195,7 @@ TEST(IndexRange, BeginAndEndDoNotCompareEqualWhenSizeIsGreaterThanZero)
 TEST(IndexRange, IteratorsCanBePassedToStdVectorConstructor)
 {
   using RangeType = IndexRange<2, true>;
-  RangeType range(RangeType::SizeType{ { 1, 2 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 1, 2 } });
 
   // Easily store all indices of an IndexRange in an std::vector:
   const std::vector<RangeType::IndexType> stdVector(range.begin(), range.end());
@@ -206,9 +211,9 @@ TEST(IndexRange, IteratorsCanBePassedToStdReverseCopy)
 {
   using RangeType = IndexRange<2, true>;
   using IndexType = RangeType::IndexType;
-  RangeType range(RangeType::SizeType{ { 2, 3 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 2, 3 } });
 
-  const unsigned int numberOfIndices = range.size();
+  static constexpr unsigned int numberOfIndices = range.size();
 
   const std::vector<IndexType> stdVector(range.begin(), range.end());
   std::vector<IndexType>       reversedStdVector1(numberOfIndices);
@@ -237,7 +242,7 @@ TEST(IndexRange, IteratorsCanBePassedToStdForEach)
 {
   using RangeType = IndexRange<2, true>;
   using IndexType = RangeType::IndexType;
-  RangeType range(RangeType::SizeType{ { 2, 3 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 2, 3 } });
 
   std::for_each(range.begin(), range.end(), [](const IndexType index) { EXPECT_TRUE(index >= IndexType()); });
 }
@@ -249,7 +254,7 @@ TEST(IndexRange, CanBeUsedAsExpressionOfRangeBasedForLoop)
 {
   using RangeType = IndexRange<2, true>;
   using IndexType = RangeType::IndexType;
-  RangeType range(RangeType::SizeType{ { 2, 3 } });
+  static constexpr RangeType range(RangeType::SizeType{ { 2, 3 } });
 
   for (auto && index : range)
   {
@@ -266,14 +271,14 @@ TEST(IndexRange, SupportsImageRegion)
   using IndexType = ImageRegionIndexRangeType::IndexType;
   using RegionType = itk::ImageRegion<Dimension>;
 
-  const RegionType::SizeType  size = { { 2, 3 } };
-  const RegionType::IndexType regionIndex = { { 4, 5 } };
-  const RegionType            imageRegion{ regionIndex, size };
+  static constexpr RegionType::SizeType  size = { { 2, 3 } };
+  static constexpr RegionType::IndexType regionIndex = { { 4, 5 } };
+  const RegionType                       imageRegion{ regionIndex, size };
 
   // Default index range, beginning at [0, 0].
-  const ZeroBasedIndexRange<Dimension> indexRange(size);
-  const auto                           beginOfIndexRange = indexRange.cbegin();
-  const auto                           endOfIndexRange = indexRange.cend();
+  static constexpr ZeroBasedIndexRange<Dimension> indexRange(size);
+  static constexpr auto                           beginOfIndexRange = indexRange.cbegin();
+  static constexpr auto                           endOfIndexRange = indexRange.cend();
 
   const ImageRegionIndexRangeType imageRegionIndexRange(imageRegion);
 
@@ -320,9 +325,10 @@ TEST(IndexRange, IsEmptyWhenDefaultConstructed)
 // Tests empty() for a range that has a region size of zero.
 TEST(IndexRange, IsEmptyWhenRegionSizeIsZero)
 {
-  ExpectRangeIsEmptyWhenRegionSizeIsZero<1>();
-  ExpectRangeIsEmptyWhenRegionSizeIsZero<2>();
-  ExpectRangeIsEmptyWhenRegionSizeIsZero<3>();
+  std::mt19937 randomNumberEngine;
+  ExpectRangeIsEmptyWhenRegionSizeIsZero<1>(randomNumberEngine);
+  ExpectRangeIsEmptyWhenRegionSizeIsZero<2>(randomNumberEngine);
+  ExpectRangeIsEmptyWhenRegionSizeIsZero<3>(randomNumberEngine);
 }
 
 
@@ -330,6 +336,7 @@ TEST(IndexRange, IsEmptyWhenRegionSizeIsZero)
 // that has a size value of zero.
 TEST(IndexRange, BeginIsEndWhenSizeHasZeroValue)
 {
-  ExpectRangeBeginIsEndWhenSizeHasZeroValue<2>();
-  ExpectRangeBeginIsEndWhenSizeHasZeroValue<3>();
+  std::mt19937 randomNumberEngine;
+  ExpectRangeBeginIsEndWhenSizeHasZeroValue<2>(randomNumberEngine);
+  ExpectRangeBeginIsEndWhenSizeHasZeroValue<3>(randomNumberEngine);
 }

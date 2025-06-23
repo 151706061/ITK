@@ -84,8 +84,8 @@ public:
   /** Default constructor. Needed since we provide a cast constructor. */
   ImageReverseIterator() = default;
 
-  /** Constructor establishes an iterator to walk a particular image and a
-   * particular region of that image. */
+  /** Constructor establishes an iterator to walk a particular image and a particular region of that image. Initializes
+   * the iterator at the begin of the region. */
   ImageReverseIterator(ImageType * ptr, const RegionType & region);
 
   /** Constructor that can be used to cast from an ImageIterator to an
@@ -115,9 +115,11 @@ public:
 protected:
   /** the construction from a const iterator is declared protected
       in order to enforce const correctness. */
+  /** @ITKStartGrouping */
   ImageReverseIterator(const ImageRegionReverseConstIterator<TImage> & it);
   Self &
   operator=(const ImageRegionReverseConstIterator<TImage> & it);
+  /** @ITKEndGrouping */
 };
 } // end namespace itk
 

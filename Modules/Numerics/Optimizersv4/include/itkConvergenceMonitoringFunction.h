@@ -25,9 +25,7 @@
 
 #include <deque>
 
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 /**
  * \class ConvergenceMonitoringFunction
@@ -50,7 +48,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ConvergenceMonitoringFunction);
 
   using ScalarType = TScalar;
@@ -117,7 +115,6 @@ protected:
 
   EnergyValueContainerType m_EnergyValues{};
 };
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #endif

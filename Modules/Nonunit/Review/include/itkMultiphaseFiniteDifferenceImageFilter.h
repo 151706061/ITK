@@ -125,29 +125,13 @@ namespace itk
  * (or ThreadedHalt) method returns a true value to stop iteration.
  *
  *
- * Based on the paper:
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * Based on the paper \cite chan1999.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
- *
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ImageFilter
  * \ingroup LevelSetSegmentation
@@ -170,7 +154,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiphaseFiniteDifferenceImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same. */
@@ -180,7 +164,11 @@ public:
   using InputImageType = TInputImage;
   using InputImagePointer = typename InputImageType::Pointer;
   using InputPointType = typename InputImageType::PointType;
-  using InputCoordRepType = typename InputPointType::CoordRepType;
+  using InputCoordinateType = typename InputPointType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using InputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `InputCoordRepType`. Please use `InputCoordinateType` instead!") = InputCoordinateType;
+#endif
   using InputIndexType = typename InputImageType::IndexType;
   using InputIndexValueType = typename InputIndexType::IndexValueType;
   using InputSizeType = typename InputImageType::SizeType;
@@ -349,8 +337,7 @@ public:
 
     m_DifferenceFunctions.resize(m_FunctionCount, nullptr);
 
-    RadiusType radius;
-    radius.Fill(1);
+    constexpr auto radius = MakeFilled<RadiusType>(1);
 
     for (unsigned int i = 0; i < this->m_FunctionCount; ++i)
     {
@@ -380,16 +367,14 @@ public:
 
 protected:
   MultiphaseFiniteDifferenceImageFilter()
+    : m_FunctionCount(0)
+    , m_KdTree(nullptr)
+    , m_MaximumRMSError(itk::Math::eps)
+    , m_RMSChange(NumericTraits<double>::max())
+    , m_NumberOfIterations(NumericTraits<unsigned int>::max())
+    , m_UseImageSpacing(true)
+
   {
-    this->m_KdTree = nullptr;
-    this->m_ElapsedIterations = 0;
-    this->m_MaximumRMSError = itk::Math::eps;
-    this->m_RMSChange = NumericTraits<double>::max();
-    this->m_UseImageSpacing = true;
-    this->m_ManualReinitialization = false;
-    this->m_InitializedState = false;
-    this->m_NumberOfIterations = NumericTraits<unsigned int>::max();
-    this->m_FunctionCount = 0;
     this->InPlaceOff();
   }
 

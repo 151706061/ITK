@@ -28,7 +28,7 @@ SlopeInterceptTest()
   // fill out a nifti image and write it.
   const char *  filename = "SlopeIntercept.nii";
   nifti_image * niftiImage = nifti_simple_init_nim();
-  niftiImage->fname = (char *)malloc(strlen(filename) + 1);
+  niftiImage->fname = static_cast<char *>(malloc(strlen(filename) + 1));
   if (niftiImage->fname == nullptr)
   {
     std::cerr << "Failed to allocate memory for filename, length requested " << strlen(filename) + 1 << std::endl;
@@ -36,7 +36,7 @@ SlopeInterceptTest()
   }
   strcpy(niftiImage->fname, filename);
   niftiImage->nifti_type = 1;
-  niftiImage->iname = (char *)malloc(strlen(filename) + 1);
+  niftiImage->iname = static_cast<char *>(malloc(strlen(filename) + 1));
   if (niftiImage->iname == nullptr)
   {
     free(niftiImage->fname);
@@ -121,7 +121,7 @@ SlopeInterceptTest()
     if (!Equal(it.Value(), static_cast<float>(i) / 256.0))
     {
       //      return EXIT_FAILURE;
-      double error = itk::Math::abs(it.Value() - (static_cast<double>(i) / 256.0));
+      const double error = itk::Math::abs(it.Value() - (static_cast<double>(i) / 256.0));
       if (error > maxerror)
       {
         maxerror = error;
@@ -167,8 +167,8 @@ SlopeInterceptWriteTest()
     itout.Set(static_cast<PixelType>(i));
   }
   using WriterType = itk::ImageFileWriter<OutputImageType>;
-  auto                       writer = WriterType::New();
-  itk::NiftiImageIO::Pointer niftiImageIO(itk::NiftiImageIO::New());
+  auto                             writer = WriterType::New();
+  const itk::NiftiImageIO::Pointer niftiImageIO(itk::NiftiImageIO::New());
   niftiImageIO->SetRescaleSlope(1.0 / 256.0);
   niftiImageIO->SetRescaleIntercept(-10.0);
   writer->SetImageIO(niftiImageIO);
@@ -209,7 +209,7 @@ SlopeInterceptWriteTest()
     if (!Equal(it.Value(), static_cast<float>(i) / 256.0 - 10.0))
     {
       //      return EXIT_FAILURE;
-      double error = itk::Math::abs(it.Value() - (static_cast<double>(i) / 256.0 - 10.0));
+      const double error = itk::Math::abs(it.Value() - (static_cast<double>(i) / 256.0 - 10.0));
       if (error > maxerror)
       {
         maxerror = error;

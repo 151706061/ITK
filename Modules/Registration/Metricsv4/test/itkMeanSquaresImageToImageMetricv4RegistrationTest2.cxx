@@ -104,9 +104,9 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest2(int argc, char * argv[])
   movingImageReader->SetFileName(argv[2]);
 
   fixedImageReader->Update();
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   movingImageReader->Update();
-  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
 
   /** define a resample filter that will ultimately be used to deform the image */
   using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -133,14 +133,14 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest2(int argc, char * argv[])
   auto metric = MetricType::New();
 
   using PointType = PointSetType::PointType;
-  PointSetType::Pointer                             pset(PointSetType::New());
+  const PointSetType::Pointer                       pset(PointSetType::New());
   unsigned long                                     ind = 0;
   itk::ImageRegionIteratorWithIndex<FixedImageType> it(fixedImage, fixedImage->GetLargestPossibleRegion());
 
   for (it.GoToBegin(); !it.IsAtEnd(); ++it)
   {
     // take every N^th point
-    if (true /*ct % 4 == 0*/)
+    if constexpr (true /*ct % 4 == 0*/)
     {
       PointType pt;
       fixedImage->TransformIndexToPhysicalPoint(it.GetIndex(), pt);
@@ -162,13 +162,13 @@ itkMeanSquaresImageToImageMetricv4RegistrationTest2(int argc, char * argv[])
   metric->SetMovingImage(movingImage);
   metric->SetFixedTransform(identityTransform);
   metric->SetMovingTransform(affineTransform);
-  const bool gaussian = false;
+  constexpr bool gaussian = false;
   metric->SetUseMovingImageGradientFilter(gaussian);
   metric->SetUseFixedImageGradientFilter(gaussian);
   metric->Initialize();
 
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
 

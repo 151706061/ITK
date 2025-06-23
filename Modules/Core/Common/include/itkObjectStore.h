@@ -34,7 +34,7 @@ namespace itk
 class ObjectStoreEnums
 {
 public:
-  /** \class GrowthStrategy
+  /**
    * \ingroup ITKCommon
    * Type of memory allocation strategy */
   enum class GrowthStrategy : uint8_t
@@ -95,7 +95,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ObjectStore);
 
   /** Type of the objects in storage. */
@@ -141,13 +141,15 @@ public:
   Clear();
 
   /** Set/Get the linear growth size */
+  /** @ITKStartGrouping */
   itkSetMacro(LinearGrowthSize, SizeValueType);
   itkGetConstMacro(LinearGrowthSize, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the growth strategy. */
+  /** @ITKStartGrouping */
   itkSetEnumMacro(GrowthStrategy, GrowthStrategyEnum);
   itkGetConstMacro(GrowthStrategy, GrowthStrategyEnum);
-
+  /** @ITKEndGrouping */
   /** Set growth strategy to exponential */
   void
   SetGrowthStrategyToExponential()
@@ -177,10 +179,9 @@ protected:
     MemoryBlock() = default;
 
     MemoryBlock(SizeValueType n)
-      : Size(n)
-    {
-      Begin = new ObjectType[n];
-    }
+      : Begin(new ObjectType[n])
+      , Size(n)
+    {}
 
     ~MemoryBlock() = default; // Purposely does *not* free memory
 

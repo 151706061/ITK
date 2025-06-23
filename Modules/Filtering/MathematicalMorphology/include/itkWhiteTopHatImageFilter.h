@@ -28,9 +28,7 @@ namespace itk
 /** \class WhiteTopHatImageFilter
  * \brief White top hat extracts local maxima that are larger than the structuring element
  *
- * Top-hats are described in Chapter 4.5 of Pierre Soille's book
- * "Morphological Image Analysis: Principles and Applications",
- * Second Edition, Springer, 2003.
+ * Top-hats are described in \cite soille2004b.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -84,19 +82,21 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WhiteTopHatImageFilter);
 
   /** A safe border is added to input image to avoid borders effects
    * and remove it once the closing is done */
+  /** @ITKStartGrouping */
   itkSetMacro(SafeBorder, bool);
   itkGetConstReferenceMacro(SafeBorder, bool);
   itkBooleanMacro(SafeBorder);
-
+  /** @ITKEndGrouping */
   /** Set/Get the backend filter class. */
+  /** @ITKStartGrouping */
   itkSetMacro(Algorithm, AlgorithmEnum);
   itkGetConstMacro(Algorithm, AlgorithmEnum);
-
+  /** @ITKEndGrouping */
   itkSetMacro(ForceAlgorithm, bool);
   itkGetConstReferenceMacro(ForceAlgorithm, bool);
   itkBooleanMacro(ForceAlgorithm);

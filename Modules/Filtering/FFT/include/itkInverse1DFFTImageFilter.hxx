@@ -38,8 +38,8 @@ Inverse1DFFTImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the inputs
-  typename InputImageType::Pointer  input = const_cast<InputImageType *>(this->GetInput());
-  typename OutputImageType::Pointer output = this->GetOutput();
+  const typename InputImageType::Pointer  input = const_cast<InputImageType *>(this->GetInput());
+  const typename OutputImageType::Pointer output = this->GetOutput();
 
   if (!input || !output)
   {
@@ -73,7 +73,7 @@ template <typename TInputImage, typename TOutputImage>
 void
 Inverse1DFFTImageFilter<TInputImage, TOutputImage>::EnlargeOutputRequestedRegion(DataObject * out)
 {
-  OutputImageType * output = dynamic_cast<OutputImageType *>(out);
+  auto * output = dynamic_cast<OutputImageType *>(out);
 
   // we need to enlarge the region in the fft direction to the
   // largest possible in that direction

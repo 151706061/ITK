@@ -57,7 +57,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VersorRigid3DTransform);
 
   /** Dimension of parameters. */
@@ -128,7 +128,10 @@ public:
   ComputeJacobianWithRespectToParameters(const InputPointType & p, JacobianType & jacobian) const override;
 
 protected:
-  VersorRigid3DTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] VersorRigid3DTransform(const MatrixType &       matrix,
+                                                                      const OutputVectorType & offset);
+#endif
   VersorRigid3DTransform(unsigned int paramDim);
   VersorRigid3DTransform();
   ~VersorRigid3DTransform() override = default;

@@ -39,6 +39,8 @@ template <unsigned int TPointDimension = 3>
 class ITK_TEMPLATE_EXPORT SurfaceSpatialObjectPoint : public SpatialObjectPoint<TPointDimension>
 {
 public:
+  ITK_DEFAULT_COPY_AND_MOVE(SurfaceSpatialObjectPoint);
+
   using Self = SurfaceSpatialObjectPoint;
   using Superclass = SpatialObjectPoint<TPointDimension>;
   using PointType = Point<double, TPointDimension>;
@@ -48,18 +50,15 @@ public:
   /** Constructor */
   SurfaceSpatialObjectPoint();
 
-  /** Copy Constructor */
-  SurfaceSpatialObjectPoint(const SurfaceSpatialObjectPoint & other);
-
   /** Destructor */
   ~SurfaceSpatialObjectPoint() override = default;
 
   /** Get the normal in object space. */
-  const CovariantVectorType &
+  [[nodiscard]] const CovariantVectorType &
   GetNormalInObjectSpace() const;
 
   /** Get the normal in world space. */
-  const CovariantVectorType
+  [[nodiscard]] const CovariantVectorType
   GetNormalInWorldSpace() const;
 
   /** Set the normal in object space. */
@@ -69,10 +68,6 @@ public:
   /** Set the normal in world space. */
   void
   SetNormalInWorldSpace(const CovariantVectorType & normal);
-
-  /** Copy one SurfaceSpatialObjectPoint to another. */
-  Self &
-  operator=(const SurfaceSpatialObjectPoint & rhs);
 
 protected:
   CovariantVectorType m_NormalInObjectSpace{};

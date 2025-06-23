@@ -121,7 +121,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ObjectToObjectOptimizerBaseTemplate);
 
   /**  Scale type. */
@@ -151,8 +151,10 @@ public:
   using StopConditionDescriptionType = std::ostringstream;
 
   /** Accessors for Metric */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Metric, MetricType);
   itkGetModifiableObjectMacro(Metric, MetricType);
+  /** @ITKEndGrouping */
 
   /** Accessor for metric value. Returns the value
    *  stored in m_CurrentMetricValue from the most recent
@@ -212,9 +214,11 @@ public:
    * optimization, and overrides any scales set using SetScales().
    * Default is true.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(DoEstimateScales, bool);
   itkGetConstReferenceMacro(DoEstimateScales, bool);
   itkBooleanMacro(DoEstimateScales);
+  /** @ITKEndGrouping */
 
   /** Set the number of work units to use when threading.
    * The default is the global default number of work units
@@ -223,11 +227,19 @@ public:
   SetNumberOfWorkUnits(ThreadIdType number);
 
 #if !defined(ITK_LEGACY_REMOVE)
-  /** Set the number of work units to use when threading.
+  /** Set/Get the number of work units to use when threading.
    *
    * NOTE: deprecated. Use SetNumberOfWorkUnits() */
-  itkLegacyMacro(virtual void SetNumberOfThreads(ThreadIdType number)) { return this->SetNumberOfWorkUnits(number); }
-  itkLegacyMacro(virtual const ThreadIdType & GetNumberOfThreads() const) { return this->m_NumberOfWorkUnits; }
+  /** @ITKStartGrouping */
+  itkLegacyMacro(virtual void SetNumberOfThreads(ThreadIdType number))
+  {
+    return this->SetNumberOfWorkUnits(number);
+  }
+  itkLegacyMacro(virtual const ThreadIdType & GetNumberOfThreads() const)
+  {
+    return this->m_NumberOfWorkUnits;
+  }
+  /** @ITKEndGrouping */
 #endif // !ITK_LEGACY_REMOVE
 
   /** Get the number of work units set to be used. */
@@ -259,7 +271,7 @@ public:
   StartOptimization(bool doOnlyInitialization = false);
 
   /** Stop condition return string type */
-  virtual const StopConditionReturnStringType
+  virtual StopConditionReturnStringType
   GetStopConditionDescription() const = 0;
 
   /** Returns true if derived optimizer supports using scales.
@@ -274,6 +286,7 @@ public:
 protected:
   /** Default constructor */
   ObjectToObjectOptimizerBaseTemplate();
+
   ~ObjectToObjectOptimizerBaseTemplate() override;
 
   MetricTypePointer m_Metric{};

@@ -133,7 +133,7 @@ main(int argc, char * argv[])
   using MovingImageType = itk::Image<PixelType, ImageDimension>;
 
 
-  const unsigned int SpaceDimension = ImageDimension;
+  constexpr unsigned int SpaceDimension = ImageDimension;
 
   constexpr unsigned int SplineOrder = 3;
   using CoordinateRepType = double;
@@ -202,7 +202,8 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  FixedImageType::ConstPointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::ConstPointer fixedImage =
+    fixedImageReader->GetOutput();
 
   registration->SetFixedImage(fixedImage);
   registration->SetMovingImage(movingImageReader->GetOutput());
@@ -216,7 +217,8 @@ main(int argc, char * argv[])
   // Setup the metric parameters
   metric->SetNumberOfHistogramBins(50);
 
-  FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
+  const FixedImageType::RegionType fixedRegion =
+    fixedImage->GetBufferedRegion();
 
   const unsigned int numberOfPixels = fixedRegion.GetNumberOfPixels();
 
@@ -278,7 +280,7 @@ main(int argc, char * argv[])
   using OptimizerScalesType = OptimizerType::ScalesType;
   OptimizerScalesType optimizerScales(
     rigidTransform->GetNumberOfParameters());
-  const double translationScale = 1.0 / 1000.0;
+  constexpr double translationScale = 1.0 / 1000.0;
 
   optimizerScales[0] = 1.0;
   optimizerScales[1] = 1.0;
@@ -409,7 +411,7 @@ main(int argc, char * argv[])
   //  Perform Deformable Registration
   auto bsplineTransformCoarse = DeformableTransformType::New();
 
-  unsigned int numberOfGridNodesInOneDimensionCoarse = 5;
+  constexpr unsigned int numberOfGridNodesInOneDimensionCoarse = 5;
 
   DeformableTransformType::PhysicalDimensionsType fixedPhysicalDimensions;
   DeformableTransformType::MeshSizeType           meshSize;
@@ -540,7 +542,7 @@ main(int argc, char * argv[])
 
   auto bsplineTransformFine = DeformableTransformType::New();
 
-  unsigned int numberOfGridNodesInOneDimensionFine = 20;
+  constexpr unsigned int numberOfGridNodesInOneDimensionFine = 20;
 
   meshSize.Fill(numberOfGridNodesInOneDimensionFine - SplineOrder);
 
@@ -599,7 +601,8 @@ main(int argc, char * argv[])
     decomposition->SetInput(upsampler->GetOutput());
     decomposition->Update();
 
-    ParametersImageType::Pointer newCoefficients = decomposition->GetOutput();
+    const ParametersImageType::Pointer newCoefficients =
+      decomposition->GetOutput();
 
     // copy the coefficients into the parameter array
     using Iterator = itk::ImageRegionIterator<ParametersImageType>;

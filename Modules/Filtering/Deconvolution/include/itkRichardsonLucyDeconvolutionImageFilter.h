@@ -32,8 +32,7 @@ namespace itk
  * algorithm.
  *
  * This filter implements the Richardson-Lucy deconvolution algorithm
- * as defined in Bertero M and Boccacci P, "Introduction to Inverse
- * Problems in Imaging", 1998. The algorithm assumes that the input
+ * as defined in \cite bertero1998. The algorithm assumes that the input
  * image has been formed by a linear shift-invariant system with a
  * known kernel.
  *
@@ -45,7 +44,7 @@ namespace itk
  *
  * "Deconvolution: infrastructure and reference algorithms"
  * by Gaetan Lehmann
- * https://www.insight-journal.org/browse/publication/753
+ * https://doi.org/10.54294/tvgfv1
  *
  * \author Gaetan Lehmann, Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France
  * \author Cory Quammen, The University of North Carolina at Chapel Hill
@@ -87,7 +86,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RichardsonLucyDeconvolutionImageFilter);
 
 protected:

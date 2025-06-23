@@ -66,7 +66,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TransformParametersAdaptor);
 
   /** Typedefs associated with the transform */
@@ -107,7 +107,8 @@ public:
 
   /** Initialize the transform using the specified fixed parameters */
   void
-  AdaptTransformParameters() override{};
+  AdaptTransformParameters() override
+  {}
 
 protected:
   TransformParametersAdaptor() = default;

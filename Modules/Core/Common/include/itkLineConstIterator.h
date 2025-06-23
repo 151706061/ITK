@@ -102,7 +102,7 @@ public:
    *  representations. */
   using AccessorType = typename TImage::AccessorType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkVirtualGetNameOfClassMacro(LineConstIterator);
 
   /** Get the dimension (size) of the index. */
@@ -120,14 +120,14 @@ public:
   }
 
   /** Get the pixel value */
-  const PixelType
+  [[nodiscard]] const PixelType
   Get() const
   {
     return m_Image->GetPixel(m_CurrentImageIndex);
   }
 
   /** Is the iterator at the end of the line? */
-  bool
+  [[nodiscard]] bool
   IsAtEnd() const
   {
     return m_IsAtEnd;

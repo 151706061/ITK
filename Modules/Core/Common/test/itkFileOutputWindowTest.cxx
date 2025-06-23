@@ -40,15 +40,15 @@ itkFileOutputWindowTest(int, char *[])
   std::cout << "window->GetFileName(): " << fileName2 << std::endl;
 
   // Test itkSetMacros
-  const bool flush = false;
+  constexpr bool flush = false;
   window->SetFlush(flush);
-  const bool append = false;
+  constexpr bool append = false;
   window->SetAppend(append);
 
   // Test itkGetMacros
-  bool flush2 = window->GetFlush();
+  const bool flush2 = window->GetFlush();
   std::cout << "window->GetFlush(): " << flush2 << std::endl;
-  bool append2 = window->GetAppend();
+  const bool append2 = window->GetAppend();
   std::cout << "window->GetAppend(): " << append2 << std::endl;
 
   // Test itkBooleanMacros

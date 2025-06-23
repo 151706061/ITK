@@ -52,10 +52,9 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
   using PixelType = itk::Vector<float, VectorLength>;
   using ImageType = itk::Image<PixelType, ImageDimension>;
 
-  auto                         image = ImageType::New();
-  typename ImageType::SizeType size;
-  size.Fill(16);
-  typename ImageType::RegionType region(size);
+  auto                                 image = ImageType::New();
+  auto                                 size = ImageType::SizeType::Filled(16);
+  const typename ImageType::RegionType region(size);
 
   image->SetRegions(region);
   image->Allocate();
@@ -80,10 +79,10 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
   }
 
   // set up central difference calculator
-  using CoordRepType = float;
+  using CoordinateType = float;
   using DerivativeType = itk::Matrix<double, VectorLength, ImageDimension>;
 
-  using FunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordRepType, DerivativeType>;
+  using FunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordinateType, DerivativeType>;
   using OutputType = typename FunctionType::OutputType;
   using OutputValueType = typename FunctionType::OutputValueType;
 
@@ -91,11 +90,9 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
 
   function->SetInputImage(image);
 
-  typename ImageType::IndexType index;
-
   // pick an index inside the image
-  index.Fill(8);
-  OutputType indexOutput = function->EvaluateAtIndex(index);
+  typename ImageType::IndexType index{ { 8, 8 } };
+  OutputType                    indexOutput = function->EvaluateAtIndex(index);
   std::cout << "Index: " << index << " Derivative: ";
   std::cout << indexOutput << std::endl;
 
@@ -103,10 +100,9 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
   OutputType truthOutput;
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
-    PixelType                     deriv;
     typename ImageType::IndexType indexTest = index;
     indexTest[dim] = indexTest[dim] + 1;
-    deriv = image->GetPixel(indexTest);
+    PixelType deriv = image->GetPixel(indexTest);
     indexTest[dim] = indexTest[dim] - 2;
     deriv -= image->GetPixel(indexTest);
     deriv /= 2.0;
@@ -133,8 +129,7 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
   }
 
   // test continuous index
-  typename FunctionType::ContinuousIndexType cindex;
-  cindex.Fill(8.0);
+  auto       cindex = itk::MakeFilled<typename FunctionType::ContinuousIndexType>(8.0);
   OutputType continuousIndexOutput = function->EvaluateAtContinuousIndex(cindex);
   std::cout << "ContinuousIndex: " << cindex << " Derivative: ";
   std::cout << continuousIndexOutput << std::endl;
@@ -145,8 +140,7 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
     result = EXIT_FAILURE;
   }
 
-  typename FunctionType::PointType point;
-  point.Fill(8.0);
+  auto       point = itk::MakeFilled<typename FunctionType::PointType>(8.0);
   OutputType pointOutput = function->Evaluate(point);
   std::cout << "Point: " << point << " Derivative: ";
   std::cout << pointOutput << std::endl;
@@ -355,7 +349,7 @@ itkCentralDifferenceImageFunctionOnVectorTestRun()
   // Test with incorrectly-sized output type
   using BadDerivativeType = itk::Matrix<double, 10, ImageDimension>;
 
-  using BadFunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordRepType, BadDerivativeType>;
+  using BadFunctionType = itk::CentralDifferenceImageFunction<ImageType, CoordinateType, BadDerivativeType>;
 
   auto badFunction = BadFunctionType::New();
   ITK_TRY_EXPECT_EXCEPTION(badFunction->SetInputImage(image));

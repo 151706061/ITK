@@ -24,14 +24,12 @@ namespace itk
 {
 template <typename TInputImage, typename TFeatureImage, typename TOutputImage>
 BinaryImageToStatisticsLabelMapFilter<TInputImage, TFeatureImage, TOutputImage>::BinaryImageToStatisticsLabelMapFilter()
+  : m_OutputBackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_InputForegroundValue(NumericTraits<InputImagePixelType>::max())
+  , m_ComputePerimeter(true)
+  , m_NumberOfBins(LabelObjectValuatorType::GetDefaultNumberOfBins())
+  , m_ComputeHistogram(true)
 {
-  m_OutputBackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_InputForegroundValue = NumericTraits<InputImagePixelType>::max();
-  m_FullyConnected = false;
-  m_ComputeFeretDiameter = false;
-  m_ComputePerimeter = true;
-  m_NumberOfBins = LabelObjectValuatorType::GetDefaultNumberOfBins();
-  m_ComputeHistogram = true;
   this->SetNumberOfRequiredInputs(2);
 }
 
@@ -43,7 +41,7 @@ BinaryImageToStatisticsLabelMapFilter<TInputImage, TFeatureImage, TOutputImage>:
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -100,7 +98,7 @@ BinaryImageToStatisticsLabelMapFilter<TInputImage, TFeatureImage, TOutputImage>:
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
   os << indent << "OutputBackgroundValue: "
      << static_cast<typename NumericTraits<OutputImagePixelType>::PrintType>(m_OutputBackgroundValue) << std::endl;
   os << indent << "InputForegroundValue: "

@@ -33,6 +33,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::BSpl
   , m_GridOrigin(Superclass::m_CoefficientImages[0]->GetOrigin())
   , m_GridSpacing(Superclass::m_CoefficientImages[0]->GetSpacing())
   , m_GridDirection(Superclass::m_CoefficientImages[0]->GetDirection())
+  , m_Offset(SplineOrder / 2)
 {
 
   // Instantiate an identity transform
@@ -41,15 +42,8 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::BSpl
   this->m_BulkTransform = id;
 
   // Setup variables for computing interpolation
-  this->m_Offset = SplineOrder / 2;
-  if (SplineOrder % 2)
-  {
-    this->m_SplineOrderOdd = true;
-  }
-  else
-  {
-    this->m_SplineOrderOdd = false;
-  }
+  this->m_SplineOrderOdd = (SplineOrder % 2 != 0);
+
   this->m_ValidRegion = this->m_GridRegion; // HACK:  Perhaps this->m_ValidRegion is redundant also.
   this->m_ValidRegionFirst.Fill(0);
   this->m_ValidRegionLast.Fill(1);
@@ -404,8 +398,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::SetC
   }
   else
   {
-    itkExceptionMacro("SetCoefficientImage() requires that an array of "
-                      << "correctly sized images be supplied.");
+    itkExceptionMacro("SetCoefficientImage() requires that an array of correctly sized images be supplied.");
   }
 }
 
@@ -500,8 +493,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::Tran
   this->m_WeightsFunction->Evaluate(index, weights, supportIndex);
 
   // For each dimension, correlate coefficient with weights
-  constexpr SizeType supportSize = WeightsFunctionType::SupportSize;
-  const RegionType   supportRegion(supportIndex, supportSize);
+  const RegionType supportRegion(supportIndex, WeightsFunctionType::SupportSize);
 
   outputPoint.Fill(ScalarType{});
 
@@ -557,8 +549,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::Comp
   // Zero all components of jacobian
   jacobian.SetSize(SpaceDimension, this->GetNumberOfParameters());
   jacobian.Fill(0.0);
-  SizeType supportSize;
-  supportSize.Fill(SplineOrder + 1);
+  constexpr auto supportSize = SizeType::Filled(SplineOrder + 1);
 
   ContinuousIndexType index =
     this->m_CoefficientImages[0]
@@ -580,7 +571,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::Comp
 
   const RegionType supportRegion(supportIndex, supportSize);
 
-  IndexType startIndex = this->m_CoefficientImages[0]->GetLargestPossibleRegion().GetIndex();
+  const IndexType startIndex = this->m_CoefficientImages[0]->GetLargestPossibleRegion().GetIndex();
 
   const SizeType & MeshGridSize = this->m_GridRegion.GetSize();
   SizeType         cumulativeGridSizes;
@@ -590,7 +581,7 @@ BSplineDeformableTransform<TParametersValueType, VDimension, VSplineOrder>::Comp
     cumulativeGridSizes[d] = cumulativeGridSizes[d - 1] * MeshGridSize[d];
   }
 
-  SizeValueType numberOfParametersPerDimension = this->GetNumberOfParametersPerDimension();
+  const SizeValueType numberOfParametersPerDimension = this->GetNumberOfParametersPerDimension();
 
   unsigned long counter = 0;
   for (ImageRegionConstIteratorWithIndex<ImageType> It(this->m_CoefficientImages[0], supportRegion); !It.IsAtEnd();

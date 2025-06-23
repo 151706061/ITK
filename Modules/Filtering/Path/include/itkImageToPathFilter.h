@@ -34,7 +34,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "ContourExtractor2DImageFilter: A subpixel-precision image isocontour extraction filter."
  * by Pincus Z.
- * https://www.insight-journal.org/browse/publication/72
+ * https://doi.org/10.54294/olkmog
  *
  * \ingroup ImageFilters
  * \ingroup ITKPath
@@ -51,7 +51,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageToPathFilter);
 
   /** Some convenient type alias. */

@@ -73,7 +73,7 @@ public:
   /** Instantiation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorGradientAnisotropicDiffusionImageFilter);
 
   /** Extract information from the superclass. */
@@ -82,19 +82,14 @@ public:
   /** Determine the image dimension from the  superclass. */
   static constexpr unsigned int ImageDimension = Superclass::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType::ValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck,
                   (Concept::HasNumericTraits<typename TOutputImage::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   VectorGradientAnisotropicDiffusionImageFilter()
   {
-    typename VectorGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::Pointer p =
-      VectorGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
+    auto p = VectorGradientNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
     this->SetDifferenceFunction(p);
   }
 

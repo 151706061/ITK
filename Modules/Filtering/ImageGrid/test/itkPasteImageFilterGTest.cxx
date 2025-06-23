@@ -55,8 +55,6 @@ protected:
   template <typename TInputImage, typename TSourceImage = TInputImage>
   struct FixtureUtilities
   {
-    static const unsigned int Dimension = TInputImage::ImageDimension;
-
     using PixelType = typename TInputImage::PixelType;
     using OutputPixelType = PixelType;
     using InputImageType = TInputImage;
@@ -80,8 +78,7 @@ protected:
     {
       auto image = TImage::New();
 
-      typename TImage::SizeType imageSize;
-      imageSize.Fill(size);
+      auto imageSize = TImage::SizeType::Filled(size);
       image->SetRegions(typename TImage::RegionType(imageSize));
       image->Allocate();
       image->FillBuffer(0);

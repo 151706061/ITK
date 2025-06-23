@@ -35,47 +35,20 @@ namespace itk
 // DEPRECATED: These macros are left here for compatibility.
 // In the future, they will be removed in favor of the "ITK_" prefixed
 // versions.
-#if defined(ITK_FUTURE_LEGACY_REMOVE)
+#define EXERCISE_BASIC_OBJECT_METHODS \
+  static_assert(false, "Replace EXERCISE_BASIC_OBJECT_METHODS with ITK_EXERCISE_BASIC_OBJECT_METHODS")
+#define TRY_EXPECT_EXCEPTION static_assert(false, "Replace TRY_EXPECT_EXCEPTION with ITK_TRY_EXPECT_EXCEPTION")
+#define TRY_EXPECT_NO_EXCEPTION static_assert(false, "Replace TRY_EXPECT_NO_EXCEPTION with ITK_TRY_EXPECT_NO_EXCEPTION")
+#define TEST_EXPECT_TRUE_STATUS_VALUE \
+  static_assert(false, "Replace TEST_EXPECT_TRUE_STATUS_VALUE with ITK_TEST_EXPECT_TRUE_STATUS_VALUE")
+#define TEST_EXPECT_TRUE static_assert(false, "Replace TEST_EXPECT_TRUE with ITK_TEST_EXPECT_TRUE")
+#define TEST_EXPECT_EQUAL_STATUS_VALUE "Replace TEST_EXPECT_EQUAL_STATUS_VALUE with ITK_TEST_EXPECT_EQUAL_STATUS_VALUE"
+#define TEST_EXPECT_EQUAL static_assert(false, "Replace TEST_EXPECT_EQUAL with ITK_TEST_EXPECT_EQUAL")
+#define TEST_SET_GET static_assert(false, "Replace TEST_SET_GET with ITK_TEST_SET_GET")
+#define TEST_SET_GET_VALUE static_assert(false, "Replace TEST_SET_GET_VALUE with ITK_TEST_SET_GET_VALUE")
+#define TEST_SET_GET_NULL_VALUE static_assert(false, "Replace TEST_SET_GET_NULL_VALUE with ITK_TEST_SET_GET_NULL_VALUE")
+#define TEST_SET_GET_BOOLEAN static_assert(false, "Replace TEST_SET_GET_BOOLEAN with ITK_TEST_SET_GET_BOOLEAN")
 
-#  if defined(__clang__) || defined(__GNUC__)
-#    pragma GCC poison EXERCISE_BASIC_OBJECT_METHODS
-#    pragma GCC poison TRY_EXPECT_EXCEPTION
-#    pragma GCC poison TRY_EXPECT_NO_EXCEPTION
-#    pragma GCC poison TEST_EXPECT_TRUE_STATUS_VALUE
-#    pragma GCC poison TEST_EXPECT_TRUE
-#    pragma GCC poison TEST_EXPECT_EQUAL_STATUS_VALUE
-#    pragma GCC poison TEST_EXPECT_EQUAL
-#    pragma GCC poison TEST_SET_GET
-#    pragma GCC poison TEST_SET_GET_VALUE
-#    pragma GCC poison TEST_SET_GET_NULL_VALUE
-#    pragma GCC poison TEST_SET_GET_BOOLEAN
-#  else
-#    define EXERCISE_BASIC_OBJECT_METHODS "Replace EXERCISE_BASIC_OBJECT_METHODS with ITK_EXERCISE_BASIC_OBJECT_METHODS"
-#    define TRY_EXPECT_EXCEPTION "Replace TRY_EXPECT_EXCEPTION with ITK_TRY_EXPECT_EXCEPTION"
-#    define TRY_EXPECT_NO_EXCEPTION "Replace TRY_EXPECT_NO_EXCEPTION with ITK_TRY_EXPECT_NO_EXCEPTION"
-#    define TEST_EXPECT_TRUE_STATUS_VALUE "Replace TEST_EXPECT_TRUE_STATUS_VALUE with ITK_TEST_EXPECT_TRUE_STATUS_VALUE"
-#    define TEST_EXPECT_TRUE "Replace TEST_EXPECT_TRUE with ITK_TEST_EXPECT_TRUE"
-#    define TEST_EXPECT_EQUAL_STATUS_VALUE \
-      "Replace TEST_EXPECT_EQUAL_STATUS_VALUE with ITK_TEST_EXPECT_EQUAL_STATUS_VALUE"
-#    define TEST_EXPECT_EQUAL "Replace TEST_EXPECT_EQUAL with ITK_TEST_EXPECT_EQUAL"
-#    define TEST_SET_GET "Replace TEST_SET_GET with ITK_TEST_SET_GET"
-#    define TEST_SET_GET_VALUE "Replace TEST_SET_GET_VALUE with ITK_TEST_SET_GET_VALUE"
-#    define TEST_SET_GET_NULL_VALUE "Replace TEST_SET_GET_NULL_VALUE with ITK_TEST_SET_GET_NULL_VALUE"
-#    define TEST_SET_GET_BOOLEAN "Replace TEST_SET_GET_BOOLEAN with ITK_TEST_SET_GET_BOOLEAN"
-#  endif
-#else
-#  define EXERCISE_BASIC_OBJECT_METHODS ITK_EXERCISE_BASIC_OBJECT_METHODS
-#  define TRY_EXPECT_EXCEPTION ITK_TRY_EXPECT_EXCEPTION
-#  define TRY_EXPECT_NO_EXCEPTION ITK_TRY_EXPECT_NO_EXCEPTION
-#  define TEST_EXPECT_TRUE_STATUS_VALUE ITK_TEST_EXPECT_TRUE_STATUS_VALUE
-#  define TEST_EXPECT_TRUE ITK_TEST_EXPECT_TRUE
-#  define TEST_EXPECT_EQUAL_STATUS_VALUE ITK_TEST_EXPECT_EQUAL_STATUS_VALUE
-#  define TEST_EXPECT_EQUAL ITK_TEST_EXPECT_EQUAL
-#  define TEST_SET_GET ITK_TEST_SET_GET
-#  define TEST_SET_GET_VALUE ITK_TEST_SET_GET_VALUE
-#  define TEST_SET_GET_NULL_VALUE ITK_TEST_SET_GET_NULL_VALUE
-#  define TEST_SET_GET_BOOLEAN ITK_TEST_SET_GET_BOOLEAN
-#endif
 
 /* clang-format off */
 #if defined(__GNUC__)
@@ -143,9 +116,10 @@ namespace itk
 
 #define ITK_TEST_EXPECT_TRUE_STATUS_VALUE(command, statusVal)                   \
   {                                                                             \
-    CLANG_PRAGMA_PUSH                                                           \
-    CLANG_SUPPRESS_Wfloat_equal bool _ITK_TEST_EXPECT_TRUE_command(command);    \
-    CLANG_PRAGMA_POP                                                            \
+    ITK_GCC_PRAGMA_PUSH                                                         \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                               \
+    bool _ITK_TEST_EXPECT_TRUE_command(command);                                \
+    ITK_GCC_PRAGMA_POP                                                          \
     if (!(_ITK_TEST_EXPECT_TRUE_command))                                       \
     {                                                                           \
       std::cerr << "Error in " << #command << std::endl;                        \
@@ -159,9 +133,10 @@ namespace itk
 
 #define ITK_TEST_EXPECT_TRUE(command)                                           \
   {                                                                             \
-    CLANG_PRAGMA_PUSH                                                           \
-    CLANG_SUPPRESS_Wfloat_equal bool _ITK_TEST_EXPECT_TRUE_command(command);    \
-    CLANG_PRAGMA_POP                                                            \
+    ITK_GCC_PRAGMA_PUSH                                                         \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                               \
+    bool _ITK_TEST_EXPECT_TRUE_command(command);                                \
+    ITK_GCC_PRAGMA_POP                                                          \
     if (!(_ITK_TEST_EXPECT_TRUE_command))                                       \
     {                                                                           \
       std::cerr << "Error in " << #command << std::endl;                        \
@@ -174,38 +149,40 @@ namespace itk
   ITK_MACROEND_NOOP_STATEMENT
 
 
-#define ITK_TEST_EXPECT_EQUAL_STATUS_VALUE(lh, rh, statusVal)                     \
-  {                                                                               \
-    CLANG_PRAGMA_PUSH                                                             \
-    CLANG_SUPPRESS_Wfloat_equal bool _ITK_TEST_EXPECT_EQUAL_result((lh) == (rh)); \
-    CLANG_PRAGMA_POP                                                              \
-    if (!(_ITK_TEST_EXPECT_EQUAL_result))                                         \
-    {                                                                             \
-      std::cerr << "Error in " << #lh << " == " << #rh << std::endl;              \
-      std::cerr << "\tIn " __FILE__ ", line " << __LINE__ << std::endl;           \
-      std::cerr << "\tlh: " << (lh) << std::endl;                                 \
-      std::cerr << "\trh: " << (rh) << std::endl;                                 \
-      std::cerr << "Expression is not equal" << std::endl;                        \
-      statusVal = EXIT_FAILURE;                                                   \
-    }                                                                             \
-  }                                                                               \
+#define ITK_TEST_EXPECT_EQUAL_STATUS_VALUE(lh, rh, statusVal)           \
+  {                                                                     \
+    ITK_GCC_PRAGMA_PUSH                                                 \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                       \
+    bool _ITK_TEST_EXPECT_EQUAL_result((lh) == (rh));                   \
+    ITK_GCC_PRAGMA_POP                                                  \
+    if (!(_ITK_TEST_EXPECT_EQUAL_result))                               \
+    {                                                                   \
+      std::cerr << "Error in " << #lh << " == " << #rh << std::endl;    \
+      std::cerr << "\tIn " __FILE__ ", line " << __LINE__ << std::endl; \
+      std::cerr << "\tlh: " << (lh) << std::endl;                       \
+      std::cerr << "\trh: " << (rh) << std::endl;                       \
+      std::cerr << "Expression is not equal" << std::endl;              \
+      statusVal = EXIT_FAILURE;                                         \
+    }                                                                   \
+  }                                                                     \
   ITK_MACROEND_NOOP_STATEMENT
 
-#define ITK_TEST_EXPECT_EQUAL(lh, rh)                                             \
-  {                                                                               \
-    CLANG_PRAGMA_PUSH                                                             \
-    CLANG_SUPPRESS_Wfloat_equal bool _ITK_TEST_EXPECT_EQUAL_result((lh) == (rh)); \
-    CLANG_PRAGMA_POP                                                              \
-    if (!(_ITK_TEST_EXPECT_EQUAL_result))                                         \
-    {                                                                             \
-      std::cerr << "Error in " << #lh << " == " << #rh << std::endl;              \
-      std::cerr << "\tIn " __FILE__ ", line " << __LINE__ << std::endl;           \
-      std::cerr << "\tlh: " << (lh) << std::endl;                                 \
-      std::cerr << "\trh: " << (rh) << std::endl;                                 \
-      std::cerr << "Expression is not equal" << std::endl;                        \
-      return EXIT_FAILURE;                                                        \
-    }                                                                             \
-  }                                                                               \
+#define ITK_TEST_EXPECT_EQUAL(lh, rh)                                   \
+  {                                                                     \
+    ITK_GCC_PRAGMA_PUSH                                                 \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                       \
+    bool _ITK_TEST_EXPECT_EQUAL_result((lh) == (rh));                   \
+    ITK_GCC_PRAGMA_POP                                                  \
+    if (!(_ITK_TEST_EXPECT_EQUAL_result))                               \
+    {                                                                   \
+      std::cerr << "Error in " << #lh << " == " << #rh << std::endl;    \
+      std::cerr << "\tIn " __FILE__ ", line " << __LINE__ << std::endl; \
+      std::cerr << "\tlh: " << (lh) << std::endl;                       \
+      std::cerr << "\trh: " << (rh) << std::endl;                       \
+      std::cerr << "Expression is not equal" << std::endl;              \
+      return EXIT_FAILURE;                                              \
+    }                                                                   \
+  }                                                                     \
   ITK_MACROEND_NOOP_STATEMENT
 
 
@@ -221,16 +198,18 @@ namespace itk
   ITK_MACROEND_NOOP_STATEMENT
 
 
-#define ITK_TEST_SET_GET_VALUE(variable, command)                       \
-  CLANG_PRAGMA_PUSH                                                     \
-  CLANG_SUPPRESS_Wfloat_equal if (variable != command) CLANG_PRAGMA_POP \
-  {                                                                     \
-    std::cerr << "Error in " << #command << std::endl;                  \
-    std::cerr << "  In " __FILE__ ", line " << __LINE__ << std::endl;   \
-    std::cerr << "Expected " << variable << std::endl;                  \
-    std::cerr << "but got  " << command << std::endl;                   \
-    return EXIT_FAILURE;                                                \
-  }                                                                     \
+#define ITK_TEST_SET_GET_VALUE(variable, command)                     \
+  ITK_GCC_PRAGMA_PUSH                                                 \
+  ITK_GCC_SUPPRESS_Wfloat_equal                                       \
+  if (variable != command)                                            \
+  {                                                                   \
+    std::cerr << "Error in " << #command << std::endl;                \
+    std::cerr << "  In " __FILE__ ", line " << __LINE__ << std::endl; \
+    std::cerr << "Expected " << variable << std::endl;                \
+    std::cerr << "but got  " << command << std::endl;                 \
+    return EXIT_FAILURE;                                              \
+  }                                                                   \
+  ITK_GCC_PRAGMA_POP                                                  \
   ITK_MACROEND_NOOP_STATEMENT
 
 #define ITK_TEST_SET_GET_NULL_VALUE(command)                          \

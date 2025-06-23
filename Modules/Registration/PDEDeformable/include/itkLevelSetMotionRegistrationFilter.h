@@ -27,7 +27,7 @@ namespace itk
  * \brief Deformably register two images using level set motion.
  *
  * LevelSetMotionFilter implements a deformable registration algorithm that
- * aligns a fixed and a moving image under level set motion. The
+ * aligns a fixed and a moving image under level set motion \cite vemuri2003. The
  * equations of motion are similar to those of the
  * DemonsRegistrationFilter. The main differences are:
  *    (1) Gradients of the moving image are calculated on a smoothed
@@ -78,10 +78,6 @@ namespace itk
  * \warning This filter assumes that the fixed image type, moving image type
  * and deformation field type all have the same number of dimensions.
  *
- * Ref: B.C. Vemuri, J. Ye, Y. Chen, C.M. Leonard. "Image
- * registration via level-set motion: applications to atlas-based
- * segmentation". Medical Image Analysis. Vol. 7. pp. 1-20. 2003.
- *
  * \sa LevelSetMotionRegistrationFunction
  * \sa DemonsRegistrationFilter
  * \ingroup DeformableImageRegistration MultiThreaded
@@ -103,7 +99,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetMotionRegistrationFilter);
 
   /** Inherit types from superclass. */
@@ -130,10 +126,10 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images.
+   * computed over the overlapping region between the two images.
    * This is value is only available for the previous iteration and
    * NOT the current iteration. */
-  virtual double
+  [[nodiscard]] virtual double
   GetMetric() const;
 
   /** Set/Get the parameter alpha.  Alpha is added to the calculated
@@ -145,7 +141,7 @@ public:
   virtual void
   SetAlpha(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetAlpha() const;
 
   /** Set/Get the threshold below which the absolute difference of
@@ -155,7 +151,7 @@ public:
   virtual void
   SetIntensityDifferenceThreshold(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetIntensityDifferenceThreshold() const;
 
   /** Set/Get the threshold below which the gradient magnitude is
@@ -163,7 +159,7 @@ public:
   virtual void
   SetGradientMagnitudeThreshold(double);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetGradientMagnitudeThreshold() const;
 
   /** Set/Get the standard deviation used for smoothing the moving
@@ -181,7 +177,7 @@ public:
   virtual void
   SetGradientSmoothingStandardDeviations(double sigma);
 
-  virtual double
+  [[nodiscard]] virtual double
   GetGradientSmoothingStandardDeviations() const;
 
 protected:

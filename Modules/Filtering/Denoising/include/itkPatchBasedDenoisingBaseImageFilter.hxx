@@ -25,10 +25,9 @@ namespace itk
 
 template <typename TInputImage, typename TOutputImage>
 PatchBasedDenoisingBaseImageFilter<TInputImage, TOutputImage>::PatchBasedDenoisingBaseImageFilter()
-{
-  m_InputImage = nullptr;
-  m_OutputImage = nullptr;
-}
+  : m_InputImage(nullptr)
+  , m_OutputImage(nullptr)
+{}
 
 template <typename TInputImage, typename TOutputImage>
 void
@@ -211,8 +210,7 @@ PatchBasedDenoisingBaseImageFilter<TInputImage, TOutputImage>::GetPatchRadiusInV
     thisPtr->m_InputImage = this->GetInput();
   }
   const typename InputImageType::SpacingType & spacing = this->m_InputImage->GetSpacing();
-  typename InputImageType::SpacingValueType    maxSpacing;
-  maxSpacing = spacing[0];
+  typename InputImageType::SpacingValueType    maxSpacing = spacing[0];
   for (unsigned int dim = 1; dim < ImageDimension; ++dim)
   {
     if (spacing[dim] > maxSpacing)
@@ -220,8 +218,7 @@ PatchBasedDenoisingBaseImageFilter<TInputImage, TOutputImage>::GetPatchRadiusInV
       maxSpacing = spacing[dim];
     }
   }
-  PatchRadiusType radius;
-  radius.Fill(m_PatchRadius);
+  auto radius = MakeFilled<PatchRadiusType>(m_PatchRadius);
   for (unsigned int dim = 0; dim < ImageDimension; ++dim)
   {
     radius[dim] = itk::Math::ceil(maxSpacing * radius[dim] / spacing[dim]);
@@ -243,10 +240,8 @@ PatchBasedDenoisingBaseImageFilter<TInputImage, TOutputImage>::Halt()
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -257,65 +252,16 @@ PatchBasedDenoisingBaseImageFilter<TInputImage, TOutputImage>::PrintSelf(std::os
 
   os << indent << "State: " << m_State << std::endl;
   os << indent << "PatchRadius: " << m_PatchRadius << std::endl;
-  if (m_KernelBandwidthEstimation)
-  {
-    os << indent << "KernelBandwidthEstimation: On" << std::endl;
-  }
-  else
-  {
-    os << indent << "KernelBandwidthEstimation: Off" << std::endl;
-  }
-
+  itkPrintSelfBooleanMacro(KernelBandwidthEstimation);
   os << indent << "KernelBandwidthUpdateFrequency: " << m_KernelBandwidthUpdateFrequency << std::endl;
   os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
   os << indent << "ElapsedIterations: " << m_ElapsedIterations << std::endl;
-
-  if (m_NoiseModel == NoiseModelEnum::GAUSSIAN)
-  {
-    os << indent << "NoiseModelEnum::GAUSSIAN" << std::endl;
-  }
-  else if (m_NoiseModel == NoiseModelEnum::RICIAN)
-  {
-    os << indent << "NoiseModelEnum::RICIAN" << std::endl;
-  }
-  else if (m_NoiseModel == NoiseModelEnum::POISSON)
-  {
-    os << indent << "NoiseModelEnum::POISSON" << std::endl;
-  }
-  else
-  {}
-
+  os << indent << "NoiseModel: " << m_NoiseModel << std::endl;
   os << indent << "SmoothingWeight: " << m_SmoothingWeight << std::endl;
   os << indent << "NoiseModelFidelityWeight: " << m_NoiseModelFidelityWeight << std::endl;
-
-  if (m_AlwaysTreatComponentsAsEuclidean)
-  {
-    os << indent << "AlwaysTreatComponentsAsEuclidean: On" << std::endl;
-  }
-  else
-  {
-    os << indent << "AlwaysTreatComponentsAsEuclidean: Off" << std::endl;
-  }
-
-  if (m_ComponentSpace == Self::ComponentSpaceEnum::EUCLIDEAN)
-  {
-    os << indent << "ComponentSpace: EUCLIDEAN" << std::endl;
-  }
-  else if (m_ComponentSpace == Self::ComponentSpaceEnum::RIEMANNIAN)
-  {
-    os << indent << "ComponentSpace: RIEMANNIAN" << std::endl;
-  }
-  else
-  {}
-
-  if (m_ManualReinitialization)
-  {
-    os << indent << "ManualReinitialization: On" << std::endl;
-  }
-  else
-  {
-    os << indent << "ManualReinitialization: Off" << std::endl;
-  }
+  itkPrintSelfBooleanMacro(AlwaysTreatComponentsAsEuclidean);
+  os << indent << "ComponentSpace: " << m_ComponentSpace << std::endl;
+  itkPrintSelfBooleanMacro(ManualReinitialization);
 }
 } // end namespace itk
 

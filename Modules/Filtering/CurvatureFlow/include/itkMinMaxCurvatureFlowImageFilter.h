@@ -28,7 +28,7 @@ namespace itk
  * \brief Denoise an image using min/max curvature flow.
  *
  * MinMaxCurvatureFlowImageFilter implements a curvature driven image denoising
- * algorithm. Iso-brightness contours in the grayscale input image are viewed
+ * algorithm \cite sethian1999. Iso-brightness contours in the grayscale input image are viewed
  * as a level set. The level set is then evolved using a curvature-based speed
  * function:
  *
@@ -61,10 +61,6 @@ namespace itk
  * however for dimensions greater than 3D, an expensive brute-force search
  * is used to compute the local threshold.
  *
- * Reference:
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Chapter 16, Second edition, 1999.
- *
  * \sa MinMaxCurvatureFlowFunction
  * \sa CurvatureFlowImageFilter
  * \sa BinaryMinMaxCurvatureFlowImageFilter
@@ -94,7 +90,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MinMaxCurvatureFlowImageFilter);
 
   /** Inherit type alias from Superclass. */
@@ -113,11 +109,10 @@ public:
   using RadiusValueType = typename RadiusType::SizeValueType;
 
   /** Set/Get the stencil radius. */
+  /** @ITKStartGrouping */
   itkSetMacro(StencilRadius, RadiusValueType);
   itkGetConstMacro(StencilRadius, RadiusValueType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(UnsignedLongConvertibleToOutputCheck,
                   (Concept::Convertible<unsigned long, typename TOutputImage::PixelType>));
   itkConceptMacro(OutputLessThanComparableCheck, (Concept::LessThanComparable<typename TOutputImage::PixelType>));
@@ -129,8 +124,6 @@ public:
                   (Concept::GreaterThanComparable<typename TOutputImage::PixelType, unsigned long>));
   itkConceptMacro(UnsignedLongOutputAditiveOperatorsCheck,
                   (Concept::AdditiveOperators<unsigned long, typename TOutputImage::PixelType>));
-  // End concept checking
-#endif
 
 protected:
   MinMaxCurvatureFlowImageFilter();

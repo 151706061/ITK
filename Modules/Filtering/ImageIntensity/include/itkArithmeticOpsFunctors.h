@@ -20,14 +20,11 @@
 
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Functor
+namespace itk::Functor
 {
 
 /**
  * \class Add2
- * \brief
  * \ingroup ITKImageIntensity
  */
 template <typename TInput1, typename TInput2 = TInput1, typename TOutput = TInput1>
@@ -149,10 +146,8 @@ public:
     {
       return (TOutput)(A / B);
     }
-    else
-    {
-      return NumericTraits<TOutput>::max(static_cast<TOutput>(A));
-    }
+
+    return NumericTraits<TOutput>::max(static_cast<TOutput>(A));
   }
 };
 
@@ -167,10 +162,9 @@ class ITK_TEMPLATE_EXPORT DivideOrZeroOut
 {
 public:
   DivideOrZeroOut()
-  {
-    m_Threshold = 1e-5 * NumericTraits<TDenominator>::OneValue();
-    m_Constant = TOutput{};
-  };
+    : m_Threshold(1e-5 * NumericTraits<TDenominator>::OneValue())
+    , m_Constant(TOutput{})
+  {}
 
   ~DivideOrZeroOut() = default;
 
@@ -222,10 +216,8 @@ public:
     {
       return static_cast<TOutput>(A % B);
     }
-    else
-    {
-      return NumericTraits<TOutput>::max(static_cast<TOutput>(A));
-    }
+
+    return NumericTraits<TOutput>::max(static_cast<TOutput>(A));
   }
 };
 
@@ -304,10 +296,8 @@ public:
       {
         return NumericTraits<TOutput>::max(A);
       }
-      else
-      {
-        return NumericTraits<TOutput>::NonpositiveMin(A);
-      }
+
+      return NumericTraits<TOutput>::NonpositiveMin(A);
     }
     return static_cast<TOutput>(temp);
   }
@@ -369,7 +359,7 @@ public:
     return (TOutput)(-A);
   }
 };
-} // namespace Functor
-} // namespace itk
+} // namespace itk::Functor
+
 
 #endif

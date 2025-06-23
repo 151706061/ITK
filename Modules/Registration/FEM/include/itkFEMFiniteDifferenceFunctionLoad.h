@@ -37,9 +37,7 @@
 #include "itkNCCRegistrationFunction.h"
 #include "itkMIRegistrationFunction.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 
 /**
@@ -75,7 +73,7 @@ public:
   /** New macro for creation of through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FiniteDifferenceFunctionLoad);
 
 
@@ -340,8 +338,7 @@ private:
 
   typename DisplacementFieldType::Pointer m_DisplacementField{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMFiniteDifferenceFunctionLoad.hxx"

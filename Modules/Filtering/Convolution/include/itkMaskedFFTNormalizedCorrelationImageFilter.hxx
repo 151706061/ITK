@@ -53,7 +53,7 @@ template <typename TImage>
 class PostProcessCorrelation
 {
 public:
-  PostProcessCorrelation() { m_RequiredNumberOfOverlappingPixels = 0; }
+  PostProcessCorrelation() = default;
   ~PostProcessCorrelation() = default;
 
   void
@@ -101,7 +101,7 @@ public:
   }
 
 private:
-  SizeValueType m_RequiredNumberOfOverlappingPixels;
+  SizeValueType m_RequiredNumberOfOverlappingPixels{ 0 };
   double        m_PrecisionTolerance;
 };
 } // namespace Functor
@@ -132,7 +132,7 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   }
 
   this->UpdateProgress(m_AccumulatedProgress);
-  OutputImagePointer outputImage = this->GetOutput();
+  const OutputImagePointer outputImage = this->GetOutput();
 
   fixedMask = this->PreProcessMask(fixedImage, fixedMask);
   movingMask = this->PreProcessMask(movingImage, movingMask);
@@ -233,14 +233,14 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   auto sqrtFilter = SqrtType::New();
   sqrtFilter->SetInput(this->ElementProduct<RealImageType, RealImageType>(fixedDenom, rotatedMovingDenom));
   sqrtFilter->Update();
-  RealImagePointer denominator = sqrtFilter->GetOutput();
+  const RealImagePointer denominator = sqrtFilter->GetOutput();
   fixedDenom = nullptr;         // No longer needed
   rotatedMovingDenom = nullptr; // No longer needed
 
   // Determine a tolerance on the precision of the denominator values.
   const double precisionTolerance = CalculatePrecisionTolerance<RealImageType>(denominator);
 
-  RealImagePointer NCC = this->ElementQuotient<RealImageType>(numerator, denominator);
+  const RealImagePointer NCC = this->ElementQuotient<RealImageType>(numerator, denominator);
   numerator = nullptr; // No longer needed
 
   // Given the numberOfOverlapPixels, we can check that the m_RequiredNumberOfOverlappingPixels is not set higher than
@@ -259,7 +259,7 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   // pixels (or both). Here, we calculate the number of required pixels resulting from both of these methods and choose
   // the one that gives the largest number of pixels. These both default to 0 so that if a user only sets one, the other
   // is ignored.
-  SizeValueType requiredNumberOfOverlappingPixels =
+  const SizeValueType requiredNumberOfOverlappingPixels =
     std::max((SizeValueType)(m_RequiredFractionOfOverlappingPixels * m_MaximumNumberOfOverlappingPixels),
              m_RequiredNumberOfOverlappingPixels);
 
@@ -283,7 +283,7 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   postProcessor->Update();
 
   // Store the output origin computed in GenerateOutputInformation so that it can be reset after the Graft.
-  RealPointType outputOrigin = this->GetOutput()->GetOrigin();
+  const RealPointType outputOrigin = this->GetOutput()->GetOrigin();
   outputImage->Graft(postProcessor->GetOutput());
   outputImage->SetOrigin(outputOrigin);
 }
@@ -295,13 +295,12 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   LocalInputImageType * inputImage)
 {
   // Store the original origin of the image.
-  typename LocalInputImageType::PointType inputOrigin = inputImage->GetOrigin();
+  const typename LocalInputImageType::PointType inputOrigin = inputImage->GetOrigin();
 
   // Flip the moving images along all dimensions so that the correlation can be more easily handled.
   using FlipperType = itk::FlipImageFilter<LocalInputImageType>;
-  typename FlipperType::FlipAxesArrayType flipAxes;
-  flipAxes.Fill(true);
-  auto rotater = FlipperType::New();
+  constexpr auto flipAxes = MakeFilled<typename FlipperType::FlipAxesArrayType>(true);
+  auto           rotater = FlipperType::New();
   rotater->SetFlipAxes(flipAxes);
   rotater->SetInput(inputImage);
   rotater->Update();
@@ -377,9 +376,9 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   LocalInputImageType * inputImage,
   InputSizeType &       FFTImageSize)
 {
-  typename LocalInputImageType::PixelType constantPixel = 0;
-  typename LocalInputImageType::SizeType  upperPad;
-  upperPad = FFTImageSize - inputImage->GetLargestPossibleRegion().GetSize();
+  const typename LocalInputImageType::PixelType constantPixel = 0;
+  const typename LocalInputImageType::SizeType  upperPad =
+    FFTImageSize - inputImage->GetLargestPossibleRegion().GetSize();
 
   using PadType = itk::ConstantPadImageFilter<LocalInputImageType, RealImageType>;
   auto padder = PadType::New();
@@ -600,7 +599,7 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
 
 template <typename TInputImage, typename TOutputImage, typename TMaskImage>
 void
-MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>::VerifyInputInformation() ITKv5_CONST
+MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>::VerifyInputInformation() const
 {
   // Call the superclass' implementation of this method.
   Superclass::VerifyInputInformation();
@@ -609,10 +608,10 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   // We need a few additional checks.
   // Check that the image sizes are the same as their corresponding
   // masks.
-  std::ostringstream fixedSizeString, movingSizeString;
   if (this->GetFixedImageMask() && this->GetFixedImage()->GetLargestPossibleRegion().GetSize() !=
                                      this->GetFixedImageMask()->GetLargestPossibleRegion().GetSize())
   {
+    std::ostringstream fixedSizeString;
     fixedSizeString << std::endl
                     << "The fixed image must be the same size as the fixed mask.  " << std::endl
                     << "FixedImage Size: " << this->GetFixedImage()->GetLargestPossibleRegion().GetSize()
@@ -623,6 +622,7 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   if (this->GetMovingImageMask() && this->GetMovingImage()->GetLargestPossibleRegion().GetSize() !=
                                       this->GetMovingImageMask()->GetLargestPossibleRegion().GetSize())
   {
+    std::ostringstream movingSizeString;
     movingSizeString << std::endl
                      << "The moving image must be the same size as the moving mask.  " << std::endl
                      << "MovingImage Size: " << this->GetMovingImage()->GetLargestPossibleRegion().GetSize()
@@ -648,15 +648,13 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   // is bigger than our input.
 
   // Cast away the constness so we can set the requested region.
-  InputImagePointer inputPtr;
-  inputPtr = const_cast<InputImageType *>(this->GetFixedImage());
+  InputImagePointer inputPtr = const_cast<InputImageType *>(this->GetFixedImage());
   inputPtr->SetRequestedRegion(this->GetFixedImage()->GetLargestPossibleRegion());
 
   inputPtr = const_cast<InputImageType *>(this->GetMovingImage());
   inputPtr->SetRequestedRegion(this->GetMovingImage()->GetLargestPossibleRegion());
 
-  MaskImagePointer maskPtr;
-  maskPtr = const_cast<MaskImageType *>(this->GetFixedImageMask());
+  MaskImagePointer maskPtr = const_cast<MaskImageType *>(this->GetFixedImageMask());
   if (maskPtr)
   {
     maskPtr->SetRequestedRegion(this->GetFixedImageMask()->GetLargestPossibleRegion());
@@ -677,9 +675,9 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   Superclass::GenerateOutputInformation();
 
   // get pointers to the input and output
-  InputImageConstPointer fixedImage = this->GetFixedImage();
-  InputImageConstPointer movingImage = this->GetMovingImage();
-  OutputImagePointer     output = this->GetOutput();
+  const InputImageConstPointer fixedImage = this->GetFixedImage();
+  const InputImageConstPointer movingImage = this->GetMovingImage();
+  const OutputImagePointer     output = this->GetOutput();
 
   // Compute the size of the output image.
   typename OutputImageType::SizeType size;
@@ -718,8 +716,8 @@ MaskedFFTNormalizedCorrelationImageFilter<TInputImage, TOutputImage, TMaskImage>
   Superclass::EnlargeOutputRequestedRegion(output);
 
   // get pointers to the input and output
-  InputImageConstPointer fixedImage = this->GetFixedImage();
-  InputImageConstPointer movingImage = this->GetMovingImage();
+  const InputImageConstPointer fixedImage = this->GetFixedImage();
+  const InputImageConstPointer movingImage = this->GetMovingImage();
 
   // Compute the size of the output image.
   typename OutputImageType::SizeType size;

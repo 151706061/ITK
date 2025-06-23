@@ -37,20 +37,20 @@ using PointsVectorContainerPointer = typename PointsVectorContainer::Pointer;
 int
 itkPointSetTest(int, char *[])
 {
-  int pointDimension = 3;
-  int numOfPoints = 100;
+  constexpr int pointDimension = 3;
+  constexpr int numOfPoints = 100;
 
   /**
    * Define the 3d geometric positions for 8 points in a cube.
    */
-  PointSet::CoordRepType testPointCoords[3];
+  PointSet::CoordinateType testPointCoords[3];
 
   /**
    * Create the point set through its object factory.
    */
-  PointSet::Pointer pset(PointSet::New());
+  const PointSet::Pointer pset(PointSet::New());
 
-  ITK_EXERCISE_BASIC_OBJECT_METHODS(pset, PointSet, DataObject);
+  ITK_EXERCISE_BASIC_OBJECT_METHODS(pset, PointSet, PointSetBase);
 
 
   // Test point container existence exception
@@ -67,9 +67,9 @@ itkPointSetTest(int, char *[])
   {
     for (int i = 0; i < numOfPoints; ++i)
     {
-      testPointCoords[0] = (PointSet::CoordRepType)vnl_sample_uniform(-1.0, 1.0);
-      testPointCoords[1] = (PointSet::CoordRepType)vnl_sample_uniform(-1.0, 1.0);
-      testPointCoords[2] = (PointSet::CoordRepType)vnl_sample_uniform(-1.0, 1.0);
+      testPointCoords[0] = static_cast<PointSet::CoordinateType>(vnl_sample_uniform(-1.0, 1.0));
+      testPointCoords[1] = static_cast<PointSet::CoordinateType>(vnl_sample_uniform(-1.0, 1.0));
+      testPointCoords[2] = static_cast<PointSet::CoordinateType>(vnl_sample_uniform(-1.0, 1.0));
       pset->SetPoint(i, PointType(testPointCoords));
     }
   }
@@ -82,7 +82,7 @@ itkPointSetTest(int, char *[])
   // Test non-existing point id exception
   ITK_TRY_EXPECT_EXCEPTION(pset->GetPoint(pId));
 
-  PointSet::RegionType region = 0;
+  constexpr PointSet::RegionType region = 0;
   pset->SetRequestedRegion(region);
 
   pset->SetBufferedRegion(region);
@@ -100,7 +100,7 @@ itkPointSetTest(int, char *[])
   }
 
   // Insert the points using SetPointArray.
-  PointsVectorContainerPointer pointsArray = PointsVectorContainer::New();
+  const PointsVectorContainerPointer pointsArray = PointsVectorContainer::New();
 
   // Test for in-compatible input array dimension
   pointsArray->InsertElement(0, 1.0);

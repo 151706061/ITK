@@ -62,9 +62,7 @@
 #  include "itkfdstream/fdstream.hxx"
 #endif
 
-namespace itk
-{
-namespace i18n
+namespace itk::i18n
 {
 // Check if the string is correctly encoded
 #if LOCAL_USE_WIN32_WOPEN
@@ -171,10 +169,9 @@ I18nOpenForWriting(const std::string & str, const bool append = false)
   {
     return I18nOpen(str, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
   }
-  else
-  {
-    return I18nOpen(str, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
-  }
+
+  return I18nOpen(str, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+
 #else
   if (!append)
   {
@@ -241,13 +238,12 @@ private:
 class I18nIfstream : public std::istream
 {
 public:
-  I18nIfstream(const char * str, std::ios_base::openmode mode = std::ios_base::in)
+  I18nIfstream(const char * str, std::ios_base::openmode itkNotused(mode) = std::ios_base::in)
     : std::istream(0)
     , m_fd(I18nOpenForReading(str))
     , m_buf(m_fd)
   {
     ///\todo better handle mode flag
-    (void)mode;
     this->rdbuf(&m_buf);
   }
 
@@ -293,8 +289,8 @@ public:
 using I18nOfstream = std::ofstream;
 using I18nIfstream = std::ifstream;
 #endif
-} // namespace i18n
-} // namespace itk
+} // namespace itk::i18n
+
 
 #undef LOCAL_USE_WIN32_WOPEN
 #undef LOCAL_USE_FDSTREAM

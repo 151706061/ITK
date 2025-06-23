@@ -45,10 +45,11 @@ public:
   using FixedParametersType = typename TransformType::FixedParametersType;
   using FixedParametersValueType = typename TransformType::FixedParametersValueType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(TxtTransformIOTemplate);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Determine the file type. Returns true if this ImageIO can read the
    * file specified. */
   bool
@@ -80,7 +81,7 @@ protected:
 private:
   /** trim spaces and newlines from start and end of a string */
   std::string
-  trim(std::string const & source, char const * delims = " \t\r\n");
+  trim(const std::string & source, const char * delims = " \t\r\n");
 };
 
 /** This helps to meet backward compatibility */

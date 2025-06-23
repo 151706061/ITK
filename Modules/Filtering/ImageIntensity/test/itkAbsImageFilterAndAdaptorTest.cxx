@@ -97,7 +97,7 @@ itkAbsImageFilterAndAdaptorTest(int, char *[])
   filter->SetInput(inputImage);
 
   // Get the Smart Pointer to the Filter Output
-  OutputImageType::Pointer outputImage = filter->GetOutput();
+  const OutputImageType::Pointer outputImage = filter->GetOutput();
 
   // Execute the filter
   filter->Update();
@@ -107,7 +107,7 @@ itkAbsImageFilterAndAdaptorTest(int, char *[])
 
   //  Check the content of the result image
   std::cout << "Verification of the output " << std::endl;
-  const OutputImageType::PixelType epsilon = 1e-6;
+  constexpr OutputImageType::PixelType epsilon = 1e-6;
   ot.GoToBegin();
   it.GoToBegin();
   while (!ot.IsAtEnd())
@@ -153,7 +153,7 @@ itkAbsImageFilterAndAdaptorTest(int, char *[])
   diffFilter->Update();
 
   // Get the Smart Pointer to the Diff filter Output
-  OutputImageType::Pointer diffImage = diffFilter->GetOutput();
+  const OutputImageType::Pointer diffImage = diffFilter->GetOutput();
 
   //  Check the content of the diff image
   std::cout << "Comparing the results with those of an Adaptor" << std::endl;
@@ -168,7 +168,7 @@ itkAbsImageFilterAndAdaptorTest(int, char *[])
     std::cout.precision(static_cast<int>(itk::Math::abs(std::log10(epsilon))));
     std::cout << dt.Get() << std::endl;
     const OutputImageType::PixelType diff = dt.Get();
-    if (!itk::Math::FloatAlmostEqual(diff, (OutputImageType::PixelType)0, 10, epsilon))
+    if (!itk::Math::FloatAlmostEqual(diff, OutputImageType::PixelType{ 0 }, 10, epsilon))
     {
       std::cerr.precision(static_cast<int>(itk::Math::abs(std::log10(epsilon))));
       std::cerr << "Error in itkAbsImageFilterTest " << std::endl;

@@ -42,7 +42,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \ingroup IntensityImageFilters  MultiThreaded
  * \ingroup ITKLabelMap
@@ -69,7 +69,7 @@ public:
   inline TPixel
   operator()(const TPixel & A) const
   {
-    bool a = (A == m_ForegroundValue);
+    const bool a = (A == m_ForegroundValue);
     if (!a)
     {
       return m_ForegroundValue;
@@ -98,27 +98,28 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BinaryNotImageFilter);
 
   using PixelType = typename TImage::PixelType;
 
   /** Set/Get the value in the image considered as "foreground". Defaults to
    * maximum value of PixelType. */
+  /** @ITKStartGrouping */
   itkSetMacro(ForegroundValue, PixelType);
   itkGetConstMacro(ForegroundValue, PixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the value used as "background". Defaults to
    * NumericTraits<PixelType>::NonpositiveMin(). */
+  /** @ITKStartGrouping */
   itkSetMacro(BackgroundValue, PixelType);
   itkGetConstMacro(BackgroundValue, PixelType);
-
+  /** @ITKEndGrouping */
 protected:
   BinaryNotImageFilter()
-  {
-    m_ForegroundValue = NumericTraits<PixelType>::max();
-    m_BackgroundValue = NumericTraits<PixelType>::NonpositiveMin();
-  }
+    : m_ForegroundValue(NumericTraits<PixelType>::max())
+    , m_BackgroundValue(NumericTraits<PixelType>::NonpositiveMin())
+  {}
   ~BinaryNotImageFilter() override = default;
 
   void

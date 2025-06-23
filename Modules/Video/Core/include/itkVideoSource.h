@@ -67,12 +67,12 @@ public:
 
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VideoSource);
 
   /*-PUBLIC METHODS----------------------------------------------------------*/
 
-  /** Access the spacial dimensionality of the frames */
+  /** Access the spatial dimensionality of the frames */
   static constexpr unsigned int OutputFrameDimension = OutputFrameType::ImageDimension;
   static unsigned int
   GetOutputFrameDimension()

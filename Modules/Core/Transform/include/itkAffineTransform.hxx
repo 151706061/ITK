@@ -34,11 +34,13 @@ AffineTransform<TParametersValueType, VDimension>::AffineTransform(unsigned int 
   : Superclass(parametersDimension)
 {}
 
+#if !defined(ITK_LEGACY_REMOVE)
 template <typename TParametersValueType, unsigned int VDimension>
 AffineTransform<TParametersValueType, VDimension>::AffineTransform(const MatrixType &       matrix,
                                                                    const OutputVectorType & offset)
   : Superclass(matrix, offset)
 {}
+#endif
 
 template <typename TParametersValueType, unsigned int VDimension>
 void
@@ -88,12 +90,10 @@ template <typename TParametersValueType, unsigned int VDimension>
 void
 AffineTransform<TParametersValueType, VDimension>::Scale(const OutputVectorType & factor, bool pre)
 {
-  MatrixType   trans;
-  unsigned int i, j;
-
-  for (i = 0; i < VDimension; ++i)
+  MatrixType trans;
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
-    for (j = 0; j < VDimension; ++j)
+    for (unsigned int j = 0; j < VDimension; ++j)
     {
       trans[i][j] = 0.0;
     }
@@ -117,12 +117,10 @@ template <typename TParametersValueType, unsigned int VDimension>
 void
 AffineTransform<TParametersValueType, VDimension>::Rotate(int axis1, int axis2, TParametersValueType angle, bool pre)
 {
-  MatrixType   trans;
-  unsigned int i, j;
-
-  for (i = 0; i < VDimension; ++i)
+  MatrixType trans;
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
-    for (j = 0; j < VDimension; ++j)
+    for (unsigned int j = 0; j < VDimension; ++j)
     {
       trans[i][j] = 0.0;
     }
@@ -176,22 +174,19 @@ AffineTransform<TParametersValueType, VDimension>::Rotate3D(const OutputVectorTy
                                                             TParametersValueType     angle,
                                                             bool                     pre)
 {
-  MatrixType trans;
-  ScalarType r, x1, x2, x3;
-  ScalarType q0, q1, q2, q3;
-
   // Convert the axis to a unit vector
-  r = std::sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
-  x1 = axis[0] / r;
-  x2 = axis[1] / r;
-  x3 = axis[2] / r;
+  const ScalarType r = std::sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
+  const ScalarType x1 = axis[0] / r;
+  const ScalarType x2 = axis[1] / r;
+  const ScalarType x3 = axis[2] / r;
 
   // Compute quaternion elements
-  q0 = std::cos(angle / 2.0);
-  q1 = x1 * std::sin(angle / 2.0);
-  q2 = x2 * std::sin(angle / 2.0);
-  q3 = x3 * std::sin(angle / 2.0);
+  const ScalarType q0 = std::cos(angle / 2.0);
+  const ScalarType q1 = x1 * std::sin(angle / 2.0);
+  const ScalarType q2 = x2 * std::sin(angle / 2.0);
+  const ScalarType q3 = x3 * std::sin(angle / 2.0);
 
+  MatrixType trans;
   // Compute elements of the rotation matrix
   trans[0][0] = q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3;
   trans[0][1] = 2.0 * (q1 * q2 - q0 * q3);
@@ -222,12 +217,10 @@ template <typename TParametersValueType, unsigned int VDimension>
 void
 AffineTransform<TParametersValueType, VDimension>::Shear(int axis1, int axis2, TParametersValueType coef, bool pre)
 {
-  MatrixType   trans;
-  unsigned int i, j;
-
-  for (i = 0; i < VDimension; ++i)
+  MatrixType trans;
+  for (unsigned int i = 0; i < VDimension; ++i)
   {
-    for (j = 0; j < VDimension; ++j)
+    for (unsigned int j = 0; j < VDimension; ++j)
     {
       trans[i][j] = 0.0;
     }
@@ -259,26 +252,23 @@ template <typename TParametersValueType, unsigned int VDimension>
 auto
 AffineTransform<TParametersValueType, VDimension>::GetInverseTransform() const -> InverseTransformBasePointer
 {
-  Pointer inv = New();
-
-  return this->GetInverse(inv) ? inv.GetPointer() : nullptr;
+  return Superclass::InvertTransform(*this);
 }
 
 template <typename TParametersValueType, unsigned int VDimension>
 auto
 AffineTransform<TParametersValueType, VDimension>::Metric(const Self * other) const -> ScalarType
 {
-  ScalarType result = 0.0, term;
-
+  ScalarType result = 0.0;
   for (unsigned int i = 0; i < VDimension; ++i)
   {
     for (unsigned int j = 0; j < VDimension; ++j)
     {
-      term = this->GetMatrix()[i][j] - other->GetMatrix()[i][j];
-      result += term * term;
+      const ScalarType term1 = this->GetMatrix()[i][j] - other->GetMatrix()[i][j];
+      result += term1 * term1;
     }
-    term = this->GetOffset()[i] - other->GetOffset()[i];
-    result += term * term;
+    const ScalarType term2 = this->GetOffset()[i] - other->GetOffset()[i];
+    result += term2 * term2;
   }
   return std::sqrt(result);
 }
@@ -287,12 +277,13 @@ template <typename TParametersValueType, unsigned int VDimension>
 auto
 AffineTransform<TParametersValueType, VDimension>::Metric() const -> ScalarType
 {
-  ScalarType result = 0.0, term;
-
+  ScalarType result = 0.0;
   for (unsigned int i = 0; i < VDimension; ++i)
   {
+
     for (unsigned int j = 0; j < VDimension; ++j)
     {
+      ScalarType term;
       if (i == j)
       {
         term = this->GetMatrix()[i][j] - 1.0;
@@ -303,8 +294,8 @@ AffineTransform<TParametersValueType, VDimension>::Metric() const -> ScalarType
       }
       result += term * term;
     }
-    term = this->GetOffset()[i];
-    result += term * term;
+    const ScalarType term2 = this->GetOffset()[i];
+    result += term2 * term2;
   }
 
   return std::sqrt(result);

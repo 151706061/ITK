@@ -51,8 +51,8 @@ namespace itk
  * \ingroup ImageFunctions
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TOutput, typename TCoordRep = float>
-class ITK_TEMPLATE_EXPORT ImageFunction : public FunctionBase<Point<TCoordRep, TInputImage::ImageDimension>, TOutput>
+template <typename TInputImage, typename TOutput, typename TCoordinate = float>
+class ITK_TEMPLATE_EXPORT ImageFunction : public FunctionBase<Point<TCoordinate, TInputImage::ImageDimension>, TOutput>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(ImageFunction);
@@ -63,12 +63,12 @@ public:
   /** Standard class type aliases. */
   using Self = ImageFunction;
 
-  using Superclass = FunctionBase<Point<TCoordRep, Self::ImageDimension>, TOutput>;
+  using Superclass = FunctionBase<Point<TCoordinate, Self::ImageDimension>, TOutput>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageFunction);
 
   /** InputImageType type alias support */
@@ -83,18 +83,22 @@ public:
   /** OutputType type alias support */
   using OutputType = TOutput;
 
-  /** CoordRepType type alias support */
-  using CoordRepType = TCoordRep;
+  /** CoordinateType type alias support */
+  using CoordinateType = TCoordinate;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
 
   /** Index Type. */
   using IndexType = typename InputImageType::IndexType;
   using IndexValueType = typename InputImageType::IndexValueType;
 
   /** ContinuousIndex Type. */
-  using ContinuousIndexType = ContinuousIndex<TCoordRep, Self::ImageDimension>;
+  using ContinuousIndexType = ContinuousIndex<TCoordinate, Self::ImageDimension>;
 
   /** Point Type. */
-  using PointType = Point<TCoordRep, Self::ImageDimension>;
+  using PointType = Point<TCoordinate, Self::ImageDimension>;
 
   /** Set the input image.
    * \warning this method caches BufferedRegion information.
@@ -112,7 +116,7 @@ public:
 
   /** Evaluate the function at specified Point position.
    * Subclasses must provide this method. */
-  TOutput
+  OutputType
   Evaluate(const PointType & point) const override = 0;
 
   /** Evaluate the function at specified Index position.
@@ -171,11 +175,11 @@ public:
   virtual bool
   IsInsideBuffer(const PointType & point) const
   {
-    const ContinuousIndexType index = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordRep>(point);
+    const ContinuousIndexType index = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordinate>(point);
     /* Call IsInsideBuffer to test against BufferedRegion bounds.
      * TransformPhysicalPointToContinuousIndex tests against
      * LargestPossibleRegion */
-    bool isInside = IsInsideBuffer(index);
+    const bool isInside = IsInsideBuffer(index);
     return isInside;
   }
 
@@ -183,7 +187,7 @@ public:
   void
   ConvertPointToNearestIndex(const PointType & point, IndexType & index) const
   {
-    const ContinuousIndexType cindex = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordRep>(point);
+    const ContinuousIndexType cindex = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordinate>(point);
     this->ConvertContinuousIndexToNearestIndex(cindex, index);
   }
 
@@ -191,7 +195,7 @@ public:
   void
   ConvertPointToContinuousIndex(const PointType & point, ContinuousIndexType & cindex) const
   {
-    cindex = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordRep>(point);
+    cindex = m_Image->template TransformPhysicalPointToContinuousIndex<TCoordinate>(point);
   }
 
   /** Convert continuous index to nearest index. */

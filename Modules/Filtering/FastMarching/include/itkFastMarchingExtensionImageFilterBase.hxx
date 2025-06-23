@@ -23,16 +23,13 @@ namespace itk
 {
 template <typename TInput, typename TOutput, typename TAuxValue, unsigned int VAuxDimension>
 FastMarchingExtensionImageFilterBase<TInput, TOutput, TAuxValue, VAuxDimension>::FastMarchingExtensionImageFilterBase()
+  : m_AuxiliaryAliveValues(nullptr)
+  , m_AuxiliaryTrialValues(nullptr)
 {
-  m_AuxiliaryAliveValues = nullptr;
-  m_AuxiliaryTrialValues = nullptr;
-
   this->ProcessObject::SetNumberOfRequiredOutputs(1 + AuxDimension);
-
-  AuxImagePointer ptr;
   for (unsigned int k = 0; k < AuxDimension; ++k)
   {
-    ptr = AuxImageType::New();
+    AuxImagePointer ptr = AuxImageType::New();
     this->ProcessObject::SetNthOutput(k + 1, ptr.GetPointer());
     this->m_AuxImages[k] = nullptr;
   }
@@ -146,9 +143,9 @@ FastMarchingExtensionImageFilterBase<TInput, TOutput, TAuxValue, VAuxDimension>:
 
   if (m_AuxiliaryAliveValues)
   {
-    AuxValueContainerConstIterator auxIter = m_AuxiliaryAliveValues->Begin();
-    NodePairContainerConstIterator pointsIter = this->m_AlivePoints->Begin();
-    NodePairContainerConstIterator pointsEnd = this->m_AlivePoints->Begin();
+    AuxValueContainerConstIterator       auxIter = m_AuxiliaryAliveValues->Begin();
+    NodePairContainerConstIterator       pointsIter = this->m_AlivePoints->Begin();
+    const NodePairContainerConstIterator pointsEnd = this->m_AlivePoints->Begin();
 
     while (pointsIter != pointsEnd)
     {
@@ -166,13 +163,13 @@ FastMarchingExtensionImageFilterBase<TInput, TOutput, TAuxValue, VAuxDimension>:
       ++pointsIter;
       ++auxIter;
     } // end container while
-  }   // if AuxAliveValues set
+  } // if AuxAliveValues set
 
   if (m_AuxiliaryTrialValues)
   {
-    AuxValueContainerConstIterator auxIter = m_AuxiliaryTrialValues->Begin();
-    NodePairContainerConstIterator pointsIter = this->m_TrialPoints->Begin();
-    NodePairContainerConstIterator pointsEnd = this->m_TrialPoints->End();
+    AuxValueContainerConstIterator       auxIter = m_AuxiliaryTrialValues->Begin();
+    NodePairContainerConstIterator       pointsIter = this->m_TrialPoints->Begin();
+    const NodePairContainerConstIterator pointsEnd = this->m_TrialPoints->End();
 
     while (pointsIter != pointsEnd)
     {
@@ -190,7 +187,7 @@ FastMarchingExtensionImageFilterBase<TInput, TOutput, TAuxValue, VAuxDimension>:
       ++pointsIter;
       ++auxIter;
     } // end container loop
-  }   // if AuxTrialValues set
+  } // if AuxTrialValues set
 }
 
 template <typename TInput, typename TOutput, typename TAuxValue, unsigned int VAuxDimension>

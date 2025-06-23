@@ -51,11 +51,9 @@ itkPermuteAxesImageFilterTest(int, char *[])
 
 
   // define a small input test
-  ImageType::IndexType  index = { { 10, 20, 30, 40 } };
-  ImageType::SizeType   size = { { 5, 4, 3, 2 } };
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  constexpr ImageType::IndexType index = { { 10, 20, 30, 40 } };
+  constexpr ImageType::SizeType  size = { { 5, 4, 3, 2 } };
+  const ImageType::RegionType    region{ index, size };
 
   double spacing[ImageDimension] = { 1.1, 1.2, 1.3, 1.4 };
   double origin[ImageDimension] = { 0.5, 0.4, 0.3, 0.2 };
@@ -88,9 +86,9 @@ itkPermuteAxesImageFilterTest(int, char *[])
 
   permuter->SetInput(inputImage);
 
-  ShowProgressObject                                    progressWatch(permuter);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(permuter);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   permuter->AddObserver(itk::ProgressEvent(), command);
 
@@ -100,7 +98,7 @@ itkPermuteAxesImageFilterTest(int, char *[])
   permuter->Print(std::cout);
 
   // check the output
-  ImageType::Pointer outputImage = permuter->GetOutput();
+  const ImageType::Pointer outputImage = permuter->GetOutput();
 
   inputIter.GoToBegin();
   bool passed = true;

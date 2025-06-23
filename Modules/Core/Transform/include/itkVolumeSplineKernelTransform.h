@@ -25,8 +25,7 @@ namespace itk
 /** \class VolumeSplineKernelTransform
  * This class defines the thin plate spline (TPS) transformation.
  * It is implemented in as straightforward a manner as possible from
- * the IEEE TMI paper by Davis, Khotanzad, Flamig, and Harms,
- * Vol. 16 No. 3 June 1997
+ * \cite davis1997.
  *
  * \ingroup ITKTransform
  */
@@ -46,7 +45,7 @@ public:
   /** New macro for creation of through a Smart Pointer */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VolumeSplineKernelTransform);
 
   /** Scalar type. */

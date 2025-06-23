@@ -33,9 +33,7 @@
 #include <vnl/vnl_sparse_matrix_linear_system.h>
 #include <cmath>
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class SolverCrankNicolson
@@ -81,7 +79,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SolverCrankNicolson);
 
   using Float = Element::Float;
@@ -139,7 +137,7 @@ public:
   itkGetMacro(Rho, Float);
 
   /** Returns the time step used for dynamic problems. */
-  Float
+  [[nodiscard]] Float
   GetTimeStep() const override
   {
     return m_TimeStep;
@@ -276,8 +274,7 @@ protected:
   unsigned int m_SumMatrixIndex{};
   unsigned int m_DiffMatrixBySolutionTMinus1Index{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkFEMSolverCrankNicolson.hxx"

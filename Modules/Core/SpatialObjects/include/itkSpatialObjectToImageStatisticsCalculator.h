@@ -48,7 +48,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SpatialObjectToImageStatisticsCalculator);
 
   /** Type definitions for the input image. */
@@ -82,9 +82,10 @@ public:
   using SampleType = itk::Statistics::ListSample<VectorType>;
 
   /** Set/Get the direction of the sample */
+  /** @ITKStartGrouping */
   itkSetMacro(SampleDirection, unsigned int);
   itkGetConstMacro(SampleDirection, unsigned int);
-
+  /** @ITKEndGrouping */
   /** Set the input image. */
   itkSetConstObjectMacro(Image, ImageType);
 

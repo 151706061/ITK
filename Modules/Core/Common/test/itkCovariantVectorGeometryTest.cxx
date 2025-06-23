@@ -53,7 +53,7 @@ itkCovariantVectorGeometryTest(int, char *[])
   std::cout << "vb = (1,3,5)   = ";
   std::cout << vb << std::endl;
 
-  VectorType vc = vb - va;
+  const VectorType vc = vb - va;
   std::cout << "vc  =  vb - va  = ";
   std::cout << vc << std::endl;
 
@@ -73,7 +73,7 @@ itkCovariantVectorGeometryTest(int, char *[])
   std::cout << "ve  -=  vb      = ";
   std::cout << ve << std::endl;
 
-  VectorType vh = vb;
+  const VectorType vh = vb;
   std::cout << "vh   =  vb      = ";
   std::cout << vh << std::endl;
 
@@ -81,15 +81,15 @@ itkCovariantVectorGeometryTest(int, char *[])
   std::cout << "vg( va )        = ";
   std::cout << vg << std::endl;
 
-  ValueType norm2 = vg.GetSquaredNorm();
+  const ValueType norm2 = vg.GetSquaredNorm();
   std::cout << "vg squared norm = ";
   std::cout << norm2 << std::endl;
 
-  ValueType norm = vg.GetNorm();
+  const ValueType norm = vg.GetNorm();
   std::cout << "vg norm = ";
   std::cout << norm << std::endl;
 
-  ValueType normX = vg.Normalize();
+  const ValueType normX = vg.Normalize();
   std::cout << "vg after normalizing: " << vg << std::endl;
   if (norm != normX)
   {
@@ -137,7 +137,7 @@ itkCovariantVectorGeometryTest(int, char *[])
   {
     std::cout << "Test for CastFrom() method... ";
 
-    const float tolerance = 1e-7;
+    constexpr float tolerance = 1e-7;
 
     //  CovariantVector Classes
     using DoubleCovariantVectorType = itk::CovariantVector<double, N>;
@@ -190,7 +190,7 @@ itkCovariantVectorGeometryTest(int, char *[])
     covariant[1] = 3.0;
     covariant[2] = 5.0;
 
-    const double expectedValue = -28.0;
+    constexpr double expectedValue = -28.0;
 
     if (!itk::Math::FloatAlmostEqual(expectedValue, covariant * contravariant) ||
         !itk::Math::FloatAlmostEqual(expectedValue, contravariant * covariant))
@@ -240,7 +240,7 @@ itkCovariantVectorGeometryTest(int, char *[])
     using CovariantVectorType = itk::CovariantVector<double, 3>;
     CovariantVectorType::ComponentType comp(1.0);
     double                             x(1.0);
-    if (sizeof(comp) != sizeof(double))
+    if constexpr (sizeof(comp) != sizeof(double))
     {
       std::cerr << "error -- CovariantVectorType::ComponentType size != sizeof(double)" << std::endl;
       return EXIT_FAILURE;

@@ -20,13 +20,11 @@
 
 namespace itk
 {
-const double FRPR_TINY = 1e-20;
+constexpr double FRPR_TINY = 1e-20;
 
 FRPROptimizer::FRPROptimizer()
-{
-  m_UseUnitLengthGradient = false;
-  m_OptimizationType = OptimizationEnum::PolakRibiere;
-}
+  : m_OptimizationType(OptimizationEnum::PolakRibiere)
+{}
 
 FRPROptimizer::~FRPROptimizer() = default;
 
@@ -36,10 +34,10 @@ FRPROptimizer::GetValueAndDerivative(ParametersType & p, double * val, Parameter
   this->m_CostFunction->GetValueAndDerivative(p, *val, *xi);
   if (this->GetMaximize())
   {
-    (*val) = -(*val);
+    (*val) *= -1;
     for (unsigned int i = 0; i < this->GetSpaceDimension(); ++i)
     {
-      (*xi)[i] = -(*xi)[i];
+      (*xi)[i] *= -1;
     }
   }
   if (this->GetUseUnitLengthGradient())
@@ -73,9 +71,9 @@ FRPROptimizer::LineOptimize(ParametersType * p, ParametersType & xi, double * va
   double ax = 0.0;
   double fa = (*val);
   double xx = this->GetStepLength();
-  double fx;
-  double bx;
-  double fb;
+  double fx = NAN;
+  double bx = NAN;
+  double fb = NAN;
 
   this->LineBracket(&ax, &xx, &bx, &fa, &fx, &fb, tempCoord);
   this->SetCurrentLinePoint(xx, fx);
@@ -93,8 +91,6 @@ FRPROptimizer::LineOptimize(ParametersType * p, ParametersType & xi, double * va
 void
 FRPROptimizer::StartOptimization()
 {
-  unsigned int i;
-
   if (m_CostFunction.IsNull())
   {
     return;
@@ -107,7 +103,7 @@ FRPROptimizer::StartOptimization()
 
   FRPROptimizer::ParametersType tempCoord(this->GetSpaceDimension());
 
-  double                        gg, gam, dgg;
+
   FRPROptimizer::ParametersType g(this->GetSpaceDimension());
   FRPROptimizer::ParametersType h(this->GetSpaceDimension());
   FRPROptimizer::ParametersType xi(this->GetSpaceDimension());
@@ -116,10 +112,10 @@ FRPROptimizer::StartOptimization()
   p = this->GetInitialPosition();
   this->SetCurrentPosition(p);
 
-  double fp;
+  double fp = NAN;
   this->GetValueAndDerivative(p, &fp, &xi);
 
-  for (i = 0; i < this->GetSpaceDimension(); ++i)
+  for (unsigned int i = 0; i < this->GetSpaceDimension(); ++i)
   {
     g[i] = -xi[i];
     xi[i] = g[i];
@@ -132,8 +128,7 @@ FRPROptimizer::StartOptimization()
   {
     this->SetCurrentIteration(currentIteration);
 
-    double fret;
-    fret = fp;
+    double fret = fp;
     this->LineOptimize(&p, xi, &fret, tempCoord);
 
     if (2.0 * itk::Math::abs(fret - fp) <=
@@ -158,12 +153,12 @@ FRPROptimizer::StartOptimization()
       this->GetValueAndDerivative(p, &fp, &xi);
     }
 
-    gg = 0.0;
-    dgg = 0.0;
+    double gg = 0.0;
+    double dgg = 0.0;
 
     if (m_OptimizationType == OptimizationEnum::PolakRibiere)
     {
-      for (i = 0; i < this->GetSpaceDimension(); ++i)
+      for (unsigned int i = 0; i < this->GetSpaceDimension(); ++i)
       {
         gg += g[i] * g[i];
         dgg += (xi[i] + g[i]) * xi[i];
@@ -171,7 +166,7 @@ FRPROptimizer::StartOptimization()
     }
     if (m_OptimizationType == OptimizationEnum::FletchReeves)
     {
-      for (i = 0; i < this->GetSpaceDimension(); ++i)
+      for (unsigned int i = 0; i < this->GetSpaceDimension(); ++i)
       {
         gg += g[i] * g[i];
         dgg += xi[i] * xi[i];
@@ -185,8 +180,8 @@ FRPROptimizer::StartOptimization()
       return;
     }
 
-    gam = dgg / gg;
-    for (i = 0; i < this->GetSpaceDimension(); ++i)
+    const double gam = dgg / gg;
+    for (unsigned int i = 0; i < this->GetSpaceDimension(); ++i)
     {
       g[i] = -xi[i];
       xi[i] = g[i] + gam * h[i];
@@ -218,7 +213,7 @@ FRPROptimizer::PrintSelf(std::ostream & os, Indent indent) const
   Superclass::PrintSelf(os, indent);
 
   os << indent << "OptimizationType: " << m_OptimizationType << std::endl;
-  os << indent << "UseUnitLengthGradient: " << (m_UseUnitLengthGradient ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseUnitLengthGradient);
 }
 
 std::ostream &

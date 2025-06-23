@@ -44,7 +44,7 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
     using TensorReconstructionImageFilterType =
       itk::DiffusionTensor3DReconstructionImageFilter<ReferencePixelType, GradientPixelType, TensorPrecisionType>;
     using GradientImageType = TensorReconstructionImageFilterType::GradientImageType;
-    TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
+    const TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
       TensorReconstructionImageFilterType::New();
 
     ITK_EXERCISE_BASIC_OBJECT_METHODS(
@@ -65,11 +65,9 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
     using ReferenceRegionType = ReferenceImageType::RegionType;
     using ReferenceIndexType = ReferenceRegionType::IndexType;
     using ReferenceSizeType = ReferenceRegionType::SizeType;
-    ReferenceSizeType   sizeReferenceImage = { { 4, 4, 4 } };
-    ReferenceIndexType  indexReferenceImage = { { 0, 0, 0 } };
-    ReferenceRegionType regionReferenceImage;
-    regionReferenceImage.SetSize(sizeReferenceImage);
-    regionReferenceImage.SetIndex(indexReferenceImage);
+    constexpr ReferenceSizeType  sizeReferenceImage = { { 4, 4, 4 } };
+    constexpr ReferenceIndexType indexReferenceImage = { { 0, 0, 0 } };
+    const ReferenceRegionType    regionReferenceImage{ indexReferenceImage, sizeReferenceImage };
     referenceImage->SetRegions(regionReferenceImage);
     referenceImage->Allocate();
     referenceImage->FillBuffer(100);
@@ -79,9 +77,9 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
 
     // Assign gradient directions
     //
-    double gradientDirections[6][3] = { { -1.000000, 0.000000, 0.000000 }, { -0.166000, 0.986000, 0.000000 },
-                                        { 0.110000, 0.664000, 0.740000 },  { -0.901000, -0.419000, -0.110000 },
-                                        { 0.169000, -0.601000, 0.781000 }, { 0.815000, -0.386000, 0.433000 } };
+    const double gradientDirections[6][3] = { { -1.000000, 0.000000, 0.000000 }, { -0.166000, 0.986000, 0.000000 },
+                                              { 0.110000, 0.664000, 0.740000 },  { -0.901000, -0.419000, -0.110000 },
+                                              { 0.169000, -0.601000, 0.781000 }, { 0.815000, -0.386000, 0.433000 } };
 
 
     // Create gradient images
@@ -94,12 +92,10 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
 
     for (unsigned int i = 0; i < numberOfGradientImages; ++i)
     {
-      auto               gradientImage = GradientImageType::New();
-      GradientSizeType   sizeGradientImage = { { 4, 4, 4 } };
-      GradientIndexType  indexGradientImage = { { 0, 0, 0 } };
-      GradientRegionType regionGradientImage;
-      regionGradientImage.SetSize(sizeGradientImage);
-      regionGradientImage.SetIndex(indexGradientImage);
+      auto                        gradientImage = GradientImageType::New();
+      constexpr GradientSizeType  sizeGradientImage = { { 4, 4, 4 } };
+      constexpr GradientIndexType indexGradientImage = { { 0, 0, 0 } };
+      const GradientRegionType    regionGradientImage{ indexGradientImage, sizeGradientImage };
       gradientImage->SetRegions(regionGradientImage);
       gradientImage->Allocate();
 
@@ -119,14 +115,14 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
       tensorReconstructionFilter->AddGradientImage(gradientDirection, gradientImage);
       std::cout << "Gradient directions: " << gradientDirection << std::endl;
 
-      const TensorReconstructionImageFilterType::GradientDirectionType::element_type epsilon = 1e-3;
-      TensorReconstructionImageFilterType::GradientDirectionType                     output =
+      constexpr TensorReconstructionImageFilterType::GradientDirectionType::element_type epsilon = 1e-3;
+      TensorReconstructionImageFilterType::GradientDirectionType                         output =
         tensorReconstructionFilter->GetGradientDirection(i);
       for (unsigned int j = 0; j < gradientDirection.size(); ++j)
       {
-        TensorReconstructionImageFilterType::GradientDirectionType::element_type gradientDirectionComponent =
+        const TensorReconstructionImageFilterType::GradientDirectionType::element_type gradientDirectionComponent =
           gradientDirection[j];
-        TensorReconstructionImageFilterType::GradientDirectionType::element_type outputComponent = output[j];
+        const TensorReconstructionImageFilterType::GradientDirectionType::element_type outputComponent = output[j];
         if (!itk::Math::FloatAlmostEqual(gradientDirectionComponent, outputComponent, 10, epsilon))
         {
           std::cerr.precision(static_cast<int>(itk::Math::abs(std::log10(epsilon))));
@@ -141,8 +137,8 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
     }
 
     // Test gradient direction index exception
-    unsigned int idx = numberOfGradientImages + 1;
-    ITK_TRY_EXPECT_EXCEPTION(tensorReconstructionFilter->GetGradientDirection(idx));
+    constexpr unsigned int idx = numberOfGradientImages + 1;
+    ITK_TRY_EXPECT_EXCEPTION([[maybe_unused]] auto val = tensorReconstructionFilter->GetGradientDirection(idx));
 
     //
     // second time through test, use the mask image
@@ -159,7 +155,7 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
       tensorReconstructionFilter->SetMaskImage(maskImage);
       //
       // just for coverage, use the Spatial Object input type as well.
-      itk::ImageMaskSpatialObject<3>::Pointer maskSpatialObject = itk::ImageMaskSpatialObject<3>::New();
+      const itk::ImageMaskSpatialObject<3>::Pointer maskSpatialObject = itk::ImageMaskSpatialObject<3>::New();
       maskSpatialObject->SetImage(maskImage);
       maskSpatialObject->Update();
       tensorReconstructionFilter->SetMaskSpatialObject(maskSpatialObject);
@@ -175,17 +171,17 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
               << "This filter is using " << tensorReconstructionFilter->GetNumberOfWorkUnits() << " work units "
               << std::endl;
 
-    itk::SimpleFilterWatcher watcher(tensorReconstructionFilter, "Tensor Reconstruction");
+    const itk::SimpleFilterWatcher watcher(tensorReconstructionFilter, "Tensor Reconstruction");
 
     tensorReconstructionFilter->Update();
 
     using TensorImageType = TensorReconstructionImageFilterType::TensorImageType;
-    TensorImageType::Pointer tensorImage = tensorReconstructionFilter->GetOutput();
+    const TensorImageType::Pointer tensorImage = tensorReconstructionFilter->GetOutput();
     using TensorImageIndexType = TensorImageType::IndexType;
 
-    TensorImageIndexType tensorImageIndex = { { 3, 3, 3 } };
-    GradientIndexType    gradientImageIndex = { { 3, 3, 3 } };
-    ReferenceIndexType   referenceImageIndex = { { 3, 3, 3 } };
+    constexpr TensorImageIndexType tensorImageIndex = { { 3, 3, 3 } };
+    constexpr GradientIndexType    gradientImageIndex = { { 3, 3, 3 } };
+    constexpr ReferenceIndexType   referenceImageIndex = { { 3, 3, 3 } };
 
     std::cout << std::endl << "Pixels at index: " << tensorImageIndex << std::endl;
     std::cout << "Reference pixel " << referenceImage->GetPixel(referenceImageIndex) << std::endl;
@@ -201,8 +197,8 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
                                               { -8.4079, 0.900034, 2.62504 } };
 
     std::cout << std::endl << "Reconstructed tensor : " << std::endl;
-    bool   passed = true;
-    double precision = 0.0001;
+    bool             passed = true;
+    constexpr double precision = 0.0001;
     for (unsigned int i = 0; i < 3; ++i)
     {
       std::cout << '\t';
@@ -225,7 +221,7 @@ itkDiffusionTensor3DReconstructionImageFilterTest(int argc, char * argv[])
       for (const auto & i : expectedResult)
       {
         std::cout << '\t';
-        for (double j : i)
+        for (const double j : i)
         {
           std::cout << j << ' ';
         }

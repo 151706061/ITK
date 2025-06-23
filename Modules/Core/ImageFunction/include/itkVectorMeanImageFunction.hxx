@@ -19,27 +19,27 @@
 #define itkVectorMeanImageFunction_hxx
 
 #include "itkConstNeighborhoodIterator.h"
+#include "itkMakeFilled.h"
 
 namespace itk
 {
 
-template <typename TInputImage, typename TCoordRep>
-VectorMeanImageFunction<TInputImage, TCoordRep>::VectorMeanImageFunction()
-{
-  m_NeighborhoodRadius = 1;
-}
+template <typename TInputImage, typename TCoordinate>
+VectorMeanImageFunction<TInputImage, TCoordinate>::VectorMeanImageFunction()
+  : m_NeighborhoodRadius(1)
+{}
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 void
-VectorMeanImageFunction<TInputImage, TCoordRep>::PrintSelf(std::ostream & os, Indent indent) const
+VectorMeanImageFunction<TInputImage, TCoordinate>::PrintSelf(std::ostream & os, Indent indent) const
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "NeighborhoodRadius: " << m_NeighborhoodRadius << std::endl;
 }
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 auto
-VectorMeanImageFunction<TInputImage, TCoordRep>::EvaluateAtIndex(const IndexType & index) const -> RealType
+VectorMeanImageFunction<TInputImage, TCoordinate>::EvaluateAtIndex(const IndexType & index) const -> RealType
 {
 
   using PixelType = typename TInputImage::PixelType;
@@ -54,8 +54,7 @@ VectorMeanImageFunction<TInputImage, TCoordRep>::EvaluateAtIndex(const IndexType
   }
 
   // Create an N-d neighborhood kernel, using a zeroflux boundary condition
-  typename InputImageType::SizeType kernelSize;
-  kernelSize.Fill(m_NeighborhoodRadius);
+  auto kernelSize = InputImageType::SizeType::Filled(m_NeighborhoodRadius);
 
   ConstNeighborhoodIterator<InputImageType> it(
     kernelSize, this->GetInputImage(), this->GetInputImage()->GetBufferedRegion());

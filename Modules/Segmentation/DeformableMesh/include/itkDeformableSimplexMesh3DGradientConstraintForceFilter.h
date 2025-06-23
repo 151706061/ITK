@@ -45,6 +45,9 @@ public:
 
   ImageVoxel() = default;
   ImageVoxel(const int * pos, const double * subpos, double val, double dist, unsigned int ind)
+    : m_Value(val)
+    , m_Distance(dist)
+    , m_Index(ind)
   {
     this->m_Vpos[0] = pos[0];
     this->m_Vpos[1] = pos[1];
@@ -52,37 +55,34 @@ public:
     this->m_Spos[0] = subpos[0];
     this->m_Spos[1] = subpos[1];
     this->m_Spos[2] = subpos[2];
-    this->m_Value = val;
-    this->m_Distance = dist;
-    this->m_Index = ind;
   }
 
   /// returns voxel X coordinate (voxel column)
-  unsigned int
+  [[nodiscard]] unsigned int
   GetX() const
   {
     return m_Vpos[0];
   }
   /// returns voxel Y coordinate (voxel row)
-  unsigned int
+  [[nodiscard]] unsigned int
   GetY() const
   {
     return m_Vpos[1];
   }
   /// returns voxel Z coordinate (voxel plane)
-  unsigned int
+  [[nodiscard]] unsigned int
   GetZ() const
   {
     return m_Vpos[2];
   }
   /// returns voxel distance to origin
-  double
+  [[nodiscard]] double
   GetDistance() const
   {
     return m_Distance;
   }
   /// returns voxel value
-  double
+  [[nodiscard]] double
   GetValue() const
   {
     return m_Value;
@@ -96,7 +96,7 @@ public:
     m_Value = val;
   }
 
-  inline friend std::ostream &
+  friend inline std::ostream &
   operator<<(std::ostream & os, const ImageVoxel & val)
   {
     os << "Vpos: " << val.m_Vpos << std::endl;
@@ -131,7 +131,8 @@ public:
 };
 // Define how to print enumeration
 extern ITKDeformableMesh_EXPORT std::ostream &
-                                operator<<(std::ostream & out, const DeformableSimplexMesh3DGradientConstraintForceFilterEnums::SIDE value);
+operator<<(std::ostream & out, const DeformableSimplexMesh3DGradientConstraintForceFilterEnums::SIDE value);
+
 /**
  * \class DeformableSimplexMesh3DGradientConstraintForceFilter
  * \brief
@@ -162,7 +163,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DeformableSimplexMesh3DGradientConstraintForceFilter);
 
   /** Some type alias. */
@@ -190,9 +191,10 @@ public:
   using OriginalImagePointer = typename OriginalImageType::ConstPointer;
 
   /** control the range of search for Bresenham at normal line */
+  /** @ITKStartGrouping */
   itkSetMacro(Range, int);
   itkGetConstMacro(Range, int);
-
+  /** @ITKEndGrouping */
   using SIDEEnum = DeformableSimplexMesh3DGradientConstraintForceFilterEnums::SIDE;
 #if !defined(ITK_LEGACY_REMOVE)
   /**Exposes enums values for backwards compatibility*/

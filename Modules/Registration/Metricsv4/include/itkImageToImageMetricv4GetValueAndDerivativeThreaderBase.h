@@ -187,6 +187,7 @@ protected:
     JacobianType MovingTransformJacobian;
     JacobianType MovingTransformJacobianPositional;
   };
+
   itkPadStruct(ITK_CACHE_LINE_ALIGNMENT,
                GetValueAndDerivativePerThreadStruct,
                PaddedGetValueAndDerivativePerThreadStruct);

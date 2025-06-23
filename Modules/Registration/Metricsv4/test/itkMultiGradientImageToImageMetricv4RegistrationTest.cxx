@@ -57,9 +57,14 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
 
   std::cout << argc << std::endl;
   unsigned int numberOfIterations = 10;
+  bool         useSubSampling = true;
   if (argc >= 5)
   {
     numberOfIterations = std::stoi(argv[4]);
+  }
+  if (argc >= 6)
+  {
+    useSubSampling = std::stoi(argv[5]);
   }
   std::cout << " iterations " << numberOfIterations << std::endl;
 
@@ -80,9 +85,9 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
 
   // get the images
   fixedImageReader->Update();
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   movingImageReader->Update();
-  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
 
   /** define a resample filter that will ultimately be used to deform the image */
   using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -113,7 +118,7 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   metric->SetNumberOfHistogramBins(20);
   auto metric2 = MetricType2::New();
 
-  if (false)
+  if (!useSubSampling)
   {
     std::cout << "Dense sampling." << std::endl;
     metric->SetUseSampledPointSet(false);
@@ -121,8 +126,9 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   else
   {
     using PointType = PointSetType::PointType;
-    PointSetType::Pointer                             pset(PointSetType::New());
-    unsigned long                                     ind = 0, ct = 0;
+    const PointSetType::Pointer                       pset(PointSetType::New());
+    unsigned long                                     ind = 0;
+    unsigned long                                     ct = 0;
     itk::ImageRegionIteratorWithIndex<FixedImageType> It(fixedImage, fixedImage->GetLargestPossibleRegion());
     for (It.GoToBegin(); !It.IsAtEnd(); ++It)
     {
@@ -142,7 +148,6 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
     metric2->SetUseSampledPointSet(true);
     std::cout << "Testing metric with point set..." << std::endl;
   }
-
   metric->SetFixedImage(fixedImage);
   metric->SetMovingImage(movingImage);
   metric->SetFixedTransform(identityTransform);
@@ -161,7 +166,7 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
 
   std::cout << "First do an affine registration " << std::endl;
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   RegistrationParameterScalesFromShiftType::ScalesType scales(affineTransform->GetNumberOfParameters());
   shiftScaleEstimator->SetMetric(metric);
@@ -178,7 +183,7 @@ itkMultiGradientImageToImageMetricv4RegistrationTest(int argc, char * argv[])
   std::cout << "now declare optimizer2  " << std::endl;
 
   using RegistrationParameterScalesFromShiftType2 = itk::RegistrationParameterScalesFromPhysicalShift<MetricType2>;
-  RegistrationParameterScalesFromShiftType2::Pointer shiftScaleEstimator2 =
+  const RegistrationParameterScalesFromShiftType2::Pointer shiftScaleEstimator2 =
     RegistrationParameterScalesFromShiftType2::New();
   shiftScaleEstimator2->SetMetric(metric2);
   shiftScaleEstimator2->EstimateScales(scales);

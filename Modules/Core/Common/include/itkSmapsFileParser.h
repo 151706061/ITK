@@ -277,8 +277,8 @@ public:
   GetMemoryUsage(const char * filter, const char * token = "Size");
 
 protected:
-  std::string m_MapFilePath{}; //< location of the last loaded Map file
-  TMapData    m_MapData{};     //< data of the loaded smap file
+  std::string m_MapFilePath{}; // location of the last loaded Map file
+  TMapData    m_MapData{};     // data of the loaded smap file
 };
 
 /** \class SmapsFileParser
@@ -291,14 +291,14 @@ template <typename TSmapsDataType>
 class ITK_TEMPLATE_EXPORT SmapsFileParser : public MapFileParser<TSmapsDataType>
 {
 public:
-  virtual ~SmapsFileParser() = default;
+  ~SmapsFileParser() override = default;
   /** Load and parse the smaps file pointed by smapsFileLocation.
    *  If smapsFileLocation is empty, load the file located at
    *  "/proc/" + PID + "/smaps"
    *  Throw an exception is the file can't be opened.
    */
-  virtual void
-  ReadFile(const std::string & mapFileLocation = "");
+  void
+  ReadFile(const std::string & mapFileLocation = "") override;
 };
 
 /** \class VMMapFileParser
@@ -310,12 +310,12 @@ template <typename TVMMapDataType>
 class ITK_TEMPLATE_EXPORT VMMapFileParser : public MapFileParser<TVMMapDataType>
 {
 public:
-  virtual ~VMMapFileParser() = default;
+  ~VMMapFileParser() override = default;
   /** If no vmmap file, create one using "vmmap pid" command
    *  Throw an exception is the file can't be created/opened.
    */
-  virtual void
-  ReadFile(const std::string & mapFileLocation = "");
+  void
+  ReadFile(const std::string & mapFileLocation = "") override;
 };
 } // end namespace itk
 

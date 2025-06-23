@@ -44,9 +44,7 @@ namespace itk
  * sub-pixel resolution for the output contours.
  *
  * The marching squares algorithm is a special case of the marching cubes
- * algorithm (Lorensen, William and Harvey E. Cline. Marching Cubes: A High
- * Resolution 3D Surface Construction Algorithm. Computer Graphics (SIGGRAPH 87
- * Proceedings) 21(4) July 1987, p. 163-170). A simple explanation is available
+ * algorithm \cite lorensen1987. A simple explanation is available
  * here: http://users.polytech.unice.fr/~lingrand/MarchingCubes/algo.html
  *
  * There is an ambiguous case in the marching squares algorithm: if a given
@@ -91,7 +89,7 @@ namespace itk
  * must be set at the filter level.
  *
  * This class was contributed to the Insight Journal by Zachary Pincus.
- * https://www.insight-journal.org/browse/publication/72
+ * https://doi.org/10.54294/olkmog
  *
  * \sa Image
  * \sa Path
@@ -127,7 +125,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ContourExtractor2DImageFilter);
 
   /** Image and path type alias support */
@@ -155,22 +153,25 @@ public:
 
   /** Control the orientation of the contours with reference to the image
    * gradient. (See class documentation.) */
+  /** @ITKStartGrouping */
   itkSetMacro(ReverseContourOrientation, bool);
   itkGetConstReferenceMacro(ReverseContourOrientation, bool);
   itkBooleanMacro(ReverseContourOrientation);
-
+  /** @ITKEndGrouping */
   /** Control whether high- or low-valued pixels are vertex-connected.
    * Default is for low-valued pixels to be vertex-connected.
    * (See class documentation.) */
+  /** @ITKStartGrouping */
   itkSetMacro(VertexConnectHighPixels, bool);
   itkGetConstReferenceMacro(VertexConnectHighPixels, bool);
   itkBooleanMacro(VertexConnectHighPixels);
-
+  /** @ITKEndGrouping */
   /** Return contours for all distinct labels */
+  /** @ITKStartGrouping */
   itkSetMacro(LabelContours, bool);
   itkGetConstReferenceMacro(LabelContours, bool);
   itkBooleanMacro(LabelContours);
-
+  /** @ITKEndGrouping */
   /** Control whether the largest possible input region is used, or if a
    * custom requested region is to be used. */
   void
@@ -182,17 +183,14 @@ public:
 
   /** Set/Get the image intensity value that the contours should follow.
    *  This is the equivalent of an iso-value in Marching Squares. */
+  /** @ITKStartGrouping */
   itkSetMacro(ContourValue, InputRealType);
   itkGetConstReferenceMacro(ContourValue, InputRealType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(DimensionShouldBe2, (Concept::SameDimension<Self::InputImageDimension, 2>));
   itkConceptMacro(InputPixelTypeComparable, (Concept::Comparable<InputPixelType>));
   itkConceptMacro(InputHasPixelTraitsCheck, (Concept::HasPixelTraits<InputPixelType>));
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ContourExtractor2DImageFilter();
@@ -264,7 +262,7 @@ private:
 
   struct VertexHash
   {
-    using CoordinateType = typename VertexType::CoordRepType;
+    using CoordinateType = typename VertexType::CoordinateType;
     inline size_t
     operator()(const VertexType & v) const noexcept
     {
@@ -280,7 +278,7 @@ private:
   void
   CreateSingleContour(InputPixelType         label,
                       const InputImageType * input,
-                      const InputRegionType  extendedRegion,
+                      const InputRegionType  usableRegion,
                       SizeValueType          totalNumberOfPixels,
                       ContourContainerType & contoursOutput);
 

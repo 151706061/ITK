@@ -278,10 +278,8 @@ PolygonCell<TCellInterface>::PointIdsBegin() -> PointIdIterator
   {
     return &m_PointIds.front();
   }
-  else
-  {
-    return nullptr;
-  }
+
+  return nullptr;
 }
 
 /**
@@ -297,10 +295,8 @@ PolygonCell<TCellInterface>::PointIdsBegin() const -> PointIdConstIterator
   {
     return &m_PointIds.front();
   }
-  else
-  {
-    return nullptr;
-  }
+
+  return nullptr;
 }
 
 /**
@@ -315,10 +311,8 @@ PolygonCell<TCellInterface>::PointIdsEnd() -> PointIdIterator
   {
     return &m_PointIds.back() + 1;
   }
-  else
-  {
-    return nullptr;
-  }
+
+  return nullptr;
 }
 
 /**
@@ -334,10 +328,8 @@ PolygonCell<TCellInterface>::PointIdsEnd() const -> PointIdConstIterator
   {
     return &m_PointIds.back() + 1;
   }
-  else
-  {
-    return nullptr;
-  }
+
+  return nullptr;
 }
 
 /**
@@ -387,8 +379,8 @@ template <typename TCellInterface>
 bool
 PolygonCell<TCellInterface>::GetEdge(CellFeatureIdentifier edgeId, EdgeAutoPointer & edgePointer)
 {
-  auto *       edge = new EdgeType;
-  unsigned int max_pointId = this->GetNumberOfPoints() - 1;
+  auto *             edge = new EdgeType;
+  const unsigned int max_pointId = this->GetNumberOfPoints() - 1;
 
   if (edgeId < max_pointId)
   {

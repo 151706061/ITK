@@ -39,8 +39,6 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateNextOutputRegion(long *
                                                                           std::vector<long> *     sizes,
                                                                           OutputImageRegionType & outputRegion)
 {
-  unsigned int         ctr;
-  int                  done = 0;
   OutputImageIndexType nextIndex = outputRegion.GetIndex();
   OutputImageSizeType  nextSize = outputRegion.GetSize();
 
@@ -49,7 +47,8 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateNextOutputRegion(long *
   // value for the region parameters.  If we wrap on a region, then we
   // also increment to the next region for the next higher dimension.
   //
-  for (ctr = 0; (ctr < ImageDimension) && !done; ++ctr)
+  int done = 0;
+  for (unsigned int ctr = 0; (ctr < ImageDimension) && !done; ++ctr)
   {
     regIndices[ctr]++;
     done = 1;
@@ -72,7 +71,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateNextOutputRegion(long *
   // If any dimension has zero size, then we do not need to process this
   // region.  Report this back to the calling routine.
   //
-  for (ctr = 0; ctr < ImageDimension; ++ctr)
+  for (unsigned int ctr = 0; ctr < ImageDimension; ++ctr)
   {
     if (nextSize[ctr] == 0)
     {
@@ -96,7 +95,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateNextInputRegion(long * 
                                                                          std::vector<long> *    sizes,
                                                                          InputImageRegionType & inputRegion)
 {
-  unsigned int        ctr;
+  unsigned int        ctr = 0;
   int                 done = 0;
   InputImageIndexType nextIndex = inputRegion.GetIndex();
   InputImageSizeType  nextSize = inputRegion.GetSize();
@@ -150,10 +149,8 @@ template <typename TInputImage, typename TOutputImage>
 int
 MirrorPadImageFilter<TInputImage, TOutputImage>::FindRegionsInArea(long start, long end, long size, long offset)
 {
-  int  result = 1;
-  long regionsize;
-
-  regionsize = end - start;
+  int        result = 1;
+  const long regionsize = end - start;
   if (regionsize > 0) // Find out home many regions we have,
   {
     result = regionsize / size;
@@ -183,21 +180,20 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::ConvertOutputIndexToInputIndex(
                                                                                 const int *             oddRegionArray,
                                                                                 double &                outDecayFactor)
 {
-  unsigned int dimCtr;
-  long         a, b, c; // Output region goes from a to a+b-1
-                        // Input region goes from c to c+b-1
   OutputImageIndexType outputRegionStart = outputRegion.GetIndex();
   InputImageIndexType  inputRegionStart = inputRegion.GetIndex();
   InputImageSizeType   inputSizes = inputRegion.GetSize();
 
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
-    a = outputRegionStart[dimCtr];
-    c = inputRegionStart[dimCtr];
+    // Output region goes from a to a+b-1
+    // Input region goes from c to c+b-1
+    const long a = outputRegionStart[dimCtr];
+    const long c = inputRegionStart[dimCtr];
 
     if (oddRegionArray[dimCtr])
     {
-      b = inputSizes[dimCtr];
+      const long b = inputSizes[dimCtr];
       inputIndex[dimCtr] = a + c + b - 1 - outputIndex[dimCtr];
     }
     else
@@ -212,7 +208,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::ConvertOutputIndexToInputIndex(
 
     // city-block distance, first layer of 6-connected outside voxels having distance 1
     // 18-connected voxels and second 6-connected layer having distance 2 etc.
-    for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+    for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
     {
       distanceFromEdge += (itk::Math::abs(outputIndex[dimCtr] - inputIndex[dimCtr]) + 1) / 2;
     }
@@ -230,8 +226,6 @@ template <typename TInputImage, typename TOutputImage>
 int
 MirrorPadImageFilter<TInputImage, TOutputImage>::RegionIsOdd(long base, long test, long size)
 {
-  long oddness;
-
   // Within first region is even.
   if ((test >= base) && (test < (base + size)))
   {
@@ -240,11 +234,11 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::RegionIsOdd(long base, long tes
 
   if (test < base)
   {
-    oddness = (base - test - 1) / size;
+    const long oddness = (base - test - 1) / size;
     return !(oddness & 1);
   }
 
-  oddness = (test - base) / size;
+  const long oddness = (test - base) / size;
   return (oddness & 1);
 }
 
@@ -269,8 +263,6 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildInterRegions(std::vector<l
                                                                    int                 numRegs,
                                                                    int &               regCtr)
 {
-  long sizeTemp; // Holder for current size calculation.
-
   // Region 0 is between, which has a starting index equal to
   // the input region starting index, unless that would be
   // outside the bounds of the output image.
@@ -287,6 +279,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildInterRegions(std::vector<l
 
   // Size of the in region is the area from index 0 to the end of the
   // input or the output, whichever comes first.
+  long sizeTemp = 0; // Holder for current size calculation.
   if ((inputIndex + inputSize) < (outputIndex + outputSize))
   {
     sizeTemp = inputIndex + inputSize - outputRegionStart[0];
@@ -325,10 +318,6 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildPreRegions(std::vector<lon
                                                                  int                 numRegs,
                                                                  int &               regCtr)
 {
-  long sizeTemp; // Holder for current size calculation.
-  int  ctr;      // Generic loop counter.
-  long offset;   // Offset for times when we need to shorten both ends.
-
   // Handle the pre-region.  Within the pre-region, the first and last
   // groups may be truncated and only contain the back part of the input
   // data.  All other regions will be complete copies of the input.
@@ -337,11 +326,12 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildPreRegions(std::vector<lon
   // Size of the pre-region is all the output that precedes the input,
   // all except the first (and possibly the last) will be the size of
   // the input.
-  sizeTemp = outputRegionStart[0] - outputIndex;
+  // Holder for current size calculation.
+  long sizeTemp = outputRegionStart[0] - outputIndex;
   sizeTemp = ((sizeTemp > 0) ? (sizeTemp % inputSize) : 0);
   outputRegionSizes[regCtr] = sizeTemp;
   inputRegionSizes[regCtr] = sizeTemp;
-  offset = inputSize - sizeTemp;
+  long offset = inputSize - sizeTemp; // Offset for times when we need to shorten both ends.
   if ((sizeTemp == 0) || this->RegionIsOdd(inputIndex, outputIndex, inputSize))
   {
     inputRegionStart[regCtr] = inputIndex;
@@ -352,7 +342,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildPreRegions(std::vector<lon
   }
   // Handle the rest of the pre-region by stepping through in blocks of
   // the size of the input image.
-  for (ctr = 1; ctr < numRegs; ++ctr)
+  for (int ctr = 1; ctr < numRegs; ++ctr)
   {
     ++regCtr;
     offset = 0;
@@ -398,20 +388,16 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildPostRegions(std::vector<lo
                                                                   int                 numRegs,
                                                                   int &               regCtr)
 {
-  long sizeTemp; // Holder for current size calculation.
-  int  ctr;      // Generic loop counter.
-  int  offset;   // Offset for when we have to shorten both ends.
-
   // Handle the post region.  The post region has a number of
   // areas of size equal to the input region, followed by one
   // region of possibly smaller size.
   ++regCtr;
-  sizeTemp = outputIndex + outputSize - inputIndex - inputSize;
+  long sizeTemp = outputIndex + outputSize - inputIndex - inputSize;
   sizeTemp = ((sizeTemp > 0) ? (sizeTemp % inputSize) : 0);
   outputRegionSizes[regCtr] = sizeTemp;
   inputRegionSizes[regCtr] = sizeTemp;
   outputRegionStart[regCtr] = outputIndex + outputSize - sizeTemp;
-  offset = inputSize - sizeTemp;
+  int offset = inputSize - sizeTemp;
   if ((sizeTemp > 0) && this->RegionIsOdd(inputIndex, outputRegionStart[regCtr], inputSize))
   {
     inputRegionStart[regCtr] = inputIndex + offset;
@@ -421,7 +407,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::BuildPostRegions(std::vector<lo
     inputRegionStart[regCtr] = inputIndex;
   }
 
-  for (ctr = numRegs - 1; ctr >= 1; ctr--)
+  for (int ctr = numRegs - 1; ctr >= 1; ctr--)
   {
     offset = 0;
     ++regCtr;
@@ -463,15 +449,12 @@ template <typename TInputImage, typename TOutputImage>
 void
 MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
 {
-  unsigned int dimCtr;
-  int          regCtr;
-
   // call the superclass' implementation of this method
   // Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
-  typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
+  const typename Superclass::InputImagePointer  inputPtr = const_cast<InputImageType *>(this->GetInput());
+  const typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -488,18 +471,19 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   // For n dimensions, there are k^n combinations of before, between, and
   // after on these regions.  We are keeping this flexible so that we
   // can handle other blockings imposed by the mirror and wrap algorithms.
-  long              inRegLimit[ImageDimension];
-  long              outRegLimit[ImageDimension];
-  long              minIndex[ImageDimension], maxIndex[ImageDimension];
-  int               numPre[ImageDimension], numPost[ImageDimension], numIn[ImageDimension];
+
+  // Calculate the actual number of regions for each dimension,
+  // and set up the required variables here.
   std::vector<long> outputRegionStart[ImageDimension];
   std::vector<long> outputRegionSizes[ImageDimension];
   std::vector<long> inputRegionStart[ImageDimension];
   std::vector<long> inputRegionSizes[ImageDimension];
-
-  // Calculate the actual number of regions for each dimension,
-  // and set up the required variables here.
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  long              inRegLimit[ImageDimension];
+  long              outRegLimit[ImageDimension];
+  int               numPre[ImageDimension];
+  int               numPost[ImageDimension];
+  int               numIn[ImageDimension];
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     numIn[dimCtr] = 1; // Always assume exactly one inter region.
     numPre[dimCtr] =   // Count how many versions of input fit in pre-pad
@@ -524,7 +508,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   // Generate the break points for the image regions we counted in the
   // previous loop.
   //
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     //
     // Generate region 0 (inter-region) information.  Based on the indices
@@ -533,16 +517,16 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
     // corresponding to the input region.  Padding will be on either
     // side of this region.
     //
-    regCtr = BuildInterRegions(inputRegionStart[dimCtr],
-                               outputRegionStart[dimCtr],
-                               inputRegionSizes[dimCtr],
-                               outputRegionSizes[dimCtr],
-                               inputIndex[dimCtr],
-                               outputIndex[dimCtr],
-                               static_cast<long>(inputSize[dimCtr]),
-                               static_cast<long>(outputSize[dimCtr]),
-                               numIn[dimCtr],
-                               regCtr);
+    int regCtr = BuildInterRegions(inputRegionStart[dimCtr],
+                                   outputRegionStart[dimCtr],
+                                   inputRegionSizes[dimCtr],
+                                   outputRegionSizes[dimCtr],
+                                   inputIndex[dimCtr],
+                                   outputIndex[dimCtr],
+                                   static_cast<long>(inputSize[dimCtr]),
+                                   static_cast<long>(outputSize[dimCtr]),
+                                   numIn[dimCtr],
+                                   regCtr);
 
     //
     // Generate region 1 (pre-region) information for that part of the
@@ -579,12 +563,14 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   // Pick the indices which span the largest input region we need for this
   // output region.
   //
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  long minIndex[ImageDimension];
+  long maxIndex[ImageDimension];
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     minIndex[dimCtr] = inputRegionStart[dimCtr][0];
     maxIndex[dimCtr] = minIndex[dimCtr] + static_cast<long>(inputRegionSizes[dimCtr][0]);
 
-    for (regCtr = 1; regCtr < (numIn[dimCtr] + numPre[dimCtr] + numPost[dimCtr]); ++regCtr)
+    for (int regCtr = 1; regCtr < (numIn[dimCtr] + numPre[dimCtr] + numPost[dimCtr]); ++regCtr)
     {
       if (minIndex[dimCtr] == maxIndex[dimCtr])
       {
@@ -607,7 +593,7 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
 
   typename TInputImage::SizeType  inputRequestedRegionSize;
   typename TInputImage::IndexType inputRequestedRegionStartIndex;
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     inputRequestedRegionStartIndex[dimCtr] = minIndex[dimCtr];
     inputRequestedRegionSize[dimCtr] = maxIndex[dimCtr] - minIndex[dimCtr];
@@ -623,10 +609,8 @@ void
 MirrorPadImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
-  unsigned int dimCtr, i;
-  int          regCtr;
-  int          numRegions = 1; // number of regions in our decomposed space.
-  int          goodInput, goodOutput;
+
+  int numRegions = 1; // number of regions in our decomposed space.
 
   // Are the regions non-empty?
   itkDebugMacro("MirrorPadImageFilter::DynamicThreadedGenerateData");
@@ -652,15 +636,16 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   long              inRegLimit[ImageDimension];
   long              outRegIndices[ImageDimension];
   long              outRegLimit[ImageDimension];
-  int               numPre[ImageDimension], numPost[ImageDimension], numIn[ImageDimension];
+  int               numPre[ImageDimension];
+  int               numPost[ImageDimension];
+  int               numIn[ImageDimension];
   std::vector<long> outputRegionStart[ImageDimension];
   std::vector<long> outputRegionSizes[ImageDimension];
   std::vector<long> inputRegionStart[ImageDimension];
   std::vector<long> inputRegionSizes[ImageDimension];
-
   // Calculate the actual number of regions for each dimension,
   // and set up the required variables here.
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     numIn[dimCtr] = 1; // Always assume exactly one inter region.
     numPre[dimCtr] =   // Count how many versions of input fit in pre-pad
@@ -686,23 +671,23 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
 
   // Generate the break points for the image regions we counted in the
   // previous loop.
-  for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+  for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
   {
     // Generate region 0 (inter-region) information.  Based on the indices
     // of the input and the output for this dimension, decide what are the
     // starting points and the lengths of the output region directly
     // corresponding to the input region.  Padding will be on either
     // side of this region.
-    regCtr = BuildInterRegions(inputRegionStart[dimCtr],
-                               outputRegionStart[dimCtr],
-                               inputRegionSizes[dimCtr],
-                               outputRegionSizes[dimCtr],
-                               inputIndex[dimCtr],
-                               outputIndex[dimCtr],
-                               static_cast<long>(inputSize[dimCtr]),
-                               static_cast<long>(outputSize[dimCtr]),
-                               numIn[dimCtr],
-                               regCtr);
+    int regCtr = BuildInterRegions(inputRegionStart[dimCtr],
+                                   outputRegionStart[dimCtr],
+                                   inputRegionSizes[dimCtr],
+                                   outputRegionSizes[dimCtr],
+                                   inputIndex[dimCtr],
+                                   outputIndex[dimCtr],
+                                   static_cast<long>(inputSize[dimCtr]),
+                                   static_cast<long>(outputSize[dimCtr]),
+                                   numIn[dimCtr],
+                                   regCtr);
 
     // Generate region 1 (pre-region) information for that part of the
     // output image which precedes the input image in this dimension.
@@ -738,20 +723,16 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
 
   TotalProgressReporter progress(this, this->GetOutput()->GetRequestedRegion().GetNumberOfPixels());
 
-  int                  oddRegionArray[ImageDimension];
-  OutputImageIndexType currentOutputIndex;
-  InputImageIndexType  currentInputIndex;
-
-  i = 0;
+  unsigned int i = 0;
 
   // Now walk the regions.
-  for (regCtr = 0; regCtr < numRegions; ++regCtr)
+  for (int regCtr = 0; regCtr < numRegions; ++regCtr)
   {
     // If both a valid output and input region are defined for the particular
     // defined region, then copy the input values to the output values.
-    goodOutput =
+    const int goodOutput =
       this->GenerateNextOutputRegion(outRegIndices, outRegLimit, outputRegionStart, outputRegionSizes, outputRegion);
-    goodInput =
+    const int goodInput =
       this->GenerateNextInputRegion(inRegIndices, inRegLimit, inputRegionStart, inputRegionSizes, inputRegion);
     if (goodInput && goodOutput)
     {
@@ -762,20 +743,22 @@ MirrorPadImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
       }
       else // this is a padding region, which might need exponential decay
       {
-        for (dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
+        int oddRegionArray[ImageDimension];
+        for (unsigned int dimCtr = 0; dimCtr < ImageDimension; ++dimCtr)
         {
           oddRegionArray[dimCtr] =
             RegionIsOdd(inputIndex[dimCtr], outputRegion.GetIndex()[dimCtr], static_cast<long>(inputSize[dimCtr]));
         }
 
-        OutputIterator outIt(outputPtr, outputRegion);
-        InputIterator  inIt(inputPtr, inputRegion);
-        double         decayFactor = 1.0;
+
+        double decayFactor = 1.0;
 
         // Do the actual copy of the input pixels to the output pixels here.
-        for (; !outIt.IsAtEnd(); ++outIt, i++, ++inIt)
+        InputImageIndexType currentInputIndex;
+        InputIterator       inIt(inputPtr, inputRegion);
+        for (OutputIterator outIt(outputPtr, outputRegion); !outIt.IsAtEnd(); ++outIt, i++, ++inIt)
         {
-          currentOutputIndex = outIt.GetIndex();
+          OutputImageIndexType currentOutputIndex = outIt.GetIndex();
 
           this->ConvertOutputIndexToInputIndex(
             currentOutputIndex, currentInputIndex, outputRegion, inputRegion, oddRegionArray, decayFactor);

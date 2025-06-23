@@ -97,7 +97,7 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  itk::FileOutputWindow::Pointer fow = itk::FileOutputWindow::New();
+  auto fow = itk::FileOutputWindow::New();
   fow->SetInstance(fow);
 
   // The types of each one of the components in the registration methods
@@ -511,7 +511,7 @@ main(int argc, char * argv[])
   //  Software Guide : EndLatex
 
   //  Software Guide : BeginCodeSnippet
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   resample->SetSize(fixedImage->GetLargestPossibleRegion().GetSize());
   resample->SetOutputOrigin(fixedImage->GetOrigin());
   resample->SetOutputSpacing(fixedImage->GetSpacing());

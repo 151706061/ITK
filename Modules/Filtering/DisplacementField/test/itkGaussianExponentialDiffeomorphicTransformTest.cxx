@@ -49,7 +49,7 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
   FieldType::SizeType   size;
   FieldType::IndexType  start;
   FieldType::RegionType region;
-  int                   dimLength = 20;
+  constexpr int         dimLength = 20;
   size.Fill(dimLength);
   start.Fill(0);
   region.SetSize(size);
@@ -57,8 +57,7 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
   field->SetRegions(region);
   field->Allocate();
 
-  FieldType::PixelType zeroVector;
-  zeroVector.Fill(0);
+  constexpr FieldType::PixelType zeroVector{};
   field->FillBuffer(zeroVector);
 
   displacementTransform->SetConstantVelocityField(field);
@@ -66,14 +65,13 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
 
   /* Test SmoothDisplacementFieldGauss */
   std::cout << "Test SmoothDisplacementFieldGauss" << std::endl;
-  DisplacementTransformType::ParametersType params;
   using ParametersValueType = DisplacementTransformType::ParametersValueType;
-  ParametersValueType                            paramsZero{};
-  DisplacementTransformType::ParametersType      paramsFill(displacementTransform->GetNumberOfParameters());
-  DisplacementTransformType::ParametersValueType paramsFillValue = 0.0;
+  constexpr ParametersValueType                            paramsZero{};
+  DisplacementTransformType::ParametersType                paramsFill(displacementTransform->GetNumberOfParameters());
+  constexpr DisplacementTransformType::ParametersValueType paramsFillValue = 0.0;
   paramsFill.Fill(paramsFillValue);
   // Add an outlier to visually see that some smoothing is taking place.
-  unsigned int outlier = dimLength * dimensions * 4 + dimLength * dimensions / 2;
+  constexpr unsigned int outlier = dimLength * dimensions * 4 + dimLength * dimensions / 2;
   paramsFill(outlier) = 99.0;
   paramsFill(outlier + 1) = 99.0;
   displacementTransform->SetGaussianSmoothingVarianceForTheUpdateField(3);
@@ -81,7 +79,7 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
   // params = displacementTransform->GetParameters();
   // std::cout << "params *before* SmoothDisplacementFieldGauss: " << std::endl
   //          << params << std::endl;
-  params = displacementTransform->GetParameters();
+  DisplacementTransformType::ParametersType params = displacementTransform->GetParameters();
   // std::cout << "field->GetPixelContainer *after* Smooth: "
   //          << field->GetPixelContainer() << std::endl;
   /* We should see 0's on all boundaries from the smoothing routine */
@@ -119,7 +117,7 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
   {
     for (int j = -2; j < 3; ++j)
     {
-      unsigned int index = outlier + static_cast<unsigned int>(i * (int)(dimLength * dimensions) + j);
+      const unsigned int index = outlier + static_cast<unsigned int>(i * static_cast<int>(dimLength * dimensions) + j);
       std::cout << params(index) << ' ';
     }
     std::cout << std::endl;
@@ -183,7 +181,7 @@ itkGaussianExponentialDiffeomorphicTransformTest(int, char *[])
   {
     for (int j = -2; j < 3; ++j)
     {
-      unsigned int index = outlier + static_cast<unsigned int>(i * (int)(dimLength * dimensions) + j);
+      const unsigned int index = outlier + static_cast<unsigned int>(i * static_cast<int>(dimLength * dimensions) + j);
       std::cout << params(index) << ' ';
       if (itk::Math::AlmostEquals(params(index), paramsFillValue))
       {

@@ -64,7 +64,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(IterativeInverseDisplacementFieldImageFilter);
 
   /** Some type alias. */
@@ -103,14 +103,10 @@ public:
   itkSetMacro(StopValue, double);
   itkGetConstMacro(StopValue, double);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputImageValueType>));
 
   itkConceptMacro(SameDimensionCheck,
                   (Concept::SameDimension<TInputImage::ImageDimension, TOutputImage::ImageDimension>));
-  // End concept checking
-#endif
 
 protected:
   IterativeInverseDisplacementFieldImageFilter();

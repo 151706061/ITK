@@ -25,21 +25,13 @@ namespace itk
 template <unsigned int TPointDimension>
 LineSpatialObjectPoint<TPointDimension>::LineSpatialObjectPoint()
 {
-  unsigned int        ii = 0;
-  CovariantVectorType normal;
-  normal.Fill(0);
+  unsigned int                  ii = 0;
+  constexpr CovariantVectorType normal{};
   while (ii < TPointDimension - 1)
   {
     this->m_NormalArrayInObjectSpace[ii] = normal;
     ++ii;
   }
-}
-
-template <unsigned int TPointDimension>
-LineSpatialObjectPoint<TPointDimension>::LineSpatialObjectPoint(const LineSpatialObjectPoint & other)
-  : Superclass(other)
-{
-  this->m_NormalArrayInObjectSpace = other.m_NormalArrayInObjectSpace;
 }
 
 template <unsigned int TPointDimension>
@@ -64,19 +56,6 @@ void
 LineSpatialObjectPoint<TPointDimension>::SetNormalInObjectSpace(CovariantVectorType & normal, unsigned int index)
 {
   m_NormalArrayInObjectSpace[index] = normal;
-}
-
-/** Copy a point to another */
-template <unsigned int TPointDimension>
-auto
-LineSpatialObjectPoint<TPointDimension>::operator=(const LineSpatialObjectPoint & rhs) -> Self &
-{
-  if (this != &rhs)
-  {
-    Superclass::operator=(rhs);
-    this->m_NormalArrayInObjectSpace = rhs.m_NormalArrayInObjectSpace;
-  }
-  return *this;
 }
 
 } // end namespace itk

@@ -38,11 +38,11 @@ struct itk_jpeg_error_mgr
 
 extern "C"
 {
-  METHODDEF(void) itk_jpeg_error_exit(j_common_ptr cinfo)
+  METHODDEF(void) itk_jpeg_error_exit([[maybe_unused]] j_common_ptr cinfo)
   {
     /* cinfo->err really points to an itk_jpeg_error_mgr struct, so coerce pointer
      */
-    itk_jpeg_error_mgr * myerr = (itk_jpeg_error_mgr *)cinfo->err;
+    auto * myerr = (itk_jpeg_error_mgr *)cinfo->err;
 
     /* Always display the message. */
     /* We could postpone this until after returning, if we chose. */
@@ -58,8 +58,6 @@ extern "C"
     char buffer[JMSG_LENGTH_MAX + 1];
     (*cinfo->err->format_message)(cinfo, buffer);
     printf("%s\n", buffer);
-#else
-    (void)cinfo;
 #endif
   }
 }
@@ -73,10 +71,8 @@ class JPEGFileWrapper
 {
 public:
   JPEGFileWrapper(const char * const fname, const char * const openMode)
-    : m_FilePointer(nullptr)
-  {
-    m_FilePointer = fopen(fname, openMode);
-  }
+    : m_FilePointer(fopen(fname, openMode))
+  {}
 
   virtual ~JPEGFileWrapper()
   {
@@ -86,14 +82,14 @@ public:
     }
   }
 
-  FILE * volatile m_FilePointer;
+  FILE * volatile m_FilePointer{ nullptr };
 };
 
 bool
 JPEGImageIO::CanReadFile(const char * file)
 {
   // First check the extension
-  std::string filename = file;
+  const std::string filename = file;
 
   if (filename.empty())
   {
@@ -101,7 +97,7 @@ JPEGImageIO::CanReadFile(const char * file)
     return false;
   }
 
-  bool extensionFound = this->HasSupportedReadExtension(file, false);
+  const bool extensionFound = this->HasSupportedReadExtension(file, false);
 
   if (!extensionFound)
   {
@@ -110,7 +106,7 @@ JPEGImageIO::CanReadFile(const char * file)
   }
 
   // Now check the file header
-  JPEGFileWrapper JPEGfp(file, "rb");
+  const JPEGFileWrapper JPEGfp(file, "rb");
   if (JPEGfp.m_FilePointer == nullptr)
   {
     return false;
@@ -167,8 +163,8 @@ void
 JPEGImageIO::Read(void * buffer)
 {
   // use this class so return will call close
-  JPEGFileWrapper JPEGfp(this->GetFileName(), "rb");
-  FILE *          fp = JPEGfp.m_FilePointer;
+  const JPEGFileWrapper JPEGfp(this->GetFileName(), "rb");
+  FILE *                fp = JPEGfp.m_FilePointer;
   if (!fp)
   {
     itkExceptionMacro("Error JPEGImageIO could not open file: " << this->GetFileName() << std::endl
@@ -340,8 +336,8 @@ JPEGImageIO::ReadImageInformation()
   m_IsCMYK = false;
 
   // use this class so return will call close
-  JPEGFileWrapper JPEGfp(m_FileName.c_str(), "rb");
-  FILE *          fp = JPEGfp.m_FilePointer;
+  const JPEGFileWrapper JPEGfp(m_FileName.c_str(), "rb");
+  FILE *                fp = JPEGfp.m_FilePointer;
   if (!fp)
   {
     itkExceptionMacro("Error JPEGImageIO could not open file: " << this->GetFileName() << std::endl
@@ -370,11 +366,14 @@ JPEGImageIO::ReadImageInformation()
 
   // jpeg_calc_output_dimensions to calculate cinfo.output_components
   jpeg_calc_output_dimensions(&cinfo);
-  if (sizeof(void *) < 8 && (static_cast<unsigned long long>(cinfo.output_width) * cinfo.output_height *
-                             cinfo.output_components) > 0xffffffff)
+  if constexpr (sizeof(void *) < 8)
   {
-    jpeg_destroy_decompress(&cinfo);
-    itkExceptionMacro("JPEG image is too big " << this->GetFileName());
+    if ((static_cast<unsigned long long>(cinfo.output_width) * cinfo.output_height * cinfo.output_components) >
+        0xffffffff)
+    {
+      jpeg_destroy_decompress(&cinfo);
+      itkExceptionMacro("JPEG image is too big " << this->GetFileName());
+    }
   }
 
   // pull out the width/height
@@ -408,7 +407,7 @@ JPEGImageIO::ReadImageInformation()
         }
         break;
       }
-      // else fallthrough
+      [[fallthrough]];
     default:
       m_PixelType = IOPixelEnum::VECTOR;
       this->SetNumberOfComponents(cinfo.output_components);
@@ -438,7 +437,7 @@ JPEGImageIO::ReadImageInformation()
 bool
 JPEGImageIO::CanWriteFile(const char * name)
 {
-  std::string filename = name;
+  const std::string filename = name;
 
   if (filename.empty())
   {
@@ -470,11 +469,11 @@ JPEGImageIO::Write(const void * buffer)
 }
 
 void
-JPEGImageIO::WriteSlice(std::string & fileName, const void * const buffer)
+JPEGImageIO::WriteSlice(const std::string & fileName, const void * const buffer)
 {
   // use this class so return will call close
-  JPEGFileWrapper JPEGfp(fileName.c_str(), "wb");
-  FILE *          fp = JPEGfp.m_FilePointer;
+  const JPEGFileWrapper JPEGfp(fileName.c_str(), "wb");
+  FILE *                fp = JPEGfp.m_FilePointer;
   if (!fp)
   {
     itkExceptionMacro("Unable to open file " << fileName << " for writing." << std::endl

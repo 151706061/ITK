@@ -91,13 +91,18 @@ public:
 
   /** Sets the dimensional direction of a directional operator. */
   void
-  SetDirection(const unsigned long direction)
+  SetDirection(const unsigned int direction)
   {
+    if (direction >= VDimension)
+    {
+      itkExceptionMacro(<< " Can not set direction " << direction << " greater than dimensionality of neighborhood "
+                        << VDimension);
+    }
     m_Direction = direction;
   }
 
   /** Returns the direction (dimension number) of a directional operator. */
-  unsigned long
+  [[nodiscard]] unsigned int
   GetDirection() const
   {
     return m_Direction;
@@ -176,7 +181,7 @@ protected:
 
 private:
   /** Direction (dimension number) of the derivative. */
-  unsigned long m_Direction{ 0 };
+  unsigned int m_Direction{ 0 };
 };
 } // namespace itk
 

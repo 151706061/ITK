@@ -100,7 +100,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WarpVectorImageFilter);
 
   /** Typedef to describe the output image region type. */
@@ -131,13 +131,17 @@ public:
   using DisplacementType = typename DisplacementFieldType::PixelType;
 
   /** Interpolator type alias support */
-  using CoordRepType = double;
-  using InterpolatorType = VectorInterpolateImageFunction<InputImageType, CoordRepType>;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
+  using InterpolatorType = VectorInterpolateImageFunction<InputImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
-  using DefaultInterpolatorType = VectorLinearInterpolateImageFunction<InputImageType, CoordRepType>;
+  using DefaultInterpolatorType = VectorLinearInterpolateImageFunction<InputImageType, CoordinateType>;
 
   /** Point type */
-  using PointType = Point<CoordRepType, Self::ImageDimension>;
+  using PointType = Point<CoordinateType, Self::ImageDimension>;
 
   /** Type for representing the direction of the output image */
   using DirectionType = typename TOutputImage::DirectionType;
@@ -155,29 +159,33 @@ public:
   GetDisplacementField();
 
   /** Get/Set the interpolator function. */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Interpolator, InterpolatorType);
   itkGetModifiableObjectMacro(Interpolator, InterpolatorType);
-
+  /** @ITKEndGrouping */
   /** Set the output image spacing. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputSpacing, SpacingType);
   virtual void
   SetOutputSpacing(const double * spacing);
-
+  /** @ITKEndGrouping */
   /** Get the output image spacing. */
   itkGetConstReferenceMacro(OutputSpacing, SpacingType);
 
   /** Set the output image origin. */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputOrigin, PointType);
   virtual void
   SetOutputOrigin(const double * origin);
-
+  /** @ITKEndGrouping */
   /** Get the output image origin. */
   itkGetConstReferenceMacro(OutputOrigin, PointType);
 
   /** Set/Get the direction (orientation) of the output image */
+  /** @ITKStartGrouping */
   itkSetMacro(OutputDirection, DirectionType);
   itkGetConstReferenceMacro(OutputDirection, DirectionType);
-
+  /** @ITKEndGrouping */
   /** Set the edge padding value */
   itkSetMacro(EdgePaddingValue, PixelType);
 
@@ -206,14 +214,10 @@ public:
   void
   BeforeThreadedGenerateData() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType::ValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<ValueType>));
   itkConceptMacro(DisplacementFieldHasNumericTraitsCheck,
                   (Concept::HasNumericTraits<typename TDisplacementField::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   WarpVectorImageFilter();

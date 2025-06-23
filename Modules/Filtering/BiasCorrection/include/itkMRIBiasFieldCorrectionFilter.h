@@ -29,6 +29,9 @@
 #include "itkOnePlusOneEvolutionaryOptimizer.h"
 #include "itkImageRegionIterator.h"
 
+#include <memory> // For unique_ptr.
+
+
 namespace itk
 {
 /**
@@ -56,7 +59,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MRIBiasEnergyFunction);
 
   /** Method for creation through the object factory. */
@@ -154,7 +157,7 @@ protected:
   MRIBiasEnergyFunction();
 
   /** Destructor. */
-  ~MRIBiasEnergyFunction() override;
+  ~MRIBiasEnergyFunction() override = default;
 
 private:
   /** Bias field object pointer. */
@@ -170,7 +173,7 @@ private:
   ImageRegionType m_Region{};
 
   /** Internal energy function object pointer. */
-  InternalEnergyFunction * m_InternalEnergyFunction{};
+  std::unique_ptr<InternalEnergyFunction> m_InternalEnergyFunction;
 
   /** Sampling factors */
   SamplingFactorType m_SamplingFactor{};
@@ -216,15 +219,7 @@ private:
  * The multiresolution pyramid implementation is based on
  * itkMultiResolutionPyramidImageFilter (without Gaussian smoothing)
  *
- * For more details. refer to the following articles.
- * "Parametric estimate of intensity inhomogeneities applied to MRI"
- * Martin Styner, Guido Gerig, Christian Brechbuehler, Gabor Szekely,
- * IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165, 2000,
- * (https://www.cs.unc.edu/~styner/docs/tmi00.pdf)
- *
- * "Evaluation of 2D/3D bias correction with 1+1ES-optimization"
- * Martin Styner, Prof. Dr. G. Gerig (IKT, BIWI, ETH Zuerich), TR-197
- * (https://www.cs.unc.edu/~styner/docs/StynerTR97.pdf)
+ * For more details refer to \cite styner2000 and \cite styner1997.
  * \ingroup ITKBiasCorrection
  */
 template <typename TInputImage, typename TOutputImage, typename TMaskImage>
@@ -242,7 +237,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MRIBiasFieldCorrectionFilter);
 
   /** The dimension of the image. */
@@ -298,15 +293,19 @@ public:
   /** Set/Get the input mask image pointer.
    * Without this mask, this filter calculates the energy value using
    * all pixels in the input image. */
+  /** @ITKStartGrouping */
   void
   SetInputMask(ImageMaskType * inputMask);
   itkGetModifiableObjectMacro(InputMask, ImageMaskType);
+  /** @ITKEndGrouping */
 
   /** Get/Set the out mask image pointer.
    * Without this mask, this filter corrects every pixel in the input image. */
+  /** @ITKStartGrouping */
   void
   SetOutputMask(ImageMaskType * outputMask);
   itkGetModifiableObjectMacro(OutputMask, ImageMaskType);
+  /** @ITKEndGrouping */
 
 #if defined(ITK_LEGACY_REMOVE)
   /** If this value is true, the filter assumes the bias field is
@@ -322,9 +321,11 @@ public:
   /** Set/Get the multiplicative nature of the filter's bias field: if
    * true, the filter assumes the bias field is multiplicative and
    * internally uses log intensity values for every calculation. */
+  /** @ITKStartGrouping */
   itkSetMacro(BiasFieldMultiplicative, bool);
   itkGetConstMacro(BiasFieldMultiplicative, bool);
   itkBooleanMacro(BiasFieldMultiplicative);
+  /** @ITKEndGrouping */
 
 #if defined(ITK_LEGACY_REMOVE)
   /** If the bias field is multiplicative, it returns true. */
@@ -339,18 +340,22 @@ public:
    * intensity correction will be applied before bias field
    * correction (default value is true for 3D input images, and false for 2D
    * input images). */
+  /** @ITKStartGrouping */
   itkSetMacro(UsingInterSliceIntensityCorrection, bool);
   itkGetConstMacro(UsingInterSliceIntensityCorrection, bool);
   itkBooleanMacro(UsingInterSliceIntensityCorrection);
+  /** @ITKEndGrouping */
 
   /** Set/Get the slab correction flag. If the flag is true, inter-slice
    * intensity correction and bias field correction will be performed slab by
    * slab which is identified by the slab identifier (default value is false).
    * NOTE: if users want to slab identification, all the input image data
    * should be buffered. */
+  /** @ITKStartGrouping */
   itkSetMacro(UsingSlabIdentification, bool);
   itkGetConstMacro(UsingSlabIdentification, bool);
   itkBooleanMacro(UsingSlabIdentification);
+  /** @ITKEndGrouping */
 
   itkSetMacro(SlabBackgroundMinimumThreshold, InputImagePixelType);
   itkGetConstReferenceMacro(SlabBackgroundMinimumThreshold, InputImagePixelType);
@@ -366,24 +371,32 @@ public:
    * the inter-slice intensity correction without actual bias correction,
    * disabling bias field correction would be an useful option (default value
    * is true). */
+  /** @ITKStartGrouping */
   itkSetMacro(UsingBiasFieldCorrection, bool);
   itkGetConstMacro(UsingBiasFieldCorrection, bool);
   itkBooleanMacro(UsingBiasFieldCorrection);
+  /** @ITKEndGrouping */
 
   /** Set/Get the flag. If the flag is true, the output image (corrected image)
    * will be created when this filter is updated (default value is true). */
+  /** @ITKStartGrouping */
   itkSetMacro(GeneratingOutput, bool);
   itkGetConstMacro(GeneratingOutput, bool);
   itkBooleanMacro(GeneratingOutput);
+  /** @ITKEndGrouping */
 
   /** Sets the direction of slicing.
    * 0 - x axis, 1 - y axis, 2 - z axis */
+  /** @ITKStartGrouping */
   itkSetMacro(SlicingDirection, int);
   itkGetConstMacro(SlicingDirection, int);
+  /** @ITKEndGrouping */
 
   /** Set/Get the degree of the bias field estimate. */
+  /** @ITKStartGrouping */
   itkSetMacro(BiasFieldDegree, int);
   itkGetConstMacro(BiasFieldDegree, int);
+  /** @ITKEndGrouping */
 
   /** Sets the initial 3D bias field estimate coefficients that will be
    * used for correcting each slab. */
@@ -411,26 +424,35 @@ public:
 
   /** Set/Get the maximum iteration termination condition parameter for the
    * bias field correction. */
+  /** @ITKStartGrouping */
   itkSetMacro(VolumeCorrectionMaximumIteration, int);
   itkGetConstMacro(VolumeCorrectionMaximumIteration, int);
+  /** @ITKEndGrouping */
 
   /** Set/Get the maximum iteration termination condition parameter for the
    * inter-slice intensity inhomogeneity correction. */
+  /** @ITKStartGrouping */
   itkSetMacro(InterSliceCorrectionMaximumIteration, int);
   itkGetConstMacro(InterSliceCorrectionMaximumIteration, int);
+  /** @ITKEndGrouping */
 
   /** Set/Get the initial search radius. */
+  /** @ITKStartGrouping */
   itkSetMacro(OptimizerInitialRadius, double);
   itkGetConstMacro(OptimizerInitialRadius, double);
+  /** @ITKEndGrouping */
 
   /** Set/Get the search radius grow factor. */
+  /** @ITKStartGrouping */
   itkSetMacro(OptimizerGrowthFactor, double);
   itkGetConstMacro(OptimizerGrowthFactor, double);
+  /** @ITKEndGrouping */
 
   /** Set/Get the search radius shrink factor. */
-
+  /** @ITKStartGrouping */
   itkSetMacro(OptimizerShrinkFactor, double);
   itkGetConstMacro(OptimizerShrinkFactor, double);
+  /** @ITKEndGrouping */
 
   /** Set the number of multi-resolution levels. The matrix containing the
    * schedule will be resized accordingly. The schedule is populated with
@@ -467,7 +489,7 @@ public:
   SetStartingShrinkFactors(const unsigned int * factors);
 
   /** Get the starting shrink factors. */
-  const unsigned int *
+  [[nodiscard]] const unsigned int *
   GetStartingShrinkFactors() const;
 
   /** Test if the schedule is downward divisible. This method returns true if

@@ -43,7 +43,7 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
   using ValueType = double;
 
-  const ValueType epsilon = 1e-12;
+  constexpr ValueType epsilon = 1e-12;
 
   //  Versor Transform type
   using TransformType = itk::ScaleSkewVersor3DTransform<ValueType>;
@@ -70,7 +70,7 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     auto axis = itk::MakeFilled<VectorType>(1.5);
 
-    ValueType angle = 120.0 * std::atan(1.0) / 45.0;
+    const ValueType angle = 120.0 * std::atan(1.0) / 45.0;
 
     VersorType versor;
     versor.Set(axis, angle);
@@ -89,18 +89,13 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     transform->SetParameters(parameters);
 
-    if (0.0 > epsilon)
-    {
-      std::cout << "Error ! " << std::endl;
-      return EXIT_FAILURE;
-    }
     std::cout << " PASSED !" << std::endl;
   }
 
   {
     std::cout << "Test initial rotation matrix " << std::endl;
-    auto       transform = TransformType::New();
-    MatrixType matrix = transform->GetMatrix();
+    auto             transform = TransformType::New();
+    const MatrixType matrix = transform->GetMatrix();
     std::cout << "Matrix = " << std::endl;
     std::cout << matrix << std::endl;
   }
@@ -142,9 +137,9 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     {
       // Rotate an itk::Point
-      TransformType::InputPointType::ValueType pInit[3] = { 1, 4, 9 };
-      TransformType::InputPointType            p = pInit;
-      TransformType::OutputPointType           q;
+      constexpr TransformType::InputPointType::ValueType pInit[3] = { 1, 4, 9 };
+      const TransformType::InputPointType                p = pInit;
+      TransformType::OutputPointType                     q;
       q = versor.Transform(p);
 
       TransformType::OutputPointType r;
@@ -164,16 +159,14 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
         std::cerr << "Reported Result is   : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an itk::Point " << std::endl;
-      }
+
+      std::cout << "Ok rotating an itk::Point " << std::endl;
     }
 
     {
       // Translate an itk::Vector
       TransformType::InputVectorType::ValueType pInit[3] = { 1, 4, 9 };
-      TransformType::InputVectorType            p = pInit;
+      const TransformType::InputVectorType      p = pInit;
       TransformType::OutputVectorType           q;
       q = versor.Transform(p);
 
@@ -194,16 +187,14 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
         std::cerr << "Reported Result is    : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an itk::Vector " << std::endl;
-      }
+
+      std::cout << "Ok rotating an itk::Vector " << std::endl;
     }
 
     {
       // Translate an itk::CovariantVector
       TransformType::InputCovariantVectorType::ValueType pInit[3] = { 1, 4, 9 };
-      TransformType::InputCovariantVectorType            p = pInit;
+      const TransformType::InputCovariantVectorType      p = pInit;
       TransformType::OutputCovariantVectorType           q;
       q = versor.Transform(p);
 
@@ -224,10 +215,8 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
         std::cerr << "Reported Result is              : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an itk::CovariantVector " << std::endl;
-      }
+
+      std::cout << "Ok rotating an itk::CovariantVector " << std::endl;
     }
 
     {
@@ -257,10 +246,8 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
         std::cerr << "Reported Result is        : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an vnl_Vector " << std::endl;
-      }
+
+      std::cout << "Ok rotating an vnl_Vector " << std::endl;
     }
   }
 
@@ -299,17 +286,16 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
       std::cerr << "The center point was not invariant to rotation " << std::endl;
       return EXIT_FAILURE;
     }
-    else
-    {
-      std::cout << "Ok center is invariant to rotation." << std::endl;
-    }
+
+    std::cout << "Ok center is invariant to rotation." << std::endl;
+
 
     const unsigned int np = transform->GetNumberOfParameters();
 
     ParametersType parameters(np); // Number of parameters
     parameters.Fill(0.0);
 
-    VersorType versor;
+    constexpr VersorType versor;
 
     // TODO: Test jacobian with non-zero skew
 
@@ -327,7 +313,7 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     ParametersType parameters2 = transform->GetParameters();
 
-    const double tolerance = 1e-8;
+    constexpr double tolerance = 1e-8;
     for (unsigned int p = 0; p < np; ++p)
     {
       if (itk::Math::abs(parameters[p] - parameters2[p]) > tolerance)
@@ -428,7 +414,7 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     ParametersType parameters(np); // Number of parameters
 
-    VersorType versor;
+    constexpr VersorType versor;
 
     parameters[0] = versor.GetX(); // Rotation axis * sin(t/2)
     parameters[1] = versor.GetY();
@@ -448,7 +434,7 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     ParametersType parameters2 = transform->GetParameters();
 
-    const double tolerance = 1e-8;
+    constexpr double tolerance = 1e-8;
     for (unsigned int p = 0; p < np; ++p)
     {
       if (itk::Math::abs(parameters[p] - parameters2[p]) > tolerance)
@@ -484,14 +470,13 @@ itkScaleSkewVersor3DTransformTest(int, char *[])
 
     transform->SetTranslation(translation);
 
-    TransformType::ScaleVectorType scale;
-    scale.Fill(2.5);
+    auto scale = itk::MakeFilled<TransformType::ScaleVectorType>(2.5);
 
     transform->SetScale(scale);
 
     TransformType::ScaleVectorType rscale = transform->GetScale();
 
-    const double tolerance = 1e-8;
+    constexpr double tolerance = 1e-8;
     for (unsigned int j = 0; j < 3; ++j)
     {
       if (itk::Math::abs(rscale[j] - scale[j]) > tolerance)

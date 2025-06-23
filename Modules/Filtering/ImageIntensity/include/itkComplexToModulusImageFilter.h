@@ -67,18 +67,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ComplexToModulusImageFilter);
 
   using InputPixelType = typename TInputImage::PixelType;
   using OutputPixelType = typename TOutputImage::PixelType;
   using InputPixelValueType = typename NumericTraits<InputPixelType>::ValueType;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputMultiplyOperatorCheck, (Concept::MultiplyOperator<InputPixelValueType>));
-  // End concept checking
-#endif
 
 protected:
   ComplexToModulusImageFilter()

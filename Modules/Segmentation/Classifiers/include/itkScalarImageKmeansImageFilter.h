@@ -83,7 +83,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarImageKmeansImageFilter);
 
   /** Image type alias support */
@@ -133,10 +133,11 @@ public:
    * to true, the labels are selected in order to span the dynamic range of the
    * output image. This last option is useful when the output image is intended
    * only for display. The default value is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseNonContiguousLabels, bool);
   itkGetConstReferenceMacro(UseNonContiguousLabels, bool);
   itkBooleanMacro(UseNonContiguousLabels);
-
+  /** @ITKEndGrouping */
   /** Set Region method to constrain classification to a certain region */
   void
   SetImageRegion(const ImageRegionType & region);
@@ -144,11 +145,7 @@ public:
   /** Get the region over which the statistics will be computed */
   itkGetConstReferenceMacro(ImageRegion, ImageRegionType);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ScalarImageKmeansImageFilter();
@@ -167,7 +164,7 @@ protected:
   /* See superclass for doxygen. This methods additionally checks that
    * the number of means is not 0. */
   void
-  VerifyPreconditions() ITKv5_CONST override;
+  VerifyPreconditions() const override;
 
 private:
   using MeansContainer = std::vector<RealPixelType>;

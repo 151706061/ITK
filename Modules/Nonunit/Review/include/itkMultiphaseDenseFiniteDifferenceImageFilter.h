@@ -66,29 +66,13 @@ namespace itk
  * subclass it to a specific instance that supplies a function and Halt()
  * method.
  *
- * Based on the paper:
- *
- *        "An active contour model without edges"
- *         T. Chan and L. Vese.
- *         In Scale-Space Theories in Computer Vision, pages 141-151, 1999.
+ * Based on the paper \cite chan1999.
  *
  * \author Mosaliganti K., Smith B., Gelas A., Gouaillard A., Megason S.
  *
- *  This code was taken from the Insight Journal paper:
- *
- *      "Cell Tracking using Coupled Active Surfaces for Nuclei and Membranes"
- *      https://www.insight-journal.org/browse/publication/642
- *
- *  That is based on the papers:
- *
- *      "Level Set Segmentation: Active Contours without edge"
- *      https://www.insight-journal.org/browse/publication/322
- *
- *      and
- *
- *      "Level set segmentation using coupled active surfaces"
- *      https://www.insight-journal.org/browse/publication/323
- *
+ *  This code was taken from the Insight Journal paper \cite Mosaliganti_2009_c
+ *  that is based on the papers \cite Mosaliganti_2009_a and
+ *  \cite  Mosaliganti_2009_b.
  *
  * \ingroup ImageFilters
  * \sa FiniteDifferenceImageFilter
@@ -112,7 +96,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultiphaseDenseFiniteDifferenceImageFilter);
 
   /** Dimensionality of input and output data is assumed to be the same.
@@ -170,21 +154,17 @@ public:
   void
   SetFunctionCount(const IdCellType & n);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputTimesDoubleCheck, (Concept::MultiplyOperator<OutputPixelType, double>));
   itkConceptMacro(OutputAdditiveOperatorsCheck, (Concept::AdditiveOperators<OutputPixelType>));
   itkConceptMacro(InputConvertibleToOutputCheck, (Concept::Convertible<FeaturePixelType, OutputPixelType>));
-  // End concept checking
-#endif
 
   itkSetMacro(ReinitializeCounter, unsigned int);
   itkGetMacro(ReinitializeCounter, unsigned int);
 
 protected:
   MultiphaseDenseFiniteDifferenceImageFilter()
+    : m_ReinitializeCounter(1)
   {
-    this->m_ReinitializeCounter = 1;
     // FIXME: this->m_UpdateCounter really used?
     // this->m_UpdateCounter = 0;        // FIXME: Should this be a bool ?
   }

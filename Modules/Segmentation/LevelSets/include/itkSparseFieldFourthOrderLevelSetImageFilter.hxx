@@ -35,20 +35,15 @@ const typename SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputIma
 
 template <typename TInputImage, typename TOutputImage>
 SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::SparseFieldFourthOrderLevelSetImageFilter()
+  : m_MaxRefitIteration(100)
+  , m_MaxNormalIteration(25)
+  , m_RMSChangeNormalProcessTrigger(ValueType{})
+  , m_LevelSetFunction(nullptr)
+  , m_CurvatureBandWidth(ValueType{ ImageDimension } + 0.5)
+  , m_NormalProcessConductance(ValueType{})
+  , m_NormalProcessUnsharpWeight(ValueType{})
 {
-  m_RefitIteration = 0;
-  m_LevelSetFunction = nullptr;
-  m_ConvergenceFlag = false;
-
   this->SetIsoSurfaceValue(0);
-  m_MaxRefitIteration = 100;
-  m_MaxNormalIteration = 25;
-  m_RMSChangeNormalProcessTrigger = ValueType{};
-  m_CurvatureBandWidth = static_cast<ValueType>(ImageDimension) + 0.5;
-  m_NormalProcessType = 0;
-  m_NormalProcessConductance = ValueType{};
-  m_NormalProcessUnsharpFlag = false;
-  m_NormalProcessUnsharpWeight = ValueType{};
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -84,27 +79,24 @@ auto
 SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ComputeCurvatureFromSparseImageNeighborhood(
   SparseImageIteratorType & it) const -> ValueType
 {
-  unsigned int            counter;
-  SizeValueType           position, stride[ImageDimension], indicator[ImageDimension];
-  constexpr SizeValueType one = 1;
-  const SizeValueType     center = it.Size() / 2;
-  NormalVectorType        normalvector;
-  ValueType               curvature;
-  bool                    flag = false;
-
+  constexpr SizeValueType      one = 1;
+  const SizeValueType          center = it.Size() / 2;
+  bool                         flag = false;
   const NeighborhoodScalesType neighborhoodScales = this->GetDifferenceFunction()->ComputeNeighborhoodScales();
 
+  SizeValueType stride[ImageDimension];
+  SizeValueType indicator[ImageDimension];
   for (unsigned int j = 0; j < ImageDimension; ++j)
   {
     stride[j] = it.GetStride(j);
     indicator[j] = one << j;
   }
 
-  curvature = ValueType{};
+  ValueType curvature{};
 
-  for (counter = 0; counter < m_NumVertex; ++counter)
+  for (unsigned int counter = 0; counter < m_NumVertex; ++counter)
   {
-    position = center;
+    SizeValueType position = center;
     for (unsigned int k = 0; k < ImageDimension; ++k)
     {
       if (counter & indicator[k])
@@ -118,7 +110,7 @@ SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ComputeCur
     }
     else
     {
-      normalvector = it.GetPixel(position)->m_Data;
+      NormalVectorType normalvector = it.GetPixel(position)->m_Data;
       for (unsigned int j = 0; j < ImageDimension; ++j) // derivative axis
       {
         if (counter & indicator[j])
@@ -133,7 +125,7 @@ SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ComputeCur
     }
   } // end counter
 
-  if (flag == true)
+  if (flag)
   {
     curvature = ValueType{};
   }
@@ -157,15 +149,12 @@ SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ComputeCur
   }
   SparseImageIteratorType sparseImageIterator(radius, sparseImage, sparseImage->GetRequestedRegion());
 
-  ValueType  distance;
-  NodeType * node;
-
   sparseImageIterator.GoToBegin();
   distanceImageIterator.GoToBegin();
   while (!distanceImageIterator.IsAtEnd())
   {
-    distance = distanceImageIterator.Value();
-    node = sparseImageIterator.GetCenterPixel();
+    const ValueType distance = distanceImageIterator.Value();
+    NodeType *      node = sparseImageIterator.GetCenterPixel();
     if ((distance >= -m_CurvatureBandWidth) && (distance <= m_CurvatureBandWidth))
     {
       node->m_Curvature = ComputeCurvatureFromSparseImageNeighborhood(sparseImageIterator);
@@ -187,15 +176,13 @@ template <typename TInputImage, typename TOutputImage>
 bool
 SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ActiveLayerCheckBand() const
 {
-  typename LayerType::Iterator      layerIt;
-  typename SparseImageType::Pointer im = m_LevelSetFunction->GetSparseTargetImage();
-  bool                              flag = false;
-  NodeType *                        node;
+  const typename SparseImageType::Pointer im = m_LevelSetFunction->GetSparseTargetImage();
+  bool                                    flag = false;
 
-  layerIt = this->m_Layers[0]->Begin();
+  typename LayerType::Iterator layerIt = this->m_Layers[0]->Begin();
   while (layerIt != this->m_Layers[0]->End())
   {
-    node = im->GetPixel(layerIt->m_Value);
+    NodeType * node = im->GetPixel(layerIt->m_Value);
     if ((node == nullptr) || (node->m_CurvatureFlag == false))
     {
       // level set touching edge of normal band
@@ -211,13 +198,10 @@ template <typename TInputImage, typename TOutputImage>
 void
 SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ProcessNormals()
 {
-  typename NormalVectorFilterType::Pointer   NormalVectorFilter;
-  typename NormalVectorFunctionType::Pointer NormalVectorFunction;
+  ValueType temp{ ImageDimension };
 
-  auto temp = static_cast<ValueType>(ImageDimension);
-
-  NormalVectorFilter = NormalVectorFilterType::New();
-  NormalVectorFunction = NormalVectorFunctionType::New();
+  const typename NormalVectorFilterType::Pointer   NormalVectorFilter = NormalVectorFilterType::New();
+  const typename NormalVectorFunctionType::Pointer NormalVectorFunction = NormalVectorFunctionType::New();
   NormalVectorFunction->SetNormalProcessType(m_NormalProcessType);
   NormalVectorFunction->SetConductanceParameter(m_NormalProcessConductance);
   NormalVectorFilter->SetNormalFunction(NormalVectorFunction);
@@ -230,8 +214,8 @@ SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ProcessNor
   // Move the pixel container and image information of the image we are working
   // on into a temporary image to  use as the input to the mini-pipeline.  This
   // avoids a complete copy of the image.
-  typename OutputImageType::Pointer phi = this->GetOutput();
-  auto                              tmp = OutputImageType::New();
+  const typename OutputImageType::Pointer phi = this->GetOutput();
+  auto                                    tmp = OutputImageType::New();
   tmp->SetRequestedRegion(phi->GetRequestedRegion());
   tmp->SetBufferedRegion(phi->GetBufferedRegion());
   tmp->SetLargestPossibleRegion(phi->GetLargestPossibleRegion());
@@ -241,7 +225,7 @@ SparseFieldFourthOrderLevelSetImageFilter<TInputImage, TOutputImage>::ProcessNor
   NormalVectorFilter->SetInput(tmp);
   NormalVectorFilter->Update();
 
-  typename SparseImageType::Pointer SparseNormalImage = NormalVectorFilter->GetOutput();
+  const typename SparseImageType::Pointer SparseNormalImage = NormalVectorFilter->GetOutput();
 
   this->ComputeCurvatureTarget(tmp, SparseNormalImage);
   m_LevelSetFunction->SetSparseTargetImage(SparseNormalImage);

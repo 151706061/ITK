@@ -25,8 +25,8 @@ namespace itk
 template <typename TParametersValueType>
 Euler3DTransform<TParametersValueType>::Euler3DTransform()
   : Superclass(ParametersDimension)
+
 {
-  m_ComputeZYX = false;
   m_AngleX = m_AngleY = m_AngleZ = ScalarType{};
   this->m_FixedParameters.SetSize(SpaceDimension + 1);
   this->m_FixedParameters.Fill(0.0);
@@ -34,8 +34,8 @@ Euler3DTransform<TParametersValueType>::Euler3DTransform()
 
 template <typename TParametersValueType>
 Euler3DTransform<TParametersValueType>::Euler3DTransform(const MatrixType & matrix, const OutputPointType & offset)
+
 {
-  m_ComputeZYX = false;
   this->SetMatrix(matrix);
 
   OffsetType off;
@@ -50,8 +50,9 @@ Euler3DTransform<TParametersValueType>::Euler3DTransform(const MatrixType & matr
 template <typename TParametersValueType>
 Euler3DTransform<TParametersValueType>::Euler3DTransform(unsigned int parametersDimension)
   : Superclass(parametersDimension)
+
 {
-  m_ComputeZYX = false;
+
   m_AngleX = m_AngleY = m_AngleZ = ScalarType{};
   this->m_FixedParameters.SetSize(SpaceDimension + 1);
   this->m_FixedParameters.Fill(0.0);
@@ -180,7 +181,7 @@ Euler3DTransform<TParametersValueType>::ComputeMatrixParameters()
   if (m_ComputeZYX)
   {
     m_AngleY = -std::asin(this->GetMatrix()[2][0]);
-    double C = std::cos(m_AngleY);
+    const double C = std::cos(m_AngleY);
     if (itk::Math::abs(C) > 0.00005)
     {
       double x = this->GetMatrix()[2][2] / C;
@@ -193,15 +194,15 @@ Euler3DTransform<TParametersValueType>::ComputeMatrixParameters()
     else
     {
       m_AngleX = ScalarType{};
-      double x = this->GetMatrix()[1][1];
-      double y = -this->GetMatrix()[0][1];
+      const double x = this->GetMatrix()[1][1];
+      const double y = -this->GetMatrix()[0][1];
       m_AngleZ = std::atan2(y, x);
     }
   }
   else
   {
     m_AngleX = std::asin(this->GetMatrix()[2][1]);
-    double A = std::cos(m_AngleX);
+    const double A = std::cos(m_AngleX);
     if (itk::Math::abs(A) > 0.00005)
     {
       double x = this->GetMatrix()[2][2] / A;
@@ -215,8 +216,8 @@ Euler3DTransform<TParametersValueType>::ComputeMatrixParameters()
     else
     {
       m_AngleZ = ScalarType{};
-      double x = this->GetMatrix()[0][0];
-      double y = this->GetMatrix()[1][0];
+      const double x = this->GetMatrix()[0][0];
+      const double y = this->GetMatrix()[1][0];
       m_AngleY = std::atan2(y, x);
     }
   }
@@ -228,14 +229,14 @@ void
 Euler3DTransform<TParametersValueType>::ComputeMatrix()
 {
   // need to check if angles are in the right order
-  const ScalarType cx = std::cos(m_AngleX);
-  const ScalarType sx = std::sin(m_AngleX);
-  const ScalarType cy = std::cos(m_AngleY);
-  const ScalarType sy = std::sin(m_AngleY);
-  const ScalarType cz = std::cos(m_AngleZ);
-  const ScalarType sz = std::sin(m_AngleZ);
-  const ScalarType one = NumericTraits<ScalarType>::OneValue();
-  const ScalarType zero{};
+  const ScalarType     cx = std::cos(m_AngleX);
+  const ScalarType     sx = std::sin(m_AngleX);
+  const ScalarType     cy = std::cos(m_AngleY);
+  const ScalarType     sy = std::sin(m_AngleY);
+  const ScalarType     cz = std::cos(m_AngleZ);
+  const ScalarType     sz = std::sin(m_AngleZ);
+  const ScalarType     one = NumericTraits<ScalarType>::OneValue();
+  constexpr ScalarType zero{};
 
   Matrix<TParametersValueType, 3, 3> RotationX;
   RotationX[0][0] = one;
@@ -332,7 +333,7 @@ Euler3DTransform<TParametersValueType>::ComputeJacobianWithRespectToParameters(c
   }
 
   // compute derivatives for the translation part
-  unsigned int blockOffset = 3;
+  constexpr unsigned int blockOffset = 3;
   for (unsigned int dim = 0; dim < SpaceDimension; ++dim)
   {
     jacobian[dim][blockOffset + dim] = 1.0;
@@ -363,7 +364,7 @@ Euler3DTransform<TParametersValueType>::PrintSelf(std::ostream & os, Indent inde
   os << indent << "AngleX: " << static_cast<typename NumericTraits<ScalarType>::PrintType>(m_AngleX) << std::endl;
   os << indent << "AngleY: " << static_cast<typename NumericTraits<ScalarType>::PrintType>(m_AngleY) << std::endl;
   os << indent << "AngleZ: " << static_cast<typename NumericTraits<ScalarType>::PrintType>(m_AngleZ) << std::endl;
-  os << indent << "ComputeZYX: " << (m_ComputeZYX ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(ComputeZYX);
 }
 
 } // namespace itk

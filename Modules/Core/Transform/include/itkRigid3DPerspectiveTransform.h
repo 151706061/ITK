@@ -55,7 +55,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Rigid3DPerspectiveTransform);
 
   /** New macro for creation of through a Smart Pointer. */
@@ -173,7 +173,7 @@ public:
   }
 
   /** Return the Focal Distance */
-  double
+  [[nodiscard]] double
   GetFocalDistance() const
   {
     return m_FocalDistance;
@@ -236,13 +236,15 @@ public:
   using Superclass::ComputeJacobianWithRespectToPosition;
 
   /** Set a fixed offset: this allow to center the object to be transformed */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(FixedOffset, OffsetType);
   itkSetMacro(FixedOffset, OffsetType);
-
+  /** @ITKEndGrouping */
   /** Set the center of Rotation */
+  /** @ITKStartGrouping */
   itkSetMacro(CenterOfRotation, InputPointType);
   itkGetConstReferenceMacro(CenterOfRotation, InputPointType);
-
+  /** @ITKEndGrouping */
 protected:
   Rigid3DPerspectiveTransform();
   ~Rigid3DPerspectiveTransform() override = default;

@@ -169,8 +169,8 @@ struct SYSTEM_PROCESSES
   ULONG pad4;
   ULONG pad5;
 #    else
-  ULONG  ProcessId;
-  ULONG  InheritedFromProcessId;
+  ULONG ProcessId;
+  ULONG InheritedFromProcessId;
 #    endif
   ULONG       HandleCount;
   ULONG       Reserved2[2];
@@ -211,8 +211,7 @@ WindowsMemoryUsageObserver::GetMemoryUsage()
 
   if (!m_hNTLib)
   {
-    itkGenericExceptionMacro("Can't find ntdll.dll. "
-                             << "You should probably disable SUPPORT_TOOLHELP32");
+    itkGenericExceptionMacro("Can't find ntdll.dll. You should probably disable SUPPORT_TOOLHELP32");
   }
   // the ntdll.dll library could not have been opened (file not found?)
   if (!ZwQuerySystemInformation)
@@ -288,8 +287,8 @@ LinuxMemoryUsageObserver::GetMemoryUsage()
 
   // the two fields we want
   //
-  unsigned long vsize;
-  long          rss;
+  unsigned long vsize = 0;
+  long          rss = 0;
 
   procstats >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr >> tpgid >> flags >> minflt >> cminflt >>
     majflt >> cmajflt >> utime >> stime >> cutime >> cstime >> priority >> nice >> O >> itrealvalue >> starttime >>
@@ -316,10 +315,10 @@ MacOSXMemoryUsageObserver::GetMemoryUsage()
   //
   // this method comes from
   // https://stackoverflow.com/questions/5839626/how-is-top-able-to-see-memory-usage
-  task_t                 targetTask = mach_task_self();
+  const task_t           targetTask = mach_task_self();
   struct task_basic_info ti;
   mach_msg_type_number_t count = TASK_BASIC_INFO_64_COUNT;
-  kern_return_t          kr = task_info(targetTask, TASK_BASIC_INFO_64, (task_info_t)&ti, &count);
+  const kern_return_t    kr = task_info(targetTask, TASK_BASIC_INFO_64, (task_info_t)&ti, &count);
   if (kr != KERN_SUCCESS)
   {
     return 0;
@@ -429,7 +428,7 @@ SysResourceMemoryUsageObserver::GetMemoryUsage()
   // Maybe use getrusage() ??
   rusage resourceInfo;
 
-  const int who = RUSAGE_SELF;
+  constexpr int who = RUSAGE_SELF;
   if (getrusage(who, &resourceInfo) == 0)
   {
     return static_cast<MemoryUsageObserverBase::MemoryLoadType>(resourceInfo.ru_ixrss);

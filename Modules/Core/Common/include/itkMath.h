@@ -41,10 +41,7 @@
  */
 #include <vxl_version.h>
 
-
-namespace itk
-{
-namespace Math
+namespace itk::Math
 {
 // These constants originate from VXL's vnl_math.h. They have been
 // moved here to improve visibility, and to ensure that the constants
@@ -140,7 +137,7 @@ static constexpr float float_sqrteps = vnl_math::float_sqrteps;
  *  \warning We assume that the rounding mode is not changed from the default
  *  one (or at least that it is always restored to the default one).
  */
-itkTemplateFloatingToIntegerMacro(RoundHalfIntegerToEven);
+itkTemplateFloatingToIntegerMacro(RoundHalfIntegerToEven)
 
 /** \brief Round towards nearest integer
  *
@@ -164,7 +161,7 @@ itkTemplateFloatingToIntegerMacro(RoundHalfIntegerToEven);
  *  the default one (or at least that it is always restored to the
  *  default one).
  */
-itkTemplateFloatingToIntegerMacro(RoundHalfIntegerUp);
+itkTemplateFloatingToIntegerMacro(RoundHalfIntegerUp)
 
 /** \brief Round towards nearest integer (This is a synonym for RoundHalfIntegerUp)
  *
@@ -192,7 +189,7 @@ Round(TInput x)
  *  the default one (or at least that it is always restored to the
  *  default one).
  */
-itkTemplateFloatingToIntegerMacro(Floor);
+itkTemplateFloatingToIntegerMacro(Floor)
 
 /** \brief Round towards plus infinity
  *
@@ -204,7 +201,7 @@ itkTemplateFloatingToIntegerMacro(Floor);
  *  the default one (or at least that it is always restored to the
  *  default one).
  */
-itkTemplateFloatingToIntegerMacro(Ceil);
+itkTemplateFloatingToIntegerMacro(Ceil)
 
 #undef itkTemplateFloatingToIntegerMacro
 
@@ -212,10 +209,8 @@ template <typename TReturn, typename TInput>
 inline TReturn
 CastWithRangeCheck(TInput x)
 {
-#ifdef ITK_USE_CONCEPT_CHECKING
   itkConceptMacro(OnlyDefinedForIntegerTypes1, (itk::Concept::IsInteger<TReturn>));
   itkConceptMacro(OnlyDefinedForIntegerTypes2, (itk::Concept::IsInteger<TInput>));
-#endif // ITK_USE_CONCEPT_CHECKING
 
   auto ret = static_cast<TReturn>(x);
   if constexpr (sizeof(TReturn) > sizeof(TInput) &&
@@ -253,8 +248,8 @@ template <typename T>
 inline typename Detail::FloatIEEE<T>::IntType
 FloatDifferenceULP(T x1, T x2)
 {
-  Detail::FloatIEEE<T> x1f(x1);
-  Detail::FloatIEEE<T> x2f(x2);
+  const Detail::FloatIEEE<T> x1f(x1);
+  const Detail::FloatIEEE<T> x2f(x2);
   return x1f.AsULP() - x2f.AsULP();
 }
 
@@ -269,8 +264,8 @@ template <typename T>
 inline T
 FloatAddULP(T x, typename Detail::FloatIEEE<T>::IntType ulps)
 {
-  Detail::FloatIEEE<T> representInput(x);
-  Detail::FloatIEEE<T> representOutput(representInput.asInt + ulps);
+  const Detail::FloatIEEE<T> representInput(x);
+  const Detail::FloatIEEE<T> representOutput(representInput.asInt + ulps);
   return representOutput.asFloat;
 }
 
@@ -329,11 +324,7 @@ FloatAlmostEqual(T                                        x1,
     return false;
   }
 
-  typename Detail::FloatIEEE<T>::IntType ulps = FloatDifferenceULP(x1, x2);
-  if (ulps < 0)
-  {
-    ulps = -ulps;
-  }
+  const typename Detail::FloatIEEE<T>::IntType ulps = std::abs(FloatDifferenceULP(x1, x2));
   return ulps <= maxUlps;
 }
 
@@ -724,9 +715,10 @@ template <typename TInput1, typename TInput2>
 inline bool
 ExactlyEquals(const TInput1 & x1, const TInput2 & x2)
 {
-  CLANG_PRAGMA_PUSH
-  CLANG_SUPPRESS_Wfloat_equal return x1 == x2;
-  CLANG_PRAGMA_POP
+  ITK_GCC_PRAGMA_PUSH
+  ITK_GCC_SUPPRESS_Wfloat_equal
+  return x1 == x2;
+  ITK_GCC_PRAGMA_POP
 }
 
 // The NotExactlyEquals function
@@ -742,6 +734,7 @@ NotExactlyEquals(const TInput1 & x1, const TInput2 & x2)
  *
  * \note Negative numbers cannot be prime.
  */
+/** @ITKStartGrouping */
 ITKCommon_EXPORT bool
 IsPrime(unsigned short n);
 ITKCommon_EXPORT bool
@@ -750,9 +743,10 @@ ITKCommon_EXPORT bool
 IsPrime(unsigned long n);
 ITKCommon_EXPORT bool
 IsPrime(unsigned long long n);
-
+/** @ITKEndGrouping */
 
 /** Return the greatest factor of the decomposition in prime numbers. */
+/** @ITKStartGrouping */
 ITKCommon_EXPORT unsigned short
 GreatestPrimeFactor(unsigned short n);
 ITKCommon_EXPORT unsigned int
@@ -761,7 +755,7 @@ ITKCommon_EXPORT unsigned long
 GreatestPrimeFactor(unsigned long n);
 ITKCommon_EXPORT unsigned long long
 GreatestPrimeFactor(unsigned long long n);
-
+/** @ITKEndGrouping */
 
 /**  Returns `a * b`. Numeric overflow triggers a compilation error in
  * "constexpr context" and a debug assert failure at run-time.
@@ -796,11 +790,10 @@ UnsignedPower(const uintmax_t base, const uintmax_t exponent) noexcept
 
   // Uses recursive function calls because C++11 does not support other ways of
   // iterations for a constexpr function.
-  return (exponent == 0)
-           ? (assert(base > 0), 1)
-           : (exponent == 1) ? base
-                             : UnsignedProduct<TReturnType>(UnsignedPower<TReturnType>(base, exponent / 2),
-                                                            UnsignedPower<TReturnType>(base, (exponent + 1) / 2));
+  return (exponent == 0)   ? (assert(base > 0), 1)
+         : (exponent == 1) ? base
+                           : UnsignedProduct<TReturnType>(UnsignedPower<TReturnType>(base, exponent / 2),
+                                                          UnsignedPower<TReturnType>(base, (exponent + 1) / 2));
 }
 
 
@@ -885,7 +878,6 @@ abs(unsigned long long x)
 
 using std::abs;
 
-} // end namespace Math
-} // end namespace itk
+} // namespace itk::Math
 
 #endif // end of itkMath.h

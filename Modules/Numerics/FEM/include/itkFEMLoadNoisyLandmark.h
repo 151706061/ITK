@@ -22,9 +22,7 @@
 #include "itkFEMLoadLandmark.h"
 #include "ITKFEMExport.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class FEMLoadNoisyLandmark
@@ -51,7 +49,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LoadNoisyLandmark);
 
   /** Outlier or not */
@@ -239,7 +237,6 @@ private:
    */
   MatrixType m_LandmarkTensor{};
 };
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem
 
 #endif // itkFEMLoadNoisyLandmark_h

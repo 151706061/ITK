@@ -20,21 +20,15 @@
 
 #include "itkImageRegionIterator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample, typename TInputImage, typename TOutputImage>
 ImageClassifierFilter<TSample, TInputImage, TOutputImage>::ImageClassifierFilter()
+  /** Initialize decision rule */
+  : m_DecisionRule(nullptr)
 {
-  this->m_NumberOfClasses = 0;
   this->SetNumberOfRequiredInputs(3);
   this->SetNumberOfRequiredOutputs(1);
-
-  /** Initialize decision rule */
-  m_DecisionRule = nullptr;
-
-  m_NumberOfClasses = 0;
 }
 
 template <typename TSample, typename TInputImage, typename TOutputImage>
@@ -169,8 +163,7 @@ ImageClassifierFilter<TSample, TInputImage, TOutputImage>::GenerateData()
       discriminantScores[i] = membershipFunctionsWeightsArray[i] * membershipFunctions[i]->Evaluate(measurements);
     }
 
-    unsigned int classIndex;
-    classIndex = static_cast<unsigned int>(m_DecisionRule->Evaluate(discriminantScores));
+    const auto classIndex = static_cast<unsigned int>(m_DecisionRule->Evaluate(discriminantScores));
 
     auto value = static_cast<OutputPixelType>(classLabels[classIndex]);
     outItr.Set(value);
@@ -179,7 +172,6 @@ ImageClassifierFilter<TSample, TInputImage, TOutputImage>::GenerateData()
     ++outItr;
   }
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

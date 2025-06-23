@@ -38,8 +38,8 @@ namespace itk
  * \class SpatialObject
  * \brief Implementation of the composite pattern
  *
- * The purpose of this class is to implement the composite pattern [Design
- * Patterns, Gamma, 1995] within itk, so that it becomes easy to create an
+ * The purpose of this class is to implement the composite pattern
+ * \cite gamma1994 within ITK, so that it becomes easy to create an
  * environment containing objects within a scene, and to manipulate the
  * environment as a whole or any of its component objects.  An
  * object has a list of transformations to transform object coordinates
@@ -101,7 +101,7 @@ public:
   using TransformPointer = typename TransformType::Pointer;
   using TransformConstPointer = const TransformType *;
 
-  using VectorContainerType = VectorContainer<IdentifierType, PointType>;
+  using VectorContainerType = VectorContainer<PointType>;
 
   using BoundingBoxType = BoundingBox<IdentifierType, VDimension, ScalarType, VectorContainerType>;
   using BoundingBoxPointer = typename BoundingBoxType::Pointer;
@@ -133,13 +133,15 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SpatialObject);
 
   /** Get/Set the ID */
+  /** @ITKStartGrouping */
   void
   SetId(int id);
   itkGetConstReferenceMacro(Id, int);
+  /** @ITKEndGrouping */
 
   /** Set the typename of the SpatialObject. Use cautiously - Conversion,
    *    Factory, and IO methods depend on standard naming.   Can be used
@@ -147,7 +149,7 @@ public:
   itkSetMacro(TypeName, std::string);
 
   /** Get the typename of the SpatialObject */
-  virtual const std::string
+  virtual std::string
   GetTypeName() const
   {
     return m_TypeName;
@@ -204,6 +206,7 @@ public:
 
   /**************/
   /* Transforms */
+
   /**************/
 
   /** Set the global to local transformation.
@@ -212,23 +215,25 @@ public:
    *
    * By setting this transform, the object transform is updated.
    */
+  /** @ITKStartGrouping */
   void
   SetObjectToWorldTransform(const TransformType * transform);
   itkGetModifiableObjectMacro(ObjectToWorldTransform, TransformType);
   const TransformType *
   GetObjectToWorldTransformInverse() const;
-
+  /** @ITKEndGrouping */
 
   /** Set the local to global transformation.
    *
    * Transforms points from the object-specific "physical" space to the "physical" space of its parent object.
    */
+  /** @ITKStartGrouping */
   void
   SetObjectToParentTransform(const TransformType * transform);
   itkGetModifiableObjectMacro(ObjectToParentTransform, TransformType);
   const TransformType *
   GetObjectToParentTransformInverse() const;
-
+  /** @ITKEndGrouping */
 
   /** Set the local to global transformation.
    *
@@ -249,6 +254,7 @@ public:
    *    * ValueAtInObjectSpace
    *    * IsEvaluableAtInObjectSpace - if the extent is beyond IsInside.
    */
+
   /**********************************************************************/
 
   /** Returns true if a point is inside the object or its children in object space. */
@@ -284,6 +290,7 @@ public:
 
   /********************************************************/
   /* Helper functions to recurse queries through children */
+
   /********************************************************/
 
   /** Return if a point is inside the object or its children. */
@@ -306,17 +313,22 @@ public:
 
   /**************************/
   /* Values and derivatives */
+
   /**************************/
 
   /** Set/Get the default inside value (ValueAtInWorldSpace()) of the object.
    *  Default is 1.0 */
+  /** @ITKStartGrouping */
   itkSetMacro(DefaultInsideValue, double);
   itkGetConstMacro(DefaultInsideValue, double);
+  /** @ITKEndGrouping */
 
   /** Set/Get the default outside value (ValueAtInWorldSpace()) of the object.
    *  Default is 0.0 */
+  /** @ITKStartGrouping */
   itkSetMacro(DefaultOutsideValue, double);
   itkGetConstMacro(DefaultOutsideValue, double);
+  /** @ITKEndGrouping */
 
   /** World space equivalent to ValueAtInObjectSpace
    * \note This member function assumes that the internal `ObjectToWorldTransformInverse` transform is up-to-date. This
@@ -392,6 +404,7 @@ public:
 
   /*********************/
   /* Deal with Parents */
+
   /*********************/
 
   /** Set the pointer to the parent object in the tree hierarchy.
@@ -420,12 +433,14 @@ public:
   GetParent();
 
   /** Set/Get the parent Identification number */
+  /** @ITKStartGrouping */
   itkSetMacro(ParentId, int);
   itkGetConstReferenceMacro(ParentId, int);
-
+  /** @ITKEndGrouping */
 
   /**********************/
   /* Deal with Children */
+
   /**********************/
 
   /** Set the list of pointers to children to the list passed as argument. */
@@ -465,7 +480,7 @@ public:
   AddChildrenToList(ChildrenListType * childrenList, unsigned int depth = 0, const std::string & name = "") const;
 
   virtual void
-  AddChildrenToConstList(ChildrenConstListType * childrenList,
+  AddChildrenToConstList(ChildrenConstListType * childrenCList,
                          unsigned int            depth = 0,
                          const std::string &     name = "") const;
 
@@ -504,6 +519,7 @@ public:
 
   /**********************/
   /* Bounding Box       */
+
   /**********************/
 
   /** Get a pointer to the axis-aligned bounding box of the object in world
@@ -537,6 +553,7 @@ public:
 
   /******************************/
   /* Regions used by DataObject */
+
   /******************************/
 
   /** Set the largest possible region.
@@ -654,6 +671,7 @@ public:
 
   /*************************************/
   /* Evaluate used by SpatialFunctions */
+
   /*************************************/
 
   /** Returns true if a point is inside the object - provided
@@ -682,7 +700,8 @@ public:
                    const)
   {
     return IsInsideInObjectSpace(point, depth, name);
-  };
+  }
+
 #endif
 
 protected:

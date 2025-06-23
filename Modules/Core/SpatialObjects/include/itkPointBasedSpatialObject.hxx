@@ -101,8 +101,8 @@ PointBasedSpatialObject<TDimension, TSpatialObjectPointType>::ClosestPointInObje
   double                 closestPointDistance = NumericTraits<double>::max();
   while (it != itend)
   {
-    typename SpatialObjectPoint<TDimension>::PointType curpos = it->GetPositionInObjectSpace();
-    double                                             curdistance = curpos.EuclideanDistanceTo(point);
+    const typename SpatialObjectPoint<TDimension>::PointType curpos = it->GetPositionInObjectSpace();
+    const double                                             curdistance = curpos.EuclideanDistanceTo(point);
     if (curdistance < closestPointDistance)
     {
       closestPoint = (*it);
@@ -130,8 +130,8 @@ PointBasedSpatialObject<TDimension, TSpatialObjectPointType>::ClosestPointInWorl
   double                 closestPointDistance = NumericTraits<double>::max();
   while (it != itend)
   {
-    typename SpatialObjectPoint<TDimension>::PointType curpos = it->GetPositionInWorldSpace();
-    double                                             curdistance = curpos.EuclideanDistanceTo(point);
+    const typename SpatialObjectPoint<TDimension>::PointType curpos = it->GetPositionInWorldSpace();
+    const double                                             curdistance = curpos.EuclideanDistanceTo(point);
     if (curdistance < closestPointDistance)
     {
       closestPoint = (*it);
@@ -154,14 +154,13 @@ PointBasedSpatialObject<TDimension, TSpatialObjectPointType>::ComputeMyBoundingB
 
   if (it == end)
   {
-    typename BoundingBoxType::PointType pnt;
-    pnt.Fill(typename BoundingBoxType::PointType::ValueType{});
+    const typename BoundingBoxType::PointType pnt{};
     this->GetModifiableMyBoundingBoxInObjectSpace()->SetMinimum(pnt);
     this->GetModifiableMyBoundingBoxInObjectSpace()->SetMaximum(pnt);
     return;
   }
 
-  PointType pt = it->GetPositionInObjectSpace();
+  const PointType pt = it->GetPositionInObjectSpace();
 
   this->GetModifiableMyBoundingBoxInObjectSpace()->SetMinimum(pt);
   this->GetModifiableMyBoundingBoxInObjectSpace()->SetMaximum(pt);
@@ -213,7 +212,7 @@ PointBasedSpatialObject<TDimension, TSpatialObjectPointType>::InternalClone() co
   // this to new transform.
   typename LightObject::Pointer loPtr = Superclass::InternalClone();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");

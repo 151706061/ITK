@@ -25,6 +25,8 @@ namespace itk
 
 template <typename TInputImage, typename TFeatureImage, typename TOutputPixelType>
 SegmentationLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType>::SegmentationLevelSetImageFilter()
+  : m_AutoGenerateSpeedAdvection(true)
+  , m_SegmentationFunction(nullptr)
 {
   // #0 "InitialImage" required
   Self::SetPrimaryInputName("InitialImage");
@@ -34,15 +36,12 @@ SegmentationLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType>::S
 
   this->SetNumberOfRequiredInputs(2);
   this->SetNumberOfLayers(TInputImage::ImageDimension);
-  m_SegmentationFunction = nullptr;
-  m_AutoGenerateSpeedAdvection = true;
   this->SetIsoSurfaceValue(ValueType{});
 
   // Provide some reasonable defaults which will at least prevent infinite
   // looping.
   this->SetMaximumRMSError(0.02);
   this->SetNumberOfIterations(1000);
-  m_ReverseExpansionDirection = false;
 }
 
 template <typename TInputImage, typename TFeatureImage, typename TOutputPixelType>
@@ -72,14 +71,14 @@ SegmentationLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType>::G
 
   // A positive speed value causes surface expansion, the opposite of the
   // default. Flip the sign of the propagation and advection weights.
-  if (m_ReverseExpansionDirection == true)
+  if (m_ReverseExpansionDirection)
   {
     this->GetSegmentationFunction()->ReverseExpansionDirection();
   }
 
   // Allocate the images from which speeds will be sampled.
   // if it is uninitialized and AutoGenerateSpeedAdvection is true
-  if (!this->m_IsInitialized && m_AutoGenerateSpeedAdvection == true)
+  if (!this->m_IsInitialized && m_AutoGenerateSpeedAdvection)
   {
     if (Math::NotExactlyEquals(this->GetSegmentationFunction()->GetPropagationWeight(), 0))
     {
@@ -96,7 +95,7 @@ SegmentationLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType>::G
   Superclass::GenerateData();
 
   // Reset all the signs of the weights.
-  if (m_ReverseExpansionDirection == true)
+  if (m_ReverseExpansionDirection)
   {
     this->GetSegmentationFunction()->ReverseExpansionDirection();
   }
@@ -109,8 +108,8 @@ SegmentationLevelSetImageFilter<TInputImage, TFeatureImage, TOutputPixelType>::P
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "ReverseExpansionDirection: " << (m_ReverseExpansionDirection ? "On" : "Off") << std::endl;
-  os << indent << "AutoGenerateSpeedAdvection: " << (m_AutoGenerateSpeedAdvection ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(ReverseExpansionDirection);
+  itkPrintSelfBooleanMacro(AutoGenerateSpeedAdvection);
 
   os << indent << "SegmentationFunction: ";
   if (m_SegmentationFunction != nullptr)

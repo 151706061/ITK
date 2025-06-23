@@ -67,29 +67,26 @@ onAnyThrow(itk::Object *, const itk::EventObject &, void *)
 void
 onUserRemove(itk::Object * o, const itk::EventObject &, void * data)
 {
-  unsigned long idToRemove = *static_cast<unsigned long *>(data);
+  const unsigned long idToRemove = *static_cast<unsigned long *>(data);
   o->RemoveObserver(idToRemove);
 }
 
 int
 testDeleteObserverDuringEvent()
 {
-  itk::Object::Pointer o = itk::Object::New();
+  const itk::Object::Pointer o = itk::Object::New();
 
-
-  unsigned long idToRemove;
-
-  itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
   removeCmd->SetCallback(onUserRemove);
   removeCmd->SetObjectName("Remove Command");
 
-  itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
   cmd->SetCallback(onAny);
   cmd->SetObjectName("Any Command 1");
 
   // Add Order 1
   o->AddObserver(itk::UserEvent(), removeCmd);
-  idToRemove = o->AddObserver(itk::AnyEvent(), cmd);
+  unsigned long idToRemove = o->AddObserver(itk::AnyEvent(), cmd);
   o->AddObserver(itk::AnyEvent(), cmd);
   removeCmd->SetClientData(&idToRemove);
 
@@ -180,14 +177,14 @@ int
 testCommandConstObject()
 {
 
-  itk::Object::Pointer      o = itk::Object::New();
-  itk::Object::ConstPointer co = o;
+  const itk::Object::Pointer      o = itk::Object::New();
+  const itk::Object::ConstPointer co = o;
 
-  itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
   cmd->SetConstCallback(onAnyConst);
   cmd->SetObjectName("Any Command 1");
 
-  itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
   removeCmd->SetCallback(onUserRemove);
   removeCmd->SetObjectName("Remove Command");
 
@@ -215,25 +212,23 @@ testCommandRecursiveObject()
   // a Command.
   // This is a super-mean test that is not likely to really be used.
 
-  itk::Object::Pointer      o = itk::Object::New();
-  itk::Object::ConstPointer co = o;
+  const itk::Object::Pointer      o = itk::Object::New();
+  const itk::Object::ConstPointer co = o;
 
-  unsigned long idToRemove;
-
-  itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
   cmd->SetCallback(onAny);
   cmd->SetObjectName("Any Command 1");
 
-  itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer removeCmd = itk::CStyleCommand::New();
   removeCmd->SetCallback(onUserRemove);
   removeCmd->SetObjectName("Remove Command");
 
-  itk::CStyleCommand::Pointer cmdInvoke = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer cmdInvoke = itk::CStyleCommand::New();
   cmdInvoke->SetCallback(onAnyInvokeUser);
   cmdInvoke->SetObjectName("Any Invoke User");
 
   // On 1 Remove 1
-  idToRemove = o->AddObserver(itk::AnyEvent(), cmdInvoke);
+  unsigned long idToRemove = o->AddObserver(itk::AnyEvent(), cmdInvoke);
   o->AddObserver(itk::UserEvent(), removeCmd);
   o->AddObserver(itk::AnyEvent(), cmd);
   removeCmd->SetClientData(&idToRemove);
@@ -274,9 +269,9 @@ bool
 testDeleteEventThrow()
 {
   // check the case where an exception in thrown in the DeleteEvent
-  itk::Object::Pointer o = itk::Object::New();
+  const itk::Object::Pointer o = itk::Object::New();
 
-  itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer cmd = itk::CStyleCommand::New();
   cmd->SetCallback(onAnyThrow);
 
   o->AddObserver(itk::DeleteEvent(), cmd);
@@ -295,7 +290,7 @@ testLambdaCommand()
 
   {
     // check the case where an exception in thrown in the DeleteEvent
-    itk::Object::Pointer o = itk::Object::New();
+    const itk::Object::Pointer o = itk::Object::New();
     /*----- FIRST OBSERVER LAMBDA */
     o->AddObserver(itk::AnyEvent(), [&cnt](const itk::EventObject &) { ++cnt; });
 
@@ -311,7 +306,7 @@ testLambdaCommand()
     ITK_TEST_EXPECT_EQUAL(1, cnt);
     ITK_TEST_EXPECT_EQUAL(1, name_of_class_cnt);
 
-  }                              // A DeleteEvent is called here! as object "o" is deleted
+  } // A DeleteEvent is called here! as object "o" is deleted
   ITK_TEST_EXPECT_EQUAL(2, cnt); // Verify that cnt really was incremented during DeleteEvent!
   ITK_TEST_EXPECT_EQUAL(2, name_of_class_cnt);
   return EXIT_SUCCESS;

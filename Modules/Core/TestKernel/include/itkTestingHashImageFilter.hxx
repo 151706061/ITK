@@ -22,9 +22,7 @@
 
 #include "itksys/MD5.h"
 
-namespace itk
-{
-namespace Testing
+namespace itk::Testing
 {
 
 template <typename TImageType>
@@ -65,14 +63,14 @@ HashImageFilter<TImageType>::AfterThreadedGenerateData()
 
   try
   {
-    typename ImageType::ConstPointer input = this->GetInput();
+    const typename ImageType::ConstPointer input = this->GetInput();
 
     // make a good guess about the number of components in each pixel
     size_t numberOfComponent = sizeof(PixelType) / sizeof(ValueType);
 
     if (strcmp(input->GetNameOfClass(), "VectorImage") == 0)
     {
-      // spacial case for VectorImages
+      // special case for VectorImages
       numberOfComponent = ImageType::AccessorFunctorType::GetVectorLength(input);
     }
     else if (sizeof(PixelType) % sizeof(ValueType) != 0)
@@ -83,16 +81,13 @@ HashImageFilter<TImageType>::AfterThreadedGenerateData()
     // we feel bad about accessing the data this way
     const void * const buffer = input->GetBufferPointer();
 
-    typename ImageType::RegionType largestRegion = input->GetBufferedRegion();
-    const size_t                   numberOfValues = largestRegion.GetNumberOfPixels() * numberOfComponent;
+    const typename ImageType::RegionType largestRegion = input->GetBufferedRegion();
+    const size_t                         numberOfValues = largestRegion.GetNumberOfPixels() * numberOfComponent;
 
     // Possible byte swap so we always calculate on little endian data
     const auto ByteSwapBigEndian = [buffer, numberOfValues] {
-      if (Swapper::SystemIsBigEndian())
-      {
-        Swapper::SwapRangeFromSystemToLittleEndian(static_cast<ValueType *>(const_cast<void *>(buffer)),
-                                                   static_cast<typename Swapper::BufferSizeType>(numberOfValues));
-      }
+      Swapper::SwapRangeFromSystemToLittleEndian(static_cast<ValueType *>(const_cast<void *>(buffer)),
+                                                 static_cast<typename Swapper::BufferSizeType>(numberOfValues));
     };
 
     ByteSwapBigEndian();
@@ -143,7 +138,6 @@ HashImageFilter<TImageType>::PrintSelf(std::ostream & os, Indent indent) const
   os << indent << "HashFunction: " << m_HashFunction << std::endl;
 }
 
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #endif // itkTestingHashImageFilter_hxx

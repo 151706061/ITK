@@ -31,38 +31,21 @@
 int
 itkJointHistogramMutualInformationImageToImageMetricv4Test(int, char *[])
 {
-
   constexpr unsigned int imageSize = 10;
   constexpr unsigned int imageDimensionality = 3;
   using ImageType = itk::Image<double, imageDimensionality>;
 
-  ImageType::SizeType size;
-  size.Fill(imageSize);
-  ImageType::IndexType index;
-  index.Fill(0);
-  ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
-  ImageType::SpacingType spacing;
-  spacing.Fill(1.0);
-  ImageType::PointType origin;
-  origin.Fill(0);
-  ImageType::DirectionType direction;
-  direction.SetIdentity();
+  auto                           size = ImageType::SizeType::Filled(imageSize);
+  constexpr ImageType::IndexType index{};
+  const ImageType::RegionType    region{ index, size };
 
   /* Create simple test images. */
   auto fixedImage = ImageType::New();
   fixedImage->SetRegions(region);
-  fixedImage->SetSpacing(spacing);
-  fixedImage->SetOrigin(origin);
-  fixedImage->SetDirection(direction);
   fixedImage->Allocate();
 
   auto movingImage = ImageType::New();
   movingImage->SetRegions(region);
-  movingImage->SetSpacing(spacing);
-  movingImage->SetOrigin(origin);
-  movingImage->SetDirection(direction);
   movingImage->Allocate();
 
   /* Fill images */
@@ -99,12 +82,11 @@ itkJointHistogramMutualInformationImageToImageMetricv4Test(int, char *[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(metric, JointHistogramMutualInformationImageToImageMetricv4, ImageToImageMetricv4);
 
-
-  itk::SizeValueType numberOfHistogramBins = 6;
+  constexpr itk::SizeValueType numberOfHistogramBins = 6;
   metric->SetNumberOfHistogramBins(numberOfHistogramBins);
   ITK_TEST_SET_GET_VALUE(numberOfHistogramBins, metric->GetNumberOfHistogramBins());
 
-  double varianceForJointPDFSmoothing = 1.5;
+  constexpr double varianceForJointPDFSmoothing = 1.5;
   metric->SetVarianceForJointPDFSmoothing(varianceForJointPDFSmoothing);
   ITK_TEST_SET_GET_VALUE(varianceForJointPDFSmoothing, metric->GetVarianceForJointPDFSmoothing());
 
@@ -118,13 +100,12 @@ itkJointHistogramMutualInformationImageToImageMetricv4Test(int, char *[])
 
   ITK_TRY_EXPECT_NO_EXCEPTION(metric->Initialize());
 
-
   // Evaluate
-  MetricType::MeasureType    valueReturn1, valueReturn2;
-  MetricType::DerivativeType derivativeReturn;
-
+  MetricType::MeasureType valueReturn1 = NAN;
   ITK_TRY_EXPECT_NO_EXCEPTION(valueReturn1 = metric->GetValue());
 
+  MetricType::MeasureType    valueReturn2 = NAN;
+  MetricType::DerivativeType derivativeReturn;
   ITK_TRY_EXPECT_NO_EXCEPTION(metric->GetValueAndDerivative(valueReturn2, derivativeReturn));
 
   if (itk::Math::NotExactlyEquals(valueReturn1, valueReturn2))
@@ -139,8 +120,7 @@ itkJointHistogramMutualInformationImageToImageMetricv4Test(int, char *[])
   MovingTransformType::ParametersType parameters(movingTransform->GetNumberOfParameters());
   parameters.Fill(static_cast<MovingTransformType::ParametersValueType>(1000));
   movingTransform->SetParameters(parameters);
-  MetricType::MeasureType expectedMetricMax;
-  expectedMetricMax = itk::NumericTraits<MetricType::MeasureType>::max();
+  constexpr MetricType::MeasureType expectedMetricMax = itk::NumericTraits<MetricType::MeasureType>::max();
   std::cout << "Testing non-overlapping images. Expect a warning:" << std::endl;
   metric->GetValueAndDerivative(valueReturn2, derivativeReturn);
   if (metric->GetNumberOfValidPoints() != 0 || itk::Math::NotAlmostEquals(valueReturn2, expectedMetricMax))
@@ -151,7 +131,6 @@ itkJointHistogramMutualInformationImageToImageMetricv4Test(int, char *[])
               << "  Expected metric max value: " << expectedMetricMax << std::endl;
   }
   movingTransform->SetIdentity();
-
 
   std::cout << "Test finished." << std::endl;
   return EXIT_SUCCESS;

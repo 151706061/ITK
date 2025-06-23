@@ -41,7 +41,7 @@ namespace itk
  *  This code was contributed in the Insight Journal paper:
  *  "A Streaming IO Base Class and Support for Streaming the MRC and VTK File Format"
  *  by Lowekamp B., Chen D.
- *  https://www.insight-journal.org/browse/publication/729
+ *  https://doi.org/10.54294/ufs19w
  *
  * \ingroup ITKIOMRC
  */
@@ -66,7 +66,7 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MRCImageIOFactory);
 
   /** Register one factory of this type  */

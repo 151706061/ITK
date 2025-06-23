@@ -29,7 +29,7 @@ namespace itk
  * \author Alexandre Gouaillard, Leonardo Florez-Valencia, Eric Boix
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/122
+ * https://doi.org/10.54294/4mx7kk
  *
  * \ingroup ITKQuadEdgeMesh
  */
@@ -49,7 +49,11 @@ public:
   using InputMeshType = TInputMesh;
   using InputMeshPointer = typename InputMeshType::Pointer;
   using InputMeshConstPointer = typename InputMeshType::ConstPointer;
-  using InputCoordRepType = typename InputMeshType::CoordRepType;
+  using InputCoordinateType = typename InputMeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using InputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `InputCoordRepType`. Please use `InputCoordinateType` instead!") = InputCoordinateType;
+#endif
   using InputPointType = typename InputMeshType::PointType;
   using InputPointIdentifier = typename InputMeshType::PointIdentifier;
   using InputQEPrimal = typename InputMeshType::QEPrimal;
@@ -76,7 +80,11 @@ public:
   using OutputMeshType = TOutputMesh;
   using OutputMeshPointer = typename OutputMeshType::Pointer;
   using OutputMeshConstPointer = typename OutputMeshType::ConstPointer;
-  using OutputCoordRepType = typename OutputMeshType::CoordRepType;
+  using OutputCoordinateType = typename OutputMeshType::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using OutputCoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `OutputCoordRepType`. Please use `OutputCoordinateType` instead!") = OutputCoordinateType;
+#endif
   using OutputPointType = typename OutputMeshType::PointType;
   using OutputPointIdentifier = typename OutputMeshType::PointIdentifier;
   using OutputQEPrimal = typename OutputMeshType::QEPrimal;
@@ -148,7 +156,7 @@ CopyMeshToMeshCellData(const TInputMesh * in, TOutputMesh * out)
   using InputCellDataContainerConstPointer = typename InputCellDataContainer::ConstPointer;
   using OutputCellDataContainerPointer = typename OutputCellDataContainer::Pointer;
 
-  InputCellDataContainerConstPointer inputCellData = in->GetCellData();
+  const InputCellDataContainerConstPointer inputCellData = in->GetCellData();
 
   if (inputCellData == nullptr)
   {
@@ -156,7 +164,7 @@ CopyMeshToMeshCellData(const TInputMesh * in, TOutputMesh * out)
     return;
   }
 
-  OutputCellDataContainerPointer outputCellData = OutputCellDataContainer::New();
+  const OutputCellDataContainerPointer outputCellData = OutputCellDataContainer::New();
   outputCellData->Reserve(inputCellData->Size());
 
   // Copy point data
@@ -164,7 +172,7 @@ CopyMeshToMeshCellData(const TInputMesh * in, TOutputMesh * out)
   InputCellDataContainerConstIterator inIt = inputCellData->Begin();
   while (inIt != inputCellData->End())
   {
-    typename OutputCellDataContainer::Element point(inIt.Value());
+    const typename OutputCellDataContainer::Element point(inIt.Value());
     outputCellData->SetElement(inIt.Index(), point);
     ++inIt;
   }
@@ -189,7 +197,7 @@ CopyMeshToMeshPointData(const TInputMesh * in, TOutputMesh * out)
     return;
   }
 
-  OutputPointDataContainerPointer outputPointData = OutputPointDataContainer::New();
+  const OutputPointDataContainerPointer outputPointData = OutputPointDataContainer::New();
   outputPointData->Reserve(inputPointData->Size());
 
   // Copy point data
@@ -197,7 +205,7 @@ CopyMeshToMeshPointData(const TInputMesh * in, TOutputMesh * out)
   InputPointDataContainerConstIterator inIt = inputPointData->Begin();
   while (inIt != inputPointData->End())
   {
-    typename OutputPointDataContainer::Element point(inIt.Value());
+    const typename OutputPointDataContainer::Element point(inIt.Value());
     outputPointData->SetElement(inIt.Index(), point);
     ++inIt;
   }
@@ -221,7 +229,7 @@ CopyMeshToMeshCells(const TInputMesh * in, TOutputMesh * out)
 
   out->SetCellsAllocationMethod(MeshEnums::MeshClassCellsAllocationMethod::CellsAllocatedDynamicallyCellByCell);
 
-  InputCellsContainerConstPointer inCells = in->GetCells();
+  const InputCellsContainerConstPointer inCells = in->GetCells();
 
   if (inCells == nullptr)
   {
@@ -229,16 +237,16 @@ CopyMeshToMeshCells(const TInputMesh * in, TOutputMesh * out)
     return;
   }
 
-  InputCellsContainerConstIterator cIt = inCells->Begin();
-  InputCellsContainerConstIterator cEnd = inCells->End();
+  InputCellsContainerConstIterator       cIt = inCells->Begin();
+  const InputCellsContainerConstIterator cEnd = inCells->End();
   while (cIt != cEnd)
   {
     auto * pe = dynamic_cast<InputPolygonCellType *>(cIt.Value());
     if (pe)
     {
-      InputPointIdList              points;
-      InputPointsIdInternalIterator pIt = pe->InternalPointIdsBegin();
-      InputPointsIdInternalIterator pEnd = pe->InternalPointIdsEnd();
+      InputPointIdList                    points;
+      InputPointsIdInternalIterator       pIt = pe->InternalPointIdsBegin();
+      const InputPointsIdInternalIterator pEnd = pe->InternalPointIdsEnd();
 
       while (pIt != pEnd)
       {
@@ -262,7 +270,7 @@ CopyMeshToMeshEdgeCells(const TInputMesh * in, TOutputMesh * out)
   using InputCellsContainerConstIterator = typename InputCellsContainer::ConstIterator;
   using InputEdgeCellType = typename TInputMesh::EdgeCellType;
 
-  InputCellsContainerConstPointer inEdgeCells = in->GetEdgeCells();
+  const InputCellsContainerConstPointer inEdgeCells = in->GetEdgeCells();
 
   if (inEdgeCells == nullptr)
   {
@@ -270,8 +278,8 @@ CopyMeshToMeshEdgeCells(const TInputMesh * in, TOutputMesh * out)
     return;
   }
 
-  InputCellsContainerConstIterator ecIt = inEdgeCells->Begin();
-  InputCellsContainerConstIterator ecEnd = inEdgeCells->End();
+  InputCellsContainerConstIterator       ecIt = inEdgeCells->Begin();
+  const InputCellsContainerConstIterator ecEnd = inEdgeCells->End();
 
   while (ecIt != ecEnd)
   {
@@ -297,7 +305,7 @@ CopyMeshToMeshPoints(const TInputMesh * in, TOutputMesh * out)
   using OutputPointsContainerPointer = typename TOutputMesh::PointsContainerPointer;
   using OutputPointType = typename TOutputMesh::PointType;
 
-  InputPointsContainerConstPointer inPoints = in->GetPoints();
+  const InputPointsContainerConstPointer inPoints = in->GetPoints();
 
   if (inPoints == nullptr)
   {
@@ -305,8 +313,8 @@ CopyMeshToMeshPoints(const TInputMesh * in, TOutputMesh * out)
     return;
   }
 
-  InputPointsContainerConstIterator inIt = inPoints->Begin();
-  InputPointsContainerConstIterator inEnd = inPoints->End();
+  InputPointsContainerConstIterator       inIt = inPoints->Begin();
+  const InputPointsContainerConstIterator inEnd = inPoints->End();
 
   OutputPointsContainerPointer oPoints = out->GetPoints();
   if (oPoints == nullptr)

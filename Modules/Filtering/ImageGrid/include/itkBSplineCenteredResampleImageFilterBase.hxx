@@ -229,29 +229,25 @@ BSplineCenteredResampleImageFilterBase<TInputImage, TOutputImage>::Reduce1DImage
                                                                                  unsigned int       inTraverseSize,
                                                                                  ProgressReporter & progress)
 {
-  IndexValueType i1, i2;
+  const SizeValueType outTraverseSize = inTraverseSize / 2;
 
-  SizeValueType outK, inK;
-  SizeValueType outTraverseSize = inTraverseSize / 2;
-
-  inTraverseSize = outTraverseSize * 2; // ensures that an even number is used.
-  SizeValueType inModK;                 // number for modulus math of in
-  inModK = 2L * inTraverseSize;
+  inTraverseSize = outTraverseSize * 2;             // ensures that an even number is used.
+  const SizeValueType inModK = 2L * inTraverseSize; // number for modulus math of in
 
   // TODO:  Need to allocate this once as a scratch variable instead of each
   // time through.
   std::vector<double> temp;
   temp.resize(inTraverseSize);
 
-  for (inK = 0; inK < inTraverseSize; ++inK)
+  for (SizeValueType inK = 0; inK < inTraverseSize; ++inK)
   {
     temp[inK] = in[inK] * this->m_G[0];
 
     for (int i = 1; i < this->m_GSize; ++i)
     {
       // Calculate indices for left and right of symmetrical filter.
-      i1 = inK - i;
-      i2 = inK + i;
+      IndexValueType i1 = inK - i;
+      IndexValueType i2 = inK + i;
       // reflect at boundaries if necessary
       if (i1 < 0)
       {
@@ -274,10 +270,10 @@ BSplineCenteredResampleImageFilterBase<TInputImage, TOutputImage>::Reduce1DImage
     }
   }
 
-  for (outK = 0; outK < outTraverseSize; ++outK)
+  for (SizeValueType outK = 0; outK < outTraverseSize; ++outK)
   {
-    i1 = 2 * outK;
-    double outVal = (temp[i1] + temp[i1 + 1]) / 2.0;
+    const IndexValueType i1 = 2 * outK;
+    const double         outVal = (temp[i1] + temp[i1 + 1]) / 2.0;
     out.Set(static_cast<OutputImagePixelType>(outVal));
     ++out;
     progress.CompletedPixel();
@@ -295,22 +291,21 @@ BSplineCenteredResampleImageFilterBase<TInputImage, TOutputImage>::Expand1DImage
                                                                                  unsigned int       inTraverseSize,
                                                                                  ProgressReporter & progress)
 {
-  IndexValueType i1, i2;
+  IndexValueType i1;
+  IndexValueType i2;
 
-  IndexValueType inK;
-  SizeValueType  outTraverseSize = inTraverseSize * 2;
+  IndexValueType      inK;
+  const SizeValueType outTraverseSize = inTraverseSize * 2;
   // inTraverseSize = outTraverseSize/2;  // ensures that an even number is used.
   IndexValueType inModK; // number for modulus math of in
 
   inModK = outTraverseSize;
-  IndexValueType k0 = (this->m_HSize / 2) * 2 - 1L;
-
-  double outVal, outVal2;
+  const IndexValueType k0 = (this->m_HSize / 2) * 2 - 1L;
 
   for (inK = 0; inK < (IndexValueType)inTraverseSize; ++inK)
   {
     // outK = inK * 2L;
-    outVal = in[inK] * this->m_H[0];
+    double outVal = in[inK] * this->m_H[0];
     for (int k = 2; k < this->m_HSize; k += 2)
     {
       i1 = inK - k / 2L;
@@ -338,10 +333,10 @@ BSplineCenteredResampleImageFilterBase<TInputImage, TOutputImage>::Expand1DImage
     }
     out.Set(static_cast<OutputImagePixelType>(outVal));
     ++out;
-    outVal2 = 0;
+    double outVal2 = 0;
     for (IndexValueType k = -k0; k < this->m_HSize; k += 2L)
     {
-      IndexValueType kk = itk::Math::abs(static_cast<int>(k));
+      const IndexValueType kk = itk::Math::abs(static_cast<int>(k));
       i1 = inK + (k + 1L) / 2L;
       if (i1 < 0L)
       {
@@ -367,12 +362,12 @@ BSplineCenteredResampleImageFilterBase<TInputImage, TOutputImage>::Expand1DImage
 
   // Now apply the Haar[-x]
   --out;
-  for (IndexValueType j = outTraverseSize - 1; j > 0L; j--)
+  for (IndexValueType j = outTraverseSize - 1; j > 0L; --j)
   {
     // out[j] = (out[j] + out[j-1]/2.0;
-    outVal = out.Get();
+    double outVal = out.Get();
     --out;
-    outVal2 = out.Get();
+    double outVal2 = out.Get();
     outVal = (outVal + outVal2) / 2.0;
     ++out;
     out.Set(static_cast<OutputImagePixelType>(outVal));

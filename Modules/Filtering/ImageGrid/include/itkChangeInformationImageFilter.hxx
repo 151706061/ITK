@@ -31,8 +31,6 @@ ChangeInformationImageFilter<TInputImage>::GenerateOutputInformation()
 {
   Superclass::GenerateOutputInformation();
 
-  unsigned int i;
-
   typename TInputImage::RegionType outputRegion;
   typename TInputImage::SizeType   inputSize;
   typename TInputImage::SizeType   outputSize;
@@ -45,8 +43,8 @@ ChangeInformationImageFilter<TInputImage>::GenerateOutputInformation()
   itkDebugMacro("GenerateOutputInformation Start");
 
   // Get pointers to the input and output
-  typename Superclass::OutputImagePointer output = this->GetOutput();
-  typename Superclass::InputImagePointer  input = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::OutputImagePointer output = this->GetOutput();
+  const typename Superclass::InputImagePointer  input = const_cast<TInputImage *>(this->GetInput());
 
   if (!output || !input)
   {
@@ -111,12 +109,12 @@ ChangeInformationImageFilter<TInputImage>::GenerateOutputInformation()
     typename TInputImage::PointType                     centerPoint;
     ContinuousIndex<SpacePrecisionType, ImageDimension> centerIndex;
 
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
       centerIndex[i] = static_cast<double>((outputSize[i] - 1) / 2.0);
     }
     output->TransformContinuousIndexToPhysicalPoint(centerIndex, centerPoint);
-    for (i = 0; i < ImageDimension; ++i)
+    for (unsigned int i = 0; i < ImageDimension; ++i)
     {
       origin[i] = output->GetOrigin()[i] - centerPoint[i];
     }
@@ -182,12 +180,12 @@ ChangeInformationImageFilter<TInputImage>::PrintSelf(std::ostream & os, Indent i
 
   itkPrintSelfObjectMacro(ReferenceImage);
 
-  os << indent << "CenterImage: " << (m_CenterImage ? "On" : "Off") << std::endl;
-  os << indent << "ChangeSpacing: " << (m_ChangeSpacing ? "On" : "Off") << std::endl;
-  os << indent << "ChangeOrigin: " << (m_ChangeOrigin ? "On" : "Off") << std::endl;
-  os << indent << "ChangeDirection: " << (m_ChangeDirection ? "On" : "Off") << std::endl;
-  os << indent << "ChangeRegion: " << (m_ChangeRegion ? "On" : "Off") << std::endl;
-  os << indent << "UseReferenceImage: " << (m_UseReferenceImage ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(CenterImage);
+  itkPrintSelfBooleanMacro(ChangeSpacing);
+  itkPrintSelfBooleanMacro(ChangeOrigin);
+  itkPrintSelfBooleanMacro(ChangeDirection);
+  itkPrintSelfBooleanMacro(ChangeRegion);
+  itkPrintSelfBooleanMacro(UseReferenceImage);
 
   os << indent << "OutputSpacing: " << static_cast<typename NumericTraits<SpacingType>::PrintType>(m_OutputSpacing)
      << std::endl;

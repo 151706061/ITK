@@ -23,9 +23,7 @@
 #include "itkProcessObject.h"
 #include "itkSimpleDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class HistogramToTextureFeaturesFilterEnums
  *\brief This class contains all enum classes used by HistogramToTextureFeaturesFilter class.
@@ -35,7 +33,6 @@ class HistogramToTextureFeaturesFilterEnums
 {
 public:
   /**
-   * \class TextureFeature
    * \ingroup ITKStatistics
    * Texture feature types
    */
@@ -54,7 +51,7 @@ public:
 };
 // Define how to print enumeration
 extern ITKStatistics_EXPORT std::ostream &
-                            operator<<(std::ostream & out, const HistogramToTextureFeaturesFilterEnums::TextureFeature value);
+operator<<(std::ostream & out, const HistogramToTextureFeaturesFilterEnums::TextureFeature value);
 
 /**
  * \class HistogramToTextureFeaturesFilter
@@ -105,21 +102,8 @@ extern ITKStatistics_EXPORT std::ostream &
  * http://www.cssip.uq.edu.au/meastex/www/algs/algs/algs.html
  * https://www.ucalgary.ca/~mhallbey/texture/texture_tutorial.html
  *
- * Print references:
- *
- * Haralick, R.M., K. Shanmugam and I. Dinstein. 1973.  Textural Features for
- * Image Classification. IEEE Transactions on Systems, Man and Cybernetics.
- * SMC-3(6):610-620.
- *
- * Haralick, R.M. 1979. Statistical and Structural Approaches to Texture.
- * Proceedings of the IEEE, 67:786-804.
- *
- * R.W. Conners and C.A. Harlow. A Theoretical Comparison of Texture Algorithms.
- * IEEE Transactions on Pattern Analysis and Machine Intelligence,  2:204-222, 1980.
- *
- * R.W. Conners, M.M. Trivedi, and C.A. Harlow. Segmentation of a High-Resolution
- * Urban Scene using Texture  Operators. Computer Vision, Graphics and Image
- * Processing, 25:273-310,  1984.
+ * For algorithmic details see \cite haralick1973, \cite haralick1979,
+ * \cite conners1980 and \cite conners1984.
  *
  * \sa ScalarImageToCooccurrenceMatrixFilter
  * \sa ScalarImageToTextureFeaturesFilter
@@ -127,7 +111,6 @@ extern ITKStatistics_EXPORT std::ostream &
  * Author: Zachary Pincus
  * \ingroup ITKStatistics
  */
-
 template <typename THistogram>
 class ITK_TEMPLATE_EXPORT HistogramToTextureFeaturesFilter : public ProcessObject
 {
@@ -140,7 +123,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HistogramToTextureFeaturesFilter);
 
   /** standard New() method support */
@@ -273,8 +256,7 @@ private:
 
   RelativeFrequencyContainerType m_RelativeFrequencyContainer{};
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkHistogramToTextureFeaturesFilter.hxx"

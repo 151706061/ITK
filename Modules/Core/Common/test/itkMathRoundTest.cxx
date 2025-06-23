@@ -17,10 +17,11 @@
  *=========================================================================*/
 
 #include <iostream>
+#include <string_view>
 #include "itkIndex.h"
 
 bool
-math_test_helper(std::string str, bool test)
+math_test_helper(const std::string_view str, bool test)
 {
   if (!test)
   {
@@ -198,9 +199,7 @@ itkMathRoundTest(int, char *[])
   {
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "Test passed" << std::endl;
-    return EXIT_SUCCESS;
-  }
+
+  std::cout << "Test passed" << std::endl;
+  return EXIT_SUCCESS;
 }

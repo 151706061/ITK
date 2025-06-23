@@ -393,7 +393,7 @@ itkSampleToHistogramFilterTest(int, char *[])
   }
 
 
-  InputHistogramMeasurementVectorObjectType::Pointer histogramBinMinimumObject =
+  const InputHistogramMeasurementVectorObjectType::Pointer histogramBinMinimumObject =
     InputHistogramMeasurementVectorObjectType::New();
 
   histogramBinMinimumObject->Set(histogramBinMinimum1);
@@ -513,7 +513,7 @@ itkSampleToHistogramFilterTest(int, char *[])
   }
 
 
-  InputHistogramMeasurementVectorObjectType::Pointer histogramBinMaximumObject =
+  const InputHistogramMeasurementVectorObjectType::Pointer histogramBinMaximumObject =
     InputHistogramMeasurementVectorObjectType::New();
 
   histogramBinMaximumObject->Set(histogramBinMaximum1);
@@ -583,8 +583,8 @@ itkSampleToHistogramFilterTest(int, char *[])
   }
 
   // Testing the settings of the AutoMinimumMaximum Flag.
-  const bool autoMinimumMaximum1 = true;
-  const bool autoMinimumMaximum2 = false;
+  constexpr bool autoMinimumMaximum1 = true;
+  constexpr bool autoMinimumMaximum2 = false;
 
   filter->SetAutoMinimumMaximum(autoMinimumMaximum1);
 

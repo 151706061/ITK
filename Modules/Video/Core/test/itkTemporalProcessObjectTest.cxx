@@ -24,15 +24,14 @@
 /** Set up dummy implementations of TemporalProcessObject and
  * TemporalDataObject for testing
  */
-namespace itk
-{
-namespace TemporalProcessObjectTest
+
+namespace itk::TemporalProcessObjectTest
 {
 
 using SizeValueType = itk::SizeValueType;
 using OffsetValueType = itk::OffsetValueType;
 
-/** \class CallRecordEnumms
+/** \class CallRecordEnums
  * \brief Contains all enum classes for CallRecord class.
  */
 class CallRecordEnums
@@ -133,17 +132,17 @@ public:
   }
 
   /** Access members */
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetCallerId() const
   {
     return m_CallerId;
   }
-  RecordTypeEnum
+  [[nodiscard]] RecordTypeEnum
   GetRecordType() const
   {
     return m_RecordType;
   }
-  MethodTypeEnum
+  [[nodiscard]] MethodTypeEnum
   GetMethodType() const
   {
     return m_MethodType;
@@ -194,11 +193,11 @@ protected:
  * Static list of CallRecord items representing the stack trace of
  * calls to GenerateData and TemporalStreamingGenerateData
  */
-std::vector<CallRecord> m_CallStack;
+static std::vector<CallRecord> processCallStackTraceList;
 
 /**
  * \class DummyTemporalDataObject
- * Create TemporaDataObject subclass that does nothing, but overrides some
+ * Create TemporalDataObject subclass that does nothing, but overrides some
  * methods to provide debug output
  */
 class DummyTemporalDataObject : public TemporalDataObject
@@ -259,7 +258,7 @@ public:
     for (SizeValueType i = 0; i < x; ++i)
     {
       // Create a new DataObject
-      DataObject::Pointer obj = DataObject::New().GetPointer();
+      const DataObject::Pointer obj = DataObject::New().GetPointer();
 
       // Append to the end of the buffer
       m_DataObjectBuffer->MoveHeadForward();
@@ -278,7 +277,7 @@ public:
     m_DataObjectBuffer->SetBufferContents(frameNumber, obj);
   }
 
-  /** Get a bufferd frame */
+  /** Get a buffered frame */
   DataObject::Pointer
   GetFrame(SizeValueType frameNumber)
   {
@@ -289,15 +288,15 @@ public:
     }
 
     // make sure we have the desired frame buffered
-    SizeValueType bufStart = m_BufferedTemporalRegion.GetFrameStart();
-    SizeValueType bufEnd = bufStart + m_BufferedTemporalRegion.GetFrameDuration() - 1;
+    const SizeValueType bufStart = m_BufferedTemporalRegion.GetFrameStart();
+    const SizeValueType bufEnd = bufStart + m_BufferedTemporalRegion.GetFrameDuration() - 1;
     if (frameNumber < bufStart || frameNumber > bufEnd)
     {
       return nullptr;
     }
 
     // If we can, fetch the desired frame
-    OffsetValueType frameOffset = frameNumber - bufEnd; // Should be negative
+    const OffsetValueType frameOffset = frameNumber - bufEnd; // Should be negative
     return m_DataObjectBuffer->GetBufferContents(frameOffset);
   }
 };
@@ -327,17 +326,17 @@ public:
   TemporalStreamingGenerateData() override
   {
     // Create a START entry in the stack trace
-    m_CallStack.emplace_back(
+    processCallStackTraceList.emplace_back(
       m_IdNumber, CallRecord::RecordTypeEnum::START_CALL, CallRecord::MethodTypeEnum::STREAMING_GENERATE_DATA);
 
     // Report
-    SizeValueType outputStart = this->GetOutput()->GetRequestedTemporalRegion().GetFrameStart();
+    const SizeValueType outputStart = this->GetOutput()->GetRequestedTemporalRegion().GetFrameStart();
     std::cout << "**(ID = " << m_IdNumber << ") - TemporalStreamingGenerateData" << std::endl;
     std::cout << "  -> output requested from: " << outputStart << " to "
               << this->GetOutput()->GetRequestedTemporalRegion().GetFrameDuration() + outputStart - 1 << std::endl;
 
-    SizeValueType inputStart = this->GetInput()->GetRequestedTemporalRegion().GetFrameStart();
-    SizeValueType inputEnd = inputStart + this->GetInput()->GetRequestedTemporalRegion().GetFrameDuration() - 1;
+    const SizeValueType inputStart = this->GetInput()->GetRequestedTemporalRegion().GetFrameStart();
+    const SizeValueType inputEnd = inputStart + this->GetInput()->GetRequestedTemporalRegion().GetFrameDuration() - 1;
     std::cout << "  -> input requested from " << inputStart << " to " << inputEnd << std::endl;
     std::cout << "  -> input buffered from " << this->GetInput()->GetBufferedTemporalRegion().GetFrameStart() << " to "
               << this->GetInput()->GetBufferedTemporalRegion().GetFrameStart() +
@@ -345,12 +344,12 @@ public:
               << std::endl;
 
     // Get the list of unbuffered frames
-    TemporalRegion unbufferedRegion = this->GetOutput()->GetUnbufferedRequestedTemporalRegion();
+    const TemporalRegion unbufferedRegion = this->GetOutput()->GetUnbufferedRequestedTemporalRegion();
     std::cout << unbufferedRegion << std::endl;
 
     // Make sure that the requested output duration matches the unit output
     // duration
-    SizeValueType numFramesOut = this->GetOutput()->GetRequestedTemporalRegion().GetFrameDuration();
+    const SizeValueType numFramesOut = this->GetOutput()->GetRequestedTemporalRegion().GetFrameDuration();
     if (numFramesOut != m_UnitOutputNumberOfFrames)
     {
       itkExceptionMacro("Requested non-unit number of output frames");
@@ -359,7 +358,7 @@ public:
     // Just pass frames from the input through to the output and add debug info
     for (SizeValueType i = outputStart; i < outputStart + numFramesOut; ++i)
     {
-      DataObject::Pointer newObj = DataObject::New().GetPointer();
+      const DataObject::Pointer newObj = DataObject::New().GetPointer();
 
       // Set the output
       this->GetOutput()->SetObjectAtFrame(i, newObj);
@@ -369,7 +368,7 @@ public:
     // this->GetOutput()->SetBufferedTemporalRegion(this->GetOutput()->GetRequestedTemporalRegion());
 
     // Create an END entry in the stack trace
-    m_CallStack.emplace_back(
+    processCallStackTraceList.emplace_back(
       m_IdNumber, CallRecord::RecordTypeEnum::END_CALL, CallRecord::MethodTypeEnum::STREAMING_GENERATE_DATA);
   }
 
@@ -466,10 +465,10 @@ public:
 
   /** Override UpdateOutputData for debug output */
   void
-  UpdateOutputData(DataObject * dobj) override
+  UpdateOutputData(DataObject * dataObj) override
   {
     std::cout << "(ID = " << m_IdNumber << ") - UpdateOutputData" << std::endl;
-    Superclass::UpdateOutputData(dobj);
+    Superclass::UpdateOutputData(dataObj);
   }
 
   /** Override GenerateData for debug output */
@@ -477,14 +476,14 @@ public:
   GenerateData() override
   {
     // Create a START entry in the stack trace
-    m_CallStack.emplace_back(
+    processCallStackTraceList.emplace_back(
       m_IdNumber, CallRecord::RecordTypeEnum::START_CALL, CallRecord::MethodTypeEnum::GENERATE_DATA);
 
     std::cout << "*(ID = " << m_IdNumber << ") - GenerateData" << std::endl;
     Superclass::GenerateData();
 
     // Create an END entry in the stack trace
-    m_CallStack.emplace_back(
+    processCallStackTraceList.emplace_back(
       m_IdNumber, CallRecord::RecordTypeEnum::END_CALL, CallRecord::MethodTypeEnum::GENERATE_DATA);
   }
 
@@ -519,8 +518,7 @@ private:
   SizeValueType m_IdNumber{ 0 };
 };
 
-} // end namespace TemporalProcessObjectTest
-} // end namespace itk
+} // namespace itk::TemporalProcessObjectTest
 
 
 int
@@ -603,8 +601,8 @@ itkTemporalProcessObjectTest(int, char *[])
   // Test results of requested region propagation
 
   // Set up requested region for the end of the pipeline
-  itk::TemporalRegion endLargestPossibleRegion = tpo3->GetOutput()->GetLargestPossibleTemporalRegion();
-  itk::TemporalRegion finalRequest;
+  const itk::TemporalRegion endLargestPossibleRegion = tpo3->GetOutput()->GetLargestPossibleTemporalRegion();
+  itk::TemporalRegion       finalRequest;
   finalRequest.SetFrameStart(endLargestPossibleRegion.GetFrameStart());
   finalRequest.SetFrameDuration(1);
   itk::TemporalProcessObjectTest::DummyTemporalDataObject * finalOutput = tpo3->GetOutput();
@@ -633,13 +631,13 @@ itkTemporalProcessObjectTest(int, char *[])
   // Test Generation of data
 
   // Call update to execute the entire pipeline and track the call stack
-  itk::TemporalProcessObjectTest::m_CallStack.clear();
+  itk::TemporalProcessObjectTest::processCallStackTraceList.clear();
   tpo3->Update();
 
   // Print out duration of buffered output region
-  itk::TemporalProcessObjectTest::DummyTemporalDataObject::Pointer outputObject = tpo3->GetOutput();
-  OffsetValueType outputStart = outputObject->GetBufferedTemporalRegion().GetFrameStart();
-  SizeValueType   outputDuration = outputObject->GetBufferedTemporalRegion().GetFrameDuration();
+  const itk::TemporalProcessObjectTest::DummyTemporalDataObject::Pointer outputObject = tpo3->GetOutput();
+  const OffsetValueType outputStart = outputObject->GetBufferedTemporalRegion().GetFrameStart();
+  const SizeValueType   outputDuration = outputObject->GetBufferedTemporalRegion().GetFrameDuration();
   std::cout << "Buffered Output Region: " << outputStart << "->" << outputStart + outputDuration - 1 << std::endl;
 
   // Create a list of CallRecord items representing the correct
@@ -706,13 +704,13 @@ itkTemporalProcessObjectTest(int, char *[])
   correctCallStack.emplace_back(3, RecordType::RecordTypeEnum::END_CALL, RecordType::MethodTypeEnum::GENERATE_DATA);
 
   // Check that correct number of calls made
-  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::m_CallStack.size(), correctCallStack.size());
+  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::processCallStackTraceList.size(), correctCallStack.size());
 
   // Check that call lists match
   std::cout << std::endl;
-  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::m_CallStack.size(); ++i)
+  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::processCallStackTraceList.size(); ++i)
   {
-    if (itk::TemporalProcessObjectTest::m_CallStack[i] != correctCallStack[i])
+    if (itk::TemporalProcessObjectTest::processCallStackTraceList[i] != correctCallStack[i])
     {
       std::cerr << "Test failed!" << std::endl;
       std::cerr << "Error in call stack at index [" << i << "]" << std::endl;
@@ -720,7 +718,7 @@ itkTemporalProcessObjectTest(int, char *[])
       correctCallStack[i].Print();
       std::cerr << std::endl;
       std::cerr << " differs from ";
-      itk::TemporalProcessObjectTest::m_CallStack[i].Print();
+      itk::TemporalProcessObjectTest::processCallStackTraceList[i].Print();
       return EXIT_FAILURE;
     }
   }
@@ -736,17 +734,17 @@ itkTemporalProcessObjectTest(int, char *[])
   finalOutput->SetRequestedTemporalRegion(finalRequest);
 
   // Call update to execute the entire pipeline and track the call stack
-  itk::TemporalProcessObjectTest::m_CallStack.clear();
+  itk::TemporalProcessObjectTest::processCallStackTraceList.clear();
   tpo3->Update();
 
   // Check that correct number of calls made
-  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::m_CallStack.size(), correctCallStack.size());
+  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::processCallStackTraceList.size(), correctCallStack.size());
 
   // Check that call lists match
   std::cout << std::endl;
-  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::m_CallStack.size(); ++i)
+  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::processCallStackTraceList.size(); ++i)
   {
-    if (itk::TemporalProcessObjectTest::m_CallStack[i] != correctCallStack[i])
+    if (itk::TemporalProcessObjectTest::processCallStackTraceList[i] != correctCallStack[i])
     {
       std::cerr << "Test failed!" << std::endl;
       std::cerr << "Error in call stack at index [" << i << "]" << std::endl;
@@ -754,7 +752,7 @@ itkTemporalProcessObjectTest(int, char *[])
       correctCallStack[i].Print();
       std::cerr << std::endl;
       std::cerr << " differs from ";
-      itk::TemporalProcessObjectTest::m_CallStack[i].Print();
+      itk::TemporalProcessObjectTest::processCallStackTraceList[i].Print();
       return EXIT_FAILURE;
     }
   }
@@ -762,7 +760,7 @@ itkTemporalProcessObjectTest(int, char *[])
   // Call Update again and make sure that nothing happens except one call to
   // GenerateData at the bottom which doesn't end up needing to do anything
 
-  itk::TemporalProcessObjectTest::m_CallStack.clear();
+  itk::TemporalProcessObjectTest::processCallStackTraceList.clear();
   tpo3->Update();
 
   correctCallStack.clear();
@@ -774,13 +772,13 @@ itkTemporalProcessObjectTest(int, char *[])
   correctCallStack.emplace_back(3, RecordType::RecordTypeEnum::END_CALL, RecordType::MethodTypeEnum::GENERATE_DATA);
 
   // Check that correct number of calls made
-  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::m_CallStack.size(), correctCallStack.size());
+  ITK_TEST_EXPECT_EQUAL(itk::TemporalProcessObjectTest::processCallStackTraceList.size(), correctCallStack.size());
 
   // Check that call lists match
   std::cout << std::endl;
-  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::m_CallStack.size(); ++i)
+  for (SizeValueType i = 0; i < itk::TemporalProcessObjectTest::processCallStackTraceList.size(); ++i)
   {
-    if (itk::TemporalProcessObjectTest::m_CallStack[i] != correctCallStack[i])
+    if (itk::TemporalProcessObjectTest::processCallStackTraceList[i] != correctCallStack[i])
     {
       std::cerr << "Test failed!" << std::endl;
       std::cerr << "Error in call stack at index [" << i << "]" << std::endl;
@@ -788,7 +786,7 @@ itkTemporalProcessObjectTest(int, char *[])
       correctCallStack[i].Print();
       std::cerr << std::endl;
       std::cerr << " differs from ";
-      itk::TemporalProcessObjectTest::m_CallStack[i].Print();
+      itk::TemporalProcessObjectTest::processCallStackTraceList[i].Print();
       return EXIT_FAILURE;
     }
   }
@@ -797,9 +795,9 @@ itkTemporalProcessObjectTest(int, char *[])
   // process object gets set to the largest possible temporal region if no
   // temporal region has been set
 
-  // Reset tpo1 and the requsted temporal region of tdo
+  // Reset tpo1 and the requested temporal region of tdo
   tpo1 = TPOType::New();
-  itk::TemporalRegion emptyRegion;
+  const itk::TemporalRegion emptyRegion;
   tdo->SetRequestedTemporalRegion(emptyRegion);
   tpo1->SetInput(tdo);
   tpo1->UpdateOutputInformation();
@@ -812,7 +810,7 @@ itkTemporalProcessObjectTest(int, char *[])
                         tpo1->GetOutput()->GetLargestPossibleTemporalRegion());
   ITK_TEST_EXPECT_TRUE(!(tpo1->GetOutput()->GetRequestedTemporalRegion() == emptyRegion));
 
-  // Test that if largest possible temporal region has infinte duration,
+  // Test that if largest possible temporal region has infinite duration,
   // request gets set to duration 1
   tpo1 = TPOType::New();
   largestRegion = tdo->GetLargestPossibleTemporalRegion();
@@ -837,7 +835,7 @@ itkTemporalProcessObjectTest(int, char *[])
     std::cout << "STREAMED ENUM VALUE CallRecordEnums::RecordType: " << ee << std::endl;
   }
 
-  // Test streaming enitk::TemporalProcessObjectTest::CallRecordEnumscordEnums::MethodType elements
+  // Test streaming itk::TemporalProcessObjectTest::CallRecordEnums::MethodType elements
   const std::set<itk::TemporalProcessObjectTest::CallRecordEnums::MethodType> allMethodType{
     itk::TemporalProcessObjectTest::CallRecordEnums::MethodType::GENERATE_DATA,
     itk::TemporalProcessObjectTest::CallRecordEnums::MethodType::STREAMING_GENERATE_DATA,

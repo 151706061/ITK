@@ -53,17 +53,16 @@ HilbertPath<TIndexValue, VDimension>::TransformPathIndexToMultiDimensionalIndex(
   PathIndexType d = 0;
   PathIndexType e = 0;
 
-  IndexType index;
-  index.Fill(0);
+  IndexType index{};
 
   for (PathIndexType i = 0; i < this->m_HilbertOrder; ++i)
   {
-    PathIndexType w = this->GetBitRange(id, Dimension * this->m_HilbertOrder, i * Dimension, (i + 1) * Dimension);
-    PathIndexType l = this->GetGrayCode(w);
+    const PathIndexType w = this->GetBitRange(id, Dimension * this->m_HilbertOrder, i * Dimension, (i + 1) * Dimension);
+    PathIndexType       l = this->GetGrayCode(w);
     l = this->GetInverseTransform(e, d, Dimension, l);
     for (PathIndexType j = 0; j < Dimension; ++j)
     {
-      PathIndexType b = this->GetBitRange(l, Dimension, j, j + 1);
+      const PathIndexType b = this->GetBitRange(l, Dimension, j, j + 1);
       index[j] = this->SetBit(index[j], this->m_HilbertOrder, i, b);
     }
     e ^= this->GetLeftBitRotation(this->GetEntry(w), d + 1, Dimension);
@@ -87,11 +86,11 @@ HilbertPath<TIndexValue, VDimension>::TransformMultiDimensionalIndexToPathIndex(
     PathIndexType l = 0;
     for (PathIndexType j = 0; j < Dimension; ++j)
     {
-      PathIndexType b = this->GetBitRange(index[Dimension - j - 1], this->m_HilbertOrder, i, i + 1);
+      const PathIndexType b = this->GetBitRange(index[Dimension - j - 1], this->m_HilbertOrder, i, i + 1);
       l |= b << j;
     }
     l = this->GetTransform(e, d, Dimension, l);
-    PathIndexType w = this->GetInverseGrayCode(l);
+    const PathIndexType w = this->GetInverseGrayCode(l);
     e ^= this->GetLeftBitRotation(this->GetEntry(w), d + 1, Dimension);
     d = (d + this->GetDirection(w, Dimension) + 1) % Dimension;
     id = (id << Dimension) | w;
@@ -156,10 +155,8 @@ HilbertPath<TIndexValue, VDimension>::SetBit(const PathIndexType x,
   {
     return (x | (1 << (width - i - 1)));
   }
-  else
-  {
-    return (x & ~(1 << (width - i - 1)));
-  }
+
+  return (x & ~(1 << (width - i - 1)));
 }
 
 template <typename TIndexValue, unsigned int VDimension>
@@ -178,7 +175,7 @@ HilbertPath<TIndexValue, VDimension>::GetInverseGrayCode(const PathIndexType x) 
     return x;
   }
 
-  PathIndexType m = static_cast<PathIndexType>(std::ceil(std::log(static_cast<double>(x)) / std::log(2.0))) + 1;
+  const PathIndexType m = static_cast<PathIndexType>(std::ceil(std::log(static_cast<double>(x)) / std::log(2.0))) + 1;
 
   PathIndexType i = x;
   PathIndexType j = 1;
@@ -216,7 +213,7 @@ HilbertPath<TIndexValue, VDimension>::GetDirection(const PathIndexType x, const 
   {
     return 0;
   }
-  else if (x % 2 == 0)
+  if (x % 2 == 0)
   {
     return (this->GetTrailingSetBits(x - 1, n) % n);
   }
@@ -234,10 +231,8 @@ HilbertPath<TIndexValue, VDimension>::GetEntry(const PathIndexType x) -> PathInd
   {
     return 0;
   }
-  else
-  {
-    return (this->GetGrayCode(2 * static_cast<PathIndexType>((x - 1) / 2)));
-  }
+
+  return (this->GetGrayCode(2 * static_cast<PathIndexType>((x - 1) / 2)));
 }
 
 template <typename TIndexValue, unsigned int VDimension>

@@ -185,13 +185,7 @@ template <typename TParametersValueType, unsigned int VDimension>
 auto
 ScaleTransform<TParametersValueType, VDimension>::GetInverseTransform() const -> InverseTransformBasePointer
 {
-  Pointer inv = New();
-
-  if (this->GetInverse(inv))
-  {
-    return inv.GetPointer();
-  }
-  return nullptr;
+  return Superclass::InvertTransform(*this);
 }
 
 template <typename TParametersValueType, unsigned int VDimension>
@@ -199,8 +193,7 @@ void
 ScaleTransform<TParametersValueType, VDimension>::SetIdentity()
 {
   Superclass::SetIdentity();
-  ScaleType i;
-  i.Fill(1.0);
+  constexpr auto i = MakeFilled<ScaleType>(1.0);
   this->SetScale(i);
 }
 

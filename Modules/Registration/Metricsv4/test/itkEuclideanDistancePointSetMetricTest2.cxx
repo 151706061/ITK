@@ -37,15 +37,12 @@ itkEuclideanDistancePointSetMetricTest2Run()
   using PointType = typename PointSetType::PointType;
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
   // Create a few points and apply a small offset to make the moving points
   auto      pointMax = static_cast<float>(100.0);
-  PointType fixedPoint;
-  fixedPoint.Fill(0.0);
+  PointType fixedPoint{};
   fixedPoint[0] = 0.0;
   fixedPoint[1] = 0.0;
   fixedPoints->SetPoint(0, fixedPoint);
@@ -61,7 +58,7 @@ itkEuclideanDistancePointSetMetricTest2Run()
   fixedPoint[0] = pointMax / 2.0;
   fixedPoint[1] = pointMax / 2.0;
   fixedPoints->SetPoint(4, fixedPoint);
-  if (Dimension == 3)
+  if constexpr (Dimension == 3)
   {
     fixedPoint[0] = pointMax / 2.0;
     fixedPoint[1] = pointMax / 2.0;
@@ -72,7 +69,7 @@ itkEuclideanDistancePointSetMetricTest2Run()
     fixedPoint[2] = pointMax / 2.0;
     fixedPoints->SetPoint(6, fixedPoint);
   }
-  unsigned int numberOfPoints = fixedPoints->GetNumberOfPoints();
+  const unsigned int numberOfPoints = fixedPoints->GetNumberOfPoints();
 
   PointType movingPoint;
   for (unsigned int n = 0; n < numberOfPoints; ++n)
@@ -80,7 +77,7 @@ itkEuclideanDistancePointSetMetricTest2Run()
     fixedPoint = fixedPoints->GetPoint(n);
     movingPoint[0] = fixedPoint[0] + (n + 1) * 0.5;
     movingPoint[1] = fixedPoint[1] - (n + 2) * 0.5;
-    if (Dimension == 3)
+    if constexpr (Dimension == 3)
     {
       movingPoint[2] = fixedPoint[2] + (n + 3) * 0.5;
     }
@@ -100,37 +97,22 @@ itkEuclideanDistancePointSetMetricTest2Run()
   using FieldType = typename DisplacementFieldTransformType::DisplacementFieldType;
   using RegionType = typename FieldType::RegionType;
 
-  typename FieldType::SpacingType spacing;
-  spacing.Fill(1.0);
+  auto regionSize = RegionType::SizeType::Filled(static_cast<itk::SizeValueType>(pointMax + 1.0));
 
-  typename FieldType::DirectionType direction;
-  direction.Fill(0.0);
+  const typename RegionType::IndexType regionIndex{};
+
+  const RegionType region{ regionIndex, regionSize };
+
+  auto                              displacementField = FieldType::New();
+  typename FieldType::DirectionType direction{};
   for (unsigned int d = 0; d < Dimension; ++d)
   {
     direction[d][d] = 1.0;
   }
-
-  typename FieldType::PointType origin;
-  origin.Fill(0.0);
-
-  typename RegionType::SizeType regionSize;
-  regionSize.Fill(static_cast<itk::SizeValueType>(pointMax + 1.0));
-
-  typename RegionType::IndexType regionIndex;
-  regionIndex.Fill(0);
-
-  RegionType region;
-  region.SetSize(regionSize);
-  region.SetIndex(regionIndex);
-
-  auto displacementField = FieldType::New();
-  displacementField->SetOrigin(origin);
   displacementField->SetDirection(direction);
-  displacementField->SetSpacing(spacing);
   displacementField->SetRegions(region);
   displacementField->Allocate();
-  typename DisplacementFieldTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  const typename DisplacementFieldTransformType::OutputVectorType zeroVector{};
   displacementField->FillBuffer(zeroVector);
   displacementTransform->SetDisplacementField(displacementField);
 
@@ -142,14 +124,19 @@ itkEuclideanDistancePointSetMetricTest2Run()
   metric->SetMovingTransform(displacementTransform);
   // If we don't set this explicitly, it will still work because it will be taken from the
   // displacement field during initialization.
+  auto                                spacing = itk::MakeFilled<typename FieldType::SpacingType>(1.0);
+  const typename FieldType::PointType origin{};
   metric->SetVirtualDomain(spacing, origin, direction, region);
 
   metric->Initialize();
 
   // test
-  typename PointSetMetricType::MeasureType    value = metric->GetValue(), value2;
-  typename PointSetMetricType::DerivativeType derivative, derivative2;
+  const typename PointSetMetricType::MeasureType value = metric->GetValue();
+  typename PointSetMetricType::DerivativeType    derivative;
   metric->GetDerivative(derivative);
+
+  typename PointSetMetricType::MeasureType    value2;
+  typename PointSetMetricType::DerivativeType derivative2;
   metric->GetValueAndDerivative(value2, derivative2);
 
   std::cout << "value: " << value << std::endl;
@@ -197,7 +184,7 @@ itkEuclideanDistancePointSetMetricTest2Run()
   // We should get a warning printed.
   fixedPoint[0] = 0.0;
   fixedPoint[1] = 2 * pointMax;
-  unsigned int numberExpected = fixedPoints->GetNumberOfPoints() - 1;
+  const unsigned int numberExpected = fixedPoints->GetNumberOfPoints() - 1;
   fixedPoints->SetPoint(fixedPoints->GetNumberOfPoints() - 1, fixedPoint);
   metric->GetValueAndDerivative(value2, derivative2);
   if (metric->GetNumberOfValidPoints() != numberExpected)
@@ -209,7 +196,6 @@ itkEuclideanDistancePointSetMetricTest2Run()
 
   // Test with no valid points.
   auto fixedPoints2 = PointSetType::New();
-  fixedPoints2->Initialize();
   fixedPoint[0] = -pointMax;
   fixedPoint[1] = 0.0;
   fixedPoints2->SetPoint(0, fixedPoint);
@@ -234,16 +220,12 @@ itkEuclideanDistancePointSetMetricTest2Run()
 
   // Test with invalid virtual domain, i.e.
   // one that doesn't match the displacement field.
-  typename RegionType::SizeType badSize;
-  badSize.Fill(static_cast<itk::SizeValueType>(pointMax / 2.0));
-  RegionType badRegion;
-  badRegion.SetSize(badSize);
-  badRegion.SetIndex(regionIndex);
+  auto             badSize = RegionType::SizeType::Filled(static_cast<itk::SizeValueType>(pointMax / 2.0));
+  const RegionType badRegion{ regionIndex, badSize };
   metric->SetVirtualDomain(spacing, origin, direction, badRegion);
   ITK_TRY_EXPECT_EXCEPTION(metric->Initialize());
 
-  typename FieldType::SpacingType badSpacing;
-  badSpacing.Fill(0.5);
+  auto badSpacing = itk::MakeFilled<typename FieldType::SpacingType>(0.5);
   metric->SetVirtualDomain(badSpacing, origin, direction, region);
   ITK_TRY_EXPECT_EXCEPTION(metric->Initialize());
 

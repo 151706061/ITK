@@ -323,9 +323,9 @@ main()
   auto classLabelsObject = ClassLabelVectorObjectType::New();
   ClassLabelVectorType & classLabelsVector = classLabelsObject->Get();
 
-  ClassLabelType class1 = 200;
+  constexpr ClassLabelType class1 = 200;
   classLabelsVector.push_back(class1);
-  ClassLabelType class2 = 100;
+  constexpr ClassLabelType class2 = 100;
   classLabelsVector.push_back(class2);
 
   classifier->SetClassLabels(classLabelsObject);
@@ -370,7 +370,7 @@ main()
       centroid[j] = estimatedMeans[index++];
     }
     membershipFunction->SetCentroid(centroid);
-    membershipFunctionVector.push_back(membershipFunction);
+    membershipFunctionVector.emplace_back(membershipFunction);
   }
   classifier->SetMembershipFunctions(membershipFunctionVectorObject);
 

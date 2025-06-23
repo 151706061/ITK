@@ -34,16 +34,16 @@ ExtractImageInPlaceTest()
   using ImageType = itk::Image<float, 3>;
 
   using SourceType = itk::RandomImageSource<ImageType>;
-  auto                source = SourceType::New();
-  ImageType::SizeType size = { { 32, 32, 32 } };
+  auto                          source = SourceType::New();
+  constexpr ImageType::SizeType size = { { 32, 32, 32 } };
   source->SetSize(size);
 
   source->UpdateLargestPossibleRegion();
 
 
-  ImageType::IndexType extractIndex = { { 16, 16, 16 } };
-  ImageType::SizeType  extractSize = { { 8, 8, 8 } };
-  ImageType::SizeType  zeroSize = { { 0, 0, 0 } };
+  constexpr ImageType::IndexType extractIndex = { { 16, 16, 16 } };
+  constexpr ImageType::SizeType  extractSize = { { 8, 8, 8 } };
+  constexpr ImageType::SizeType  zeroSize = { { 0, 0, 0 } };
 
   using ExtractFilterType = itk::ExtractImageFilter<ImageType, ImageType>;
   auto extract = ExtractFilterType::New();
@@ -89,10 +89,8 @@ ExtractImageInPlaceTest()
 int
 itkExtractImageTest(int, char *[])
 {
-  itk::FileOutputWindow::Pointer fow = itk::FileOutputWindow::New();
+  const itk::FileOutputWindow::Pointer fow = itk::FileOutputWindow::New();
   fow->SetInstance(fow);
-
-  int nextVal;
 
   // type alias to simplify the syntax
   using SimpleImage = itk::Image<short, 2>;
@@ -108,11 +106,9 @@ itkExtractImageTest(int, char *[])
   auto if2 = ShortImage::New();
 
   // fill in an image
-  ShortImage::IndexType  index = { { 0, 0 } };
-  ShortImage::SizeType   size = { { 8, 12 } };
-  ShortImage::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  ShortImage::IndexType        index = { { 0, 0 } };
+  ShortImage::SizeType         size = { { 8, 12 } };
+  const ShortImage::RegionType region{ index, size };
   if2->SetLargestPossibleRegion(region);
   if2->SetBufferedRegion(region);
   if2->Allocate();
@@ -144,9 +140,7 @@ itkExtractImageTest(int, char *[])
   // fill in an image
   ShortImage::IndexType  extractIndex = { { 0, 0 } };
   ShortImage::SizeType   extractSize = { { 8, 12 } };
-  ShortImage::RegionType extractRegion;
-  extractRegion.SetSize(extractSize);
-  extractRegion.SetIndex(extractIndex);
+  ShortImage::RegionType extractRegion{ extractIndex, extractSize };
   extract->SetExtractionRegion(extractRegion);
   extract->UpdateLargestPossibleRegion();
 
@@ -196,7 +190,7 @@ itkExtractImageTest(int, char *[])
       }
       else
       {
-        nextVal = 8 * column + row;
+        int nextVal = 8 * column + row;
         if (iteratorIn1.Get() != nextVal)
         {
           std::cout << "Error: (" << row << ", " << column << "), expected " << nextVal << " got " << iteratorIn1.Get()
@@ -233,7 +227,7 @@ itkExtractImageTest(int, char *[])
   stream->SetInput(extract->GetOutput());
   stream->SetNumberOfStreamDivisions(2);
 
-  ShortImage::RegionType setRegion = extract->GetExtractionRegion();
+  const ShortImage::RegionType setRegion = extract->GetExtractionRegion();
   size = setRegion.GetSize();
   index = setRegion.GetIndex();
 
@@ -272,7 +266,7 @@ itkExtractImageTest(int, char *[])
         }
         else
         {
-          nextVal = 8 * column + row;
+          int nextVal = 8 * column + row;
           if (iteratorIn2.Get() != nextVal)
           {
             std::cout << "Error: (" << row << ", " << column << "), expected " << nextVal << " got "
@@ -327,7 +321,7 @@ itkExtractImageTest(int, char *[])
   ShortImage::IndexType testIndex;
   for (; !iteratorLineIn.IsAtEnd(); ++iteratorLineIn)
   {
-    LineImage::PixelType linePixelValue = iteratorLineIn.Get();
+    const LineImage::PixelType linePixelValue = iteratorLineIn.Get();
     testIndex[0] = extractIndex[0];
     testIndex[1] = iteratorLineIn.GetIndex()[0];
     if (linePixelValue != if2->GetPixel(testIndex))

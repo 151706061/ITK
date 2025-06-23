@@ -72,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CollidingFrontsImageFilter);
 
   /** Extract some information from the image types.  Dimensionality
@@ -151,11 +151,7 @@ public:
   itkGetConstMacro(StopOnTargets, bool);
   itkBooleanMacro(StopOnTargets);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   CollidingFrontsImageFilter();

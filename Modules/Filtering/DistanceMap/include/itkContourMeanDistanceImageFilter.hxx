@@ -27,12 +27,10 @@ namespace itk
 {
 template <typename TInputImage1, typename TInputImage2>
 ContourMeanDistanceImageFilter<TInputImage1, TInputImage2>::ContourMeanDistanceImageFilter()
+  : m_MeanDistance(RealType{})
 {
   // this filter requires two input images
   this->SetNumberOfRequiredInputs(2);
-
-  m_MeanDistance = RealType{};
-  m_UseImageSpacing = true;
 }
 
 template <typename TInputImage1, typename TInputImage2>
@@ -75,12 +73,12 @@ ContourMeanDistanceImageFilter<TInputImage1, TInputImage2>::GenerateInputRequest
   // - the corresponding region of the second image
   if (this->GetInput1())
   {
-    InputImage1Pointer image1 = const_cast<InputImage1Type *>(this->GetInput1());
+    const InputImage1Pointer image1 = const_cast<InputImage1Type *>(this->GetInput1());
     image1->SetRequestedRegionToLargestPossibleRegion();
 
     if (this->GetInput2())
     {
-      InputImage2Pointer image2 = const_cast<InputImage2Type *>(this->GetInput2());
+      const InputImage2Pointer image2 = const_cast<InputImage2Type *>(this->GetInput2());
       image2->SetRequestedRegion(this->GetInput1()->GetRequestedRegion());
     }
   }
@@ -99,7 +97,7 @@ void
 ContourMeanDistanceImageFilter<TInputImage1, TInputImage2>::GenerateData()
 {
   // Pass the first input through as the output
-  InputImage1Pointer image = const_cast<TInputImage1 *>(this->GetInput1());
+  const InputImage1Pointer image = const_cast<TInputImage1 *>(this->GetInput1());
 
   this->GraftOutput(image);
 
@@ -131,9 +129,9 @@ ContourMeanDistanceImageFilter<TInputImage1, TInputImage2>::GenerateData()
   progress->RegisterInternalFilter(filter21, .5f);
 
   filter12->Update();
-  RealType distance12 = filter12->GetContourDirectedMeanDistance();
+  const RealType distance12 = filter12->GetContourDirectedMeanDistance();
   filter21->Update();
-  RealType distance21 = filter21->GetContourDirectedMeanDistance();
+  const RealType distance21 = filter21->GetContourDirectedMeanDistance();
 
   if (distance12 > distance21)
   {
@@ -151,7 +149,7 @@ ContourMeanDistanceImageFilter<TInputImage1, TInputImage2>::PrintSelf(std::ostre
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
   os << indent << "MeanDistance: " << m_MeanDistance << std::endl;
 }
 } // end namespace itk

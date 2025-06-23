@@ -20,9 +20,7 @@
 
 #include "itkUnaryFunctorImageFilter.h"
 
-namespace itk
-{
-namespace Testing
+namespace itk::Testing
 {
 
 /**
@@ -57,7 +55,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(StretchIntensityImageFilter);
 
   itkSetMacro(OutputMinimum, OutputPixelType);
@@ -83,14 +81,10 @@ public:
   const TInputImage *
   GetInput() const;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<OutputPixelType>));
   itkConceptMacro(RealTypeMultiplyOperatorCheck, (Concept::MultiplyOperator<RealType>));
   itkConceptMacro(RealTypeAdditiveOperatorsCheck, (Concept::AdditiveOperators<RealType>));
-  // End concept checking
-#endif
 
 protected:
   StretchIntensityImageFilter();
@@ -128,8 +122,7 @@ private:
   OutputPixelType m_OutputMinimum{};
   OutputPixelType m_OutputMaximum{};
 };
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkTestingStretchIntensityImageFilter.hxx"

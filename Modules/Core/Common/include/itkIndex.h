@@ -27,8 +27,7 @@
 namespace itk
 {
 
-/** \struct Index
- * \brief Represent a n-dimensional index in a n-dimensional image.
+/** \brief Represent a n-dimensional index in a n-dimensional image.
  *
  * Index is a templated class to represent a multi-dimensional index,
  * i.e. (i,j,k,...). Index is templated over the dimension of the index.
@@ -210,7 +209,8 @@ public:
   /**
    * Multiply an index by a size (elementwise product).
    */
-  const Self operator*(const SizeType & vec) const
+  const Self
+  operator*(const SizeType & vec) const
   {
     Self result;
 
@@ -223,7 +223,7 @@ public:
 
   /** Get the index. This provides a read only pointer to the index.
    * \sa SetIndex() */
-  const IndexValueType *
+  [[nodiscard]] const IndexValueType *
   GetIndex() const
   {
     return m_InternalArray;
@@ -246,7 +246,7 @@ public:
    * \sa SetIndex()
    * \sa GetElement() */
   void
-  SetElement(unsigned long element, IndexValueType val)
+  SetElement(unsigned int element, IndexValueType val)
   {
     m_InternalArray[element] = val;
   }
@@ -257,8 +257,8 @@ public:
    * \warning No bound checking is performed
    * \sa GetIndex()
    * \sa SetElement() */
-  IndexValueType
-  GetElement(unsigned long element) const
+  [[nodiscard]] IndexValueType
+  GetElement(unsigned int element) const
   {
     return m_InternalArray[element];
   }
@@ -289,9 +289,9 @@ public:
   alignas(IndexValueType) IndexValueType m_InternalArray[VDimension];
 
   /** Copy values from a FixedArray by rounding each one of the components */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   inline void
-  CopyWithRound(const FixedArray<TCoordRep, VDimension> & point)
+  CopyWithRound(const FixedArray<TCoordinate, VDimension> & point)
   {
     for (unsigned int i = 0; i < VDimension; ++i)
     {
@@ -300,9 +300,9 @@ public:
   }
 
   /** Copy values from a FixedArray by casting each one of the components */
-  template <typename TCoordRep>
+  template <typename TCoordinate>
   inline void
-  CopyWithCast(const FixedArray<TCoordRep, VDimension> & point)
+  CopyWithCast(const FixedArray<TCoordinate, VDimension> & point)
   {
     for (unsigned int i = 0; i < VDimension; ++i)
     {
@@ -344,12 +344,12 @@ public:
   }
 
   void
-  swap(Index & other)
+  swap(Index & other) noexcept
   {
     std::swap(m_InternalArray, other.m_InternalArray);
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   cbegin() const
   {
     return &m_InternalArray[0];
@@ -361,13 +361,13 @@ public:
     return &m_InternalArray[0];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   begin() const
   {
     return &m_InternalArray[0];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   cend() const
   {
     return &m_InternalArray[VDimension];
@@ -379,7 +379,7 @@ public:
     return &m_InternalArray[VDimension];
   }
 
-  constexpr const_iterator
+  [[nodiscard]] constexpr const_iterator
   end() const
   {
     return &m_InternalArray[VDimension];
@@ -391,7 +391,7 @@ public:
     return reverse_iterator(end());
   }
 
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   rbegin() const
   {
     return const_reverse_iterator(end());
@@ -403,33 +403,41 @@ public:
     return reverse_iterator(begin());
   }
 
-  const_reverse_iterator
+  [[nodiscard]] const_reverse_iterator
   rend() const
   {
     return const_reverse_iterator(begin());
   }
 
-  constexpr size_type
+  [[nodiscard]] constexpr size_type
   size() const
   {
     return VDimension;
   }
 
-  constexpr size_type
+  [[nodiscard]] constexpr size_type
   max_size() const
   {
     return VDimension;
   }
 
-  constexpr bool
+  [[nodiscard]] constexpr bool
   empty() const
   {
     return false;
   }
 
-  constexpr reference operator[](size_type pos) { return m_InternalArray[pos]; }
+  constexpr reference
+  operator[](size_type pos)
+  {
+    return m_InternalArray[pos];
+  }
 
-  constexpr const_reference operator[](size_type pos) const { return m_InternalArray[pos]; }
+  constexpr const_reference
+  operator[](size_type pos) const
+  {
+    return m_InternalArray[pos];
+  }
 
   reference
   at(size_type pos)
@@ -438,32 +446,32 @@ public:
     return m_InternalArray[pos];
   }
 
-  const_reference
+  [[nodiscard]] const_reference
   at(size_type pos) const
   {
     ExceptionThrowingBoundsCheck(pos);
     return m_InternalArray[pos];
   }
 
-  reference
+  constexpr reference
   front()
   {
     return *begin();
   }
 
-  const_reference
+  [[nodiscard]] constexpr const_reference
   front() const
   {
     return *begin();
   }
 
-  reference
+  constexpr reference
   back()
   {
     return VDimension ? *(end() - 1) : *end();
   }
 
-  const_reference
+  [[nodiscard]] constexpr const_reference
   back() const
   {
     return VDimension ? *(end() - 1) : *end();
@@ -475,7 +483,7 @@ public:
     return &m_InternalArray[0];
   }
 
-  const IndexValueType *
+  [[nodiscard]] const IndexValueType *
   data() const
   {
     return &m_InternalArray[0];
@@ -522,7 +530,7 @@ operator<<(std::ostream & os, const Index<VDimension> & obj)
   {
     os << obj[i] << ", ";
   }
-  if (VDimension >= 1)
+  if constexpr (VDimension >= 1)
   {
     os << obj[VDimension - 1];
   }
@@ -577,7 +585,7 @@ operator>=(const Index<VDimension> & one, const Index<VDimension> & two)
 // Specialized algorithms [6.2.2.2].
 template <unsigned int VDimension>
 inline void
-swap(Index<VDimension> & one, Index<VDimension> & two)
+swap(Index<VDimension> & one, Index<VDimension> & two) noexcept
 {
   std::swap(one.m_InternalArray, two.m_InternalArray);
 }

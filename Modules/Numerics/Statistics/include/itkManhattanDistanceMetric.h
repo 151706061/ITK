@@ -20,9 +20,7 @@
 
 #include "itkDistanceMetric.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class ManhattanDistanceMetric
@@ -48,7 +46,7 @@ public:
 
   using typename Superclass::MeasurementVectorSizeType;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ManhattanDistanceMetric);
 
   /** Method for creation through the object factory. */
@@ -66,8 +64,7 @@ protected:
   ManhattanDistanceMetric() = default;
   ~ManhattanDistanceMetric() override = default;
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkManhattanDistanceMetric.hxx"

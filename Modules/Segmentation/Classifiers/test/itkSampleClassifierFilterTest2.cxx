@@ -69,7 +69,7 @@ itkSampleClassifierFilterTest2(int, char *[])
   // Add three membership functions and rerun the filter
   MembershipFunctionVectorType & membershipFunctionsVector = membershipFunctionsObject->Get();
 
-  MembershipFunctionPointer membershipFunction1 = MembershipFunctionType::New();
+  const MembershipFunctionPointer membershipFunction1 = MembershipFunctionType::New();
   membershipFunction1->SetMeasurementVectorSize(numberOfComponents);
   MeanVectorType mean1;
   itk::NumericTraits<MeanVectorType>::SetLength(mean1, numberOfComponents);
@@ -81,9 +81,9 @@ itkSampleClassifierFilterTest2(int, char *[])
   covariance1.SetIdentity();
   covariance1[0][0] = 0.5;
   membershipFunction1->SetCovariance(covariance1);
-  membershipFunctionsVector.push_back(membershipFunction1);
+  membershipFunctionsVector.emplace_back(membershipFunction1);
 
-  MembershipFunctionPointer membershipFunction2 = MembershipFunctionType::New();
+  const MembershipFunctionPointer membershipFunction2 = MembershipFunctionType::New();
   membershipFunction1->SetMeasurementVectorSize(numberOfComponents);
 
   MeanVectorType mean2;
@@ -96,17 +96,17 @@ itkSampleClassifierFilterTest2(int, char *[])
   covariance2.SetIdentity();
   covariance2[0][0] = 0.5;
   membershipFunction2->SetCovariance(covariance2);
-  membershipFunctionsVector.push_back(membershipFunction2);
+  membershipFunctionsVector.emplace_back(membershipFunction2);
 
   // Add class labels
   ClassLabelVectorType & classLabelVector = classLabelsObject->Get();
 
   using ClassLabelType = FilterType::ClassLabelType;
 
-  ClassLabelType class1 = 0;
+  constexpr ClassLabelType class1 = 0;
   classLabelVector.push_back(class1);
 
-  ClassLabelType class2 = 1;
+  constexpr ClassLabelType class2 = 1;
   classLabelVector.push_back(class2);
 
   // Set a decision rule type
@@ -127,9 +127,9 @@ itkSampleClassifierFilterTest2(int, char *[])
 
   MeasurementVectorType mv;
   itk::NumericTraits<MeasurementVectorType>::SetLength(mv, numberOfComponents);
-  double       mean = mean1[0];
-  double       standardDeviation = std::sqrt(covariance1[0][0]);
-  unsigned int numberOfSampleEachClass = 10;
+  double                 mean = mean1[0];
+  double                 standardDeviation = std::sqrt(covariance1[0][0]);
+  constexpr unsigned int numberOfSampleEachClass = 10;
   for (unsigned int i = 0; i < numberOfSampleEachClass; ++i)
   {
     mv[0] = (normalGenerator->GetVariate() * standardDeviation) + mean;

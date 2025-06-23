@@ -178,7 +178,7 @@ public:
   /** Smart pointer type alias support  */
   using Pointer = SmartPointer<Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(WatershedImageFilter);
 
   /** Method for creation through the object factory. */
@@ -252,14 +252,10 @@ public:
   void
   EnlargeOutputRequestedRegion(DataObject * data) override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<ScalarType>));
   itkConceptMacro(InputAdditiveOperatorsCheck, (Concept::AdditiveOperators<ScalarType>));
   itkConceptMacro(DoubleInputMultiplyOperatorCheck, (Concept::MultiplyOperator<double, ScalarType, ScalarType>));
   itkConceptMacro(InputLessThanComparableCheck, (Concept::LessThanComparable<ScalarType>));
-  // End concept checking
-#endif
 
 protected:
   WatershedImageFilter();

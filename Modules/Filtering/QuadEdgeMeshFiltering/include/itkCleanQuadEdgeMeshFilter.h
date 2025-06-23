@@ -43,7 +43,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
   using Superclass = QuadEdgeMeshToQuadEdgeMeshFilter<TInputMesh, TOutputMesh>;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CleanQuadEdgeMeshFilter);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -51,7 +51,7 @@ public:
 
   using InputMeshType = TInputMesh;
   using typename Superclass::InputMeshPointer;
-  using typename Superclass::InputCoordRepType;
+  using typename Superclass::InputCoordinateType;
   using typename Superclass::InputPointType;
   using typename Superclass::InputPointIdentifier;
   using typename Superclass::InputQEPrimal;
@@ -74,7 +74,7 @@ public:
 
   using OutputMeshType = TOutputMesh;
   using typename Superclass::OutputMeshPointer;
-  using typename Superclass::OutputCoordRepType;
+  using typename Superclass::OutputCoordinateType;
   using typename Superclass::OutputPointType;
   using typename Superclass::OutputPointIdentifier;
   using typename Superclass::OutputQEPrimal;
@@ -88,7 +88,7 @@ public:
   using OutputCellsContainerIterator = typename OutputMeshType::CellsContainerIterator;
 
   using BoundingBoxType =
-    BoundingBox<InputPointIdentifier, Self::PointDimension, InputCoordRepType, InputPointsContainer>;
+    BoundingBox<InputPointIdentifier, Self::PointDimension, InputCoordinateType, InputPointsContainer>;
 
   using BoundingBoxPointer = typename BoundingBoxType::Pointer;
 
@@ -99,13 +99,15 @@ public:
   using DecimationPointer = typename DecimationType::Pointer;
 
   /** TODO */
-  itkSetMacro(AbsoluteTolerance, InputCoordRepType);
-  itkGetConstMacro(AbsoluteTolerance, InputCoordRepType);
-
+  /** @ITKStartGrouping */
+  itkSetMacro(AbsoluteTolerance, InputCoordinateType);
+  itkGetConstMacro(AbsoluteTolerance, InputCoordinateType);
+  /** @ITKEndGrouping */
   /** TODO */
-  itkSetClampMacro(RelativeTolerance, InputCoordRepType, 0.0, 1.0);
-  itkGetConstMacro(RelativeTolerance, InputCoordRepType);
-
+  /** @ITKStartGrouping */
+  itkSetClampMacro(RelativeTolerance, InputCoordinateType, 0.0, 1.0);
+  itkGetConstMacro(RelativeTolerance, InputCoordinateType);
+  /** @ITKEndGrouping */
 protected:
   CleanQuadEdgeMeshFilter();
 
@@ -115,7 +117,7 @@ protected:
   GenerateData() override;
 
   virtual void
-  MergePoints(const InputCoordRepType absoluteToleranceSquared);
+  MergePoints(const InputCoordinateType absoluteToleranceSquared);
 
   virtual void
   CleanPoints();
@@ -124,8 +126,8 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
-  InputCoordRepType m_AbsoluteTolerance{};
-  InputCoordRepType m_RelativeTolerance{};
+  InputCoordinateType m_AbsoluteTolerance{};
+  InputCoordinateType m_RelativeTolerance{};
 
   BoundingBoxPointer m_BoundingBox{};
   CriterionPointer   m_Criterion{};

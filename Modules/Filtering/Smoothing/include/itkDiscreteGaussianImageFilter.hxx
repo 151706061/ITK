@@ -87,21 +87,21 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GetKernelVarianceArray()
       itkExceptionMacro("Could not get kernel variance! UseImageSpacing is ON but no input image was provided");
     }
 
+    const auto & spacing = this->GetInput()->GetSpacing();
+
     ArrayType adjustedVariance;
     // Adjusted variance = var / (spacing ^ 2)
     for (unsigned int dim = 0; dim < ImageDimension; ++dim)
     {
       // convert the variance from physical units to pixels
-      double s = this->GetInput()->GetSpacing()[dim];
+      double s = spacing[dim];
       s = s * s;
       adjustedVariance[dim] = m_Variance[dim] / s;
     }
     return adjustedVariance;
   }
-  else
-  {
-    return this->GetVariance();
-  }
+
+  return this->GetVariance();
 }
 
 template <typename TInputImage, typename TOutputImage>
@@ -113,7 +113,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRe
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
 
   if (!inputPtr)
   {
@@ -136,8 +136,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRe
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(radius);
@@ -209,12 +208,11 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateData()
   progress->SetMiniPipelineFilter(this);
 
   // Set up the operators
-  unsigned int i;
-  for (i = 0; i < filterDimensionality; ++i)
+  for (unsigned int i = 0; i < filterDimensionality; ++i)
   {
     // we reverse the direction to minimize computation while, because
     // the largest dimension will be split slice wise for streaming
-    unsigned int reverse_i = filterDimensionality - i - 1;
+    const unsigned int reverse_i = filterDimensionality - i - 1;
 
     this->GenerateKernel(i, oper[reverse_i]);
   }
@@ -226,7 +224,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateData()
   if (filterDimensionality == 1)
   {
     // Use just a single filter
-    SingleFilterPointer singleFilter = SingleFilterType::New();
+    const SingleFilterPointer singleFilter = SingleFilterType::New();
     singleFilter->SetOperator(oper[0]);
     singleFilter->SetInput(localInput);
     singleFilter->OverrideBoundaryCondition(m_InputBoundaryCondition);
@@ -252,7 +250,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateData()
     const unsigned int numberOfStages = filterDimensionality;
 
     // First filter convolves and changes type from input type to real type
-    FirstFilterPointer firstFilter = FirstFilterType::New();
+    const FirstFilterPointer firstFilter = FirstFilterType::New();
     firstFilter->SetOperator(oper[0]);
     firstFilter->ReleaseDataFlagOn();
     firstFilter->SetInput(localInput);
@@ -263,9 +261,9 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateData()
     std::vector<IntermediateFilterPointer> intermediateFilters;
     if (filterDimensionality > 2)
     {
-      for (i = 1; i < filterDimensionality - 1; ++i)
+      for (unsigned int i = 1; i < filterDimensionality - 1; ++i)
       {
-        IntermediateFilterPointer f = IntermediateFilterType::New();
+        const IntermediateFilterPointer f = IntermediateFilterType::New();
         f->SetOperator(oper[i]);
         f->ReleaseDataFlagOn();
 
@@ -287,7 +285,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::GenerateData()
     }
 
     // Last filter convolves and changes type from real type to output type
-    LastFilterPointer lastFilter = LastFilterType::New();
+    const LastFilterPointer lastFilter = LastFilterType::New();
     lastFilter->SetOperator(oper[filterDimensionality - 1]);
     lastFilter->OverrideBoundaryCondition(m_RealBoundaryCondition);
     if (filterDimensionality > 2)
@@ -343,7 +341,7 @@ DiscreteGaussianImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream &
   os << indent << "MaximumError: " << m_MaximumError << std::endl;
   os << indent << "MaximumKernelWidth: " << m_MaximumKernelWidth << std::endl;
   os << indent << "FilterDimensionality: " << m_FilterDimensionality << std::endl;
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
   os << indent << "RealBoundaryCondition: " << m_RealBoundaryCondition << std::endl;
 }
 } // end namespace itk

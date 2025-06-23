@@ -37,15 +37,15 @@ namespace itk
  * \ingroup ImageFunctions
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = double>
-class ITK_TEMPLATE_EXPORT RayCastInterpolateImageFunction : public InterpolateImageFunction<TInputImage, TCoordRep>
+template <typename TInputImage, typename TCoordinate = double>
+class ITK_TEMPLATE_EXPORT RayCastInterpolateImageFunction : public InterpolateImageFunction<TInputImage, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(RayCastInterpolateImageFunction);
 
   /** Standard class type aliases. */
   using Self = RayCastInterpolateImageFunction;
-  using Superclass = InterpolateImageFunction<TInputImage, TCoordRep>;
+  using Superclass = InterpolateImageFunction<TInputImage, TCoordinate>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
@@ -56,7 +56,7 @@ public:
    * Type of the Transform Base class
    * The fixed image should be a 3D image
    */
-  using TransformType = Transform<TCoordRep, 3, 3>;
+  using TransformType = Transform<TCoordinate, 3, 3>;
 
   using TransformPointer = typename TransformType::Pointer;
   using InputPointType = typename TransformType::InputPointType;
@@ -68,14 +68,14 @@ public:
 
   using SizeType = typename TInputImage::SizeType;
 
-  using DirectionType = Vector<TCoordRep, 3>;
+  using DirectionType = Vector<TCoordinate, 3>;
 
   /**  Type of the Interpolator Base class */
-  using InterpolatorType = InterpolateImageFunction<TInputImage, TCoordRep>;
+  using InterpolatorType = InterpolateImageFunction<TInputImage, TCoordinate>;
 
   using InterpolatorPointer = typename InterpolatorType::Pointer;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(RayCastInterpolateImageFunction);
 
   /** Method for creation through the object factory. */
@@ -132,22 +132,26 @@ public:
   /** Connect the Transform.
    * This Transformation is used to calculate the new focal point position.
    * */
+  /** @ITKStartGrouping */
   itkSetObjectMacro(Transform, TransformType);
   itkGetModifiableObjectMacro(Transform, TransformType);
-
+  /** @ITKEndGrouping */
   /** Connect the Interpolator. */
   itkSetObjectMacro(Interpolator, InterpolatorType);
+
   /** Get a pointer to the Interpolator.  */
   itkGetModifiableObjectMacro(Interpolator, InterpolatorType);
 
   /** The focal point or position of the ray source. */
+  /** @ITKStartGrouping */
   itkSetMacro(FocalPoint, InputPointType);
   itkGetConstMacro(FocalPoint, InputPointType);
-
+  /** @ITKEndGrouping */
   /** The threshold above which voxels along the ray path are integrated. */
+  /** @ITKStartGrouping */
   itkSetMacro(Threshold, double);
   itkGetConstMacro(Threshold, double);
-
+  /** @ITKEndGrouping */
   /** Check if a point is inside the image buffer.
    * \warning For efficiency, no validity checking of
    * the input image pointer is done. */
@@ -202,7 +206,7 @@ private:
  * \brief Contains all enum classes used by RayCastHelper class.
  * \ingroup ITKImageFunction
  * @tparam TInputImage
- * @tparam TCoordRep
+ * @tparam TCoordinate
  */
 class RayCastHelperEnums
 {

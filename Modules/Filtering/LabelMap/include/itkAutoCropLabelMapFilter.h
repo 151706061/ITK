@@ -41,7 +41,7 @@ namespace itk
  * PadLabelMapFilter can be used.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -64,7 +64,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AutoCropLabelMapFilter);
 
   /** Superclass type alias. */
@@ -96,9 +96,10 @@ public:
   /**
    * Set/Get the border added to the mask before the crop. The default is 0 on * all the axis.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(CropBorder, SizeType);
   itkGetConstReferenceMacro(CropBorder, SizeType);
-
+  /** @ITKEndGrouping */
 protected:
   AutoCropLabelMapFilter();
   ~AutoCropLabelMapFilter() override = default;

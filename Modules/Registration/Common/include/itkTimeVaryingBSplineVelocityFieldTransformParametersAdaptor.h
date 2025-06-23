@@ -78,7 +78,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(TimeVaryingBSplineVelocityFieldTransformParametersAdaptor);
 
   /** Typedefs associated with the transform */
@@ -166,7 +166,7 @@ public:
     SpacingType requiredLatticeSpacing;
     for (SizeValueType i = 0; i < TotalDimension; ++i)
     {
-      FixedParametersValueType domainPhysicalDimensions =
+      const FixedParametersValueType domainPhysicalDimensions =
         static_cast<FixedParametersValueType>(this->m_RequiredTransformDomainSize[i] - 1.0) *
         this->m_RequiredTransformDomainSpacing[i];
       requiredLatticeSpacing[i] =

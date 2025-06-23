@@ -289,7 +289,7 @@ LBFGSBOptimizer::StartOptimization()
 {
   // Check if all the bounds parameters are the same size as the initial
   // parameters.
-  unsigned int numberOfParameters = m_CostFunction->GetNumberOfParameters();
+  const unsigned int numberOfParameters = m_CostFunction->GetNumberOfParameters();
 
   if (this->GetInitialPosition().Size() < numberOfParameters)
   {
@@ -368,13 +368,11 @@ LBFGSBOptimizerHelper::report_iter()
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
-const std::string
+std::string
 LBFGSBOptimizer::GetStopConditionDescription() const
 {
   std::ostringstream stopConditionDescription;
@@ -431,7 +429,7 @@ LBFGSBOptimizer::GetStopConditionDescription() const
         stopConditionDescription << "Gradient tolerance too small";
         break;
       case vnl_nonlinear_minimizer::FAILED_USER_REQUEST:
-        stopConditionDescription << "Failed user requeset";
+        stopConditionDescription << "Failed user request";
         break;
     }
   }

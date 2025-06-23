@@ -25,9 +25,10 @@
 #define CHECK_FOR_VALUE(a, b)                                                            \
   {                                                                                      \
     double eps = 4.0 * itk::NumericTraits<double>::epsilon();                            \
-    CLANG_PRAGMA_PUSH                                                                    \
-    CLANG_SUPPRESS_Wfloat_equal eps = (b == 0.0) ? eps : itk::Math::abs(b * eps);        \
-    CLANG_PRAGMA_POP                                                                     \
+    ITK_GCC_PRAGMA_PUSH                                                                  \
+    ITK_GCC_SUPPRESS_Wfloat_equal                                                        \
+    eps = (b == 0.0) ? eps : itk::Math::abs(b * eps);                                    \
+    ITK_GCC_PRAGMA_POP                                                                   \
     if (itk::Math::abs(a - b) > eps)                                                     \
     {                                                                                    \
       std::cerr << "Error in " #a << " expected " << b << " but got " << a << std::endl; \
@@ -49,13 +50,13 @@
 int
 itkRealTimeStampTest(int, char *[])
 {
-  itk::RealTimeStamp stamp0;
+  const itk::RealTimeStamp stamp0;
 
-  double timeInMicroSeconds = stamp0.GetTimeInMicroSeconds();
-  double timeInMilliSeconds = stamp0.GetTimeInMilliSeconds();
-  double timeInSeconds = stamp0.GetTimeInSeconds();
-  double timeInHours = stamp0.GetTimeInHours();
-  double timeInDays = stamp0.GetTimeInDays();
+  const double timeInMicroSeconds = stamp0.GetTimeInMicroSeconds();
+  const double timeInMilliSeconds = stamp0.GetTimeInMilliSeconds();
+  double       timeInSeconds = stamp0.GetTimeInSeconds();
+  const double timeInHours = stamp0.GetTimeInHours();
+  const double timeInDays = stamp0.GetTimeInDays();
 
   CHECK_FOR_VALUE(timeInMicroSeconds, 0.0);
   CHECK_FOR_VALUE(timeInMilliSeconds, 0.0);
@@ -63,13 +64,13 @@ itkRealTimeStampTest(int, char *[])
   CHECK_FOR_VALUE(timeInHours, 0.0);
   CHECK_FOR_VALUE(timeInDays, 0.0);
 
-  itk::RealTimeStamp stamp1;
-  itk::RealTimeStamp stamp2 = stamp0;
+  const itk::RealTimeStamp stamp1;
+  itk::RealTimeStamp       stamp2 = stamp0;
 
-  itk::RealTimeInterval minusOneSecond(-1, 0);
+  const itk::RealTimeInterval minusOneSecond(-1, 0);
   ITK_TRY_EXPECT_EXCEPTION(stamp2 += minusOneSecond);
 
-  itk::RealTimeInterval oneSecond(1, 0);
+  const itk::RealTimeInterval oneSecond(1, 0);
 
   for (unsigned int i = 0; i < 1000000L; ++i)
   {
@@ -140,19 +141,19 @@ itkRealTimeStampTest(int, char *[])
   CHECK_FOR_VALUE(timeInSeconds, 24.0);
 
 
-  itk::RealTimeInterval timeSpan1(19, 300000L);
-  itk::RealTimeInterval timeSpan2(13, 500000L);
+  const itk::RealTimeInterval timeSpan1(19, 300000L);
+  const itk::RealTimeInterval timeSpan2(13, 500000L);
 
-  itk::RealTimeInterval timeSpan3 = timeSpan1 + timeSpan2;
+  const itk::RealTimeInterval timeSpan3 = timeSpan1 + timeSpan2;
 
   timeInSeconds = timeSpan3.GetTimeInSeconds();
 
   CHECK_FOR_VALUE(timeInSeconds, 32.8);
 
   // Test comparison operations
-  itk::RealTimeInterval dt1(15, 13);
-  itk::RealTimeInterval dt2(19, 11);
-  itk::RealTimeInterval dt3(15, 25);
+  const itk::RealTimeInterval dt1(15, 13);
+  const itk::RealTimeInterval dt2(19, 11);
+  const itk::RealTimeInterval dt3(15, 25);
 
   itk::RealTimeInterval t1;
   t1 += dt1;

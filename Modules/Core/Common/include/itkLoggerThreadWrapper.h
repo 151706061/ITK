@@ -37,7 +37,7 @@ namespace itk
 class LoggerThreadWrapperEnums
 {
 public:
-  /** \class Operation
+  /**
    * \ingroup ITKCommon
    * Definition of types of operations for LoggerThreadWrapper.
    */
@@ -73,7 +73,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LoggerThreadWrapper);
 
   /** New macro for creation of through a Smart Pointer */
@@ -129,7 +129,7 @@ public:
   AddLogOutput(OutputType * output) override;
 
   void
-  Write(PriorityLevelEnum level, std::string const & content) override;
+  Write(PriorityLevelEnum level, const std::string & content) override;
 
   void
   Flush() override;

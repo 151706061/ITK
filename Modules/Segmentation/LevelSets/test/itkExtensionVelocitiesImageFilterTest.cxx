@@ -47,9 +47,8 @@ template <typename TPoint>
 double
 SimpleSignedDistance(const TPoint & p)
 {
-  TPoint center;
-  center.Fill(50);
-  double radius = 19.5;
+  auto             center = itk::MakeFilled<TPoint>(50);
+  constexpr double radius = 19.5;
 
   double accum = 0.0;
   for (unsigned int j = 0; j < TPoint::PointDimension; ++j)
@@ -65,12 +64,11 @@ template <typename TPoint>
 double
 SimpleVelocity(const TPoint & p)
 {
-  TPoint center;
-  center.Fill(50);
+  auto center = itk::MakeFilled<TPoint>(50);
 
-  double value;
-  double x = p[0] - center[0];
-  double y = p[1] - center[1];
+  double       value = 0.0;
+  const double x = p[0] - center[0];
+  const double y = p[1] - center[1];
 
   if (y == 0.0)
   {
@@ -125,10 +123,9 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
   using PointType = itk::Point<double, ImageDimension>;
 
   // Fill an input image with simple signed distance function
-  auto                image = ImageType::New();
-  ImageType::SizeType size;
-  size.Fill(128);
-  ImageType::RegionType region(size);
+  auto                        image = ImageType::New();
+  auto                        size = ImageType::SizeType::Filled(128);
+  const ImageType::RegionType region(size);
 
   image->SetRegions(region);
   image->Allocate();
@@ -145,7 +142,7 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
     ++iter;
   }
 
-  // Squash up the level sets by mulitplying with a scalar
+  // Squash up the level sets by multiplying with a scalar
   using MultiplierType = itk::ShiftScaleImageFilter<ImageType, ImageType>;
   auto multiplier = MultiplierType::New();
   multiplier->SetInput(image);
@@ -191,9 +188,9 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
   reinitializer->SetInputVelocityImage(aux1, 0);
   reinitializer->SetInputVelocityImage(aux2, 1);
 
-  ShowProgressObject                                    progressWatch(reinitializer);
-  itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
-  command = itk::SimpleMemberCommand<ShowProgressObject>::New();
+  ShowProgressObject                                          progressWatch(reinitializer);
+  const itk::SimpleMemberCommand<ShowProgressObject>::Pointer command =
+    itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch, &ShowProgressObject::ShowProgress);
   reinitializer->AddObserver(itk::ProgressEvent(), command);
 
@@ -216,13 +213,9 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
   difference->Update();
 
   // mask out the peak at near the center point
-  ImageType::IndexType centerIndex;
-  centerIndex.Fill(50 - 8);
-  ImageType::SizeType centerSize;
-  centerSize.Fill(17);
-  ImageType::RegionType centerRegion;
-  centerRegion.SetIndex(centerIndex);
-  centerRegion.SetSize(centerSize);
+  auto                        centerIndex = ImageType::IndexType::Filled(50 - 8);
+  auto                        centerSize = ImageType::SizeType::Filled(17);
+  const ImageType::RegionType centerRegion{ centerIndex, centerSize };
 
   iter = Iterator(difference->GetOutput(), centerRegion);
   iter.GoToBegin();
@@ -238,8 +231,8 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
   calculator->SetImage(difference->GetOutput());
   calculator->Compute();
 
-  double    maxAbsDifference = calculator->GetMaximum();
-  IndexType maxAbsDifferenceIndex = calculator->GetIndexOfMaximum();
+  const double    maxAbsDifference = calculator->GetMaximum();
+  const IndexType maxAbsDifferenceIndex = calculator->GetIndexOfMaximum();
 
   std::cout << "Max. abs. difference = " << maxAbsDifference;
   std::cout << " at " << maxAbsDifferenceIndex << std::endl;
@@ -270,14 +263,14 @@ itkExtensionVelocitiesImageFilterTest(int, char *[])
   using NodeContainerType = ReinitializerType::NodeContainer;
   using ContainerIterator = NodeContainerType::ConstIterator;
 
-  NodeContainerPointer nodes = reinitializer->GetOutputNarrowBand();
-  ContainerIterator    nodeIter = nodes->Begin();
-  ContainerIterator    nodeEnd = nodes->End();
+  const NodeContainerPointer nodes = reinitializer->GetOutputNarrowBand();
+  ContainerIterator          nodeIter = nodes->Begin();
+  const ContainerIterator    nodeEnd = nodes->End();
 
   while (nodeIter != nodeEnd)
   {
-    ImageType::IndexType nodeIndex = nodeIter.Value().GetIndex();
-    double               absDiff =
+    const ImageType::IndexType nodeIndex = nodeIter.Value().GetIndex();
+    const double               absDiff =
       itk::Math::abs(aux2->GetPixel(nodeIndex) - reinitializer->GetOutputVelocityImage(1)->GetPixel(nodeIndex));
     if (absDiff > 0.6)
     {

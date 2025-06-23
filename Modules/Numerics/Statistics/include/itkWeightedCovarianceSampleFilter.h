@@ -22,9 +22,7 @@
 #include "itkCovarianceSampleFilter.h"
 #include "itkDataObjectDecorator.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class WeightedCovarianceSampleFilter
@@ -52,10 +50,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard Macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(WeightedCovarianceSampleFilter);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** Types derived from the base class */
   using typename Superclass::SampleType;
   using typename Superclass::MeasurementVectorType;
@@ -114,8 +113,7 @@ protected:
   void
   ComputeCovarianceMatrixWithWeights();
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWeightedCovarianceSampleFilter.hxx"

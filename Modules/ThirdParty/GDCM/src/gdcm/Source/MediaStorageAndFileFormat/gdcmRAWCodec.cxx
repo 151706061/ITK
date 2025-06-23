@@ -112,16 +112,18 @@ bool RAWCodec::DecodeBytes(const char* inBytes, size_t inBufferLength,
   if(!r) return false;
 
   std::string str = os.str();
-  //std::string::size_type check = str.size();//unused
 
-  
   if( this->GetPixelFormat() == PixelFormat::UINT12 ||
       this->GetPixelFormat() == PixelFormat::INT12 )
     {
     size_t len = str.size() * 16 / 12;
     char * copy = new char[len];
-    bool b = Unpacker12Bits::Unpack(copy, str.data(), str.size() ); (void)b;
-    assert( b );
+    bool b = Unpacker12Bits::Unpack(copy, str.data(), str.size() );
+    if (!b)
+      {
+      delete[] copy;
+      return false;
+      }
     assert (len == inOutBufferLength);
     assert(inOutBufferLength == len);
     memcpy(outBytes, copy, len);
@@ -135,7 +137,14 @@ bool RAWCodec::DecodeBytes(const char* inBytes, size_t inBufferLength,
     // DermaColorLossLess.dcm
     //assert (check == inOutBufferLength || check == inOutBufferLength + 1);
     // problem with: SIEMENS_GBS_III-16-ACR_NEMA_1.acr
-    memcpy(outBytes, str.c_str(), inOutBufferLength);
+    size_t len = str.size();
+    if( inOutBufferLength <= len )
+      memcpy(outBytes, str.c_str(), inOutBufferLength);
+    else
+    {
+      gdcmWarningMacro( "Requesting too much data. Truncating result" );
+      memcpy(outBytes, str.c_str(), len);
+    }
     }
 
   return r;

@@ -77,8 +77,8 @@ itkHalfToFullHermitianImageFilterTest(int argc, char * argv[])
   ComplexImageType::SizeType fftSize = fft->GetOutput()->GetLargestPossibleRegion().GetSize();
 
   // Test that the output is the expected size.
-  ComplexImageType::RegionType halfToFullOutputRegion = halfToFullFilter->GetOutput()->GetLargestPossibleRegion();
-  ComplexImageType::SizeType   halfToFullOutputSize = halfToFullOutputRegion.GetSize();
+  const ComplexImageType::RegionType halfToFullOutputRegion = halfToFullFilter->GetOutput()->GetLargestPossibleRegion();
+  const ComplexImageType::SizeType   halfToFullOutputSize = halfToFullOutputRegion.GetSize();
   if (halfToFullOutputSize != size)
   {
     std::cerr << "HalfToFullHermitianImageFilter did not produce an image of the expected size. " << std::endl;
@@ -87,13 +87,12 @@ itkHalfToFullHermitianImageFilterTest(int argc, char * argv[])
   }
 
   // Test that the full image has the Hermitian property.
-  ComplexImageType::IndexType conjugateRegionIndex;
-  conjugateRegionIndex.Fill(0);
+  ComplexImageType::IndexType conjugateRegionIndex{};
   conjugateRegionIndex[0] = static_cast<ComplexImageType::IndexValueType>(fftSize[0]) + indexShift[0];
   conjugateRegionIndex[1] = indexShift[1];
   ComplexImageType::SizeType conjugateRegionSize(size);
   conjugateRegionSize[0] -= fftSize[0];
-  itk::ImageRegion<ComplexImageType::ImageDimension> conjugateRegion(conjugateRegionIndex, conjugateRegionSize);
+  const itk::ImageRegion<ComplexImageType::ImageDimension> conjugateRegion(conjugateRegionIndex, conjugateRegionSize);
 
   using ComplexIteratorType = itk::ImageRegionConstIteratorWithIndex<ComplexImageType>;
   ComplexIteratorType it(halfToFullFilter->GetOutput(), conjugateRegion);

@@ -41,10 +41,6 @@ namespace itk
  * PolygonCell represents a polygon for a Mesh.
  *  the points of the polygon can be dynamically changed.
  *
- * \tparam TPixelType The type associated with a point, cell, or boundary
- * for use in storing its data.
- *
- * \tparam TCellTraits Type information of mesh containing cell.
  *
  * \ingroup MeshObjects
  * \ingroup ITKCommon
@@ -56,10 +52,11 @@ public:
   ITK_DISALLOW_COPY_AND_MOVE(PolygonCell);
 
   /** Standard class type aliases. */
+  /** @ITKStartGrouping */
   itkCellCommonTypedefs(PolygonCell);
   itkCellInheritedTypedefs(TCellInterface);
-
-  /** Standard part of every itk Object. */
+  /** @ITKEndGrouping */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PolygonCell);
 
   /** Save some template parameter information. */
@@ -80,18 +77,19 @@ public:
   itkCellVisitMacro(CellGeometryEnum::POLYGON_CELL);
 
   /** Implement the standard CellInterface. */
-  CellGeometryEnum
+  /** @ITKStartGrouping */
+  [[nodiscard]] CellGeometryEnum
   GetType() const override
   {
     return CellGeometryEnum::POLYGON_CELL;
   }
   void
   MakeCopy(CellAutoPointer &) const override;
-
-  unsigned int
+  /** @ITKEndGrouping */
+  [[nodiscard]] unsigned int
   GetDimension() const override;
 
-  unsigned int
+  [[nodiscard]] unsigned int
   GetNumberOfPoints() const override;
 
   CellFeatureCount
@@ -144,6 +142,7 @@ public:
   GetEdge(CellFeatureIdentifier, EdgeAutoPointer &);
 
   /** Constructor and destructor */
+  /** @ITKStartGrouping */
   PolygonCell() = default;
   PolygonCell(PointIdentifier NumberOfPoints)
   {
@@ -153,7 +152,7 @@ public:
     }
     this->BuildEdges();
   }
-
+  /** @ITKEndGrouping */
   ~PolygonCell() override = default;
 
 protected:

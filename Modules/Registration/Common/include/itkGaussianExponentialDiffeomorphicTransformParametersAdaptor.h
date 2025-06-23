@@ -45,7 +45,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GaussianExponentialDiffeomorphicTransformParametersAdaptor);
 
   using TransformType = TTransform;
@@ -54,15 +54,17 @@ public:
   /**
    * Get/Set the Gaussian smoothing standard deviation for the velocity field.
    */
+  /** @ITKStartGrouping */
   virtual void SetGaussianSmoothingVarianceForTheConstantVelocityField(ScalarType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheConstantVelocityField, ScalarType);
-
+  /** @ITKEndGrouping */
   /**
    * Get/Set the Gaussian smoothing standard deviation for the update field.
    */
+  /** @ITKStartGrouping */
   virtual void SetGaussianSmoothingVarianceForTheUpdateField(ScalarType);
   itkGetConstReferenceMacro(GaussianSmoothingVarianceForTheUpdateField, ScalarType);
-
+  /** @ITKEndGrouping */
   void
   AdaptTransformParameters() override;
 

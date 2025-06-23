@@ -34,8 +34,7 @@ itkLandmarkSpatialObjectTest(int, char *[])
 
   LandmarkType::LandmarkPointListType list;
 
-  unsigned int i;
-  for (i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 10; ++i)
   {
     LandmarkPointType p;
     PointType         pnt;
@@ -52,7 +51,7 @@ itkLandmarkSpatialObjectTest(int, char *[])
   }
 
   // Create a Landmark Spatial Object
-  LandmarkPointer landmark = LandmarkType::New();
+  const LandmarkPointer landmark = LandmarkType::New();
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(landmark, LandmarkSpatialObject, PointBasedSpatialObject);
 
@@ -72,17 +71,16 @@ itkLandmarkSpatialObjectTest(int, char *[])
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-  }
+
+  std::cout << "[PASSED]" << std::endl;
+
 
   // Point consistency
   std::cout << "Point consistency: ";
 
-  LandmarkType::LandmarkPointListType::const_iterator it = landmark->GetPoints().begin();
+  auto it = landmark->GetPoints().begin();
 
-  i = 0;
+  unsigned int i = 0;
   while (it != landmark->GetPoints().end())
   {
     for (unsigned int d = 0; d < 3; ++d)

@@ -55,34 +55,23 @@ itkGridImageSourceTest(int argc, char * argv[])
 
 
   // Specify image parameters
-  auto                size = static_cast<ImageType::SizeValueType>(std::stod(argv[2]));
-  ImageType::SizeType imageSize;
-  imageSize.Fill(size);
+  auto size = static_cast<ImageType::SizeValueType>(std::stod(argv[2]));
 
-  ImageType::PointType origin;
-  origin.Fill(0.0);
-
-  ImageType::SpacingType imageSpacing;
-  imageSpacing.Fill(1.0);
+  auto imageSize = ImageType::SizeType::Filled(size);
+  gridImage->SetSize(imageSize);
 
   ImageType::DirectionType direction;
   direction.SetIdentity();
-
-  gridImage->SetSize(imageSize);
-  gridImage->SetSpacing(imageSpacing);
-  gridImage->SetOrigin(origin);
   gridImage->SetDirection(direction);
 
-
   // Specify grid parameters
-  double scale = 255.0;
+  constexpr double scale = 255.0;
   gridImage->SetScale(scale);
   ITK_TEST_SET_GET_VALUE(scale, gridImage->GetScale());
 
 
-  auto                      sigmaValue = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[3]));
-  GridSourceType::ArrayType sigma;
-  sigma.Fill(sigmaValue);
+  auto sigmaValue = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[3]));
+  auto sigma = itk::MakeFilled<GridSourceType::ArrayType>(sigmaValue);
   auto variableSigma = static_cast<bool>(std::stoi(argv[4]));
 
   if (variableSigma)
@@ -97,9 +86,8 @@ itkGridImageSourceTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(sigma, gridImage->GetSigma());
 
 
-  auto                      spacing = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[5]));
-  GridSourceType::ArrayType gridSpacing;
-  gridSpacing.Fill(spacing);
+  auto spacing = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[5]));
+  auto gridSpacing = itk::MakeFilled<GridSourceType::ArrayType>(spacing);
 
 
   auto variableGridSpacing = static_cast<bool>(std::stoi(argv[6]));
@@ -114,18 +102,16 @@ itkGridImageSourceTest(int argc, char * argv[])
   ITK_TEST_SET_GET_VALUE(gridSpacing, gridImage->GetGridSpacing());
 
 
-  auto                      offset = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[7]));
-  GridSourceType::ArrayType gridOffset;
-  gridOffset.Fill(offset);
+  auto offset = static_cast<GridSourceType::ArrayType::ValueType>(std::stod(argv[7]));
+  auto gridOffset = itk::MakeFilled<GridSourceType::ArrayType>(offset);
   gridImage->SetGridOffset(gridOffset);
   ITK_TEST_SET_GET_VALUE(gridOffset, gridImage->GetGridOffset());
 
 
-  auto                          gridAllDimensions = static_cast<bool>(std::stoi(argv[8]));
-  GridSourceType::BoolArrayType whichDimension;
-  whichDimension.Fill(gridAllDimensions);
+  auto gridAllDimensions = static_cast<bool>(std::stoi(argv[8]));
+  auto whichDimension = itk::MakeFilled<GridSourceType::BoolArrayType>(gridAllDimensions);
 
-  bool toggleLastGridDimension = std::stod(argv[9]);
+  const bool toggleLastGridDimension = std::stod(argv[9]);
   if (toggleLastGridDimension)
   {
     whichDimension[ImageDimension - 1] = !gridAllDimensions;
@@ -137,7 +123,7 @@ itkGridImageSourceTest(int argc, char * argv[])
   auto useBSplineKernel = static_cast<bool>(std::stoi(argv[10]));
   if (useBSplineKernel)
   {
-    unsigned int bSplineOrder = std::stoi(argv[11]);
+    const unsigned int bSplineOrder = std::stoi(argv[11]);
     // Specify B-Spline function
     if (bSplineOrder == 3)
     {
@@ -154,7 +140,7 @@ itkGridImageSourceTest(int argc, char * argv[])
   }
 
 
-  itk::SimpleFilterWatcher watcher(gridImage, "GridImageSource");
+  const itk::SimpleFilterWatcher watcher(gridImage, "GridImageSource");
 
   ITK_TRY_EXPECT_NO_EXCEPTION(gridImage->Update());
 

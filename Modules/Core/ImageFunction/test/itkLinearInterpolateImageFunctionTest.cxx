@@ -40,17 +40,17 @@ RunLinearInterpolateTest()
   using SizeType = typename RegionType::SizeType;
   using IndexType = typename ImageType::IndexType;
 
-  using CoordRepType = float;
-  using ContinuousIndexType = typename itk::ContinuousIndex<CoordRepType, Dimensions>;
+  using CoordinateType = float;
+  using ContinuousIndexType = typename itk::ContinuousIndex<CoordinateType, Dimensions>;
 
   using AccumulatorType = typename ContinuousIndexType::ValueType;
 
-  using PointType = typename itk::Point<CoordRepType, Dimensions>;
+  using PointType = typename itk::Point<CoordinateType, Dimensions>;
 
-  using InterpolatorType = typename itk::LinearInterpolateImageFunction<ImageType, CoordRepType>;
-  using VectorInterpolatorType = typename itk::LinearInterpolateImageFunction<VectorImageType, CoordRepType>;
+  using InterpolatorType = typename itk::LinearInterpolateImageFunction<ImageType, CoordinateType>;
+  using VectorInterpolatorType = typename itk::LinearInterpolateImageFunction<VectorImageType, CoordinateType>;
   using VariableVectorInterpolatorType =
-    typename itk::LinearInterpolateImageFunction<VariableVectorImageType, CoordRepType>;
+    typename itk::LinearInterpolateImageFunction<VariableVectorImageType, CoordinateType>;
 
   using InterpolatedVectorType = typename VectorInterpolatorType::OutputType;
   using InterpolatedVariableVectorType = typename VariableVectorInterpolatorType::OutputType;
@@ -60,16 +60,13 @@ RunLinearInterpolateTest()
   auto variablevectorimage = VariableVectorImageType::New();
   variablevectorimage->SetVectorLength(VectorDimension);
 
-  IndexType start;
-  start.Fill(0);
+  constexpr IndexType start{};
 
   SizeType      size;
   constexpr int dimMaxLength = 3;
   size.Fill(dimMaxLength);
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const RegionType region{ start, size };
 
   image->SetRegions(region);
   image->Allocate();
@@ -153,8 +150,7 @@ RunLinearInterpolateTest()
   auto variablevectorinterpolator = VariableVectorInterpolatorType::New();
   variablevectorinterpolator->SetInputImage(variablevectorimage);
 
-  typename ImageType::SizeType radius;
-  radius.Fill(1);
+  auto radius = ImageType::SizeType::Filled(1);
   for (unsigned int d = 0; d < Dimensions; ++d)
   {
     ITK_TEST_SET_GET_VALUE(radius[d], interpolator->GetRadius()[d]);
@@ -162,7 +158,7 @@ RunLinearInterpolateTest()
 
   constexpr AccumulatorType incr = 0.2;
 
-  const AccumulatorType tolerance = 5e-6;
+  constexpr AccumulatorType tolerance = 5e-6;
   // The tolerance of the norm must be greater than the tolerance for individual items.
   const AccumulatorType normTolerance = std::sqrt(4.0f * tolerance * tolerance);
 

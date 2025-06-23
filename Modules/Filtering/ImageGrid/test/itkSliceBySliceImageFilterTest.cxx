@@ -44,8 +44,7 @@ sliceCallBack(itk::Object * object, const itk::EventObject &, void *)
   // std::cout << "callback! slice: " << filter->GetSliceIndex() << std::endl;
 
   // set half of the slice number as radius
-  MedianType::InputSizeType radius;
-  radius.Fill(filter->GetSliceIndex() / 2);
+  auto radius = MedianType::InputSizeType::Filled(filter->GetSliceIndex() / 2);
   median->SetRadius(radius);
 }
 
@@ -90,12 +89,12 @@ itkSliceBySliceImageFilterTest(int argc, char * argv[])
   using MonitorType = itk::PipelineMonitorImageFilter<FilterType::InternalOutputImageType>;
   auto monitor = MonitorType::New();
 
-  itk::CStyleCommand::Pointer command = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer command = itk::CStyleCommand::New();
   command->SetCallback(*sliceCallBack);
 
   filter->AddObserver(itk::IterationEvent(), command);
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  const itk::SimpleFilterWatcher watcher(filter, "filter");
 
   using WriterType = itk::ImageFileWriter<ImageType>;
 
@@ -103,7 +102,7 @@ itkSliceBySliceImageFilterTest(int argc, char * argv[])
   writer->SetInput(filter->GetOutput());
   writer->SetFileName(argv[2]);
 
-  unsigned int       slicingDimension;
+  unsigned int       slicingDimension = 0;
   std::istringstream istrm(argv[3]);
   istrm >> slicingDimension;
   filter->SetDimension(slicingDimension);
@@ -204,12 +203,11 @@ itkSliceBySliceImageFilterTest(int argc, char * argv[])
   //
   // Exercise exceptions
   //
-  bool caughtException;
   auto badFilter = FilterType::New();
 
   std::cout << "Testing with no filter set..." << std::endl;
   badFilter->SetInput(reader->GetOutput());
-  caughtException = false;
+  bool caughtException = false;
   try
   {
     badFilter->Update();

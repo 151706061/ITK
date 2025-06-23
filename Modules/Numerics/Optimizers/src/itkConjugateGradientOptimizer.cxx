@@ -24,10 +24,8 @@ namespace itk
  * Constructor
  */
 ConjugateGradientOptimizer::ConjugateGradientOptimizer()
-{
-  m_OptimizerInitialized = false;
-  m_VnlOptimizer = nullptr;
-}
+  : m_VnlOptimizer(nullptr)
+{}
 
 /**
  * Destructor
@@ -91,7 +89,7 @@ ConjugateGradientOptimizer::StartOptimization()
     this->GetNonConstCostFunctionAdaptor()->NegateCostFunctionOn();
   }
 
-  ParametersType initialPosition = this->GetInitialPosition();
+  const ParametersType initialPosition = this->GetInitialPosition();
 
   ParametersType parameters(initialPosition);
 

@@ -23,6 +23,8 @@
 #include "itkCommand.h"
 #include "ITKOptimizersExport.h"
 
+#include <memory> // For unique_ptr.
+
 namespace itk
 {
 /** \class MultipleValuedNonLinearVnlOptimizer
@@ -45,7 +47,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MultipleValuedNonLinearVnlOptimizer);
 
   /**  ParametersType type alias.
@@ -88,10 +90,11 @@ public:
    * current parameters. For GUI update purposes, this method is a
    * good option, for mathematical validation you should rather call
    * GetValue(). */
+  /** @ITKStartGrouping */
   itkGetConstReferenceMacro(CachedValue, MeasureType);
   itkGetConstReferenceMacro(CachedDerivative, DerivativeType);
   itkGetConstReferenceMacro(CachedCurrentPosition, ParametersType);
-
+  /** @ITKEndGrouping */
 protected:
   MultipleValuedNonLinearVnlOptimizer();
   ~MultipleValuedNonLinearVnlOptimizer() override;
@@ -126,8 +129,8 @@ private:
   void
   IterationReport(const EventObject & event);
 
-  CostFunctionAdaptorType * m_CostFunctionAdaptor{};
-  bool                      m_UseGradient{};
+  std::unique_ptr<CostFunctionAdaptorType> m_CostFunctionAdaptor;
+  bool                                     m_UseGradient{};
 
   CommandType::Pointer m_Command{};
 

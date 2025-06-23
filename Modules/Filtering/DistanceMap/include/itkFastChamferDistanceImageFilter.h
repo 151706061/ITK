@@ -46,7 +46,10 @@ namespace itk
  * Fast and Accurate Redistancing for Level Set Methods
  * `Krissian K. and Westin C.F.',
  * EUROCAST NeuroImaging Workshop Las Palmas Spain,
- * Ninth International Conference on Computer Aided Systems Theory , pages 48-51, Feb 2003.
+ * Ninth International Conference on Computer Aided Systems Theory ,
+ * pages 48-51, Feb 2003.
+ * NOTE: Attribution is incorrect, the manuscript does not appear to be
+ * part of the EUROCAST'03 proceedings (https://doi.org/10.1007/b13239).
  *
  * \ingroup ImageFeatureExtraction
  * \ingroup ITKDistanceMap
@@ -67,7 +70,7 @@ public:
   /** Method for creation through the object factory */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastChamferDistanceImageFilter);
 
   /** Type for input image. */
@@ -106,13 +109,15 @@ public:
   using WeightsType = FixedArray<float, ImageDimension>;
 
   /** coefficients of the Chamfer distance for each kind of neighbor. */
+  /** @ITKStartGrouping */
   itkSetMacro(Weights, WeightsType);
   itkGetConstReferenceMacro(Weights, WeightsType);
-
+  /** @ITKEndGrouping */
   /** Maximal computed distance */
+  /** @ITKStartGrouping */
   itkSetMacro(MaximumDistance, float);
   itkGetConstMacro(MaximumDistance, float);
-
+  /** @ITKEndGrouping */
   /** */
   void
   SetRegionToProcess(const RegionType & r);
@@ -126,8 +131,6 @@ public:
   NarrowBandPointer
   GetNarrowBand() const;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
   itkConceptMacro(SameTypeCheck, (Concept::SameType<PixelType, typename TOutputImage::PixelType>));
   itkConceptMacro(FloatConvertibleToPixelTypeCheck, (Concept::Convertible<float, PixelType>));
@@ -137,8 +140,6 @@ public:
   itkConceptMacro(PixelTypeFloatAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType, float, float>));
   itkConceptMacro(FloatGreaterThanPixelTypeCheck, (Concept::GreaterThanComparable<float, PixelType>));
   itkConceptMacro(FloatLessThanPixelTypeCheck, (Concept::LessThanComparable<float, PixelType>));
-  // End concept checking
-#endif
 
 protected:
   FastChamferDistanceImageFilter();

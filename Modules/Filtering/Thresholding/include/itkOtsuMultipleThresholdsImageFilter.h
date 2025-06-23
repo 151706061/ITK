@@ -39,7 +39,7 @@ namespace itk
  * for the ThresholdLabelerImageFilter.
  *
  * This filter also includes an option to use the valley emphasis algorithm from
- * H.F. Ng, "Automatic thresholding for defect detection", Pattern Recognition Letters, (27): 1644-1649, 2006.
+ * \cite ng2006.
  * The valley emphasis algorithm is particularly effective when the object to be thresholded is small.
  * See the following tests for examples:
  * itkOtsuMultipleThresholdsImageFilterTest3 and itkOtsuMultipleThresholdsImageFilterTest4
@@ -72,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(OtsuMultipleThresholdsImageFilter);
 
   /** Image pixel value type alias. */
@@ -101,28 +101,33 @@ public:
   static constexpr unsigned int OutputImageDimension = TOutputImage::ImageDimension;
 
   /** Set/Get the number of histogram bins. Default is 128. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(NumberOfHistogramBins, SizeValueType, 1, NumericTraits<SizeValueType>::max());
   itkGetConstMacro(NumberOfHistogramBins, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the number of thresholds. Default is 1. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(NumberOfThresholds, SizeValueType, 1, NumericTraits<SizeValueType>::max());
   itkGetConstMacro(NumberOfThresholds, SizeValueType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the offset which labels have to start from. Default is 0. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(LabelOffset, OutputPixelType, OutputPixelType{}, NumericTraits<OutputPixelType>::max());
   itkGetConstMacro(LabelOffset, OutputPixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the use of valley emphasis. Default is false. */
+  /** @ITKStartGrouping */
   itkSetMacro(ValleyEmphasis, bool);
   itkGetConstReferenceMacro(ValleyEmphasis, bool);
   itkBooleanMacro(ValleyEmphasis);
-
+  /** @ITKEndGrouping */
   /** Should the threshold value be mid-point of the bin or the maximum?
    * Default is to return bin maximum. */
+  /** @ITKStartGrouping */
   itkSetMacro(ReturnBinMidpoint, bool);
   itkGetConstReferenceMacro(ReturnBinMidpoint, bool);
   itkBooleanMacro(ReturnBinMidpoint);
-
+  /** @ITKEndGrouping */
   /** Get the computed threshold. */
   const ThresholdVectorType &
   GetThresholds() const
@@ -130,12 +135,8 @@ public:
     return m_Thresholds;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputComparableCheck, (Concept::Comparable<OutputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   OtsuMultipleThresholdsImageFilter();
@@ -155,11 +156,7 @@ private:
   OutputPixelType     m_LabelOffset{};
   ThresholdVectorType m_Thresholds{};
   bool                m_ValleyEmphasis{ false };
-#if defined(ITKV4_COMPATIBILITY)
-  bool m_ReturnBinMidpoint{ true };
-#else
-  bool m_ReturnBinMidpoint{ false };
-#endif
+  bool                m_ReturnBinMidpoint{ false };
 };
 } // end namespace itk
 

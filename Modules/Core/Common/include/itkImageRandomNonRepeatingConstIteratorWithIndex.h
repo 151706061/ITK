@@ -40,16 +40,11 @@ namespace itk
 class NodeOfPermutation
 {
 public:
-  SizeValueType m_Priority;
-  SizeValueType m_Index;
-  double        m_Value;
+  SizeValueType m_Priority{ 0 };
+  SizeValueType m_Index{ 0 };
+  double        m_Value{ 0.0 };
 
-  NodeOfPermutation()
-  {
-    m_Priority = 0;
-    m_Index = 0;
-    m_Value = 0.0;
-  }
+  NodeOfPermutation() = default;
 
   bool
   operator<(const NodeOfPermutation & b) const
@@ -58,10 +53,8 @@ public:
     {
       return m_Value < b.m_Value;
     }
-    else
-    {
-      return m_Priority < b.m_Priority;
-    }
+
+    return m_Priority < b.m_Priority;
   }
 };
 
@@ -78,8 +71,8 @@ public:
   SizeValueType       m_Size;
 
   RandomPermutation(SizeValueType sz)
+    : m_Size(sz)
   {
-    m_Size = sz;
     m_Permutation = new NodeOfPermutation[m_Size];
     m_Generator = Statistics::MersenneTwisterRandomVariateGenerator::New();
     this->Shuffle();
@@ -104,10 +97,8 @@ public:
       ostrm << "Error: RandomPermuation does not have " << i << " elements" << std::endl;
       throw std::runtime_error(ostrm.str());
     }
-    else
-    {
-      m_Permutation[i].m_Priority = priority;
-    }
+
+    m_Permutation[i].m_Priority = priority;
   }
 
   void
@@ -121,7 +112,11 @@ public:
     std::sort(m_Permutation, m_Permutation + m_Size);
   }
 
-  SizeValueType operator[](SizeValueType i) const { return m_Permutation[i].m_Index; }
+  SizeValueType
+  operator[](SizeValueType i) const
+  {
+    return m_Permutation[i].m_Index;
+  }
 
   ~RandomPermutation() { delete[] m_Permutation; }
 
@@ -129,7 +124,7 @@ public:
   void
   ReinitializeSeed() const
   {
-    m_Generator->Initialize();
+    m_Generator->SetSeed();
   }
 
   void
@@ -235,6 +230,7 @@ public:
 
   /** Default constructor. Needed since we provide a cast constructor. */
   ImageRandomNonRepeatingConstIteratorWithIndex() = default;
+
   ~ImageRandomNonRepeatingConstIteratorWithIndex() override { delete m_Permutation; }
 
   /** Constructor establishes an iterator to walk a particular image and a
@@ -248,10 +244,9 @@ public:
    * returns ImageIterators and uses constructors to cast from an
    * ImageIterator to a ImageRandomNonRepeatingConstIteratorWithIndex. */
   ImageRandomNonRepeatingConstIteratorWithIndex(const ImageConstIteratorWithIndex<TImage> & it)
+
   {
     this->ImageConstIteratorWithIndex<TImage>::operator=(it);
-
-    m_Permutation = nullptr;
   }
 
   /** operator= is provided to deep copy m_Permutation. */
@@ -275,14 +270,14 @@ public:
   }
 
   /** Is the iterator at the beginning of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtBegin() const
   {
     return (m_NumberOfSamplesDone == 0L);
   }
 
   /** Is the iterator at the end of the region? */
-  bool
+  [[nodiscard]] bool
   IsAtEnd() const
   {
     return (m_NumberOfSamplesDone >= m_NumberOfSamplesRequested);
@@ -323,6 +318,7 @@ public:
   }
 
   /** Set/Get number of random samples to extract from the image region. */
+  /** @ITKStartGrouping */
   void
   SetNumberOfSamples(SizeValueType number)
   {
@@ -332,12 +328,12 @@ public:
       m_NumberOfSamplesRequested = m_NumberOfPixelsInRegion;
     }
   }
-
-  SizeValueType
+  [[nodiscard]] SizeValueType
   GetNumberOfSamples() const
   {
     return m_NumberOfSamplesRequested;
   }
+  /** @ITKEndGrouping */
 
   /** Reinitialize the seed of the random number generator. */
   void

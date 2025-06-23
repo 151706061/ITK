@@ -26,16 +26,14 @@ namespace itk
 
 template <typename TInternalComputationValueType>
 MultiStartOptimizerv4Template<TInternalComputationValueType>::MultiStartOptimizerv4Template()
-
+  : m_StopCondition(StopConditionObjectToObjectOptimizerEnum::MAXIMUM_NUMBER_OF_ITERATIONS)
+  , m_MaximumMetricValue(NumericTraits<MeasureType>::max())
+  , m_BestParametersIndex(static_cast<ParameterListSizeType>(0))
+  , m_LocalOptimizer(nullptr)
 {
   this->m_NumberOfIterations = static_cast<SizeValueType>(0);
-  this->m_StopCondition = StopConditionObjectToObjectOptimizerEnum::MAXIMUM_NUMBER_OF_ITERATIONS;
   this->m_StopConditionDescription << this->GetNameOfClass() << ": ";
-
-  this->m_BestParametersIndex = static_cast<ParameterListSizeType>(0);
-  this->m_MaximumMetricValue = NumericTraits<MeasureType>::max();
   this->m_MinimumMetricValue = this->m_MaximumMetricValue;
-  m_LocalOptimizer = nullptr;
 }
 
 template <typename TInternalComputationValueType>
@@ -102,7 +100,7 @@ template <typename TInternalComputationValueType>
 void
 MultiStartOptimizerv4Template<TInternalComputationValueType>::InstantiateLocalOptimizer()
 {
-  LocalOptimizerPointer optimizer = LocalOptimizerType::New();
+  const LocalOptimizerPointer optimizer = LocalOptimizerType::New();
   optimizer->SetLearningRate(static_cast<TInternalComputationValueType>(1.e-1));
   optimizer->SetNumberOfIterations(25);
   this->m_LocalOptimizer = optimizer;
@@ -111,7 +109,7 @@ MultiStartOptimizerv4Template<TInternalComputationValueType>::InstantiateLocalOp
 template <typename TInternalComputationValueType>
 auto
 MultiStartOptimizerv4Template<TInternalComputationValueType>::GetStopConditionDescription() const
-  -> const StopConditionReturnStringType
+  -> StopConditionReturnStringType
 {
   return this->m_StopConditionDescription.str();
 }

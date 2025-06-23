@@ -26,7 +26,6 @@ itkCovarianceSampleFilterTest2(int, char *[])
 
   constexpr unsigned int MeasurementVectorSize = 3;
   constexpr unsigned int numberOfMeasurementVectors = 3;
-  unsigned int           counter;
 
   using MeasurementVectorType = itk::FixedArray<float, MeasurementVectorSize>;
   using SampleType = itk::Statistics::ListSample<MeasurementVectorType>;
@@ -38,7 +37,7 @@ itkCovarianceSampleFilterTest2(int, char *[])
   MeasurementVectorType measure;
 
   // reset counter
-  counter = 0;
+  unsigned int counter = 0;
 
   while (counter < numberOfMeasurementVectors)
   {
@@ -86,7 +85,7 @@ itkCovarianceSampleFilterTest2(int, char *[])
 
   meanExpected.Fill(1.0);
 
-  const double epsilon = 1e-4;
+  constexpr double epsilon = 1e-4;
 
   for (unsigned int i = 0; i < MeasurementVectorSize; ++i)
   {

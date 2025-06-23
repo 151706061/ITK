@@ -29,13 +29,13 @@ namespace itk
  *
  * The Gaussian function G(x) is given by
  * \f[
- * G(\vec{x}) = m e^{-\|\S^{-1} \vec{x}\|^2 / 2},
+ * G(\vec{x}) = m e^{-\|S^{-1} \vec{x}\|^2 / 2},
  * \f]
- * where m is a scaling factor set by SetMaximum(), and \f$\S\f$ is the
+ * where m is a scaling factor set by SetMaximum(), and \f$S\f$ is the
  * (invertible) matrix associated to the IndexToObjectTransform of the object
- * multiplied by the Sigma parameter.  If \f$\S\f$ is symmetric and positive
+ * multiplied by the Sigma parameter.  If \f$S\f$ is symmetric and positive
  * definite, and m is chosen so that the integral of G(x) is 1, then G will
- * denote a normal distribution with mean 0 and covariance matrix \f$\S \times
+ * denote a normal distribution with mean 0 and covariance matrix \f$S \times
  * Sigma\f$.
  * \ingroup ITKSpatialObjects
  */
@@ -69,22 +69,25 @@ public:
   /** The Radius determines the bounding box, and which points are
    * considered to be inside the SpatialObject.  All points with
    * z-score less than the radius are in the object.  */
+  /** @ITKStartGrouping */
   itkSetMacro(RadiusInObjectSpace, ScalarType);
   itkGetConstReferenceMacro(RadiusInObjectSpace, ScalarType);
-
+  /** @ITKEndGrouping */
   /** The Sigma parameter determines the fallout of the Gaussian inside of the
    * region defined by the Radius parameter. */
+  /** @ITKStartGrouping */
   itkSetMacro(SigmaInObjectSpace, ScalarType);
   itkGetConstReferenceMacro(SigmaInObjectSpace, ScalarType);
-
+  /** @ITKEndGrouping */
   itkSetMacro(CenterInObjectSpace, PointType);
   itkGetConstReferenceMacro(CenterInObjectSpace, PointType);
 
   /** The maximum value of the Gaussian (its value at the origin of
    * the spatial object coordinate system). */
+  /** @ITKStartGrouping */
   itkSetMacro(Maximum, ScalarType);
   itkGetConstReferenceMacro(Maximum, ScalarType);
-
+  /** @ITKEndGrouping */
   /** Compute the z-score in object space.
    *
    * The z-score is the root mean square of the z-scores along each principal axis.
@@ -117,15 +120,21 @@ public:
                        unsigned int        depth = 0,
                        const std::string & name = "") const override;
 
-  /** Returns the $sigma = $ \c m_Radius level set of the Gaussian function, as an
+  /** Returns the sigma = \c m_Radius level set of the Gaussian function, as an
    * EllipseSpatialObject. */
   typename EllipseSpatialObject<TDimension>::Pointer
   GetEllipsoid() const;
 
 #if !defined(ITK_LEGACY_REMOVE)
-  itkLegacyMacro(void SetSigma(double sigma)) { return this->SetSigmaInObjectSpace(sigma); }
+  itkLegacyMacro(void SetSigma(double sigma))
+  {
+    return this->SetSigmaInObjectSpace(sigma);
+  }
 
-  itkLegacyMacro(double GetSigma() const) { return this->GetSigmaInObjectSpace(); }
+  itkLegacyMacro(double GetSigma() const)
+  {
+    return this->GetSigmaInObjectSpace();
+  }
 #endif
 protected:
   /** This function needs to be called every time one of the object's
@@ -139,7 +148,7 @@ protected:
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 private:

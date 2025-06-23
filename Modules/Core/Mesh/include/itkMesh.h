@@ -139,7 +139,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Standard part of every itk Object. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Mesh);
 
   /** Hold on to the type information specified by the template parameters. */
@@ -168,7 +168,11 @@ public:
 #endif
 
   /** Convenient type alias obtained from TMeshTraits template parameter. */
-  using CoordRepType = typename MeshTraits::CoordRepType;
+  using CoordinateType = typename MeshTraits::CoordinateType;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
   using InterpolationWeightType = typename MeshTraits::InterpolationWeightType;
   using PointIdentifier = typename MeshTraits::PointIdentifier;
   using CellIdentifier = typename MeshTraits::CellIdentifier;
@@ -184,11 +188,11 @@ public:
   using CellDataContainer = typename MeshTraits::CellDataContainer;
 
   /** For improving Python support for Triangle Meshes **/
-  using CellsVectorContainer = typename itk::VectorContainer<IdentifierType, IdentifierType>;
+  using CellsVectorContainer = typename itk::VectorContainer<IdentifierType>;
   using CellsVectorContainerPointer = typename CellsVectorContainer::Pointer;
 
   /** Used to support geometric operations on the toolkit. */
-  using BoundingBoxType = BoundingBox<PointIdentifier, Self::PointDimension, CoordRepType, PointsContainer>;
+  using BoundingBoxType = BoundingBox<PointIdentifier, Self::PointDimension, CoordinateType, PointsContainer>;
 
   /** Create types that are pointers to each of the container types. */
   using PointsContainerPointer = typename PointsContainer::Pointer;
@@ -276,6 +280,7 @@ public:
     {
       return ((m_CellId == r.m_CellId) && (m_FeatureId == r.m_FeatureId));
     }
+
   }; // End Class: Mesh::BoundaryAssignmentIdentifier
 
   /** Used for manipulating boundaries and boundary attributes.  A
@@ -550,6 +555,7 @@ public:
    */
   bool
   GetAssignedCellBoundaryIfOneExists(int dimension, CellIdentifier, CellFeatureIdentifier, CellAutoPointer &) const;
+
   /** Dynamically build the links from points back to their using cells.  This
    * information is stored in the cell links container, not in the points. */
   void
@@ -567,16 +573,18 @@ public:
       \warning Failure to call this method correctly will lead to memory leaks
       and/or segmentation faults because the cell memory will not be erased or
       will be erased with an improper method.  */
+  /** @ITKStartGrouping */
   itkSetMacro(CellsAllocationMethod, MeshClassCellsAllocationMethodEnum);
   itkGetConstReferenceMacro(CellsAllocationMethod, MeshClassCellsAllocationMethodEnum);
-
+  /** @ITKEndGrouping */
 protected:
   /** Constructor for use by New() method. */
+  /** @ITKStartGrouping */
   Mesh();
   ~Mesh() override;
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
-
+  /** @ITKEndGrouping */
   /** Release the memory allocated for the cells pointers. This is done
    *  based on information provided by the user through the method
    *  SetCellsAllocationMethod().

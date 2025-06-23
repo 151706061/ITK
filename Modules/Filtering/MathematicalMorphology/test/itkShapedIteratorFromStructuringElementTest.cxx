@@ -22,13 +22,11 @@ using LocalImageType = itk::Image<int, 2>;
 void
 CreateImagex(LocalImageType::Pointer & image)
 {
-  LocalImageType::IndexType start;
-  start.Fill(0);
+  constexpr LocalImageType::IndexType start{};
 
-  LocalImageType::SizeType size;
-  size.Fill(10);
+  auto size = LocalImageType::SizeType::Filled(10);
 
-  LocalImageType::RegionType region(start, size);
+  const LocalImageType::RegionType region(start, size);
 
   image->SetRegions(region);
   image->AllocateInitialized();
@@ -44,8 +42,7 @@ itkShapedIteratorFromStructuringElementTest(int, char *[])
   CreateImagex(image);
 
   using StructuringElementType = itk::BinaryBallStructuringElement<PixelType, 2>;
-  StructuringElementType::RadiusType elementRadius;
-  elementRadius.Fill(2);
+  auto elementRadius = itk::MakeFilled<StructuringElementType::RadiusType>(2);
 
   StructuringElementType structuringElement;
   structuringElement.SetRadius(elementRadius);
@@ -74,7 +71,7 @@ itkShapedIteratorFromStructuringElementTest(int, char *[])
   unsigned int col = 0;
   while (!imit.IsAtEnd())
   {
-    PixelType value = imit.Get();
+    const PixelType value = imit.Get();
     ++imit;
     ++col;
     std::cout << value << ' ';

@@ -44,29 +44,29 @@ namespace itk
  * scalar images use LinearInterpolateImageFunction.
  *
  * This paper was contributed in the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/154
+ * https://doi.org/10.54294/ux2obj
  *
  * \ingroup ImageFunctions ImageInterpolators
  * \ingroup ITKImageFunction
  *
  */
-template <typename TInputImage, typename TCoordRep = float>
+template <typename TInputImage, typename TCoordinate = float>
 class ITK_TEMPLATE_EXPORT VectorLinearInterpolateNearestNeighborExtrapolateImageFunction
-  : public VectorInterpolateImageFunction<TInputImage, TCoordRep>
+  : public VectorInterpolateImageFunction<TInputImage, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(VectorLinearInterpolateNearestNeighborExtrapolateImageFunction);
 
   /** Standard class type aliases. */
   using Self = VectorLinearInterpolateNearestNeighborExtrapolateImageFunction;
-  using Superclass = VectorInterpolateImageFunction<TInputImage, TCoordRep>;
+  using Superclass = VectorInterpolateImageFunction<TInputImage, TCoordinate>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorLinearInterpolateNearestNeighborExtrapolateImageFunction);
 
   /** InputImageType type alias support */

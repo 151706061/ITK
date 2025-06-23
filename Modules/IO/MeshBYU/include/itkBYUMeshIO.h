@@ -52,7 +52,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BYUMeshIO);
 
   /*-------- This part of the interfaces deals with reading data. ----- */
@@ -118,7 +118,7 @@ protected:
   void
   WritePoints(T * buffer, std::ofstream & outputFile)
   {
-    Indent        indent(1);
+    const Indent  indent(1);
     SizeValueType index{};
 
     for (SizeValueType ii = 0; ii < this->m_NumberOfPoints; ++ii)
@@ -136,7 +136,7 @@ protected:
   void
   WriteCells(T * buffer, std::ofstream & outputFile)
   {
-    Indent        indent(7);
+    const Indent  indent(7);
     SizeValueType index{};
 
     for (SizeValueType ii = 0; ii < this->m_NumberOfCells; ++ii)

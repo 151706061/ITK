@@ -18,6 +18,7 @@
 
 #include "itkQuadEdgeMeshEulerOperatorSplitEdgeFunction.h"
 #include "itkQuadEdgeMeshEulerOperatorsTestHelper.h"
+#include "itkTestingMacros.h"
 
 int
 itkQuadEdgeMeshEulerOperatorSplitEdgeTest(int, char *[])
@@ -35,20 +36,21 @@ itkQuadEdgeMeshEulerOperatorSplitEdgeTest(int, char *[])
   //
   /////////////////////////////////////////
   std::cout << "Checking SplitEdge." << std::endl;
-  MeshPointer mesh = MeshType::New();
+  const MeshPointer mesh = MeshType::New();
   CreateSquareTriangularMesh<MeshType>(mesh);
 
   auto splitEdge = SplitEdge::New();
   std::cout << "     "
             << "Test No Mesh Input";
-  if (splitEdge->Evaluate((QEType *)1))
+  if (splitEdge->Evaluate((QEType *)nullptr))
   {
     std::cout << "FAILED." << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "OK" << std::endl;
 
-  (void)splitEdge->GetNameOfClass();
+  ITK_TEST_EXPECT_EQUAL(std::string_view("QuadEdgeMeshEulerOperatorSplitEdgeFunction"),
+                        std::string_view(splitEdge->GetNameOfClass()));
 
   splitEdge->SetInput(mesh);
   std::cout << "     "

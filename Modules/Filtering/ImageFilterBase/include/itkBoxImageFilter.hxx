@@ -43,9 +43,7 @@ template <typename TInputImage, typename TOutputImage>
 void
 BoxImageFilter<TInputImage, TOutputImage>::SetRadius(const RadiusValueType & radius)
 {
-  RadiusType rad;
-
-  rad.Fill(radius);
+  auto rad = MakeFilled<RadiusType>(radius);
   this->SetRadius(rad);
 }
 
@@ -57,7 +55,7 @@ BoxImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
+  const typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
 
   if (!inputPtr)
   {
@@ -66,8 +64,7 @@ BoxImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
 
   // get a copy of the input requested region (should equal the output
   // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
+  typename TInputImage::RegionType inputRequestedRegion = inputPtr->GetRequestedRegion();
 
   // pad the input requested region by the operator radius
   inputRequestedRegion.PadByRadius(m_Radius);
@@ -78,23 +75,21 @@ BoxImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
     inputPtr->SetRequestedRegion(inputRequestedRegion);
     return;
   }
-  else
-  {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
 
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion(inputRequestedRegion);
+  // Couldn't crop the region (requested region is outside the largest
+  // possible region).  Throw an exception.
 
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    std::ostringstream          msg;
-    msg << static_cast<const char *>(this->GetNameOfClass()) << "::GenerateInputRequestedRegion()";
-    e.SetLocation(msg.str().c_str());
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-  }
+  // store what we tried to request (prior to trying to crop)
+  inputPtr->SetRequestedRegion(inputRequestedRegion);
+
+  // build an exception
+  InvalidRequestedRegionError e(__FILE__, __LINE__);
+  std::ostringstream          msg;
+  msg << static_cast<const char *>(this->GetNameOfClass()) << "::GenerateInputRequestedRegion()";
+  e.SetLocation(msg.str().c_str());
+  e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
+  e.SetDataObject(inputPtr);
+  throw e;
 }
 
 template <typename TInputImage, typename TOutputImage>

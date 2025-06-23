@@ -82,7 +82,7 @@ public:
   using typename Superclass::OffsetType;
   using SpacingType = Vector<double, TDimension>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AnnulusOperator);
 
   /** Create the operator. The radius of the operator is determined automatically. */
@@ -91,52 +91,56 @@ public:
 
   /** Set/Get the inner radius of the annulus. Radius is specified in
    * physical units (mm). */
+  /** @ITKStartGrouping */
   void
   SetInnerRadius(double r)
   {
     m_InnerRadius = r;
   }
-  double
+  [[nodiscard]] double
   GetInnerRadius() const
   {
     return m_InnerRadius;
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the thickness of the annulus.  The outer radius of the
    * annulus is defined as r = InnerRadius + Thickness. Thickness is
    * specified in physical units (mm). */
+  /** @ITKStartGrouping */
   void
   SetThickness(double t)
   {
     m_Thickness = t;
   }
-  double
+  [[nodiscard]] double
   GetThickness() const
   {
     return m_Thickness;
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get the pixel spacings.  Setting these ensures the annulus
    * is round in physical space. Defaults to 1. */
+  /** @ITKStartGrouping */
   void
   SetSpacing(SpacingType & s)
   {
     m_Spacing = s;
   }
-  const SpacingType &
+  [[nodiscard]] const SpacingType &
   GetSpacing() const
   {
     return m_Spacing;
   }
-
+  /** @ITKEndGrouping */
   /** Set/Get whether kernel values are computed automatically or
    * specified manually */
+  /** @ITKStartGrouping */
   void
   SetNormalize(bool b)
   {
     m_Normalize = b;
   }
-  bool
+  [[nodiscard]] bool
   GetNormalize() const
   {
     return m_Normalize;
@@ -151,15 +155,16 @@ public:
   {
     this->SetNormalize(false);
   }
-
+  /** @ITKEndGrouping */
   /** If Normalize is on, you define the annulus to have a bright
    * center or a dark center. */
+  /** @ITKStartGrouping */
   void
   SetBrightCenter(bool b)
   {
     m_BrightCenter = b;
   }
-  bool
+  [[nodiscard]] bool
   GetBrightCenter() const
   {
     return m_BrightCenter;
@@ -174,17 +179,18 @@ public:
   {
     this->SetBrightCenter(false);
   }
-
+  /** @ITKEndGrouping */
   /** If Normalize is off, the interior to annulus, the
    * annulus (region between the two circles), and the region exterior to the
    * annulus to be defined manually.  Defaults are 0, 1, 0
    * respectively. */
+  /** @ITKStartGrouping */
   void
   SetInteriorValue(TPixel v)
   {
     m_InteriorValue = v;
   }
-  TPixel
+  [[nodiscard]] TPixel
   GetInteriorValue() const
   {
     return m_InteriorValue;
@@ -194,7 +200,7 @@ public:
   {
     m_AnnulusValue = v;
   }
-  TPixel
+  [[nodiscard]] TPixel
   GetAnnulusValue() const
   {
     return m_AnnulusValue;
@@ -204,12 +210,12 @@ public:
   {
     m_ExteriorValue = v;
   }
-  TPixel
+  [[nodiscard]] TPixel
   GetExteriorValue() const
   {
     return m_ExteriorValue;
   }
-
+  /** @ITKEndGrouping */
   void
   PrintSelf(std::ostream & os, Indent indent) const override
   {

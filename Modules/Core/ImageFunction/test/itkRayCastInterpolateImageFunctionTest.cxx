@@ -36,15 +36,13 @@ itkRayCastInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
 
   using IndexType = ImageType::IndexType;
   using PointType = ImageType::PointType;
-  using SpacingType = ImageType::SpacingType;
   using SizeType = ImageType::SizeType;
   using RegionType = ImageType::RegionType;
 
   /* Allocate a simple test image */
-  auto      image = ImageType::New();
-  IndexType start;
-  start.Fill(0);
-  SizeType size;
+  auto                image = ImageType::New();
+  constexpr IndexType start{};
+  SizeType            size;
   size[0] = 30;
   size[1] = 30;
   size[2] = 30;
@@ -54,16 +52,6 @@ itkRayCastInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
   region.SetSize(size);
   image->SetRegions(region);
   image->Allocate();
-
-  PointType origin;
-  origin.Fill(0.0);
-
-  SpacingType spacing;
-  spacing.Fill(1.0);
-
-  /* Set origin and spacing of physical coordinates */
-  image->SetOrigin(origin);
-  image->SetSpacing(spacing);
 
   /* Initialize the image contents */
   IndexType index;
@@ -76,7 +64,7 @@ itkRayCastInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
       for (unsigned int col = 0; col < size[0]; ++col)
       {
         index[0] = col;
-        auto value = (PixelType)(slice + row + col);
+        auto value = static_cast<PixelType>(slice + row + col);
         image->SetPixel(index, value);
       }
     }
@@ -121,12 +109,11 @@ itkRayCastInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
   ITK_TEST_SET_GET_VALUE(auxInterpolator, interp->GetInterpolator());
 
   /* Exercise the SetThreshold() method */
-  double threshold = 1.0;
+  constexpr double threshold = 1.0;
   interp->SetThreshold(threshold);
   ITK_TEST_SET_GET_VALUE(threshold, interp->GetThreshold());
 
   /* Evaluate the function */
-  double integral;
 
 
   // Evaluate the ray casting function at the same point as the focal point:
@@ -134,7 +121,7 @@ itkRayCastInterpolateImageFunctionTest(int itkNotUsed(argc), char * itkNotUsed(a
   //   - Makes the ray be invalid.
   //   - Sets the traversal direction to TraversalDirectionEnum::UNDEFINED_DIRECTION
   //   - The integral should equal to 0.
-  integral = interp->Evaluate(focus);
+  double integral = interp->Evaluate(focus);
   ITK_TEST_EXPECT_TRUE(itk::Math::FloatAlmostEqual(integral, 0.0));
 
   PointType query;

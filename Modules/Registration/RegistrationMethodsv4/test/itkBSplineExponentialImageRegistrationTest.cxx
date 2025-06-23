@@ -58,8 +58,8 @@ public:
       return;
     }
 
-    unsigned int                                             currentLevel = filter->GetCurrentLevel();
-    typename TFilter::ShrinkFactorsPerDimensionContainerType shrinkFactors =
+    const unsigned int                                             currentLevel = filter->GetCurrentLevel();
+    const typename TFilter::ShrinkFactorsPerDimensionContainerType shrinkFactors =
       filter->GetShrinkFactorsPerDimension(currentLevel);
     typename TFilter::SmoothingSigmasArrayType                 smoothingSigmas = filter->GetSmoothingSigmasPerLevel();
     typename TFilter::TransformParametersAdaptorsContainerType adaptors =
@@ -67,7 +67,7 @@ public:
 
     const itk::ObjectToObjectOptimizerBase * optimizerBase = filter->GetOptimizer();
     using GradientDescentOptimizerv4Type = itk::GradientDescentOptimizerv4;
-    typename GradientDescentOptimizerv4Type::ConstPointer optimizer =
+    const typename GradientDescentOptimizerv4Type::ConstPointer optimizer =
       dynamic_cast<const GradientDescentOptimizerv4Type *>(optimizerBase);
     if (!optimizer)
     {
@@ -130,14 +130,14 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
   auto fixedImageReader = ImageReaderType::New();
   fixedImageReader->SetFileName(argv[2]);
   fixedImageReader->Update();
-  typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const typename FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   fixedImage->Update();
   fixedImage->DisconnectPipeline();
 
   auto movingImageReader = ImageReaderType::New();
   movingImageReader->SetFileName(argv[3]);
   movingImageReader->Update();
-  typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const typename MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
   movingImage->Update();
   movingImage->DisconnectPipeline();
 
@@ -160,7 +160,7 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
   }
 
   using GradientDescentOptimizerv4Type = itk::GradientDescentOptimizerv4;
-  typename GradientDescentOptimizerv4Type::Pointer affineOptimizer =
+  const typename GradientDescentOptimizerv4Type::Pointer affineOptimizer =
     dynamic_cast<GradientDescentOptimizerv4Type *>(affineSimple->GetModifiableOptimizer());
   if (!affineOptimizer)
   {
@@ -181,7 +181,7 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
 
   {
     using ImageMetricType = itk::ImageToImageMetricv4<FixedImageType, MovingImageType>;
-    typename ImageMetricType::Pointer imageMetric =
+    const typename ImageMetricType::Pointer imageMetric =
       dynamic_cast<ImageMetricType *>(affineSimple->GetModifiableMetric());
     if (imageMetric.IsNull())
     {
@@ -196,7 +196,7 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
 
   {
     using ImageMetricType = itk::ImageToImageMetricv4<FixedImageType, MovingImageType>;
-    typename ImageMetricType::Pointer imageMetric =
+    const typename ImageMetricType::Pointer imageMetric =
       dynamic_cast<ImageMetricType *>(affineOptimizer->GetModifiableMetric());
     std::cout << "Affine parameters after registration: " << std::endl
               << affineOptimizer->GetCurrentPosition() << std::endl
@@ -230,16 +230,14 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
 
   using DisplacementFieldRegistrationType =
     itk::ImageRegistrationMethodv4<FixedImageType, MovingImageType, DisplacementFieldTransformType>;
-  typename DisplacementFieldRegistrationType::Pointer displacementFieldSimple =
+  const typename DisplacementFieldRegistrationType::Pointer displacementFieldSimple =
     DisplacementFieldRegistrationType::New();
 
   auto fieldTransform = DisplacementFieldTransformType::New();
 
-  typename DisplacementFieldTransformType::ArrayType updateControlPoints;
-  updateControlPoints.Fill(10);
+  auto updateControlPoints = itk::MakeFilled<typename DisplacementFieldTransformType::ArrayType>(10);
 
-  typename DisplacementFieldTransformType::ArrayType velocityControlPoints;
-  velocityControlPoints.Fill(10);
+  auto velocityControlPoints = itk::MakeFilled<typename DisplacementFieldTransformType::ArrayType>(10);
 
   fieldTransform->SetNumberOfControlPointsForTheUpdateField(updateControlPoints);
   fieldTransform->SetNumberOfControlPointsForTheConstantVelocityField(velocityControlPoints);
@@ -250,9 +248,8 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
   displacementFieldSimple->InPlaceOn();
 
   using CorrelationMetricType = itk::ANTSNeighborhoodCorrelationImageToImageMetricv4<FixedImageType, MovingImageType>;
-  auto                                       correlationMetric = CorrelationMetricType::New();
-  typename CorrelationMetricType::RadiusType radius;
-  radius.Fill(4);
+  auto correlationMetric = CorrelationMetricType::New();
+  auto radius = itk::MakeFilled<typename CorrelationMetricType::RadiusType>(4);
   correlationMetric->SetRadius(radius);
   correlationMetric->SetUseMovingImageGradientFilter(false);
   correlationMetric->SetUseFixedImageGradientFilter(false);
@@ -319,7 +316,7 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
     shrinkFilter->SetInput(displacementField);
     shrinkFilter->Update();
 
-    typename DisplacementFieldTransformAdaptorType::Pointer fieldTransformAdaptor =
+    const typename DisplacementFieldTransformAdaptorType::Pointer fieldTransformAdaptor =
       DisplacementFieldTransformAdaptorType::New();
     fieldTransformAdaptor->SetRequiredSpacing(shrinkFilter->GetOutput()->GetSpacing());
     fieldTransformAdaptor->SetRequiredSize(shrinkFilter->GetOutput()->GetBufferedRegion().GetSize());
@@ -331,7 +328,7 @@ PerformBSplineExpImageRegistration(int argc, char * argv[])
   displacementFieldSimple->SetTransformParametersAdaptorsPerLevel(adaptors);
 
   using DisplacementFieldRegistrationCommandType = CommandIterationUpdate<DisplacementFieldRegistrationType>;
-  typename DisplacementFieldRegistrationCommandType::Pointer displacementFieldObserver =
+  const typename DisplacementFieldRegistrationCommandType::Pointer displacementFieldObserver =
     DisplacementFieldRegistrationCommandType::New();
   displacementFieldSimple->AddObserver(itk::IterationEvent(), displacementFieldObserver);
 

@@ -43,11 +43,8 @@ namespace itk
  *
  * \author Nicholas J. Tustison
  *
- * This code was contributed in the Insight Journal paper:
- * "N-D C^k B-Spline Scattered Data Approximation"
- * by Nicholas J. Tustison, James C. Gee
- * https://www.insight-journal.org/browse/publication/57
- *
+ * This code was contributed in the Insight Journal paper
+ * \cite Tustison_2005.
  *
  * \sa KernelFunctionBase
  *
@@ -70,7 +67,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CoxDeBoorBSplineKernelFunction);
 
   using VectorType = vnl_vector<TRealValueType>;
@@ -128,8 +125,7 @@ private:
   /**
    * Use the CoxDeBoor recursion relation to generate the piecewise
    * polynomials which compose the basis function.
-   * See, for example, L. Piegl, L. Tiller, "The NURBS Book,"
-   * Springer 1997, p. 50.
+   * See, for example, \cite piegl1997 p. 50.
    */
   PolynomialType
   CoxDeBoor(const unsigned short, const VectorType, const unsigned int, const unsigned int);

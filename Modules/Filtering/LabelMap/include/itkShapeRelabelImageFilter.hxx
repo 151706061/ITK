@@ -24,11 +24,9 @@ namespace itk
 {
 template <typename TInputImage>
 ShapeRelabelImageFilter<TInputImage>::ShapeRelabelImageFilter()
-{
-  m_BackgroundValue = NumericTraits<OutputImagePixelType>::NonpositiveMin();
-  m_ReverseOrdering = false;
-  m_Attribute = LabelObjectType::NUMBER_OF_PIXELS;
-}
+  : m_BackgroundValue(NumericTraits<OutputImagePixelType>::NonpositiveMin())
+  , m_Attribute(LabelObjectType::NUMBER_OF_PIXELS)
+{}
 
 template <typename TInputImage>
 void
@@ -38,7 +36,7 @@ ShapeRelabelImageFilter<TInputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());

@@ -68,7 +68,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetMotionRegistrationFunction);
 
   /** MovingImage image type. */
@@ -98,11 +98,15 @@ public:
   using typename Superclass::TimeStepType;
 
   /** Interpolator type. */
-  using CoordRepType = double;
-  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordRepType>;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
+  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
   using PointType = typename InterpolatorType::PointType;
-  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordRepType>;
+  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordinateType>;
 
   /** Vector types. */
   using VectorType = Vector<double, Self::ImageDimension>;
@@ -167,7 +171,7 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images. */
+   * computed over the overlapping region between the two images. */
   virtual double
   GetMetric() const
   {
@@ -284,7 +288,7 @@ private:
   /** Mutex lock to protect modification to metric. */
   mutable std::mutex m_MetricCalculationMutex{};
 
-  bool m_UseImageSpacing{};
+  bool m_UseImageSpacing{ true };
 };
 } // end namespace itk
 

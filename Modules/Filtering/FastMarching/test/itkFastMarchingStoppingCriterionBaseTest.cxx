@@ -36,15 +36,15 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastMarchingStoppingCriterionBaseHelperTest);
 
-  bool
+  [[nodiscard]] bool
   IsSatisfied() const override
   {
     return true;
   }
-  std::string
+  [[nodiscard]] std::string
   GetDescription() const override
   {
     return "Description";

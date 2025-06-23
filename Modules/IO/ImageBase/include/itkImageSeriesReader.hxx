@@ -30,22 +30,6 @@
 
 namespace itk
 {
-// Destructor
-template <typename TOutputImage>
-ImageSeriesReader<TOutputImage>::~ImageSeriesReader()
-{
-  // Clear the eventual previous content of the MetaDictionary array
-  if (!m_MetaDataDictionaryArray.empty())
-  {
-    for (auto & i : m_MetaDataDictionaryArray)
-    {
-      // each element is a raw pointer, delete them.
-      delete i;
-    }
-  }
-  m_MetaDataDictionaryArray.clear();
-}
-
 template <typename TOutputImage>
 void
 ImageSeriesReader<TOutputImage>::PrintSelf(std::ostream & os, Indent indent) const
@@ -55,6 +39,11 @@ ImageSeriesReader<TOutputImage>::PrintSelf(std::ostream & os, Indent indent) con
   os << indent << "ReverseOrder: " << m_ReverseOrder << std::endl;
   os << indent << "ForceOrthogonalDirection: " << m_ForceOrthogonalDirection << std::endl;
   os << indent << "UseStreaming: " << m_UseStreaming << std::endl;
+  os << indent << "FileNames:" << std::endl;
+  for (const auto & fileName : m_FileNames)
+  {
+    os << indent.GetNextIndent() << fileName << std::endl;
+  }
 
   itkPrintSelfObjectMacro(ImageIO);
 
@@ -66,7 +55,7 @@ template <typename TOutputImage>
 int
 ImageSeriesReader<TOutputImage>::ComputeMovingDimensionIndex(ReaderType * reader)
 {
-  // This method computes the the dimension index which we are going
+  // This method computes the dimension index which we are going
   // to be moving in for slices
 
   unsigned int movingDimension = reader->GetImageIO()->GetNumberOfDimensions();
@@ -93,26 +82,17 @@ template <typename TOutputImage>
 void
 ImageSeriesReader<TOutputImage>::GenerateOutputInformation()
 {
-  typename TOutputImage::Pointer output = this->GetOutput();
+  const typename TOutputImage::Pointer output = this->GetOutput();
 
   using SpacingScalarType = typename TOutputImage::SpacingValueType;
-  Array<SpacingScalarType> position1(TOutputImage::ImageDimension);
-  position1.Fill(0.0f);
-  Array<SpacingScalarType> positionN(TOutputImage::ImageDimension);
-  positionN.Fill(0.0f);
+  Array<SpacingScalarType> position1(TOutputImage::ImageDimension, 0.0f);
+  Array<SpacingScalarType> positionN(TOutputImage::ImageDimension, 0.0f);
 
-  std::string key("ITK_ImageOrigin");
+  const std::string key("ITK_ImageOrigin");
 
   // Clear the previous content of the MetaDictionary array
-  if (!m_MetaDataDictionaryArray.empty())
-  {
-    for (auto & i : m_MetaDataDictionaryArray)
-    {
-      // each element is a raw pointer, delete them.
-      delete i;
-    }
-  }
   m_MetaDataDictionaryArray.clear();
+  m_InternalMetaDataDictionaries.clear();
 
   const auto numberOfFiles = static_cast<int>(m_FileNames.size());
   if (numberOfFiles == 0)
@@ -172,8 +152,7 @@ ImageSeriesReader<TOutputImage>::GenerateOutputInformation()
     largestRegion.SetIndex({ { 0 } });
 
     // Initialize the position to the origin returned by the reader
-    unsigned int j;
-    for (j = 0; j < TOutputImage::ImageDimension; ++j)
+    for (unsigned int j = 0; j < TOutputImage::ImageDimension; ++j)
     {
       position1[j] = static_cast<SpacingScalarType>(origin[j]);
     }
@@ -186,7 +165,7 @@ ImageSeriesReader<TOutputImage>::GenerateOutputInformation()
     const TOutputImage * last = lastReader->GetOutput();
 
     // Initialize the position to the origin returned by the reader
-    for (j = 0; j < TOutputImage::ImageDimension; ++j)
+    for (unsigned int j = 0; j < TOutputImage::ImageDimension; ++j)
     {
       positionN[j] = static_cast<SpacingScalarType>(last->GetOrigin()[j]);
     }
@@ -196,11 +175,11 @@ ImageSeriesReader<TOutputImage>::GenerateOutputInformation()
     // Compute and set the inter slice spacing
     // and last (usually third) axis of direction
     Vector<SpacingScalarType, TOutputImage::ImageDimension> dirN;
-    for (j = 0; j < TOutputImage::ImageDimension; ++j)
+    for (unsigned int j = 0; j < TOutputImage::ImageDimension; ++j)
     {
       dirN[j] = positionN[j] - position1[j];
     }
-    SpacingScalarType dirNnorm = dirN.GetNorm();
+    const SpacingScalarType dirNnorm = dirN.GetNorm();
     if (Math::AlmostEquals(dirNnorm, 0.0))
     {
       spacing[this->m_NumberOfDimensionsInImage] = 1.0;
@@ -212,7 +191,7 @@ ImageSeriesReader<TOutputImage>::GenerateOutputInformation()
       this->m_SpacingDefined = true;
       if (!m_ForceOrthogonalDirection)
       {
-        for (j = 0; j < TOutputImage::ImageDimension; ++j)
+        for (unsigned int j = 0; j < TOutputImage::ImageDimension; ++j)
         {
           direction[j][this->m_NumberOfDimensionsInImage] = dirN[j] / dirNnorm;
         }
@@ -237,9 +216,9 @@ template <typename TOutputImage>
 void
 ImageSeriesReader<TOutputImage>::EnlargeOutputRequestedRegion(DataObject * output)
 {
-  typename TOutputImage::Pointer out = dynamic_cast<TOutputImage *>(output);
-  ImageRegionType                requestedRegion = out->GetRequestedRegion();
-  ImageRegionType                largestRegion = out->GetLargestPossibleRegion();
+  const typename TOutputImage::Pointer out = dynamic_cast<TOutputImage *>(output);
+  const ImageRegionType                requestedRegion = out->GetRequestedRegion();
+  const ImageRegionType                largestRegion = out->GetLargestPossibleRegion();
 
   if (m_UseStreaming)
   {
@@ -257,9 +236,9 @@ ImageSeriesReader<TOutputImage>::GenerateData()
 {
   TOutputImage * output = this->GetOutput();
 
-  ImageRegionType requestedRegion = output->GetRequestedRegion();
-  ImageRegionType largestRegion = output->GetLargestPossibleRegion();
-  ImageRegionType sliceRegionToRequest = output->GetRequestedRegion();
+  const ImageRegionType requestedRegion = output->GetRequestedRegion();
+  const ImageRegionType largestRegion = output->GetLargestPossibleRegion();
+  ImageRegionType       sliceRegionToRequest = output->GetRequestedRegion();
 
   // Each file must have the same size.
   SizeType validSize = largestRegion.GetSize();
@@ -299,6 +278,8 @@ ImageSeriesReader<TOutputImage>::GenerateData()
   typename TOutputImage::SpacingType outputSpacing = output->GetSpacing();
   double                             maxSpacingDeviation = 0.0;
   bool                               prevSliceIsValid = false;
+
+  m_InternalMetaDataDictionaries.reserve(static_cast<size_t>(numberOfFiles));
 
   for (int i = 0; i != numberOfFiles; ++i)
   {
@@ -356,7 +337,7 @@ ImageSeriesReader<TOutputImage>::GenerateData()
       }
 
       // get the size of the region to be read
-      SizeType readSize = readerOutput->GetRequestedRegion().GetSize();
+      const SizeType readSize = readerOutput->GetRequestedRegion().GetSize();
 
       if (readSize == sliceRegionToRequest.GetSize())
       {
@@ -429,7 +410,7 @@ ImageSeriesReader<TOutputImage>::GenerateData()
         {
           dirN[j] = static_cast<SpacingScalarType>(sliceOrigin[j]) - static_cast<SpacingScalarType>(prevSliceOrigin[j]);
         }
-        SpacingScalarType dirNnorm = dirN.GetNorm();
+        const SpacingScalarType dirNnorm = dirN.GetNorm();
 
         if (this->m_SpacingDefined &&
             !Math::AlmostEquals(
@@ -460,17 +441,23 @@ ImageSeriesReader<TOutputImage>::GenerateData()
     // Deep copy the MetaDataDictionary into the array
     if (reader->GetImageIO() && needToUpdateMetaDataDictionaryArray)
     {
-      auto newDictionary = new DictionaryType;
-      *newDictionary = reader->GetImageIO()->GetMetaDataDictionary();
+      MetaDataDictionary newDictionary = reader->GetImageIO()->GetMetaDataDictionary();
       if (nonUniformSampling)
       {
         // slice-specific information
-        EncapsulateMetaData<double>(*newDictionary, "ITK_non_uniform_sampling_deviation", spacingDeviation);
+        EncapsulateMetaData<double>(newDictionary, "ITK_non_uniform_sampling_deviation", spacingDeviation);
       }
-      m_MetaDataDictionaryArray.push_back(newDictionary);
+      m_InternalMetaDataDictionaries.push_back(std::move(newDictionary));
     }
   } // end per slice loop
 
+  m_MetaDataDictionaryArray.clear();
+  m_MetaDataDictionaryArray.reserve(m_InternalMetaDataDictionaries.size());
+
+  for (MetaDataDictionary & dictionary : m_InternalMetaDataDictionaries)
+  {
+    m_MetaDataDictionaryArray.push_back(&dictionary);
+  }
 
   if (TOutputImage::ImageDimension != this->m_NumberOfDimensionsInImage &&
       maxSpacingDeviation > m_SpacingWarningRelThreshold * outputSpacing[this->m_NumberOfDimensionsInImage])

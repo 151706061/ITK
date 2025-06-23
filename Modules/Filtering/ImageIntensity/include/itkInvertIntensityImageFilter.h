@@ -34,7 +34,9 @@ class ITK_TEMPLATE_EXPORT InvertIntensityTransform
 {
 public:
   using RealType = typename NumericTraits<TInput>::RealType;
-  InvertIntensityTransform() { m_Maximum = NumericTraits<TInput>::max(); }
+  InvertIntensityTransform()
+    : m_Maximum(NumericTraits<TInput>::max())
+  {}
   ~InvertIntensityTransform() = default;
 
   void
@@ -111,13 +113,14 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InvertIntensityImageFilter);
 
   /** Set/Get the maximum intensity value for the inversion. */
+  /** @ITKStartGrouping */
   itkSetMacro(Maximum, InputPixelType);
   itkGetConstReferenceMacro(Maximum, InputPixelType);
-
+  /** @ITKEndGrouping */
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
@@ -125,11 +128,7 @@ public:
   void
   BeforeThreadedGenerateData() override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   InvertIntensityImageFilter();

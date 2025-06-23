@@ -52,7 +52,7 @@ DOMNodeXMLWriter::Update(std::ostream & os, std::string indent)
   os << indent << '<' << input->GetName();
 
   // write the "id" attribute if it is present
-  std::string id = input->GetID();
+  const std::string id = input->GetID();
   if (!id.empty())
   {
     os << " id=\"" << id << '"';
@@ -101,7 +101,7 @@ DOMNodeXMLWriter::Update()
   std::ofstream os(this->m_FileName.c_str());
   if (!os.is_open())
   {
-    itkExceptionMacro("failed openning the output XML file");
+    itkExceptionMacro("failed opening the output XML file");
   }
 
   this->Update(os);

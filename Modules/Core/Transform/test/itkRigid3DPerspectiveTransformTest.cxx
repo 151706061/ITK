@@ -28,7 +28,7 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
 
   using TransformType = itk::Rigid3DPerspectiveTransform<double>;
 
-  const double           epsilon = 1e-10;
+  constexpr double       epsilon = 1e-10;
   constexpr unsigned int N = 3;
 
   constexpr double focal = 100.0;
@@ -39,15 +39,14 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
   {
     auto transform = TransformType::New();
 
-    typename TransformType::InputVectorType vector = itk::MakeVector(1.0, 4.0, 9.0);
+    const typename TransformType::InputVectorType vector = itk::MakeVector(1.0, 4.0, 9.0);
     ITK_TRY_EXPECT_EXCEPTION(transform->TransformVector(vector));
 
     typename TransformType::InputVnlVectorType vnlVector;
     vnlVector.fill(1.0);
     ITK_TRY_EXPECT_EXCEPTION(transform->TransformVector(vnlVector));
 
-    typename TransformType::InputCovariantVectorType covVector;
-    covVector.Fill(1.0);
+    auto covVector = itk::MakeFilled<typename TransformType::InputCovariantVectorType>(1.0);
     ITK_TRY_EXPECT_EXCEPTION(transform->TransformCovariantVector(covVector));
 
     auto                                         point = itk::MakeFilled<typename TransformType::InputPointType>(1.0);
@@ -62,21 +61,17 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
     ITK_EXERCISE_BASIC_OBJECT_METHODS(transform, Rigid3DPerspectiveTransform, Transform);
 
 
-    typename TransformType::OffsetType fixedOffset;
-    fixedOffset.Fill(0);
+    constexpr typename TransformType::OffsetType fixedOffset{};
 
     transform->SetFixedOffset(fixedOffset);
     ITK_TEST_SET_GET_VALUE(fixedOffset, transform->GetFixedOffset());
 
-    typename TransformType::InputPointType centerOfRotation;
-    centerOfRotation.Fill(0);
+    constexpr typename TransformType::InputPointType centerOfRotation{};
     transform->SetCenterOfRotation(centerOfRotation);
     ITK_TEST_SET_GET_VALUE(centerOfRotation, transform->GetCenterOfRotation());
 
     // This transform has no fixed parameters; empty method body; called for coverage purposes
-    typename TransformType::FixedParametersType::ValueType fixedParametersValues = 0;
-    typename TransformType::FixedParametersType            fixedParameters;
-    fixedParameters.Fill(fixedParametersValues);
+    const typename TransformType::FixedParametersType fixedParameters{};
     transform->SetFixedParameters(fixedParameters);
   }
 
@@ -109,8 +104,7 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
     auto translation = TransformType::New();
     translation->SetFocalDistance(focal);
 
-    TransformType::OffsetType ioffset;
-    ioffset.Fill(0.0);
+    TransformType::OffsetType ioffset{};
 
     translation->SetOffset(ioffset);
     ITK_TEST_SET_GET_VALUE(ioffset, translation->GetOffset());
@@ -135,16 +129,13 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
 
     {
       // Projecting  an itk::Point
-      TransformType::InputPointType p;
-      p.Fill(10);
-      TransformType::InputPointType q;
-      q = p + ioffset;
+      auto                           p = itk::MakeFilled<TransformType::InputPointType>(10);
+      TransformType::InputPointType  q = p + ioffset;
       TransformType::OutputPointType s;
       const double                   factor = focal / q[2];
       s[0] = q[0] * factor;
       s[1] = q[1] * factor;
-      TransformType::OutputPointType r;
-      r = translation->TransformPoint(p);
+      TransformType::OutputPointType r = translation->TransformPoint(p);
       for (unsigned int i = 0; i < N - 1; ++i)
       {
         if (itk::Math::abs(s[i] - r[i]) > epsilon)
@@ -160,10 +151,8 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
         std::cerr << "Reported Result is     : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok translating an itk::Point " << std::endl;
-      }
+
+      std::cout << "Ok translating an itk::Point " << std::endl;
     }
   }
 
@@ -172,19 +161,18 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
     auto rigid = TransformType::New();
     rigid->SetFocalDistance(focal);
 
-    TransformType::OffsetType ioffset;
-    ioffset.Fill(0.0);
+    constexpr TransformType::OffsetType ioffset{};
 
     rigid->SetOffset(ioffset);
 
-    TransformType::OffsetType offset = rigid->GetOffset();
+    const TransformType::OffsetType offset = rigid->GetOffset();
     std::cout << "pure Translation test:  ";
     std::cout << offset << std::endl;
 
     using VersorType = TransformType::VersorType;
-    VersorType             rotation;
-    VersorType::VectorType axis;
-    VersorType::ValueType  angle = 30.0f * std::atan(1.0f) / 45.0f;
+    VersorType                  rotation;
+    VersorType::VectorType      axis;
+    const VersorType::ValueType angle = 30.0f * std::atan(1.0f) / 45.0f;
     axis[0] = 1.0f;
     axis[1] = 1.0f;
     axis[2] = 1.0f;
@@ -195,16 +183,13 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
 
     {
       // Project an itk::Point
-      TransformType::InputPointType p;
-      p.Fill(10.0);
-      TransformType::InputPointType q;
-      q = p + ioffset;
+      auto                           p = itk::MakeFilled<TransformType::InputPointType>(10.0);
+      TransformType::InputPointType  q = p + ioffset;
       TransformType::OutputPointType s;
       const double                   factor = focal / q[2];
       s[0] = q[0] * factor;
       s[1] = q[1] * factor;
-      TransformType::OutputPointType r;
-      r = rigid->TransformPoint(p);
+      TransformType::OutputPointType r = rigid->TransformPoint(p);
       for (unsigned int i = 0; i < N - 1; ++i)
       {
         if (itk::Math::abs(s[i] - r[i]) > epsilon)
@@ -220,10 +205,8 @@ itkRigid3DPerspectiveTransformTest(int, char *[])
         std::cerr << "Reported Result is     : " << r << std::endl;
         return EXIT_FAILURE;
       }
-      else
-      {
-        std::cout << "Ok rotating an itk::Point " << std::endl;
-      }
+
+      std::cout << "Ok rotating an itk::Point " << std::endl;
     }
   }
 

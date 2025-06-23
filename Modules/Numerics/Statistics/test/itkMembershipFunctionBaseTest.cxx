@@ -19,11 +19,7 @@
 #include <iostream>
 #include "itkMembershipFunctionBase.h"
 
-namespace itk
-{
-namespace Statistics
-{
-namespace MembershipFunctionBaseTest
+namespace itk::Statistics::MembershipFunctionBaseTest
 {
 
 template <typename TMeasurementVector>
@@ -39,7 +35,7 @@ public:
 
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MyMembershipFunctionBase);
 
   /** Method for creation through the object factory. */
@@ -49,15 +45,14 @@ public:
   double
   Evaluate(const TMeasurementVector &) const override
   {
-    double score;
-    score = 1;
+    constexpr double score = 1;
     return score;
   }
 };
 
-} // namespace MembershipFunctionBaseTest
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics::MembershipFunctionBaseTest
+
+
 int
 itkMembershipFunctionBaseTest(int, char *[])
 {

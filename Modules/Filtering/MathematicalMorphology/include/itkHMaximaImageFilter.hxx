@@ -29,7 +29,6 @@ namespace itk
 template <typename TInputImage, typename TOutputImage>
 HMaximaImageFilter<TInputImage, TOutputImage>::HMaximaImageFilter()
   : m_Height(2)
-
 {}
 
 template <typename TInputImage, typename TOutputImage>
@@ -40,7 +39,7 @@ HMaximaImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   // We need all the input.
-  InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
+  const InputImagePointer input = const_cast<InputImageType *>(this->GetInput());
   if (input)
   {
     input->SetRequestedRegion(input->GetLargestPossibleRegion());
@@ -72,8 +71,7 @@ HMaximaImageFilter<TInputImage, TOutputImage>::GenerateData()
   // Delegate to a geodesic dilation filter.
   //
   //
-  typename ReconstructionByDilationImageFilter<TInputImage, TInputImage>::Pointer dilate =
-    ReconstructionByDilationImageFilter<TInputImage, TInputImage>::New();
+  auto dilate = ReconstructionByDilationImageFilter<TInputImage, TInputImage>::New();
 
   // Create a process accumulator for tracking the progress of this minipipeline
   auto progress = ProgressAccumulator::New();
@@ -87,7 +85,7 @@ HMaximaImageFilter<TInputImage, TOutputImage>::GenerateData()
   dilate->SetFullyConnected(m_FullyConnected);
 
   // Must cast to the output type
-  typename CastImageFilter<TInputImage, TOutputImage>::Pointer cast = CastImageFilter<TInputImage, TOutputImage>::New();
+  auto cast = CastImageFilter<TInputImage, TOutputImage>::New();
   cast->SetInput(dilate->GetOutput());
   cast->InPlaceOn();
 
@@ -113,7 +111,7 @@ HMaximaImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inde
   os << indent << "Height of local maxima (contrast): "
      << static_cast<typename NumericTraits<InputImagePixelType>::PrintType>(m_Height) << std::endl;
   os << indent << "Number of iterations used to produce current output: " << m_NumberOfIterationsUsed << std::endl;
-  os << indent << "FullyConnected: " << (m_FullyConnected ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(FullyConnected);
 }
 } // end namespace itk
 #endif

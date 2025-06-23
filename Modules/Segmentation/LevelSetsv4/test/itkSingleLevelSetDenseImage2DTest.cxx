@@ -75,7 +75,7 @@ itkSingleLevelSetDenseImage2DTest(int argc, char * argv[])
   auto reader = ReaderType::New();
   reader->SetFileName(argv[1]);
   reader->Update();
-  InputImageType::Pointer input = reader->GetOutput();
+  const InputImageType::Pointer input = reader->GetOutput();
 
   auto fastMarching = FastMarchingFilterType::New();
 
@@ -133,7 +133,7 @@ itkSingleLevelSetDenseImage2DTest(int argc, char * argv[])
   auto lscontainer = LevelSetContainerType::New();
   lscontainer->SetHeaviside(heaviside);
 
-  bool levelSetNotYetAdded = lscontainer->AddLevelSet(0, level_set, false);
+  const bool levelSetNotYetAdded = lscontainer->AddLevelSet(0, level_set, false);
   if (!levelSetNotYetAdded)
   {
     return EXIT_FAILURE;
@@ -201,11 +201,9 @@ itkSingleLevelSetDenseImage2DTest(int argc, char * argv[])
   IteratorType oIt(outputImage, outputImage->GetLargestPossibleRegion());
   oIt.GoToBegin();
 
-  ImageType::IndexType idx;
-
   while (!oIt.IsAtEnd())
   {
-    idx = oIt.GetIndex();
+    const ImageType::IndexType idx = oIt.GetIndex();
     oIt.Set(level_set->Evaluate(idx));
     ++oIt;
   }

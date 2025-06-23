@@ -40,8 +40,8 @@ namespace itk
  * configuration to support float images, and ITK_USE_FFTWD must set to ON to
  * support double images.
  *
- * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/717
+ * This implementation was taken from the Insight Journal paper
+ * \cite Lehmann_2010_b.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -82,7 +82,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FFTWForwardFFTImageFilter);
 
   /** Define the image dimension. */
@@ -98,6 +98,7 @@ public:
    *
    * /sa FFTWGlobalConfiguration
    */
+  /** @ITKStartGrouping */
   virtual void
   SetPlanRigor(const int & value)
   {
@@ -112,7 +113,7 @@ public:
     }
   }
   itkGetConstReferenceMacro(PlanRigor, int);
-
+  /** @ITKEndGrouping */
   SizeValueType
   GetSizeGreatestPrimeFactor() const override;
 

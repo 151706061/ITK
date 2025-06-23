@@ -276,7 +276,7 @@ abs_vector_diff(const itk::VariableLengthVector<TPixel> & pix1, const itk::Varia
 
   for (size_t i = 0; i < pix1.GetSize(); ++i)
   {
-    double d = itk::Math::abs(static_cast<double>(pix1[i] - pix2[i]));
+    const double d = itk::Math::abs(static_cast<double>(pix1[i] - pix2[i]));
     if (d > diff)
     {
       diff = d;
@@ -323,9 +323,7 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
 
   auto im = ImageType::New();
 
-  typename ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const typename ImageType::RegionType region{ index, size };
   im->SetRegions(region);
   im->SetSpacing(spacing);
   im->SetOrigin(origin);
@@ -335,7 +333,7 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
 
   mat.SetIdentity();
 
-  if (VDimension == 3)
+  if constexpr (VDimension == 3)
   { // there are problems with 4D direction cosines!
     // 30deg rotation
     mat[1][1] = mat[0][0] = 0.866025403784439;
@@ -375,7 +373,7 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
   metaDataIntArray[4] = 2;
   itk::EncapsulateMetaData<itk::Array<int>>(metaDict, "acquisition:TestIntArray", metaDataIntArray);
 
-  std::string metaDataStdString("Test std::string");
+  const std::string metaDataStdString("Test std::string");
   itk::EncapsulateMetaData<std::string>(metaDict, "acquisition:StdString", metaDataStdString);
 
   //
@@ -437,7 +435,7 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
 
   //
   // Check MetaData
-  itk::MetaDataDictionary & metaDict2(im2->GetMetaDataDictionary());
+  const itk::MetaDataDictionary & metaDict2(im2->GetMetaDataDictionary());
 
   double metaDataDouble = 0.0;
   if (!itk::ExposeMetaData<double>(metaDict2, "acquisition:TestDouble", metaDataDouble) || metaDataDouble != 1.23)
@@ -471,16 +469,16 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
     std::cerr << "Failure reading metaData "
               << "acquisition:TestDoubleArray " << std::endl;
     std::cerr << "metaDataDoubleArray=";
-    for (size_t i = 0; i < metaDataDoubleArray.size(); ++i)
+    for (const double value : metaDataDoubleArray)
     {
-      std::cerr << metaDataDoubleArray[i] << ' ';
+      std::cerr << value << ' ';
     }
     std::cerr << std::endl;
 
     std::cerr << "metaDataDoubleArray2=";
-    for (size_t i = 0; i < metaDataDoubleArray2.size(); ++i)
+    for (const double value : metaDataDoubleArray2)
     {
-      std::cerr << metaDataDoubleArray2[i] << ' ';
+      std::cerr << value << ' ';
     }
     std::cerr << std::endl;
 
@@ -494,16 +492,16 @@ MINCReadWriteTest(const char * fileName, const char * minc_storage_type, double 
     std::cerr << "Failure reading metaData "
               << "acquisition:TestFloatArray " << std::endl;
     std::cerr << "metaDataFloatArray=";
-    for (size_t i = 0; i < metaDataFloatArray.size(); ++i)
+    for (const float value : metaDataFloatArray)
     {
-      std::cerr << metaDataFloatArray[i] << ' ';
+      std::cerr << value << ' ';
     }
     std::cerr << std::endl;
 
     std::cerr << "metaDataFloatArray2=";
-    for (size_t i = 0; i < metaDataFloatArray2.size(); ++i)
+    for (const float value : metaDataFloatArray2)
     {
-      std::cerr << metaDataFloatArray2[i] << ' ';
+      std::cerr << value << ' ';
     }
     std::cerr << std::endl;
 
@@ -589,9 +587,7 @@ MINCReadWriteTestVector(const char * fileName,
   auto im = ImageType::New();
 
   // itk::IOTestHelper::AllocateImageFromRegionAndSpacing<ImageType>(imageRegion,spacing);
-  typename ImageType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  const typename ImageType::RegionType region{ index, size };
   im->SetRegions(region);
   im->SetSpacing(spacing);
   im->SetOrigin(origin);
@@ -602,7 +598,7 @@ MINCReadWriteTestVector(const char * fileName,
 
   mat.SetIdentity();
 
-  if (VDimension == 3)
+  if constexpr (VDimension == 3)
   { // there are problems with 4D direction cosines!
     // 30deg rotation
     mat[1][1] = mat[0][0] = 0.866025403784439;
@@ -633,7 +629,7 @@ MINCReadWriteTestVector(const char * fileName,
   metaDataIntArray[4] = 2;
   itk::EncapsulateMetaData<itk::Array<int>>(metaDict, "acquisition:TestIntArray", metaDataIntArray);
 
-  std::string metaDataStdString("Test std::string");
+  const std::string metaDataStdString("Test std::string");
   itk::EncapsulateMetaData<std::string>(metaDict, "acquisition:StdString", metaDataStdString);
 
   //
@@ -695,7 +691,7 @@ MINCReadWriteTestVector(const char * fileName,
   }
 
   // Check MetaData
-  itk::MetaDataDictionary & metaDict2(im2->GetMetaDataDictionary());
+  const itk::MetaDataDictionary & metaDict2(im2->GetMetaDataDictionary());
 
   double metaDataDouble = 0.0;
   if (!itk::ExposeMetaData<double>(metaDict2, "acquisition:TestDouble", metaDataDouble) || metaDataDouble != 1.23)
@@ -741,13 +737,12 @@ MINCReadWriteTestVector(const char * fileName,
   }
 
   itk::ImageRegionIterator<ImageType> it2(im2, im2->GetLargestPossibleRegion());
-  InternalPixelType                   pix1, pix2;
   if (tolerance == 0.0)
   {
     for (it.GoToBegin(), it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it, ++it2)
     {
-      pix1 = it.Get();
-      pix2 = it2.Get();
+      const InternalPixelType pix1 = it.Get();
+      const InternalPixelType pix2 = it2.Get();
       if (!equal<TPixel>(pix1, pix2))
       {
         std::cout << "Original Pixel (" << pix1 << ") doesn't match read-in Pixel (" << pix2 << " ) "
@@ -761,8 +756,8 @@ MINCReadWriteTestVector(const char * fileName,
   { // account for rounding errors
     for (it.GoToBegin(), it2.GoToBegin(); !it.IsAtEnd() && !it2.IsAtEnd(); ++it, ++it2)
     {
-      pix1 = it.Get();
-      pix2 = it2.Get();
+      const InternalPixelType pix1 = it.Get();
+      const InternalPixelType pix2 = it2.Get();
       if (abs_vector_diff<TPixel>(pix1, pix2) > tolerance)
       {
         std::cout << "Original Pixel (" << pix1 << ") doesn't match read-in Pixel (" << pix2 << " ) "
@@ -785,7 +780,7 @@ itkMINCImageIOTest(int argc, char * argv[])
   {
     prefix = *++argv;
     --argc;
-    itksys::SystemTools::ChangeDirectory(prefix.c_str());
+    itksys::SystemTools::ChangeDirectory(prefix);
   }
 
   itk::ObjectFactoryBase::RegisterFactory(itk::MINCImageIOFactory::New(),

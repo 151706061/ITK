@@ -18,6 +18,7 @@
 #ifndef itkPyVectorContainer_hxx
 #define itkPyVectorContainer_hxx
 
+#include <memory> // For unique_ptr.
 #include <stdexcept>
 
 namespace itk
@@ -27,12 +28,7 @@ template <typename TElementIdentifier, typename TElement>
 PyObject *
 PyVectorContainer<TElementIdentifier, TElement>::_array_view_from_vector_container(VectorContainerType * vector)
 {
-  PyObject * memoryView = NULL;
-  Py_buffer  pyBuffer;
-  memset(&pyBuffer, 0, sizeof(Py_buffer));
-
-  size_t elementSize = sizeof(DataType);
-  int    res = 0;
+  Py_buffer pyBuffer{};
 
   if (!vector)
   {
@@ -41,77 +37,47 @@ PyVectorContainer<TElementIdentifier, TElement>::_array_view_from_vector_contain
 
   DataType * buffer = vector->CastToSTLContainer().data();
 
-  void * vectorBuffer = (void *)(buffer);
-
   // Computing the length of data
-  Py_ssize_t len = vector->Size();
-  len *= elementSize;
+  const auto len = static_cast<Py_ssize_t>(vector->size() * sizeof(DataType));
 
-  res = PyBuffer_FillInfo(&pyBuffer, NULL, (void *)vectorBuffer, len, 0, PyBUF_CONTIG);
-  memoryView = PyMemoryView_FromBuffer(&pyBuffer);
-
-  PyBuffer_Release(&pyBuffer);
-
-  return memoryView;
+  PyBuffer_FillInfo(&pyBuffer, nullptr, buffer, len, 0, PyBUF_CONTIG);
+  return PyMemoryView_FromBuffer(&pyBuffer);
 }
 
 template <typename TElementIdentifier, typename TElement>
 auto
-PyVectorContainer<TElementIdentifier, TElement>::_vector_container_from_array(PyObject * arr, PyObject * shape) -> const
+PyVectorContainer<TElementIdentifier, TElement>::_vector_container_from_array(PyObject * arr, PyObject * const shape) ->
   typename VectorContainerType::Pointer
 {
-  PyObject * obj = NULL;
-  PyObject * shapeseq = NULL;
-  PyObject * item = NULL;
-
-  Py_ssize_t bufferLength;
-  Py_buffer  pyBuffer;
-  memset(&pyBuffer, 0, sizeof(Py_buffer));
-
-  size_t numberOfElements = 1;
-
-  const void * buffer;
-
-  unsigned int dimension = 0;
-
-
-  size_t elementSize = sizeof(DataType);
-  size_t len = 1;
+  Py_buffer pyBuffer{};
 
   if (PyObject_GetBuffer(arr, &pyBuffer, PyBUF_CONTIG) == -1)
   {
     PyErr_SetString(PyExc_RuntimeError, "Cannot get an instance of NumPy array.");
-    PyBuffer_Release(&pyBuffer);
     return nullptr;
   }
-  else
-  {
-    bufferLength = pyBuffer.len;
-    buffer = pyBuffer.buf;
-  }
 
-  obj = shape;
-  shapeseq = PySequence_Fast(obj, "expected sequence");
-  dimension = PySequence_Size(obj);
+  [[maybe_unused]] const std::unique_ptr<Py_buffer, decltype(&PyBuffer_Release)> bufferScopeGuard(&pyBuffer,
+                                                                                                  &PyBuffer_Release);
 
-  item = PySequence_Fast_GET_ITEM(shapeseq, 0); // Only one dimension
-  numberOfElements = (size_t)PyInt_AsLong(item);
+  const Py_ssize_t   bufferLength = pyBuffer.len;
+  const void * const buffer = pyBuffer.buf;
 
-  len = numberOfElements * elementSize;
-  if (bufferLength != len)
+  PyObject * const   shapeseq = PySequence_Fast(shape, "expected sequence");
+  const unsigned int dimension = PySequence_Size(shape);
+
+  PyObject *   item = PySequence_Fast_GET_ITEM(shapeseq, 0); // Only one dimension
+  const size_t numberOfElements = static_cast<size_t>(PyInt_AsLong(item));
+
+  const size_t len = numberOfElements * sizeof(DataType);
+  if (bufferLength < 0 || static_cast<size_t>(bufferLength) != len)
   {
     PyErr_SetString(PyExc_RuntimeError, "Size mismatch of vector and Buffer.");
-    PyBuffer_Release(&pyBuffer);
     return nullptr;
   }
-  DataType * data = (DataType *)buffer;
-  auto       output = VectorContainerType::New();
-  output->resize(numberOfElements);
-  for (size_t ii = 0; ii < numberOfElements; ++ii)
-  {
-    output->SetElement(ii, data[ii]);
-  }
-  PyBuffer_Release(&pyBuffer);
+  const auto * const data = static_cast<const DataType *>(buffer);
+  auto               output = VectorContainerType::New();
+  output->assign(data, data + numberOfElements);
 
   return output;
 }

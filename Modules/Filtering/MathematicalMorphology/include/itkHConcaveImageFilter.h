@@ -33,8 +33,7 @@ namespace itk
  * This filter uses the HMinimaImageFilter.
  *
  * Geodesic morphology and the H-Convex algorithm is described in
- * Chapter 6 of Pierre Soille's book "Morphological Image Analysis:
- * Principles and Applications", Second Edition, Springer, 2003.
+ * \cite soille2004.
  *
  * \sa GrayscaleGeodesicDilateImageFilter, HMaximaImageFilter,
  * \sa MorphologyImageFilter, GrayscaleDilateImageFilter, GrayscaleFunctionDilateImageFilter, BinaryDilateImageFilter
@@ -72,33 +71,31 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(HConcaveImageFilter);
 
   /** Set/Get the height that a local maximum must be above the local
    * background (local contrast) in order to survive the
    * processing. Local maxima below this value are replaced with an
    * estimate of the local background. */
+  /** @ITKStartGrouping */
   itkSetMacro(Height, InputImagePixelType);
   itkGetConstMacro(Height, InputImagePixelType);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get whether the connected components are defined strictly by
    * face connectivity or by face+edge+vertex connectivity.  Default is
    * FullyConnectedOff.  For objects that are 1 pixel wide, use
    * FullyConnectedOn.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(FullyConnected, bool);
   itkGetConstReferenceMacro(FullyConnected, bool);
   itkBooleanMacro(FullyConnected);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputImagePixelType>));
   itkConceptMacro(IntConvertibleToInputCheck, (Concept::Convertible<int, InputImagePixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   HConcaveImageFilter();

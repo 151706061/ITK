@@ -71,10 +71,12 @@ main(int, char *[])
   auto image = ImageType::New();
 
   // The image region should be initialized
-  const ImageType::IndexType start = {
+  constexpr ImageType::IndexType start = {
     { 0, 0, 0 }
   }; // First index at {X,Y,Z}
-  const ImageType::SizeType size = { { 200, 200, 200 } }; // Size of {X,Y,Z}
+  constexpr ImageType::SizeType size = {
+    { 200, 200, 200 }
+  }; // Size of {X,Y,Z}
 
   ImageType::RegionType region;
   region.SetSize(size);
@@ -95,7 +97,7 @@ main(int, char *[])
   // vector value.
   image->FillBuffer(initialValue);
 
-  const ImageType::IndexType pixelIndex = {
+  constexpr ImageType::IndexType pixelIndex = {
     { 27, 29, 37 }
   }; // Position {X,Y,Z}
 
@@ -127,7 +129,7 @@ main(int, char *[])
 
   // The GetPixel method can also be used to read Vectors
   // pixels from the image
-  ImageType::PixelType value = image->GetPixel(pixelIndex);
+  const ImageType::PixelType value = image->GetPixel(pixelIndex);
 
   std::cout << value << std::endl;
 

@@ -47,14 +47,15 @@ ExpandImageFilter<TInputImage, TOutputImage>::PrintSelf(std::ostream & os, Inden
 {
   Superclass::PrintSelf(os, indent);
 
-  unsigned int j;
   os << indent << "ExpandFactors: [";
-  for (j = 0; j < ImageDimension - 1; ++j)
   {
-    os << m_ExpandFactors[j] << ", ";
+    unsigned int j = 0;
+    for (; j < ImageDimension - 1; ++j)
+    {
+      os << m_ExpandFactors[j] << ", ";
+    }
+    os << m_ExpandFactors[j] << ']' << std::endl;
   }
-  os << m_ExpandFactors[j] << ']' << std::endl;
-
   os << indent << "Interpolator: ";
   os << m_Interpolator.GetPointer() << std::endl;
 }
@@ -66,26 +67,16 @@ template <typename TInputImage, typename TOutputImage>
 void
 ExpandImageFilter<TInputImage, TOutputImage>::SetExpandFactors(const unsigned int factor)
 {
-  unsigned int j;
-
-  for (j = 0; j < ImageDimension; ++j)
+  if (ContainerFillWithCheck(m_ExpandFactors, factor, Self::ImageDimension))
   {
-    if (factor != m_ExpandFactors[j])
+    for (unsigned int j = 0; j < ImageDimension; ++j)
     {
-      break;
-    }
-  }
-  if (j < ImageDimension)
-  {
-    this->Modified();
-    for (j = 0; j < ImageDimension; ++j)
-    {
-      m_ExpandFactors[j] = factor;
       if (m_ExpandFactors[j] < 1)
       {
         m_ExpandFactors[j] = 1;
       }
     }
+    this->Modified();
   }
 }
 
@@ -110,7 +101,7 @@ ExpandImageFilter<TInputImage, TOutputImage>::DynamicThreadedGenerateData(
   const OutputImageRegionType & outputRegionForThread)
 {
   // Get the input and output pointers
-  OutputImagePointer outputPtr = this->GetOutput();
+  const OutputImagePointer outputPtr = this->GetOutput();
 
   // Report progress on a per scanline basis
   const SizeValueType ln = outputRegionForThread.GetSize(0);
@@ -170,7 +161,6 @@ ExpandImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
   itkAssertInDebugAndIgnoreInReleaseMacro(outputPtr);
 
   // We need to compute the input requested region (size and start index)
-  unsigned int                             i;
   const typename TOutputImage::SizeType &  outputRequestedRegionSize = outputPtr->GetRequestedRegion().GetSize();
   const typename TOutputImage::IndexType & outputRequestedRegionStartIndex = outputPtr->GetRequestedRegion().GetIndex();
 
@@ -181,7 +171,7 @@ ExpandImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion()
    * inputRequestedSize = (outputRequestedSize / ExpandFactor) + 1)
    * The extra 1 above is to take care of edge effects when streaming.
    */
-  for (i = 0; i < TInputImage::ImageDimension; ++i)
+  for (unsigned int i = 0; i < TInputImage::ImageDimension; ++i)
   {
     inputRequestedRegionSize[i] = (SizeValueType)std::ceil(static_cast<double>(outputRequestedRegionSize[i]) /
                                                            static_cast<double>(m_ExpandFactors[i])) +

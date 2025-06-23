@@ -49,9 +49,10 @@ public:
 #if !defined(ITK_LEGACY_REMOVE)
   // We need to expose the enum values at the class level
   // for backwards compatibility
-  static constexpr OctreeEnum UNKNOWN_PLANE = OctreeEnum::UNKNOWN_PLANE;
-  static constexpr OctreeEnum SAGITAL_PLANE = OctreeEnum::SAGITAL_PLANE;
-  static constexpr OctreeEnum CORONAL_PLANE = OctreeEnum::CORONAL_PLANE;
+  static constexpr OctreeEnum                                              UNKNOWN_PLANE = OctreeEnum::UNKNOWN_PLANE;
+  static constexpr OctreeEnum                                              SAGITTAL_PLANE = OctreeEnum::SAGITTAL_PLANE;
+  [[deprecated("Use SAGITTAL_PLANE instead")]] static constexpr OctreeEnum SAGITAL_PLANE = OctreeEnum::SAGITTAL_PLANE;
+  static constexpr OctreeEnum                                              CORONAL_PLANE = OctreeEnum::CORONAL_PLANE;
   static constexpr OctreeEnum TRANSVERSE_PLANE = OctreeEnum::TRANSVERSE_PLANE;
 #endif
 
@@ -134,10 +135,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ImageType = Image<TPixel, 3>;
   using ImageTypePointer = typename ImageType::Pointer;
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(Octree);
 
   ImageTypePointer
@@ -149,10 +151,11 @@ public:
                   const unsigned int ysize,
                   const unsigned int zsize) override;
 
-  void BuildFromImage(Image<TPixel, 3> * fromImage);
+  void
+  BuildFromImage(Image<TPixel, 3> * fromImage);
 
   Octree();
-  ~Octree() override;
+  ~Octree() override = default;
   void
   SetColor(unsigned int color)
   {
@@ -181,14 +184,17 @@ public:
   unsigned int
   GetDepth() override;
 
+#if !defined(ITK_LEGACY_REMOVE)
   /***
    * Exposes enum values for backwards compatibility
    * */
-#if !defined(ITK_LEGACY_REMOVE)
-  static constexpr OctreeEnum UNKNOWN_PLANE = OctreeEnum::UNKNOWN_PLANE;
-  static constexpr OctreeEnum SAGITAL_PLANE = OctreeEnum::SAGITAL_PLANE;
-  static constexpr OctreeEnum CORONAL_PLANE = OctreeEnum::CORONAL_PLANE;
+  /** @ITKStartGrouping */
+  static constexpr OctreeEnum                                              UNKNOWN_PLANE = OctreeEnum::UNKNOWN_PLANE;
+  static constexpr OctreeEnum                                              SAGITTAL_PLANE = OctreeEnum::SAGITTAL_PLANE;
+  [[deprecated("Use SAGITTAL_PLANE instead")]] static constexpr OctreeEnum SAGITAL_PLANE = OctreeEnum::SAGITTAL_PLANE;
+  static constexpr OctreeEnum                                              CORONAL_PLANE = OctreeEnum::CORONAL_PLANE;
   static constexpr OctreeEnum TRANSVERSE_PLANE = OctreeEnum::TRANSVERSE_PLANE;
+  /** @ITKEndGrouping */
 #endif
 
   OctreeNode *

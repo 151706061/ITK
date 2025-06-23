@@ -49,11 +49,10 @@ itkDeformableSimplexMesh3DGradientConstraintForceFilterTest(int, char *[])
 
   // note : image is volume of 20x20x20 starting at 0,0,0 so make sure
   // the mesh sits on image in space
-  auto      mySphereMeshSource = SphereMeshSourceType::New();
-  PointType center;
-  center.Fill(10);
+  auto                 mySphereMeshSource = SphereMeshSourceType::New();
+  auto                 center = itk::MakeFilled<PointType>(10);
   PointType::ValueType scaleInit[PointDimension] = { 5, 5, 5 };
-  VectorType           scale = scaleInit;
+  const VectorType     scale = scaleInit;
 
   mySphereMeshSource->SetCenter(center);
   mySphereMeshSource->SetResolution(2);
@@ -74,8 +73,7 @@ itkDeformableSimplexMesh3DGradientConstraintForceFilterTest(int, char *[])
 
   auto originalImage = OriginalImageType::New();
 
-  ImageSizeType imageSize;
-  imageSize.Fill(20);
+  auto imageSize = ImageSizeType::Filled(20);
   originalImage->SetRegions(imageSize);
   originalImage->Allocate();
 
@@ -132,7 +130,7 @@ itkDeformableSimplexMesh3DGradientConstraintForceFilterTest(int, char *[])
   deformFilter->SetAlpha(0.2);
   deformFilter->SetBeta(0.1);
 
-  int range = 1;
+  constexpr int range = 1;
   deformFilter->SetRange(range);
   ITK_TEST_SET_GET_VALUE(range, deformFilter->GetRange());
 
@@ -140,7 +138,7 @@ itkDeformableSimplexMesh3DGradientConstraintForceFilterTest(int, char *[])
   deformFilter->SetRigidity(0);
   deformFilter->Update();
 
-  SimplexMeshType::Pointer deformResult = deformFilter->GetOutput();
+  const SimplexMeshType::Pointer deformResult = deformFilter->GetOutput();
 
   std::cout << "Deformation Result: " << deformResult << std::endl;
 

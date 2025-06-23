@@ -124,7 +124,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorConnectedComponentImageFilter);
 
   using InputValueType = typename TInputImage::PixelType::ValueType;
@@ -141,12 +141,8 @@ public:
     return (this->GetFunctor().GetDistanceThreshold());
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputValueHasNumericTraitsCheck, (Concept::HasNumericTraits<InputValueType>));
   itkConceptMacro(InputValyeTypeIsFloatingCheck, (Concept::IsFloatingPoint<InputValueType>));
-  // End concept checking
-#endif
 
 protected:
   VectorConnectedComponentImageFilter() = default;

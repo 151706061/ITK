@@ -31,7 +31,7 @@ namespace itk
  *         The Pennsylvania State University 2005
  *
  * This implementation was contributed as a paper to the Insight Journal
- * https://www.insight-journal.org/browse/publication/237
+ * https://doi.org/10.54294/o8w4c0
  *
  * \ingroup ITKIOPhilipsREC
  */
@@ -61,7 +61,7 @@ public:
     return new PhilipsRECImageIOFactory;
   }
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(PhilipsRECImageIOFactory);
 
   /** Register one factory of this type  */

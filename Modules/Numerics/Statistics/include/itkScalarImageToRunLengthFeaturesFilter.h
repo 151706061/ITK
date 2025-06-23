@@ -23,9 +23,7 @@
 #include "itkHistogramToRunLengthFeaturesFilter.h"
 #include "itkScalarImageToRunLengthMatrixFilter.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class ScalarImageToRunLengthFeaturesFilter
@@ -70,19 +68,10 @@ namespace Statistics
  * (1) The average value of each feature.
  * (2) The standard deviation in the values of each feature.
  *
- * Print references:
- * M. M. Galloway. Texture analysis using gray level run lengths. Computer
- * Graphics and Image Processing, 4:172-179, 1975.
+ * For algorithmic details see \cite galloway1975, \cite chu1990 and
+ * \cite dasarathy1991.
  *
- * A. Chu, C. M. Sehgal, and J. F. Greenleaf. Use of gray value distribution of
- * run lengths for texture analysis.  Pattern Recognition Letters, 11:415-420,
- * 1990.
- *
- * B. R. Dasarathy and E. B. Holder. Image characterizations based on joint
- * gray-level run-length distributions. Pattern Recognition Letters, 12:490-502,
- * 1991.
- *
- * IJ article: https://www.insight-journal.org/browse/publication/231
+ * IJ article: https://doi.org/10.54294/ex0itu
  *
  * \sa ScalarImageToRunLengthMatrixFilter
  * \sa HistogramToRunLengthFeaturesFilter
@@ -101,7 +90,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ScalarImageToRunLengthFeaturesFilter);
 
   /** standard New() method support */
@@ -154,17 +143,23 @@ public:
   GetInput() const;
 
   /** Return the feature means and deviations.  */
+  /** @ITKStartGrouping */
   itkGetConstReferenceObjectMacro(FeatureMeans, FeatureValueVector);
   itkGetConstReferenceObjectMacro(FeatureStandardDeviations, FeatureValueVector);
+  /** @ITKEndGrouping */
 
   /** Set the desired feature set. Optional, for default value see above. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(RequestedFeatures, FeatureNameVector);
   itkGetConstObjectMacro(RequestedFeatures, FeatureNameVector);
+  /** @ITKEndGrouping */
 
   /** Set the  offsets over which the co-occurrence pairs will be computed.
       Optional; for default value see above. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(Offsets, OffsetVector);
   itkGetConstObjectMacro(Offsets, OffsetVector);
+  /** @ITKEndGrouping */
 
   /** Set number of histogram bins along each axis.
       Optional; for default value see above. */
@@ -228,8 +223,7 @@ private:
   OffsetVectorConstPointer      m_Offsets{};
   bool                          m_FastCalculations{};
 };
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkScalarImageToRunLengthFeaturesFilter.hxx"

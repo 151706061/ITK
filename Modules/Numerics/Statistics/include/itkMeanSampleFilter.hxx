@@ -23,9 +23,7 @@
 #include "itkCompensatedSummation.h"
 #include "itkMeasurementVectorTraits.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 template <typename TSample>
 MeanSampleFilter<TSample>::MeanSampleFilter()
@@ -54,8 +52,7 @@ template <typename TSample>
 auto
 MeanSampleFilter<TSample>::MakeOutput(DataObjectPointerArraySizeType itkNotUsed(idx)) -> DataObjectPointer
 {
-  MeasurementVectorRealType mean;
-  (void)mean; // for complainty pants : valgrind
+  [[maybe_unused]] MeasurementVectorRealType mean;
   NumericTraits<MeasurementVectorRealType>::SetLength(mean, this->GetMeasurementVectorSize());
   // NumericTraits::SetLength also initializes array to zero
   auto decoratedMean = MeasurementVectorDecoratedType::New();
@@ -159,7 +156,6 @@ MeanSampleFilter<TSample>::GenerateData()
 
   decoratedOutput->Set(output);
 }
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

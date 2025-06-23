@@ -38,8 +38,7 @@ template <unsigned int TDimension>
 void
 SpatialObject<TDimension>::Clear()
 {
-  typename BoundingBoxType::PointType pnt;
-  pnt.Fill(typename BoundingBoxType::PointType::ValueType{});
+  const typename BoundingBoxType::PointType pnt{};
   m_FamilyBoundingBoxInObjectSpace->SetMinimum(pnt);
   m_FamilyBoundingBoxInObjectSpace->SetMaximum(pnt);
   m_FamilyBoundingBoxInWorldSpace->SetMinimum(pnt);
@@ -94,17 +93,17 @@ SpatialObject<TDimension>::DerivativeAtInObjectSpace(const PointType &          
 
   if (order == 0)
   {
-    double r;
+    double r = NAN;
 
     ValueAtInObjectSpace(point, r, depth, name);
     value.Fill(r);
   }
   else
   {
-    PointType                               p1, p2;
-    DerivativeVectorType                    v1, v2;
     typename DerivativeVectorType::Iterator it = value.Begin();
+    DerivativeVectorType                    v1;
     auto                                    it_v1 = v1.cbegin();
+    DerivativeVectorType                    v2;
     auto                                    it_v2 = v2.cbegin();
 
     DerivativeOffsetType offsetDiv2;
@@ -114,8 +113,8 @@ SpatialObject<TDimension>::DerivativeAtInObjectSpace(const PointType &          
     }
     for (unsigned short i = 0; i < TDimension; i++, it++, it_v1++, it_v2++)
     {
-      p1 = point;
-      p2 = point;
+      PointType p1 = point;
+      PointType p2 = point;
 
       p1[i] -= offset[i];
       p2[i] += offset[i];
@@ -160,10 +159,8 @@ SpatialObject<TDimension>::IsInsideInObjectSpace(const PointType &   point,
   {
     return Self::IsInsideChildrenInObjectSpace(point, depth - 1, name);
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 template <unsigned int TDimension>
@@ -220,16 +217,14 @@ SpatialObject<TDimension>::IsEvaluableAtInObjectSpace(const PointType &   point,
   {
     return true;
   }
+
+  if (depth > 0)
+  {
+    return IsEvaluableAtChildrenInObjectSpace(point, depth - 1, name);
+  }
   else
   {
-    if (depth > 0)
-    {
-      return IsEvaluableAtChildrenInObjectSpace(point, depth - 1, name);
-    }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 }
 
@@ -275,11 +270,9 @@ SpatialObject<TDimension>::ValueAtInObjectSpace(const PointType &   point,
       value = m_DefaultInsideValue;
       return true;
     }
-    else
-    {
-      value = m_DefaultOutsideValue;
-      return true;
-    }
+
+    value = m_DefaultOutsideValue;
+    return true;
   }
   else
   {
@@ -334,7 +327,7 @@ SpatialObject<TDimension>::InternalClone() const
 {
   typename LightObject::Pointer loPtr = CreateAnother();
 
-  typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
+  const typename Self::Pointer rval = dynamic_cast<Self *>(loPtr.GetPointer());
   if (rval.IsNull())
   {
     itkExceptionMacro("downcast to type " << this->GetNameOfClass() << " failed.");
@@ -412,7 +405,7 @@ template <unsigned int TDimension>
 void
 SpatialObject<TDimension>::AddChild(Self * pointer)
 {
-  const typename ChildrenListType::iterator pos = std::find(m_ChildrenList.begin(), m_ChildrenList.end(), pointer);
+  const auto pos = std::find(m_ChildrenList.begin(), m_ChildrenList.end(), pointer);
   if (pos == m_ChildrenList.end())
   {
     m_ChildrenList.push_back(pointer);
@@ -432,7 +425,7 @@ template <unsigned int TDimension>
 bool
 SpatialObject<TDimension>::RemoveChild(Self * pointer)
 {
-  const typename ChildrenListType::iterator pos = std::find(m_ChildrenList.begin(), m_ChildrenList.end(), pointer);
+  const auto pos = std::find(m_ChildrenList.begin(), m_ChildrenList.end(), pointer);
   if (pos != m_ChildrenList.end())
   {
     m_ChildrenList.erase(pos);
@@ -446,10 +439,8 @@ SpatialObject<TDimension>::RemoveChild(Self * pointer)
 
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 template <unsigned int TDimension>
@@ -582,11 +573,9 @@ SpatialObject<TDimension>::GetMTime() const
 {
   ModifiedTimeType latestTime = Object::GetMTime();
 
-  ModifiedTimeType localTime;
-
   for (const auto & child : m_ChildrenList)
   {
-    localTime = child->GetMTime();
+    const ModifiedTimeType localTime = child->GetMTime();
 
     if (localTime > latestTime)
     {
@@ -601,8 +590,7 @@ template <unsigned int TDimension>
 void
 SpatialObject<TDimension>::ComputeMyBoundingBox()
 {
-  typename BoundingBoxType::PointType pnt;
-  pnt.Fill(typename BoundingBoxType::PointType::ValueType{});
+  const typename BoundingBoxType::PointType pnt{};
   if (m_MyBoundingBoxInObjectSpace->GetMinimum() != pnt || m_MyBoundingBoxInObjectSpace->GetMaximum() != pnt)
   {
     m_MyBoundingBoxInObjectSpace->SetMinimum(pnt);
@@ -638,8 +626,7 @@ SpatialObject<TDimension>::ComputeFamilyBoundingBox(unsigned int depth, const st
 {
   itkDebugMacro("Computing Bounding Box");
 
-  typename BoundingBoxType::PointType zeroPnt;
-  zeroPnt.Fill(typename BoundingBoxType::PointType::ValueType{});
+  const typename BoundingBoxType::PointType zeroPnt{};
   m_FamilyBoundingBoxInObjectSpace->SetMinimum(zeroPnt);
   m_FamilyBoundingBoxInObjectSpace->SetMaximum(zeroPnt);
   bool bbDefined = false;
@@ -892,19 +879,17 @@ SpatialObject<TDimension>::CheckIdValidity() const
 
   ChildrenListType * children = this->GetChildren();
 
-  typename ObjectListType::iterator it = children->begin();
-  typename ObjectListType::iterator itEnd = children->end();
-  typename ObjectListType::iterator it2;
-  int                               id;
-  int                               id2;
+  typename ObjectListType::iterator       it = children->begin();
+  const typename ObjectListType::iterator itEnd = children->end();
+  typename ObjectListType::iterator       it2;
 
   while (it != itEnd)
   {
-    id = (*it)->GetId();
+    const int id = (*it)->GetId();
     it2 = ++it;
     while (it2 != itEnd)
     {
-      id2 = (*it2)->GetId();
+      const int id2 = (*it2)->GetId();
       if (id == id2 || id2 == -1)
       {
         delete children;
@@ -932,19 +917,17 @@ SpatialObject<TDimension>::FixIdValidity()
   auto                              it = children->begin();
   auto                              itEnd = children->end();
   typename ObjectListType::iterator it2;
-  int                               id;
-  int                               id2;
 
   while (it != itEnd)
   {
-    id = (*it)->GetId();
+    const int id = (*it)->GetId();
     it2 = ++it;
     while (it2 != itEnd)
     {
-      id2 = (*it2)->GetId();
+      const int id2 = (*it2)->GetId();
       if (id == id2 || id2 == -1)
       {
-        int idNew = this->GetNextAvailableId();
+        const int idNew = this->GetNextAvailableId();
         (*it2)->SetId(idNew);
         ChildrenListType * children2 = (*it2)->GetChildren(0);
         auto               childIt2 = children2->begin();
@@ -969,10 +952,9 @@ SpatialObject<TDimension>::GetNextAvailableId() const
 {
   int maxId = this->GetId();
 
-  int id;
   for (const auto & child : m_ChildrenList)
   {
-    id = child->GetNextAvailableId() - 1;
+    const int id = child->GetNextAvailableId() - 1;
     if (id > maxId)
     {
       maxId = id;
@@ -1089,14 +1071,13 @@ template <unsigned int TDimension>
 bool
 SpatialObject<TDimension>::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  unsigned int      i;
   const IndexType & requestedRegionIndex = m_RequestedRegion.GetIndex();
   const IndexType & bufferedRegionIndex = m_BufferedRegion.GetIndex();
 
   const SizeType & requestedRegionSize = m_RequestedRegion.GetSize();
   const SizeType & bufferedRegionSize = m_BufferedRegion.GetSize();
 
-  for (i = 0; i < ObjectDimension; ++i)
+  for (unsigned int i = 0; i < ObjectDimension; ++i)
   {
     if ((requestedRegionIndex[i] < bufferedRegionIndex[i]) ||
         ((requestedRegionIndex[i] + static_cast<OffsetValueType>(requestedRegionSize[i])) >
@@ -1123,8 +1104,7 @@ template <unsigned int TDimension>
 bool
 SpatialObject<TDimension>::VerifyRequestedRegion()
 {
-  bool         retval = true;
-  unsigned int i;
+  bool retval = true;
 
   // Is the requested region within the LargestPossibleRegion?
   // Note that the test is indeed against the largest possible region
@@ -1135,7 +1115,7 @@ SpatialObject<TDimension>::VerifyRequestedRegion()
   const SizeType & requestedRegionSize = m_RequestedRegion.GetSize();
   const SizeType & largestPossibleRegionSize = m_LargestPossibleRegion.GetSize();
 
-  for (i = 0; i < ObjectDimension; ++i)
+  for (unsigned int i = 0; i < ObjectDimension; ++i)
   {
     if ((requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
         ((requestedRegionIndex[i] + static_cast<OffsetValueType>(requestedRegionSize[i])) >
@@ -1214,8 +1194,7 @@ SpatialObject<TDimension>::CopyInformation(const DataObject * data)
   Superclass::CopyInformation(data);
 
   // Attempt to cast data to an ImageBase
-  const SpatialObject<TDimension> * soData;
-  soData = dynamic_cast<const SpatialObject<TDimension> *>(data);
+  const auto * soData = dynamic_cast<const SpatialObject<TDimension> *>(data);
 
   if (soData == nullptr)
   {

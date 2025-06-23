@@ -34,8 +34,8 @@ enum
 }; // RGB is a vector of dimension 3
 using PixelType = itk::RGBPixel<unsigned short>;
 using ImageType = itk::Image<PixelType, ImageDimension>;
-using CoordRepType = double;
-using InterpolatorType = itk::VectorLinearInterpolateImageFunction<ImageType, CoordRepType>;
+using CoordinateType = itk::SpacePrecisionType;
+using InterpolatorType = itk::VectorLinearInterpolateImageFunction<ImageType, CoordinateType>;
 using IndexType = InterpolatorType::IndexType;
 using PointType = InterpolatorType::PointType;
 using ContinuousIndexType = InterpolatorType::ContinuousIndexType;
@@ -52,7 +52,7 @@ TestGeometricPoint(const InterpolatorType * interp, const PointType & point, boo
 
   std::cout << " Point: " << point;
 
-  bool bvalue = interp->IsInsideBuffer(point);
+  const bool bvalue = interp->IsInsideBuffer(point);
   std::cout << " Inside: " << bvalue;
 
   if (bvalue != isInside)
@@ -63,31 +63,34 @@ TestGeometricPoint(const InterpolatorType * interp, const PointType & point, boo
 
   if (isInside)
   {
-    int        k;
     OutputType value = interp->Evaluate(point);
     std::cout << " Value: ";
-    for (k = 0; k < VectorDimension - 1; ++k)
     {
-      std::cout << value[k] << ", ";
-    }
-    std::cout << value[k] << std::endl;
-
-    for (k = 0; k < VectorDimension; ++k)
-    {
-      if (itk::Math::abs(value[k] - trueValue[k]) > 1e-9)
+      int k = 0;
+      for (; k < VectorDimension - 1; ++k)
       {
-        break;
+        std::cout << value[k] << ", ";
       }
+      std::cout << value[k] << std::endl;
     }
-
-    if (k != VectorDimension)
     {
-      std::cout << " *** Error: Value should be: ";
-      for (k = 0; k < VectorDimension - 1; ++k)
+      int k = 0;
+      for (; k < VectorDimension; ++k)
       {
-        std::cout << trueValue[k] << ", ";
+        if (itk::Math::abs(value[k] - trueValue[k]) > 1e-9)
+        {
+          break;
+        }
       }
-      std::cout << trueValue[k] << std::endl;
+      if (k != VectorDimension)
+      {
+        std::cout << " *** Error: Value should be: ";
+        for (k = 0; k < VectorDimension - 1; ++k)
+        {
+          std::cout << trueValue[k] << ", ";
+        }
+        std::cout << trueValue[k] << std::endl;
+      }
     }
   }
 
@@ -109,7 +112,7 @@ TestContinuousIndex(const InterpolatorType *    interp,
 
   std::cout << " Index: " << index;
 
-  bool bvalue = interp->IsInsideBuffer(index);
+  const bool bvalue = interp->IsInsideBuffer(index);
   std::cout << " Inside: " << bvalue;
 
   if (bvalue != isInside)
@@ -120,31 +123,35 @@ TestContinuousIndex(const InterpolatorType *    interp,
 
   if (isInside)
   {
-    int        k;
     OutputType value = interp->EvaluateAtContinuousIndex(index);
     std::cout << " Value: ";
-    for (k = 0; k < VectorDimension - 1; ++k)
     {
-      std::cout << value[k] << ", ";
-    }
-    std::cout << value[k] << std::endl;
-
-    for (k = 0; k < VectorDimension; ++k)
-    {
-      if (itk::Math::abs(value[k] - trueValue[k]) > 1e-9)
+      int k = 0;
+      for (; k < VectorDimension - 1; ++k)
       {
-        break;
+        std::cout << value[k] << ", ";
       }
+      std::cout << value[k] << std::endl;
     }
-
-    if (k != VectorDimension)
     {
-      std::cout << " *** Error: Value should be: ";
-      for (k = 0; k < VectorDimension - 1; ++k)
+      int k = 0;
+      for (k = 0; k < VectorDimension; ++k)
       {
-        std::cout << trueValue[k] << ", ";
+        if (itk::Math::abs(value[k] - trueValue[k]) > 1e-9)
+        {
+          break;
+        }
       }
-      std::cout << trueValue[k] << std::endl;
+
+      if (k != VectorDimension)
+      {
+        std::cout << " *** Error: Value should be: ";
+        for (k = 0; k < VectorDimension - 1; ++k)
+        {
+          std::cout << trueValue[k] << ", ";
+        }
+        std::cout << trueValue[k] << std::endl;
+      }
     }
   }
 
@@ -157,8 +164,6 @@ TestContinuousIndex(const InterpolatorType *    interp,
 int
 itkRGBInterpolateImageFunctionTest(int, char *[])
 {
-  int flag = 0;
-
   std::cout << "Testing vector image interpolation: " << std::endl;
 
   using ImageType = RGBInterpolate::ImageType;
@@ -170,11 +175,11 @@ itkRGBInterpolateImageFunctionTest(int, char *[])
 
   using InterpolatorType = RGBInterpolate::InterpolatorType;
 
-  const unsigned int ImageDimension = RGBInterpolate::ImageDimension;
+  constexpr unsigned int ImageDimension = RGBInterpolate::ImageDimension;
 
-  ImageType::SizeType size = { { 20, 40, 80 } };
-  double              origin[3] = { 0.5, 0.5, 0.5 };
-  double              spacing[3] = { 0.1, 0.05, 0.025 };
+  constexpr ImageType::SizeType size = { { 20, 40, 80 } };
+  constexpr double              origin[3] = { 0.5, 0.5, 0.5 };
+  constexpr double              spacing[3] = { 0.1, 0.05, 0.025 };
 
 
   // Create a test image
@@ -191,22 +196,18 @@ itkRGBInterpolateImageFunctionTest(int, char *[])
 
   // Write in a simple linear pattern
   using Iterator = itk::ImageRegionIteratorWithIndex<ImageType>;
-  Iterator iter(image, region);
 
-  IndexType      index;
-  unsigned short value;
-  PixelType      pixel;
-
-  for (; !iter.IsAtEnd(); ++iter)
+  for (Iterator iter(image, region); !iter.IsAtEnd(); ++iter)
   {
-    index = iter.GetIndex();
-    value = 0;
+    IndexType      index = iter.GetIndex();
+    unsigned short value = 0;
 
     for (unsigned int j = 0; j < ImageDimension; ++j)
     {
       value += index[j];
     }
 
+    PixelType pixel;
     for (unsigned int k = 0; k < ImageDimension; ++k)
     {
       pixel[k] = (k + 1) * value;
@@ -223,122 +224,116 @@ itkRGBInterpolateImageFunctionTest(int, char *[])
   /* Test evaluation at continuous indices and corresponding
      gemetric points */
   std::cout << "Evaluate at: " << std::endl;
-  OutputType          output;
-  ContinuousIndexType cindex;
-  PointType           point;
-  bool                passed;
-
+  int flag = 0;
   // an integer position inside the image
   {
     itk::SpacePrecisionType darray[3] = { 10, 20, 40 };
     double                  temp[3] = { 70, 140, 210 };
-    output = OutputType(temp);
-    cindex = ContinuousIndexType(darray);
-    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+    auto                    output = OutputType(temp);
+    auto                    cindex = ContinuousIndexType(darray);
+    bool                    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
+    PointType point;
+    image->TransformContinuousIndexToPhysicalPoint(cindex, point);
+    passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
   }
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
-  image->TransformContinuousIndexToPhysicalPoint(cindex, point);
-  passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
   // position at the image border
   {
-    itk::SpacePrecisionType darray[3] = { 0, 20, 40 };
-    double                  temp[3] = { 60, 120, 180 };
-    output = OutputType(temp);
-    cindex = ContinuousIndexType(darray);
-    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+    itk::SpacePrecisionType darray2[3] = { 0, 20, 40 };
+    double                  temp2[3] = { 60, 120, 180 };
+    auto                    output = OutputType(temp2);
+    auto                    cindex = ContinuousIndexType(darray2);
+    bool                    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+
+
+    if (!passed)
+    {
+      flag = 1;
+    }
+    PointType point;
+    image->TransformContinuousIndexToPhysicalPoint(cindex, point);
+    passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
   }
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
-  image->TransformContinuousIndexToPhysicalPoint(cindex, point);
-  passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
   // position near image border
   {
-    itk::SpacePrecisionType epsilon = 1.0e-10;
-    itk::SpacePrecisionType darray[3] = { 19 - epsilon, 20, 40 };
-    double                  temp[3] = { 79, 158, 237 };
-    output = OutputType(temp);
-    cindex = ContinuousIndexType(darray);
-    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+    constexpr itk::SpacePrecisionType epsilon = 1.0e-10;
+    itk::SpacePrecisionType           darray[3] = { 19 - epsilon, 20, 40 };
+    double                            temp[3] = { 79, 158, 237 };
+    auto                              output = OutputType(temp);
+    auto                              cindex = ContinuousIndexType(darray);
+    bool                              passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+
+
+    if (!passed)
+    {
+      flag = 1;
+    }
+    PointType point;
+    image->TransformContinuousIndexToPhysicalPoint(cindex, point);
+    passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
   }
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
-  image->TransformContinuousIndexToPhysicalPoint(cindex, point);
-  passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
   // position outside the image
   {
     itk::SpacePrecisionType darray[3] = { 20, 20, 40 };
     double                  temp[3] = { 1, 1, 1 };
-    output = OutputType(temp);
-    cindex = ContinuousIndexType(darray);
-    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, false, output);
+    auto                    output = OutputType(temp);
+    auto                    cindex = ContinuousIndexType(darray);
+    bool                    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, false, output);
+
+
+    if (!passed)
+    {
+      flag = 1;
+    }
+    PointType point;
+    image->TransformContinuousIndexToPhysicalPoint(cindex, point);
+    passed = RGBInterpolate::TestGeometricPoint(interp, point, false, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
   }
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
-  image->TransformContinuousIndexToPhysicalPoint(cindex, point);
-  passed = RGBInterpolate::TestGeometricPoint(interp, point, false, output);
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
   // at non-integer position
   {
     itk::SpacePrecisionType darray[3] = { 5.25, 12.5, 42.0 };
     double                  temp[3] = { 59.75, 119.5, 179.25 };
-    output = OutputType(temp);
-    cindex = ContinuousIndexType(darray);
-    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+    auto                    output = OutputType(temp);
+    auto                    cindex = ContinuousIndexType(darray);
+    bool                    passed = RGBInterpolate::TestContinuousIndex(interp, cindex, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
+    PointType point;
+    image->TransformContinuousIndexToPhysicalPoint(cindex, point);
+    passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
+
+    if (!passed)
+    {
+      flag = 1;
+    }
   }
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
-  image->TransformContinuousIndexToPhysicalPoint(cindex, point);
-  passed = RGBInterpolate::TestGeometricPoint(interp, point, true, output);
-
-  if (!passed)
-  {
-    flag = 1;
-  }
-
 
   /* Return results of test */
   if (flag != 0)
@@ -346,10 +341,9 @@ itkRGBInterpolateImageFunctionTest(int, char *[])
     std::cout << "*** Some test failed" << std::endl;
     return flag;
   }
-  else
-  {
-    std::cout << "All tests successfully passed" << std::endl;
-  }
+
+  std::cout << "All tests successfully passed" << std::endl;
+
 
   return EXIT_SUCCESS;
 }

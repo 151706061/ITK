@@ -35,7 +35,7 @@ namespace itk
  *  \brief Read MetaImage file format.
  *
  *  For a detailed description of using this format, please see
- *  https://www.itk.org/Wiki/ITK/MetaIO/Documentation
+ *  https://insightsoftwareconsortium.github.io/ITKWikiArchive/Wiki/ITK/MetaIO/Documentation
  *
  *  \ingroup IOFilters
  * \ingroup ITKIOMeta
@@ -53,7 +53,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MetaImageIO);
 
   /** The different types of ImageIO's can support data of varying
@@ -109,7 +109,7 @@ public:
 
   /** set the precision in the MetaImage member
    */
-  virtual void
+  void
   SetDoublePrecision(unsigned int precision)
   {
     m_MetaImage.SetDoublePrecision(precision);
@@ -164,8 +164,10 @@ public:
   /** Determining the subsampling factor in case
    *  we want a coarse version of the image/
    * \warning this is only used when streaming is on. */
+  /** @ITKStartGrouping */
   itkSetMacro(SubSamplingFactor, unsigned int);
   itkGetConstMacro(SubSamplingFactor, unsigned int);
+  /** @ITKEndGrouping */
 
   /**
    * Set the default precision when writing out the MetaImage header.
@@ -177,11 +179,12 @@ public:
    * This function is not thread safe.
    * Default value after static initialization is 17.
    */
+  /** @ITKStartGrouping */
   static void
   SetDefaultDoublePrecision(unsigned int precision);
   static unsigned int
   GetDefaultDoublePrecision();
-
+  /** @ITKEndGrouping */
 protected:
   MetaImageIO();
   ~MetaImageIO() override;
@@ -189,7 +192,9 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
   template <unsigned int VNRows, unsigned int VNColumns = VNRows>
   bool
-  WriteMatrixInMetaData(std::ostringstream & strs, const MetaDataDictionary & metaDict, const std::string & metaString);
+  WriteMatrixInMetaData(std::ostringstream &       strs,
+                        const MetaDataDictionary & metaDict,
+                        const std::string &        metaString) const;
 
 private:
   /** Only used to synchronize the global variable across static libraries.*/
@@ -206,7 +211,7 @@ template <unsigned int VNRows, unsigned int VNColumns>
 bool
 MetaImageIO::WriteMatrixInMetaData(std::ostringstream &       strs,
                                    const MetaDataDictionary & metaDict,
-                                   const std::string &        metaString)
+                                   const std::string &        metaString) const
 {
   itk::Matrix<double, VNRows, VNColumns> mval;
   if (ExposeMetaData<itk::Matrix<double, VNRows, VNColumns>>(metaDict, metaString, mval))

@@ -93,13 +93,13 @@ itkMultiScaleHessianBasedMeasureImageFilterTest(int argc, char * argv[])
 
   multiScaleEnhancementFilter->SetSigmaStepMethodToLogarithmic();
 
-  itk::SimpleFilterWatcher watcher(multiScaleEnhancementFilter);
+  const itk::SimpleFilterWatcher watcher(multiScaleEnhancementFilter);
 
   constexpr double tolerance = 0.01;
 
   if (argc > 4)
   {
-    double sigmaMinimum = std::stod(argv[4]);
+    const double sigmaMinimum = std::stod(argv[4]);
     multiScaleEnhancementFilter->SetSigmaMinimum(sigmaMinimum);
 
     if (itk::Math::abs(multiScaleEnhancementFilter->GetSigmaMinimum() - sigmaMinimum) > tolerance)
@@ -111,7 +111,7 @@ itkMultiScaleHessianBasedMeasureImageFilterTest(int argc, char * argv[])
 
   if (argc > 5)
   {
-    double sigmaMaximum = std::stod(argv[5]);
+    const double sigmaMaximum = std::stod(argv[5]);
     multiScaleEnhancementFilter->SetSigmaMaximum(sigmaMaximum);
 
     if (itk::Math::abs(multiScaleEnhancementFilter->GetSigmaMaximum() - sigmaMaximum) > tolerance)
@@ -123,7 +123,7 @@ itkMultiScaleHessianBasedMeasureImageFilterTest(int argc, char * argv[])
 
   if (argc > 6)
   {
-    unsigned int numberOfSigmaSteps = std::stoi(argv[6]);
+    const unsigned int numberOfSigmaSteps = std::stoi(argv[6]);
     multiScaleEnhancementFilter->SetNumberOfSigmaSteps(numberOfSigmaSteps);
 
     if (multiScaleEnhancementFilter->GetNumberOfSigmaSteps() != numberOfSigmaSteps)
@@ -219,7 +219,7 @@ itkMultiScaleHessianBasedMeasureImageFilterTest(int argc, char * argv[])
 
   if (argc > 9)
   {
-    // Change sigma step to equispaced type and regnerate vesselness image
+    // Change sigma step to equispaced type and regenerate vesselness image
     auto sigmaStepMethod = static_cast<MultiScaleEnhancementFilterType::SigmaStepMethodEnum>(
       MultiScaleEnhancementFilterType::SigmaStepMethodEnum::EquispacedSigmaSteps);
     multiScaleEnhancementFilter->SetSigmaStepMethod(sigmaStepMethod);
@@ -251,7 +251,7 @@ itkMultiScaleHessianBasedMeasureImageFilterTest(int argc, char * argv[])
 
   if (argc > 10)
   {
-    // Change NonNegativeHessianBasedMeasure to Off and regnerate vesselness image
+    // Change NonNegativeHessianBasedMeasure to Off and regenerate vesselness image
     nonNegativeHessianBasedMeasure = false;
     ITK_TEST_SET_GET_BOOLEAN(
       multiScaleEnhancementFilter, NonNegativeHessianBasedMeasure, nonNegativeHessianBasedMeasure);

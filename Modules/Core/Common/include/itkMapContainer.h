@@ -55,7 +55,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard part of every itk Object. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MapContainer);
 
   /** Save the template parameters. */
@@ -73,6 +73,7 @@ public:
   /** Provide pass-through constructors corresponding to all the STL
    * map constructors.  These are for internal use only since this is also
    * an Object which must be constructed through the "New()" routine. */
+  /** @ITKStartGrouping */
   MapContainer()
     : MapType()
   {}
@@ -88,7 +89,7 @@ public:
   MapContainer(TInputIterator first, TInputIterator last, const MapKeyCompareType & comp)
     : MapType(first, last, comp)
   {}
-
+  /** @ITKEndGrouping */
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
@@ -181,8 +182,16 @@ public:
       : m_Iter(i)
     {}
 
-    Iterator & operator*() { return *this; }
-    Iterator * operator->() { return this; }
+    Iterator &
+    operator*()
+    {
+      return *this;
+    }
+    Iterator *
+    operator->()
+    {
+      return this;
+    }
     Iterator &
     operator++()
     {
@@ -227,7 +236,7 @@ public:
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
     /** Get the index into the MapContainer associated with this iterator.   */
-    ElementIdentifier
+    [[nodiscard]] ElementIdentifier
     Index() const
     {
       return m_Iter->first;
@@ -266,8 +275,16 @@ public:
       : m_Iter(r.m_Iter)
     {}
 
-    ConstIterator & operator*() { return *this; }
-    ConstIterator * operator->() { return this; }
+    ConstIterator &
+    operator*()
+    {
+      return *this;
+    }
+    ConstIterator *
+    operator->()
+    {
+      return this;
+    }
     ConstIterator &
     operator++()
     {
@@ -312,14 +329,14 @@ public:
     ITK_UNEQUAL_OPERATOR_MEMBER_FUNCTION(ConstIterator);
 
     /** Get the index into the MapContainer associated with this iterator.   */
-    ElementIdentifier
+    [[nodiscard]] ElementIdentifier
     Index() const
     {
       return m_Iter->first;
     }
 
     /** Get the value at this iterator's location in the MapContainer.   */
-    const Element &
+    [[nodiscard]] const Element &
     Value() const
     {
       return m_Iter->second;
@@ -445,7 +462,8 @@ public:
    * memory usage.
    */
   void
-  Squeeze();
+  Squeeze()
+  {}
 
   /**
    * Tell the container to release any memory it may have allocated and

@@ -31,7 +31,7 @@ namespace Functor
 {
 /** \class Cast
  *
- *  \deprecated This functor is no longer used by the CastImageFilter.
+ * Deprecated: This functor is no longer used by the CastImageFilter.
  * \ingroup ITKImageFilterBase
  */
 
@@ -119,7 +119,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CastImageFilter);
 
 protected:

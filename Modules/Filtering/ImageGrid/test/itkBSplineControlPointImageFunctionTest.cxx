@@ -79,7 +79,7 @@ itkBSplineControlPointImageFunctionTest(int, char *[])
   bspliner->SetSize(size);
   ITK_TEST_SET_GET_VALUE(size, bspliner->GetSize());
 
-  unsigned int bSplineOrderValue = 3;
+  constexpr unsigned int bSplineOrderValue = 3;
   bspliner->SetSplineOrder(bSplineOrderValue);
   for (auto i : bspliner->GetSplineOrder())
   {
@@ -92,18 +92,16 @@ itkBSplineControlPointImageFunctionTest(int, char *[])
     }
   }
 
-  BSplinerType::ArrayType bSplineOrder;
-  bSplineOrder.Fill(bSplineOrderValue);
+  auto bSplineOrder = itk::MakeFilled<BSplinerType::ArrayType>(bSplineOrderValue);
   bspliner->SetSplineOrder(bSplineOrder);
   ITK_TEST_SET_GET_VALUE(bSplineOrder, bspliner->GetSplineOrder());
 
-  BSplinerType::ArrayType::ValueType closeDimensionValue = 0;
-  BSplinerType::ArrayType            closeDimension;
-  closeDimension.Fill(closeDimensionValue);
+  constexpr BSplinerType::ArrayType::ValueType closeDimensionValue = 0;
+  auto closeDimension = itk::MakeFilled<BSplinerType::ArrayType>(closeDimensionValue);
   bspliner->SetCloseDimension(closeDimension);
   ITK_TEST_SET_GET_VALUE(closeDimension, bspliner->GetCloseDimension());
 
-  BSplinerType::RealType bSplineEpsilon = 1e-3;
+  constexpr BSplinerType::RealType bSplineEpsilon = 1e-3;
   bspliner->SetBSplineEpsilon(bSplineEpsilon);
   ITK_TEST_SET_GET_VALUE(bSplineEpsilon, bspliner->GetBSplineEpsilon());
 

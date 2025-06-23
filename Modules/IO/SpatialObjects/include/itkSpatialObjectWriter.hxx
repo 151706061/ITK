@@ -23,12 +23,23 @@ namespace itk
 {
 template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
 SpatialObjectWriter<VDimension, PixelType, TMeshTraits>::SpatialObjectWriter()
+  : m_FileName("")
+  , m_SpatialObject(nullptr)
+  , m_MetaToSpatialConverter(MetaSceneConverterType::New())
+{}
+
+template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
+void
+SpatialObjectWriter<VDimension, PixelType, TMeshTraits>::SetMetaIOVersion(unsigned int ver)
 {
-  m_FileName = "";
-  m_SpatialObject = nullptr;
-  m_BinaryPoints = false;
-  m_WriteImagesInSeparateFile = false;
-  m_MetaToSpatialConverter = MetaSceneConverterType::New();
+  m_MetaToSpatialConverter->SetMetaIOVersion(ver);
+}
+
+template <unsigned int VDimension, typename PixelType, typename TMeshTraits>
+unsigned int
+SpatialObjectWriter<VDimension, PixelType, TMeshTraits>::GetMetaIOVersion() const
+{
+  return m_MetaToSpatialConverter->GetMetaIOVersion();
 }
 
 /** Set the precision at which the transform should be written */

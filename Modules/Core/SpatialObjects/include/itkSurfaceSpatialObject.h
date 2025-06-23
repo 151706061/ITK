@@ -58,13 +58,13 @@ public:
   using typename Superclass::BoundingBoxType;
   using typename Superclass::CovariantVectorType;
 
-  using PointContainerType = VectorContainer<IdentifierType, PointType>;
+  using PointContainerType = VectorContainer<PointType>;
   using PointContainerPointer = SmartPointer<PointContainerType>;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Method for creation through the object factory. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SurfaceSpatialObject);
 
   /** Restore a spatial object to its initial state, yet preserves Id as well as
@@ -74,7 +74,7 @@ public:
 
 #if !defined(ITK_LEGACY_REMOVE)
   /** Approximate the normals of the surface. */
-  itkLegacyMacro(bool Approximate3DNormals());
+  itkLegacyMacro(bool Approximate3DNormals();)
 #endif
 
   /** Compute the normals to the surface from neighboring points. */
@@ -85,7 +85,7 @@ protected:
   SurfaceSpatialObject();
   ~SurfaceSpatialObject() override = default;
 
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 };
 

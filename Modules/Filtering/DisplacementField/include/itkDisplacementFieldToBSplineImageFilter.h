@@ -54,7 +54,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DisplacementFieldToBSplineImageFilter);
 
   /** Extract dimension from input image. */
@@ -95,71 +95,43 @@ public:
   using ArrayType = typename BSplineFilterType::ArrayType;
 
   /** Set the displacement field */
-  void
-  SetDisplacementField(const InputFieldType * field)
-  {
-    this->SetInput(0, field);
-  }
+  itkSetInputMacro(DisplacementField, InputFieldType);
 
   /** Get the input displacement field. */
-  const InputFieldType *
-  GetDisplacementField() const
-  {
-    return this->GetInput(0);
-  }
+  itkGetInputMacro(DisplacementField, InputFieldType);
 
   /**
    * Set confidence image function.  If a confidence image is specified,
    * estimation of the displacement field weights the contribution of each voxel
    * according the value of the corresponding voxel in the confidence image.
    */
-  void
-  SetConfidenceImage(const RealImageType * image)
-  {
-    this->SetNthInput(1, const_cast<RealImageType *>(image));
-  }
+  /** @ITKStartGrouping */
+  itkSetInputMacro(ConfidenceImage, RealImageType);
+  itkGetInputMacro(ConfidenceImage, RealImageType);
+
   void
   SetInput1(const RealImageType * image)
   {
     this->SetConfidenceImage(image);
   }
+  /** @ITKEndGrouping */
 
   /** Get confidence image function. */
-  const RealImageType *
-  GetConfidenceImage() const
-  {
-    return static_cast<const RealImageType *>(this->ProcessObject::GetInput(1));
-  }
 
   /** Set the input point set */
-  void
-  SetPointSet(const InputPointSetType * points)
-  {
-    this->SetNthInput(2, const_cast<InputPointSetType *>(points));
-  }
+  /** @ITKStartGrouping */
+  itkSetInputMacro(PointSet, InputPointSetType);
+  itkGetInputMacro(PointSet, InputPointSetType);
   void
   SetInput2(const InputPointSetType * points)
   {
     this->SetPointSet(points);
   }
-
-  /** Get the input point set. */
-  const InputPointSetType *
-  GetPointSet() const
-  {
-    return static_cast<const InputPointSetType *>(this->ProcessObject::GetInput(2));
-  }
+  /** @ITKEndGrouping */
 
   /** Set the confidence weights associated with the input point set*/
   void
   SetPointSetConfidenceWeights(WeightsContainerType * weights);
-
-  /** Get the displacement field control point lattice. */
-  const DisplacementFieldControlPointLatticeType *
-  GetDisplacementFieldControlPointLattice() const
-  {
-    return static_cast<const DisplacementFieldControlPointLatticeType *>(this->GetOutput(1));
-  }
 
   /** Define the b-spline domain from an image */
   void
@@ -248,9 +220,7 @@ public:
   void
   SetNumberOfFittingLevels(unsigned int n)
   {
-    ArrayType nlevels;
-
-    nlevels.Fill(n);
+    auto nlevels = MakeFilled<ArrayType>(n);
     this->SetNumberOfFittingLevels(nlevels);
   }
 
@@ -265,16 +235,20 @@ public:
   /**
    * Estimate the inverse field instead of the forward field.  Default = false.
    */
+  /** @ITKStartGrouping */
   itkBooleanMacro(EstimateInverse);
   itkSetMacro(EstimateInverse, bool);
   itkGetConstMacro(EstimateInverse, bool);
+  /** @ITKEndGrouping */
 
   /**
    * Enforce stationary boundary conditions.  Default = false.
    */
+  /** @ITKStartGrouping */
   itkBooleanMacro(EnforceStationaryBoundary);
   itkSetMacro(EnforceStationaryBoundary, bool);
   itkGetConstMacro(EnforceStationaryBoundary, bool);
+  /** @ITKEndGrouping */
 
 protected:
   /** Constructor */
@@ -286,6 +260,9 @@ protected:
   /** Standard print self function **/
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
+
+  void
+  VerifyPreconditions() const override;
 
   /** preprocessing function */
   void

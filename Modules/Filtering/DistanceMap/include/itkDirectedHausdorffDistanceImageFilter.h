@@ -85,7 +85,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DirectedHausdorffDistanceImageFilter);
 
   /** Image related type alias. */
@@ -126,19 +126,17 @@ public:
   GetInput2();
 
   /** Set/Get if image spacing should be used in computing distances. */
+  /** @ITKStartGrouping */
   itkSetMacro(UseImageSpacing, bool);
   itkGetConstMacro(UseImageSpacing, bool);
   itkBooleanMacro(UseImageSpacing);
-
+  /** @ITKEndGrouping */
   /** Return the computed directed Hausdorff distance. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(DirectedHausdorffDistance, RealType);
   itkGetConstMacro(AverageHausdorffDistance, RealType);
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKEndGrouping */
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<InputImage1PixelType>));
-  // End concept checking
-#endif
 
 protected:
   DirectedHausdorffDistanceImageFilter();
@@ -162,7 +160,7 @@ protected:
 
   /** Multi-thread version GenerateData. */
   void
-  DynamicThreadedGenerateData(const RegionType & outputRegionForThread) override;
+  DynamicThreadedGenerateData(const RegionType & regionForThread) override;
 
 
   // Override since the filter needs all the data for the algorithm

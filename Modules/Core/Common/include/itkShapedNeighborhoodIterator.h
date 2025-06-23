@@ -82,8 +82,7 @@ namespace itk
    it.ActivateOffset(offset3);
    // etc..
    ...
-   ShapedNeighborhoodIterator<ImageType>::Iterator i;
-   for (i = it.Begin(); ! i.IsAtEnd(); ++i)
+   for (auto i = it.Begin(); ! i.IsAtEnd(); ++i)
    { i.Set(i.Get() + 1.0); }
    // you may also use i != i.End(), but IsAtEnd() may be slightly faster.
    \endcode
@@ -186,7 +185,7 @@ public:
       : ConstIterator(s)
     {}
 
-    ~Iterator() ITK_ITERATOR_OVERRIDE = default;
+    ~Iterator() = default;
     Iterator &
     operator=(const Iterator & o)
     {
@@ -240,6 +239,7 @@ public:
 
   /** Returns a const iterator for the neighborhood which points to the first
    * pixel in the neighborhood. */
+  /** @ITKStartGrouping */
   Iterator
   Begin()
   {
@@ -250,6 +250,7 @@ public:
   {
     return Iterator(this, this->m_ActiveIndexList.end());
   }
+  /** @ITKEndGrouping */
 
   using Superclass::Begin;
   using Superclass::End;

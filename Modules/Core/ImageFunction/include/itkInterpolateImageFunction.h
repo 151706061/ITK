@@ -41,9 +41,9 @@ namespace itk
  *
  * \ingroup ITKImageFunction
  */
-template <typename TInputImage, typename TCoordRep = double>
+template <typename TInputImage, typename TCoordinate = double>
 class ITK_TEMPLATE_EXPORT InterpolateImageFunction
-  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>
+  : public ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(InterpolateImageFunction);
@@ -51,12 +51,12 @@ public:
   /** Standard class type aliases. */
   using Self = InterpolateImageFunction;
   using Superclass =
-    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordRep>;
+    ImageFunction<TInputImage, typename NumericTraits<typename TInputImage::PixelType>::RealType, TCoordinate>;
 
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(InterpolateImageFunction);
 
   /** OutputType type alias support */
@@ -96,7 +96,7 @@ public:
   Evaluate(const PointType & point) const override
   {
     const ContinuousIndexType index =
-      this->GetInputImage()->template TransformPhysicalPointToContinuousIndex<TCoordRep>(point);
+      this->GetInputImage()->template TransformPhysicalPointToContinuousIndex<TCoordinate>(point);
     return (this->EvaluateAtContinuousIndex(index));
   }
 
@@ -127,28 +127,13 @@ public:
     return (static_cast<RealType>(this->GetInputImage()->GetPixel(index)));
   }
 
-/** Get the radius required for interpolation.
- *
- * This defines the number of surrounding pixels required to interpolate at
- * a given point.
- */
-#if defined(ITKV4_COMPATIBILITY)
-  virtual SizeType
-  GetRadius() const
-  {
-    // if ITKv4 compatibility is enabled then set the radius to the
-    // largest by default.
-    const InputImageType * input = this->GetInputImage();
-    if (!input)
-    {
-      itkExceptionMacro("Input image required!");
-    }
-    return input->GetLargestPossibleRegion().GetSize();
-  }
-#else
+  /** Get the radius required for interpolation.
+   *
+   * This defines the number of surrounding pixels required to interpolate at
+   * a given point.
+   */
   virtual SizeType
   GetRadius() const = 0;
-#endif
 
 protected:
   InterpolateImageFunction() = default;

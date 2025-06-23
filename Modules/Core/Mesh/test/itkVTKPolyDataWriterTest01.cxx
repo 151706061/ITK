@@ -47,9 +47,9 @@ itkVTKPolyDataWriterTest01(int argc, char * argv[])
   constexpr unsigned int numberOfPoints = 4;
   constexpr unsigned int numberOfCells = 9;
 
-  float rawPoints[12] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0 };
+  constexpr float rawPoints[12] = { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0 };
 
-  unsigned long rawCells[24] = { 0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3, 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3 };
+  constexpr unsigned long rawCells[24] = { 0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3, 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3 };
 
   mesh->GetPoints()->Reserve(numberOfPoints);
   mesh->GetCells()->Reserve(numberOfCells);
@@ -67,8 +67,6 @@ itkVTKPolyDataWriterTest01(int argc, char * argv[])
   MeshType::PointIdentifier pointIds[3];
 
   MeshType::CellAutoPointer cell;
-  TriangleCellType *        triangle;
-  LineCellType *            line;
 
   for (unsigned int i = 0; i < 4; ++i)
   {
@@ -76,7 +74,7 @@ itkVTKPolyDataWriterTest01(int argc, char * argv[])
     pointIds[1] = rawCells[3 * i + 1];
     pointIds[2] = rawCells[3 * i + 2];
 
-    triangle = new TriangleCellType;
+    auto * triangle = new TriangleCellType;
     triangle->SetPointIds(pointIds);
     cell.TakeOwnership(triangle);
     mesh->SetCell(i, cell);
@@ -86,7 +84,7 @@ itkVTKPolyDataWriterTest01(int argc, char * argv[])
     pointIds[0] = rawCells[12 + 2 * (i - 4)];
     pointIds[1] = rawCells[12 + 2 * (i - 4) + 1];
 
-    line = new LineCellType;
+    auto * line = new LineCellType;
     line->SetPointIds(pointIds);
     cell.TakeOwnership(line);
     mesh->SetCell(i, cell);
@@ -98,7 +96,7 @@ itkVTKPolyDataWriterTest01(int argc, char * argv[])
 
 
   writer->SetInput(mesh);
-  std::string inputFileName = argv[1];
+  const std::string inputFileName = argv[1];
   writer->SetFileName(inputFileName);
   ITK_TEST_SET_GET_VALUE(inputFileName, writer->GetFileName());
 

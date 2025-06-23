@@ -55,7 +55,7 @@ ParameterizationQuadEdgeMeshFilterTest(const char * inputFilename,
     return EXIT_FAILURE;
   }
 
-  typename MeshType::Pointer mesh = reader->GetOutput();
+  const typename MeshType::Pointer mesh = reader->GetOutput();
 
   // ** CHOSE< COMPUTE AND SET BORDER TRANSFORM **
   auto border_transform = BorderTransformType::New();
@@ -125,7 +125,7 @@ ParameterizationQuadEdgeMeshFilterTest(const char * inputFilename,
 
   // ** PROCESS **
   param->Update();
-  typename MeshType::Pointer output = param->GetOutput();
+  const typename MeshType::Pointer output = param->GetOutput();
 
   // ** WRITE OUTPUT **
   auto writer = WriterType::New();
@@ -170,7 +170,7 @@ itkParameterizationQuadEdgeMeshFilterTest(int argc, char * argv[])
     return ParameterizationQuadEdgeMeshFilterTest<IterativeSolverTraits>(
       argv[1], std::stoi(argv[2]), std::stoi(argv[3]), argv[5]);
   }
-  else if (std::stoi(argv[4]) == 1)
+  if (std::stoi(argv[4]) == 1)
   {
     return ParameterizationQuadEdgeMeshFilterTest<LUSolverTraits>(
       argv[1], std::stoi(argv[2]), std::stoi(argv[3]), argv[5]);

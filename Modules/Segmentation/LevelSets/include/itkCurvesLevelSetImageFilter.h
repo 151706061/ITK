@@ -45,7 +45,8 @@ namespace itk
  *    the initial contour does not have to lie wholly within the shape to be segmented.
  *    The initial contour is allow to overlap the shape boundary. The extra advection term
  *    in the update equation behaves like a doublet and attracts the contour to the boundary.
- *    This approach for segmentation follows that of Lorigo et al (2001).
+ *    This approach for segmentation follows that of Lorigo et al
+ *    (2001) \cite lorigo2001.
  *
  *    \par
  *    The second input is the feature image.  For this filter, this is the edge
@@ -82,10 +83,7 @@ namespace itk
  *    zero crossings of the image correspond to the position of the level set
  *    front.
  *
- *    \par REFERENCES
- *    L. Lorigo, O. Faugeras, W.E.L. Grimson, R. Keriven, R. Kikinis, A. Nabavi,
- *    and C.-F. Westin, Curves: Curve evolution for vessel segmentation.
- *    Medical Image Analysis, 5:195-206, 2001.
+ *    For algorithmic details see \cite lorigo2001.
  *
  *   \par
  *   See SparseFieldLevelSetImageFilter and
@@ -120,7 +118,7 @@ public:
   using CurvesFunctionType = CurvesLevelSetFunction<OutputImageType, FeatureImageType>;
   using CurvesFunctionPointer = typename CurvesFunctionType::Pointer;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(CurvesLevelSetImageFilter);
 
   /** Method for creation through the object factory */
@@ -134,17 +132,13 @@ public:
     this->Modified();
   }
 
-  float
+  [[nodiscard]] float
   GetDerivativeSigma() const
   {
     return m_CurvesFunction->GetDerivativeSigma();
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputHasNumericTraitsCheck, (Concept::HasNumericTraits<TOutputPixelType>));
-  // End concept checking
-#endif
 
 protected:
   ~CurvesLevelSetImageFilter() override = default;

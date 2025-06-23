@@ -19,9 +19,7 @@
 #include "itkRandomVariateGeneratorBase.h"
 #include "itkObjectFactory.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 class VariateGeneratorTestHelper : public RandomVariateGeneratorBase
@@ -39,7 +37,7 @@ public:
   double
   GetVariate() override
   {
-    double theAnswerToTheQuestionOfLifeTheUniverseAndEverything = 42.0;
+    constexpr double theAnswerToTheQuestionOfLifeTheUniverseAndEverything = 42.0;
     return theAnswerToTheQuestionOfLifeTheUniverseAndEverything;
   }
 
@@ -52,8 +50,8 @@ public:
   }
 };
 
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics
+
 
 int
 itkRandomVariateGeneratorBaseTest(int, char *[])

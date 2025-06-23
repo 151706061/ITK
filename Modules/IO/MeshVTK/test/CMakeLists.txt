@@ -1,12 +1,14 @@
 itk_module_test()
 
-set(ITKIOMeshVTKTests
-    itkMeshFileReadWriteTest.cxx
-    itkMeshFileWriteReadTensorTest.cxx
-    itkMeshFileReadWriteVectorAttributeTest.cxx
-    itkPolylineReadWriteTest.cxx
-    itkVTKPolyDataMeshCanReadImageTest.cxx
-    itkVTKPolyDataMeshIOTest.cxx)
+set(
+  ITKIOMeshVTKTests
+  itkMeshFileReadWriteTest.cxx
+  itkMeshFileWriteReadTensorTest.cxx
+  itkMeshFileReadWriteVectorAttributeTest.cxx
+  itkPolylineReadWriteTest.cxx
+  itkVTKPolyDataMeshCanReadImageTest.cxx
+  itkVTKPolyDataMeshIOTest.cxx
+)
 
 createtestdriver(ITKIOMeshVTK "${ITKIOMeshVTK-Test_LIBRARIES}" "${ITKIOMeshVTKTests}")
 
@@ -16,8 +18,28 @@ itk_add_test(
   COMMAND
   ITKIOMeshVTKTestDriver
   itkMeshFileReadWriteTest
-  DATA{Baseline/sphere.vtk}
-  ${ITK_TEST_OUTPUT_DIR}/sphere00.vtk)
+  DATA{Input/sphere.vtk}
+  ${ITK_TEST_OUTPUT_DIR}/sphere00.vtk
+)
+itk_add_test(
+  NAME
+  itkMeshFileReadWriteTest01
+  COMMAND
+  ITKIOMeshVTKTestDriver
+  itkMeshFileReadWriteTest
+  DATA{Input/sphere_51.vtk}
+  ${ITK_TEST_OUTPUT_DIR}/sphere_51_01.vtk
+)
+itk_add_test(
+  NAME
+  itkMeshFileReadWriteTest02
+  COMMAND
+  ITKIOMeshVTKTestDriver
+  itkMeshFileReadWriteTest
+  DATA{Input/sphere_51_b.vtk}
+  ${ITK_TEST_OUTPUT_DIR}/sphere_51_b_02.vtk
+  binary
+)
 itk_add_test(
   NAME
   itkMeshFileReadWriteVectorAttributeTest
@@ -25,7 +47,8 @@ itk_add_test(
   ITKIOMeshVTKTestDriver
   itkMeshFileReadWriteVectorAttributeTest
   DATA{Baseline/sphere_norm.vtk}
-  ${ITK_TEST_OUTPUT_DIR}/sphere_norm.vtk)
+  ${ITK_TEST_OUTPUT_DIR}/sphere_norm.vtk
+)
 itk_add_test(
   NAME
   itkPolyLineReadWriteTest00
@@ -33,7 +56,8 @@ itk_add_test(
   ITKIOMeshVTKTestDriver
   itkPolylineReadWriteTest
   DATA{Baseline/fibers.vtk}
-  ${ITK_TEST_OUTPUT_DIR}/fibers.vtk)
+  ${ITK_TEST_OUTPUT_DIR}/fibers.vtk
+)
 itk_add_test(
   NAME
   itkPolyLineReadWriteTest01
@@ -42,7 +66,8 @@ itk_add_test(
   itkPolylineReadWriteTest
   DATA{Baseline/fibers.vtk}
   ${ITK_TEST_OUTPUT_DIR}/fibers_b.vtk
-  1)
+  1
+)
 itk_add_test(
   NAME
   itkPolyLineReadWriteTest02
@@ -50,7 +75,8 @@ itk_add_test(
   ITKIOMeshVTKTestDriver
   itkPolylineReadWriteTest
   DATA{Baseline/hollow_test.vtk}
-  ${ITK_TEST_OUTPUT_DIR}/hollow_test.vtk)
+  ${ITK_TEST_OUTPUT_DIR}/hollow_test.vtk
+)
 itk_add_test(
   NAME
   itkPolyLineReadWriteTest03
@@ -59,7 +85,8 @@ itk_add_test(
   itkPolylineReadWriteTest
   DATA{Baseline/hollow_test.vtk}
   ${ITK_TEST_OUTPUT_DIR}/hollow_test_b.vtk
-  1)
+  1
+)
 itk_add_test(
   NAME
   itkMeshFileWriteReadTensorTest
@@ -67,21 +94,23 @@ itk_add_test(
   ITKIOMeshVTKTestDriver
   itkMeshFileWriteReadTensorTest
   ${ITK_TEST_OUTPUT_DIR}/itkMeshFileWriteReadTensorTest2D.vtk
-  ${ITK_TEST_OUTPUT_DIR}/itkMeshFileWriteReadTensorTest3D.vtk)
+  ${ITK_TEST_OUTPUT_DIR}/itkMeshFileWriteReadTensorTest3D.vtk
+)
 itk_add_test(
   NAME
   itkVTKPolyDataMeshCanReadImageTest
   COMMAND
   ITKIOMeshVTKTestDriver
   itkVTKPolyDataMeshCanReadImageTest
-  DATA{Input/ironProt.vtk})
+  DATA{Input/ironProt.vtk}
+)
 itk_add_test(
   NAME
   itkVTKPolyDataMeshIOTestInOutAscii
   COMMAND
   ITKIOMeshVTKTestDriver
   itkVTKPolyDataMeshIOTest
-  DATA{Baseline/sphere.vtk}
+  DATA{Input/sphere.vtk}
   ${ITK_TEST_OUTPUT_DIR}/sphere_a.vtk
   DATA{${ITK_DATA_ROOT}/Input/HeadMRVolume.mha}
   ${ITK_TEST_OUTPUT_DIR}/ascii2asciivtk2mhaHeadMRVolume.mha
@@ -95,14 +124,15 @@ itk_add_test(
   320
   0
   0
-  0)
+  0
+)
 itk_add_test(
   NAME
   itkVTKPolyDataMeshIOTestInAsciiOutBinary
   COMMAND
   ITKIOMeshVTKTestDriver
   itkVTKPolyDataMeshIOTest
-  DATA{Baseline/sphere.vtk}
+  DATA{Input/sphere.vtk}
   ${ITK_TEST_OUTPUT_DIR}/sphere_b.vtk
   DATA{${ITK_DATA_ROOT}/Input/HeadMRVolume.mha}
   ${ITK_TEST_OUTPUT_DIR}/ascii2binaryvtk2mhaHeadMRVolume.mha
@@ -116,7 +146,8 @@ itk_add_test(
   320
   0
   0
-  1)
+  1
+)
 itk_add_test(
   NAME
   itkVTKPolyDataMeshIOTestInBinaryOutAscii
@@ -137,7 +168,8 @@ itk_add_test(
   2
   2
   1
-  0)
+  0
+)
 itk_add_test(
   NAME
   itkVTKPolyDataMeshIOTestInOutBinary
@@ -158,7 +190,8 @@ itk_add_test(
   2
   2
   1
-  1)
+  1
+)
 
 set(ITKIOMeshVTKGTests itkVTKPolyDataMeshIOGTest.cxx)
 

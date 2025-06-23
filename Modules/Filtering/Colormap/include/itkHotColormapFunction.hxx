@@ -18,17 +18,14 @@
 #ifndef itkHotColormapFunction_hxx
 #define itkHotColormapFunction_hxx
 
-
-namespace itk
-{
-namespace Function
+namespace itk::Function
 {
 template <typename TScalar, typename TRGBPixel>
 auto
 HotColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const -> RGBPixelType
 {
   // Map the input scalar between [0, 1].
-  RealType value = this->RescaleInputValue(v);
+  const RealType value = this->RescaleInputValue(v);
 
   // Apply the color mapping.
   RealType red = 63.0 / 26.0 * value - 1.0 / 13.0;
@@ -50,7 +47,6 @@ HotColormapFunction<TScalar, TRGBPixel>::operator()(const TScalar & v) const -> 
 
   return pixel;
 }
-} // end namespace Function
-} // end namespace itk
+} // namespace itk::Function
 
 #endif

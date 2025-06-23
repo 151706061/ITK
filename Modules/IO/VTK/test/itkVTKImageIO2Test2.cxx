@@ -40,7 +40,7 @@ itkVTKImageIO2Test2(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  std::string outputFileName = argv[1];
+  const std::string outputFileName = argv[1];
 
   using PixelType = itk::SymmetricSecondRankTensor<double, 3>;
   using ImageType = itk::Image<PixelType, 3>;
@@ -51,9 +51,8 @@ itkVTKImageIO2Test2(int argc, char * argv[])
 
   {
     // allocate an 10x10x10 image
-    auto                image = ImageType::New();
-    ImageType::SizeType imageSize;
-    imageSize.Fill(10);
+    auto image = ImageType::New();
+    auto imageSize = ImageType::SizeType::Filled(10);
     image->SetRegions(imageSize);
     image->Allocate();
 

@@ -21,7 +21,6 @@ namespace itk
 {
 CacheableScalarFunction::CacheableScalarFunction()
   : m_CacheTable(0)
-
 {}
 
 CacheableScalarFunction::~CacheableScalarFunction() = default;
@@ -33,16 +32,13 @@ CacheableScalarFunction::CreateCache(double lowerBound, double upperBound, SizeV
   m_CacheLowerBound = lowerBound;
   m_CacheUpperBound = upperBound;
 
-  SizeValueType i;
-  MeasureType   d;
-
   m_CacheTable = MeasureArrayType(m_NumberOfSamples);
 
   m_TableInc =
     static_cast<MeasureType>((m_CacheUpperBound - m_CacheLowerBound) / static_cast<double>(m_NumberOfSamples - 1));
 
-  d = static_cast<MeasureType>(m_CacheLowerBound);
-  for (i = 0; i < m_NumberOfSamples; ++i)
+  auto d = static_cast<MeasureType>(m_CacheLowerBound);
+  for (SizeValueType i = 0; i < m_NumberOfSamples; ++i)
   {
     m_CacheTable[i] = Evaluate(d);
     d += m_TableInc;

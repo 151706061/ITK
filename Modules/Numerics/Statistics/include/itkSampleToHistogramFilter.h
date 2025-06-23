@@ -43,9 +43,7 @@ itkDeclareExceptionMacro(HistogramWrongNumberOfComponents,
                          SampleToHistogramFilterException,
                          "Histogram has wrong number of components");
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 
 /**
@@ -76,7 +74,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SampleToHistogramFilter);
 
   /** Method for creation through the object factory. */
@@ -136,9 +134,10 @@ public:
   /** Methods for setting and getting the Minimum and Maximum values of the
    * histogram bins.
    \warning To use those values you need to set the AutoMinimumMaximum flag to false.*/
+  /** @ITKStartGrouping */
   itkSetGetDecoratedInputMacro(HistogramBinMinimum, HistogramMeasurementVectorType);
   itkSetGetDecoratedInputMacro(HistogramBinMaximum, HistogramMeasurementVectorType);
-
+  /** @ITKEndGrouping */
   /** Methods for setting and getting the boolean flag that defines whether the
    * minimum and maximum of the histogram are going to be computed
    * automatically from the values of the sample.
@@ -163,11 +162,12 @@ protected:
    * called.
    * \sa ProcessObject
    */
+  /** @ITKStartGrouping */
   using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
   using Superclass::MakeOutput;
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
-
+  /** @ITKEndGrouping */
   // Where the histogram is actually computed
   void
   GenerateData() override;
@@ -186,7 +186,7 @@ private:
       {
         return NumericTraits<HistogramMeasurementType>::max();
       }
-      else if (from <= fromMin)
+      if (from <= fromMin)
       {
         return NumericTraits<HistogramMeasurementType>::min();
       }
@@ -195,8 +195,7 @@ private:
   }
 
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkSampleToHistogramFilter.hxx"

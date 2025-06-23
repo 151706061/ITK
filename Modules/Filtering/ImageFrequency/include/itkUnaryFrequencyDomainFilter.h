@@ -72,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(UnaryFrequencyDomainFilter);
 
   /** Typedef to images */
@@ -87,9 +87,7 @@ public:
 
   static constexpr unsigned int ImageDimension = TImageType::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
   itkConceptMacro(ImageTypeHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TImageType::PixelType>));
-#endif
 
   /** Frequency Iterator types */
   using FrequencyIteratorType = TFrequencyIterator;
@@ -100,10 +98,11 @@ public:
    * original image in the spatial domain was odd.
    * Only needed when using HermitianFrequencyIterator and the original
    * image was odd. **/
+  /** @ITKStartGrouping */
   itkSetMacro(ActualXDimensionIsOdd, bool);
   itkGetConstReferenceMacro(ActualXDimensionIsOdd, bool);
   itkBooleanMacro(ActualXDimensionIsOdd);
-
+  /** @ITKEndGrouping */
   /** Returns factor with which the current frequency should be multiplied. */
   using ConstRefFunctionType = double(const FrequencyIteratorType &);
 
@@ -194,12 +193,13 @@ protected:
    *
    * \sa ImageToImageFilter::ThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData()  */
+  /** @ITKStartGrouping */
   template <typename TFunctor>
   void
   DynamicThreadedGenerateDataWithFunctor(const TFunctor &, const ImageRegionType & outputRegionForThread);
   void
   DynamicThreadedGenerateData(const ImageRegionType & outputRegionForThread) override;
-
+  /** @ITKEndGrouping */
 private:
   std::function<void(const ImageRegionType &)> m_DynamicThreadedGenerateDataFunction{};
 

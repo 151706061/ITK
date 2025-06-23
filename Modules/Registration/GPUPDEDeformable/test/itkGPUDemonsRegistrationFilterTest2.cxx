@@ -134,12 +134,9 @@ itkGPUDemonsRegistrationFilterTest2(int argc, char * argv[])
   SizeType                 size;
   size.SetSize(sizeArray);
 
-  IndexType index;
-  index.Fill(0);
+  IndexType index{};
 
-  RegionType region;
-  region.SetSize(size);
-  region.SetIndex(index);
+  RegionType region{ index, size };
 
   auto moving = ImageType::New();
   auto fixed = ImageType::New();
@@ -175,8 +172,7 @@ itkGPUDemonsRegistrationFilterTest2(int argc, char * argv[])
   FillWithCircle<ImageType>(fixed, center, radius, fgnd, bgnd);
 
   // fill initial deformation with zero vectors
-  VectorType zeroVec;
-  zeroVec.Fill(0.0);
+  VectorType zeroVec{};
   initField->FillBuffer(zeroVec);
 
   using CasterType = itk::CastImageFilter<FieldType, FieldType>;
@@ -206,8 +202,7 @@ itkGPUDemonsRegistrationFilterTest2(int argc, char * argv[])
   registrator->UseMovingImageGradientOff();
 
   using FunctionType = RegistrationType::GPUDemonsRegistrationFunctionType;
-  FunctionType * fptr;
-  fptr = dynamic_cast<FunctionType *>(registrator->GetDifferenceFunction().GetPointer());
+  auto * fptr = dynamic_cast<FunctionType *>(registrator->GetDifferenceFunction().GetPointer());
   if (!fptr)
   {
     std::cout << "Invalid demons registration function ptr" << std::endl;
@@ -230,8 +225,7 @@ itkGPUDemonsRegistrationFilterTest2(int argc, char * argv[])
 
   using ProgressType = ShowProgressObject<RegistrationType>;
   ProgressType                                    progressWatch(registrator);
-  itk::SimpleMemberCommand<ProgressType>::Pointer command;
-  command = itk::SimpleMemberCommand<ProgressType>::New();
+  itk::SimpleMemberCommand<ProgressType>::Pointer command = itk::SimpleMemberCommand<ProgressType>::New();
   command->SetCallbackFunction(&progressWatch, &ProgressType::ShowProgress);
   registrator->AddObserver(itk::ProgressEvent(), command);
 
@@ -244,8 +238,8 @@ itkGPUDemonsRegistrationFilterTest2(int argc, char * argv[])
   using WarperType = itk::WarpImageFilter<ImageType, ImageType, FieldType>;
   auto warper = WarperType::New();
 
-  using CoordRepType = WarperType::CoordRepType;
-  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>;
+  using CoordinateType = WarperType::CoordinateType;
+  using InterpolatorType = itk::NearestNeighborInterpolateImageFunction<ImageType, CoordinateType>;
   auto interpolator = InterpolatorType::New();
 
   warper->SetInput(moving);

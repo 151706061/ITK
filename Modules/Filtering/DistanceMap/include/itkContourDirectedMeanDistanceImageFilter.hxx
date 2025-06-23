@@ -33,15 +33,13 @@ namespace itk
 {
 template <typename TInputImage1, typename TInputImage2>
 ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::ContourDirectedMeanDistanceImageFilter()
-  : m_MeanDistance(1)
+  : m_DistanceMap(nullptr)
+  , m_MeanDistance(1)
   , m_Count(1)
+  , m_ContourDirectedMeanDistance(RealType{})
 {
   // this filter requires two input images
   this->SetNumberOfRequiredInputs(2);
-
-  m_UseImageSpacing = true;
-  m_DistanceMap = nullptr;
-  m_ContourDirectedMeanDistance = RealType{};
   this->DynamicMultiThreadingOff();
 }
 
@@ -84,12 +82,12 @@ ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::GenerateInpu
   // - the corresponding region of the second image
   if (this->GetInput1())
   {
-    InputImage1Pointer image1 = const_cast<InputImage1Type *>(this->GetInput1());
+    const InputImage1Pointer image1 = const_cast<InputImage1Type *>(this->GetInput1());
     image1->SetRequestedRegionToLargestPossibleRegion();
 
     if (this->GetInput2())
     {
-      InputImage2Pointer image2 = const_cast<InputImage2Type *>(this->GetInput2());
+      const InputImage2Pointer image2 = const_cast<InputImage2Type *>(this->GetInput2());
       image2->SetRequestedRegion(this->GetInput1()->GetRequestedRegion());
     }
   }
@@ -108,7 +106,7 @@ void
 ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::AllocateOutputs()
 {
   // Pass the first input through as the output
-  InputImage1Pointer image = const_cast<TInputImage1 *>(this->GetInput1());
+  const InputImage1Pointer image = const_cast<TInputImage1 *>(this->GetInput1());
 
   this->GraftOutput(image);
 }
@@ -117,7 +115,7 @@ template <typename TInputImage1, typename TInputImage2>
 void
 ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
+  const ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
 
   // Resize the thread temporaries
   m_MeanDistance.SetSize(numberOfWorkUnits);
@@ -144,7 +142,7 @@ template <typename TInputImage1, typename TInputImage2>
 void
 ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::AfterThreadedGenerateData()
 {
-  ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
+  const ThreadIdType numberOfWorkUnits = this->GetNumberOfWorkUnits();
 
   // Find mean over all threads
   IdentifierType count = 0;
@@ -175,16 +173,15 @@ ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::ThreadedGene
 
   ConstNeighborhoodIterator<InputImage1Type> bit;
 
-  InputImage1ConstPointer input = this->GetInput();
+  const InputImage1ConstPointer input = this->GetInput();
 
   // Find the data-set boundary "faces"
-  SizeType radius;
-  radius.Fill(1);
+  constexpr auto radius = SizeType::Filled(1);
 
   using FaceListType = typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImage1Type>::FaceListType;
 
   NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImage1Type> bC;
-  FaceListType faceList = bC(input, outputRegionForThread, radius);
+  const FaceListType faceList = bC(input, outputRegionForThread, radius);
 
   // Support progress methods/callbacks
   ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
@@ -195,7 +192,7 @@ ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::ThreadedGene
   {
     ImageRegionConstIterator<DistanceMapType> it2(m_DistanceMap, face);
     bit = ConstNeighborhoodIterator<InputImage1Type>(radius, input, face);
-    unsigned int neighborhoodSize = bit.Size();
+    const unsigned int neighborhoodSize = bit.Size();
 
     bit.OverrideBoundaryCondition(&nbc);
     bit.GoToBegin();
@@ -240,7 +237,7 @@ ContourDirectedMeanDistanceImageFilter<TInputImage1, TInputImage2>::PrintSelf(st
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "UseImageSpacing: " << (m_UseImageSpacing ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageSpacing);
   os << indent << "ContourDirectedMeanDistance: " << m_ContourDirectedMeanDistance << std::endl;
 }
 } // end namespace itk

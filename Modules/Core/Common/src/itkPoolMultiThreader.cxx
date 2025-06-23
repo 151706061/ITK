@@ -86,12 +86,10 @@ PoolMultiThreader::PoolMultiThreader()
   }
 
   ThreadIdType defaultThreads = std::max(1u, GetGlobalDefaultNumberOfThreads());
-#if !defined(ITKV4_COMPATIBILITY)
   if (defaultThreads > 1) // one work unit for only one thread
   {
     defaultThreads *= 4;
   }
-#endif
   m_NumberOfWorkUnits = std::min<ThreadIdType>(ITK_MAX_THREADS, defaultThreads);
   m_MaximumNumberOfThreads = m_ThreadPool->GetMaximumNumberOfThreads();
 }
@@ -109,7 +107,7 @@ void
 PoolMultiThreader::SetMaximumNumberOfThreads(ThreadIdType numberOfThreads)
 {
   Superclass::SetMaximumNumberOfThreads(numberOfThreads);
-  ThreadIdType threadCount = m_ThreadPool->GetMaximumNumberOfThreads();
+  const ThreadIdType threadCount = m_ThreadPool->GetMaximumNumberOfThreads();
   if (threadCount < m_MaximumNumberOfThreads)
   {
     m_ThreadPool->AddThreads(m_MaximumNumberOfThreads - threadCount);
@@ -256,11 +254,11 @@ PoolMultiThreader::ParallelizeImageRegion(unsigned int         dimension,
     else
     {
       const ImageRegionSplitterBase * splitter = ImageSourceCommon::GetGlobalDefaultSplitter();
-      ThreadIdType                    splitCount = splitter->GetNumberOfSplits(region, m_NumberOfWorkUnits);
+      const ThreadIdType              splitCount = splitter->GetNumberOfSplits(region, m_NumberOfWorkUnits);
       ProgressReporter                reporter(filter, 0, splitCount);
       itkAssertOrThrowMacro(splitCount <= m_NumberOfWorkUnits, "Split count is greater than number of work units!");
       ImageIORegion iRegion;
-      ThreadIdType  total;
+      ThreadIdType  total = 0;
       for (ThreadIdType i = 1; i < splitCount; ++i)
       {
         iRegion = region;

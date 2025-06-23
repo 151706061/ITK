@@ -46,7 +46,9 @@ template <typename TInput, typename TOutput>
 class ITK_TEMPLATE_EXPORT ThresholdLabeler
 {
 public:
-  ThresholdLabeler() { m_LabelOffset = NumericTraits<TOutput>::OneValue(); }
+  ThresholdLabeler()
+    : m_LabelOffset(NumericTraits<TOutput>::OneValue())
+  {}
   ~ThresholdLabeler() = default;
 
   using RealThresholdType = typename NumericTraits<TInput>::RealType;
@@ -131,7 +133,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ThresholdLabelerImageFilter);
 
   /** Pixel types. */
@@ -144,21 +146,18 @@ public:
   using RealThresholdVector = std::vector<RealThresholdType>;
 
   /** The input and output pixel types must support comparison operators. */
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
+  /** @ITKStartGrouping */
   itkConceptMacro(PixelTypeComparable, (Concept::Comparable<InputPixelType>));
   itkConceptMacro(OutputPixelTypeComparable, (Concept::Comparable<OutputPixelType>));
   itkConceptMacro(OutputPixelTypeOStreamWritable, (Concept::OStreamWritable<OutputPixelType>));
-  // End concept checking
-#endif
-
+  /** @ITKEndGrouping */
   /** Set the vector of thresholds. */
   void
   SetThresholds(const ThresholdVector & thresholds)
   {
     m_Thresholds = thresholds;
     m_RealThresholds.clear();
-    typename ThresholdVector::const_iterator itr = m_Thresholds.begin();
+    auto itr = m_Thresholds.begin();
     while (itr != m_Thresholds.end())
     {
       m_RealThresholds.push_back(static_cast<RealThresholdType>(*itr));
@@ -180,7 +179,7 @@ public:
   {
     m_RealThresholds = thresholds;
     m_Thresholds.clear();
-    typename RealThresholdVector::const_iterator itr = m_RealThresholds.begin();
+    auto itr = m_RealThresholds.begin();
     while (itr != m_RealThresholds.end())
     {
       m_Thresholds.push_back(static_cast<InputPixelType>(*itr));
@@ -197,9 +196,10 @@ public:
   }
 
   /** Set the offset which labels have to start from. */
+  /** @ITKStartGrouping */
   itkSetClampMacro(LabelOffset, OutputPixelType, OutputPixelType{}, NumericTraits<OutputPixelType>::max());
   itkGetConstMacro(LabelOffset, OutputPixelType);
-
+  /** @ITKEndGrouping */
 protected:
   ThresholdLabelerImageFilter();
   ~ThresholdLabelerImageFilter() override = default;

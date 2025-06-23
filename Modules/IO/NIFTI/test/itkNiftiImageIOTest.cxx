@@ -25,8 +25,7 @@ template <>
 itk::ImageBase<1>::DirectionType
 PreFillDirection<1>()
 {
-  itk::ImageBase<1>::DirectionType myDirection;
-  myDirection.Fill(0.0);
+  itk::ImageBase<1>::DirectionType myDirection{};
   myDirection[0][0] = -1.0;
   return myDirection;
 }
@@ -35,8 +34,7 @@ template <>
 itk::ImageBase<2>::DirectionType
 PreFillDirection<2>()
 {
-  itk::ImageBase<2>::DirectionType myDirection;
-  myDirection.Fill(0.0);
+  itk::ImageBase<2>::DirectionType myDirection{};
   myDirection[0][1] = 1.0;
   myDirection[1][0] = -1.0;
   return myDirection;
@@ -46,8 +44,7 @@ template <>
 itk::ImageBase<3>::DirectionType
 PreFillDirection<3>()
 {
-  itk::ImageBase<3>::DirectionType myDirection;
-  myDirection.Fill(0.0);
+  itk::ImageBase<3>::DirectionType myDirection{};
   myDirection[0][2] = 1.0;
   myDirection[1][0] = -1.0;
   myDirection[2][1] = 1.0;
@@ -58,8 +55,7 @@ template <>
 itk::ImageBase<4>::DirectionType
 PreFillDirection<4>()
 {
-  itk::ImageBase<4>::DirectionType myDirection;
-  myDirection.Fill(0.0);
+  itk::ImageBase<4>::DirectionType myDirection{};
   myDirection[0][2] = 1.0;
   myDirection[1][0] = -1.0;
   myDirection[2][1] = 1.0;
@@ -103,14 +99,16 @@ itkNiftiImageIOTest(int argc, char * argv[])
   itk::ObjectFactoryBase::UnRegisterAllFactories();
   itk::NiftiImageIOFactory::RegisterOneFactory();
   int rval = 0;
-  //
-  // first argument is passing in the writable directory to do all testing
-  if (argc > 1)
+  if (argc < 2)
   {
-    char * testdir = *++argv;
-    --argc;
-    itksys::SystemTools::ChangeDirectory(testdir);
+    std::cerr << "testFileName required." << std::endl;
+    return EXIT_FAILURE;
   }
+  //
+  // first argument is the test filepath to do all testing
+  const char * testFileName = *++argv;
+  --argc;
+
   std::string prefix = "";
   if (argc > 1)
   {
@@ -126,11 +124,19 @@ itkNiftiImageIOTest(int argc, char * argv[])
   if (argc > 1) // This is a mechanism for reading unsigned char images for testing.
   {
     using ImageType = itk::Image<unsigned char, 3>;
-    ImageType::Pointer         input;
-    itk::NiftiImageIO::Pointer imageIO = itk::NiftiImageIO::New();
+    const itk::NiftiImageIO::Pointer imageIO = itk::NiftiImageIO::New();
 
     ITK_EXERCISE_BASIC_OBJECT_METHODS(imageIO, NiftiImageIO, ImageIOBase);
 
+
+    auto convertRASVectors = false;
+    ITK_TEST_SET_GET_BOOLEAN(imageIO, ConvertRASVectors, convertRASVectors);
+
+    auto convertRASDisplacementVectors = true;
+    ITK_TEST_SET_GET_BOOLEAN(imageIO, ConvertRASDisplacementVectors, convertRASDisplacementVectors);
+
+    auto sFORM_Permissive = false;
+    ITK_TEST_SET_GET_BOOLEAN(imageIO, SFORM_Permissive, sFORM_Permissive);
 
     // Enable old behavior of NIFTI reader
     imageIO->SetLegacyAnalyze75Mode(itk::NiftiImageIOEnums::Analyze75Flavor::AnalyzeITK4);
@@ -141,12 +147,12 @@ itkNiftiImageIOTest(int argc, char * argv[])
 
       // The way the test is structured, we cannot know the expected file
       // type, so just print it
-      typename itk::NiftiImageIOEnums::NiftiFileEnum fileType = imageIO->DetermineFileType(fileName.c_str());
+      const typename itk::NiftiImageIOEnums::NiftiFileEnum fileType = imageIO->DetermineFileType(fileName.c_str());
       std::cout << "File type: " << fileType << std::endl;
 
       try
       {
-        input = itk::IOTestHelper::ReadImage<ImageType>(fileName, false, imageIO);
+        const ImageType::Pointer input = itk::IOTestHelper::ReadImage<ImageType>(fileName, false, imageIO);
       }
       catch (const itk::ExceptionObject & e)
       {
@@ -157,75 +163,74 @@ itkNiftiImageIOTest(int argc, char * argv[])
   }
   else // This is the mechanism for doing internal testing of all data types.
   {
-    int cur_return;
-    cur_return = MakeNiftiImage<char>();
+    int cur_return = MakeNiftiImage<char>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type char" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<unsigned char>();
+    cur_return = MakeNiftiImage<unsigned char>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type unsigned char" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<short>();
+    cur_return = MakeNiftiImage<short>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type short" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<unsigned short>();
+    cur_return = MakeNiftiImage<unsigned short>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type unsigned short" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<int>();
+    cur_return = MakeNiftiImage<int>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type int" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<unsigned int>();
+    cur_return = MakeNiftiImage<unsigned int>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type unsigned int" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<long>();
+    cur_return = MakeNiftiImage<long>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type long" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<unsigned long>();
+    cur_return = MakeNiftiImage<unsigned long>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type unsigned long" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<long long>();
+    cur_return = MakeNiftiImage<long long>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type long long" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<unsigned long long>();
+    cur_return = MakeNiftiImage<unsigned long long>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type unsigned long long" << std::endl;
       rval += cur_return;
     }
-    cur_return = MakeNiftiImage<float>();
+    cur_return = MakeNiftiImage<float>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type float" << std::endl;
       rval += cur_return;
     }
     // awaiting a double precision byte swapper
-    cur_return = MakeNiftiImage<double>();
+    cur_return = MakeNiftiImage<double>(testFileName);
     if (cur_return != 0)
     {
       std::cerr << "Error writing Nifti file type double" << std::endl;
@@ -236,7 +241,7 @@ itkNiftiImageIOTest(int argc, char * argv[])
   }
   // Tests added to increase code coverage.
   {
-    itk::NiftiImageIOFactory::Pointer MyFactoryTest = itk::NiftiImageIOFactory::New();
+    const itk::NiftiImageIOFactory::Pointer MyFactoryTest = itk::NiftiImageIOFactory::New();
     if (MyFactoryTest.IsNull())
     {
       return EXIT_FAILURE;

@@ -67,14 +67,14 @@ public:
   double
   GetValue(const ParametersType & position) const override
   {
-    double x = position[0];
-    double y = position[1];
+    const double x = position[0];
+    const double y = position[1];
 
     std::cout << "GetValue ( ";
     std::cout << x << " , " << y;
     std::cout << ") = ";
 
-    double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const double val = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     std::cout << val << std::endl;
 
@@ -84,8 +84,8 @@ public:
   void
   GetDerivative(const ParametersType & position, DerivativeType & derivative) const override
   {
-    double x = position[0];
-    double y = position[1];
+    const double x = position[0];
+    const double y = position[1];
 
     std::cout << "GetDerivative ( ";
     std::cout << x << " , " << y;
@@ -128,7 +128,7 @@ itkLBFGSOptimizerTest(int, char *[])
   auto costFunction = LBFGSCostFunction::New();
 
   // Set some optimizer parameters
-  bool trace = false;
+  constexpr bool trace = false;
   ITK_TEST_SET_GET_BOOLEAN(itkOptimizer, Trace, trace);
 
   unsigned int maximumNumberOfFunctionEvaluations = 1000;
@@ -152,7 +152,7 @@ itkLBFGSOptimizerTest(int, char *[])
 
   // const double F_Tolerance      = 1e-3;  // Function value tolerance: not used
   // const double X_Tolerance      = 1e-8;  // Search space tolerance: not used
-  // const double Epsilon_Function = 1e-10; // Step : not used
+  // constexpr double Epsilon_Function = 1e-10; // Step : not used
 
   vnlOptimizerType * vnlOptimizer = itkOptimizer->GetOptimizer();
 
@@ -209,8 +209,7 @@ itkLBFGSOptimizerTest(int, char *[])
   std::cout << "Number of evals = " << vnlOptimizer->get_num_evaluations() << std::endl;
   std::cout << std::endl;
 
-  OptimizerType::ParametersType finalPosition;
-  finalPosition = itkOptimizer->GetCurrentPosition();
+  OptimizerType::ParametersType finalPosition = itkOptimizer->GetCurrentPosition();
 
   std::cout << "Solution        = (" << finalPosition[0] << ',' << finalPosition[1] << ')' << std::endl;
 
@@ -219,8 +218,8 @@ itkLBFGSOptimizerTest(int, char *[])
   //
   // check results to see if it is within range
   //
-  bool   pass = true;
-  double trueParameters[2] = { 2, -2 };
+  bool             pass = true;
+  constexpr double trueParameters[2] = { 2, -2 };
   for (unsigned int j = 0; j < 2; ++j)
   {
     if (itk::Math::abs(finalPosition[j] - trueParameters[j]) > 0.01)
@@ -237,16 +236,15 @@ itkLBFGSOptimizerTest(int, char *[])
 
   // Get the final value of the optimizer
   std::cout << "Testing GetValue() : ";
-  OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
+  const OptimizerType::MeasureType finalValue = itkOptimizer->GetValue();
   if (itk::Math::abs(finalValue + 10.0) > 0.01)
   {
     std::cout << "[FAILURE]" << std::endl;
     return EXIT_FAILURE;
   }
-  else
-  {
-    std::cout << "[SUCCESS]" << std::endl;
-  }
+
+  std::cout << "[SUCCESS]" << std::endl;
+
 
   std::cout << "Test passed." << std::endl;
   return EXIT_SUCCESS;

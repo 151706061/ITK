@@ -20,9 +20,7 @@
 
 #include "itkImageRegionIterator.h"
 
-namespace itk
-{
-namespace watershed
+namespace itk::watershed
 {
 template <typename TPixelType, unsigned int TDimension>
 void
@@ -38,10 +36,10 @@ BoundaryResolver<TPixelType, TDimension>::GenerateData()
   typename BoundaryType::IndexType idxA;
   typename BoundaryType::IndexType idxB;
 
-  EquivalencyTableType::Pointer equivTable = this->GetEquivalencyTable();
+  const EquivalencyTableType::Pointer equivTable = this->GetEquivalencyTable();
 
-  typename BoundaryType::Pointer boundaryA = this->GetBoundaryA();
-  typename BoundaryType::Pointer boundaryB = this->GetBoundaryB();
+  const typename BoundaryType::Pointer boundaryA = this->GetBoundaryA();
+  const typename BoundaryType::Pointer boundaryB = this->GetBoundaryB();
 
   idxA.first = this->GetFace();
   idxB.first = this->GetFace();
@@ -90,13 +88,8 @@ BoundaryResolver<TPixelType, TDimension>::GenerateData()
 // --------------------PIPELINE METHODS------------------------
 // ------------------------------------------------------------
 template <typename TPixelType, unsigned int TDimension>
-void
-BoundaryResolver<TPixelType, TDimension>::GenerateOutputRequestedRegion(DataObject *)
-{}
-
-template <typename TPixelType, unsigned int TDimension>
 typename BoundaryResolver<TPixelType, TDimension>::DataObjectPointer
-  BoundaryResolver<TPixelType, TDimension>::MakeOutput(DataObjectPointerArraySizeType)
+BoundaryResolver<TPixelType, TDimension>::MakeOutput(DataObjectPointerArraySizeType)
 {
   return EquivalencyTable::New().GetPointer();
 }
@@ -109,7 +102,6 @@ BoundaryResolver<TPixelType, TDimension>::PrintSelf(std::ostream & os, Indent in
 
   os << indent << "Face: " << m_Face << std::endl;
 }
-} // end namespace watershed
-} // end namespace itk
+} // namespace itk::watershed
 
 #endif

@@ -19,14 +19,13 @@
 #include "itpack.h"
 #include "itkFEMLinearSystemWrapperItpack.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * constructor
  */
 LinearSystemWrapperItpack::LinearSystemWrapperItpack()
+
 {
   /* fill m_Methods with pointers to solver functions */
   m_Methods[0] = jcg_;
@@ -36,7 +35,7 @@ LinearSystemWrapperItpack::LinearSystemWrapperItpack()
   m_Methods[4] = ssorsi_;
   m_Methods[5] = rscg_;
   m_Methods[6] = rssi_;
-  m_Method = 0; /* set default method to jcg_ */
+  /* set default method to jcg_ */
 
   /* Set solving parameters */
   dfault_(&(m_IPARM[0]), &(m_RPARM[0]));
@@ -52,11 +51,6 @@ LinearSystemWrapperItpack::LinearSystemWrapperItpack()
   /* itpack recommended (but not default) value */
 #undef min
   m_RPARM[7] = 500.0 * NumericTraits<double>::min();
-
-  m_MaximumNonZeroValues = 0;
-  m_Matrices = nullptr;
-  m_Vectors = nullptr;
-  m_Solutions = nullptr;
 }
 
 void
@@ -132,7 +126,7 @@ LinearSystemWrapperItpack::InitializeVector(unsigned int vectorIndex)
   }
 
   /* delete old vector */
-  delete[](*m_Vectors)[vectorIndex];
+  delete[] (*m_Vectors)[vectorIndex];
 
   /* insert new vector */
   (*m_Vectors)[vectorIndex] = new doublereal[m_Order];
@@ -180,7 +174,7 @@ LinearSystemWrapperItpack::InitializeSolution(unsigned int solutionIndex)
   }
 
   /* delete old vector */
-  delete[](*m_Solutions)[solutionIndex];
+  delete[] (*m_Solutions)[solutionIndex];
 
   /* insert new vector */
   (*m_Solutions)[solutionIndex] = new doublereal[m_Order];
@@ -235,7 +229,7 @@ LinearSystemWrapperItpack::DestroyVector(unsigned int vectorIndex)
     }
 
     /* delete vector */
-    delete[](*m_Vectors)[vectorIndex];
+    delete[] (*m_Vectors)[vectorIndex];
     (*m_Vectors)[vectorIndex] = nullptr;
   }
 }
@@ -253,7 +247,7 @@ LinearSystemWrapperItpack::DestroySolution(unsigned int solutionIndex)
     }
 
     /* delete vector */
-    delete[](*m_Solutions)[solutionIndex];
+    delete[] (*m_Solutions)[solutionIndex];
     (*m_Solutions)[solutionIndex] = nullptr;
   }
 }
@@ -397,9 +391,8 @@ LinearSystemWrapperItpack::ScaleMatrix(Float scale, unsigned int matrixIndex)
       __FILE__, __LINE__, "LinearSystemWrapperItpack::ScaleMatrix", "m_Matrices", matrixIndex);
   }
 
-  int          i;
   doublereal * values = (*m_Matrices)[matrixIndex].GetA();
-  for (i = 0; i < (*m_Matrices)[matrixIndex].GetIA()[this->m_Order] - 1; ++i)
+  for (int i = 0; i < (*m_Matrices)[matrixIndex].GetIA()[this->m_Order] - 1; ++i)
   {
     values[i] = values[i] * scale;
   }
@@ -668,13 +661,11 @@ LinearSystemWrapperItpack::Solve()
   m_IPARM[7] = NW;
   IWKSP = new integer[3 * N];
   WKSP = new doublereal[NW + 2];
-
-  integer i;
-  for (i = 0; i < NW; ++i)
+  for (integer i = 0; i < NW; ++i)
   {
     WKSP[i] = 0.0;
   }
-  for (i = 0; i < (3 * N); ++i)
+  for (integer i = 0; i < (3 * N); ++i)
   {
     IWKSP[i] = 0;
   }
@@ -991,31 +982,30 @@ LinearSystemWrapperItpack::~LinearSystemWrapperItpack()
 {
   delete m_Matrices;
 
-  unsigned int i;
   if (m_Vectors)
   {
-    for (i = 0; i < m_NumberOfVectors; ++i)
+    for (unsigned int i = 0; i < m_NumberOfVectors; ++i)
     {
-      delete[](*m_Vectors)[i];
+      delete[] (*m_Vectors)[i];
     }
     delete m_Vectors;
   }
 
   if (m_Solutions)
   {
-    for (i = 0; i < m_NumberOfSolutions; ++i)
+    for (unsigned int i = 0; i < m_NumberOfSolutions; ++i)
     {
-      delete[](*m_Solutions)[i];
+      delete[] (*m_Solutions)[i];
     }
     delete m_Solutions;
   }
 }
 
-FEMExceptionItpackSolver::FEMExceptionItpackSolver(const char * file,
+FEMExceptionItpackSolver::FEMExceptionItpackSolver(std::string  file,
                                                    unsigned int lineNumber,
                                                    std::string  location,
                                                    integer      errorCode)
-  : FEMException(file, lineNumber)
+  : FEMException(std::move(file), lineNumber, std::move(location))
 {
   std::string solverError;
 
@@ -1079,9 +1069,6 @@ FEMExceptionItpackSolver::FEMExceptionItpackSolver(const char * file,
   buf << "Error: " << solverError;
 
   SetDescription(buf.str().c_str());
-
-  SetLocation(location);
 }
 
-} // end namespace fem
-} // end namespace itk
+} // namespace itk::fem

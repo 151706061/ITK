@@ -102,7 +102,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MovingHistogramImageFilterBase);
 
   /** Image related type alias. */
@@ -168,10 +168,9 @@ private:
   {
   public:
     DirectionCost(int dimension, int count)
-    {
-      m_Dimension = dimension;
-      m_Count = count;
-    }
+      : m_Dimension(dimension)
+      , m_Count(count)
+    {}
 
     /**
      * return true if the object is a worth choice for the best axis
@@ -184,7 +183,7 @@ private:
       {
         return true;
       }
-      else if (m_Count < dc.m_Count)
+      if (m_Count < dc.m_Count)
       {
         return false;
       }

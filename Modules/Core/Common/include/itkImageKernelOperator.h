@@ -32,7 +32,7 @@ namespace itk
  *
  * "Image Kernel Convolution"
  * by Tustison N., Gee J.
- * https://www.insight-journal.org/browse/publication/208
+ * https://doi.org/10.54294/e292kx
  *
  *
  * \note ImageKernelOperator does not have any user-declared "special member function",
@@ -55,7 +55,7 @@ public:
 
   using ImageType = Image<TPixel, VDimension>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ImageKernelOperator);
 
   /** Set the image kernel. Only images with odd size in all
@@ -65,7 +65,7 @@ public:
   SetImageKernel(const ImageType * kernel);
 
   /** Get the image kernel. */
-  const ImageType *
+  [[nodiscard]] const ImageType *
   GetImageKernel() const;
 
   void

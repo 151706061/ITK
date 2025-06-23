@@ -35,8 +35,8 @@ namespace itk
  *
  * This filter is multithreaded and supports input images of any size.
  *
- * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/717
+ * This implementation was taken from the Insight Journal paper
+ * \cite Lehmann_2010_b.
  *
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
@@ -78,7 +78,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FFTWInverseFFTImageFilter);
 
   /** Define the image dimension. */
@@ -93,6 +93,7 @@ public:
    * This has no effect with ITK_USE_CUFFTW.
    * /sa FFTWGlobalConfiguration
    */
+  /** @ITKStartGrouping */
   virtual void
   SetPlanRigor(const int & value)
   {
@@ -114,7 +115,7 @@ public:
     this->SetPlanRigor(FFTWGlobalConfiguration::GetPlanRigorValue(name));
 #endif
   }
-
+  /** @ITKEndGrouping */
   SizeValueType
   GetSizeGreatestPrimeFactor() const override;
 

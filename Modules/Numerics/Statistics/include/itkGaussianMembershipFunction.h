@@ -21,9 +21,7 @@
 #include "itkMatrix.h"
 #include "itkMembershipFunctionBase.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /**
  * \class GaussianMembershipFunction
@@ -64,10 +62,11 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
+  /** @ITKStartGrouping */
   itkOverrideGetNameOfClassMacro(GaussianMembershipFunction);
   itkNewMacro(Self);
-
+  /** @ITKEndGrouping */
   /** SmartPointer class for superclass */
   using MembershipFunctionPointer = typename Superclass::Pointer;
 
@@ -116,7 +115,7 @@ public:
   /** Method to clone a membership function, i.e. create a new instance of
    * the same type of membership function and configure its ivars to
    * match. */
-  typename LightObject::Pointer
+  [[nodiscard]] typename LightObject::Pointer
   InternalClone() const override;
 
 protected:
@@ -138,10 +137,9 @@ private:
   double m_PreFactor{};
 
   /** Boolean to cache whether the covariance is singular or nearly singular */
-  bool m_CovarianceNonsingular{};
+  bool m_CovarianceNonsingular{ true };
 };
-} // end of namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkGaussianMembershipFunction.hxx"

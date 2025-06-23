@@ -34,7 +34,7 @@ namespace itk
  * This code was contributed in the Insight Journal paper:
  * "Efficient implementation of kernel filtering"
  * by Beare R., Lehmann G
- * https://www.insight-journal.org/browse/publication/160
+ * https://doi.org/10.54294/igq8fn
  *
  * \author Richard Beare
  * \ingroup ITKReview
@@ -63,7 +63,7 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(FastApproximateRankImageFilter);
 
   /** Image related type alias. */
@@ -98,9 +98,9 @@ public:
 
 protected:
   FastApproximateRankImageFilter()
+
   {
     // to avoid valgrind warning
-    m_Rank = 0.0;
     this->SetRank(0.5);
   }
 

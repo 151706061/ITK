@@ -23,9 +23,7 @@
 #include <list>
 #include "itkOneWayEquivalencyTable.h"
 
-namespace itk
-{
-namespace watershed
+namespace itk::watershed
 {
 /**
  * \class SegmentTable
@@ -67,6 +65,7 @@ public:
       : label(l)
       , height(s)
     {}
+
     IdentifierType label;
     ScalarType     height;
 
@@ -78,10 +77,8 @@ public:
       {
         return true;
       }
-      else
-      {
-        return false;
-      }
+
+      return false;
     }
   };
 
@@ -125,10 +122,8 @@ public:
     {
       return nullptr;
     }
-    else
-    {
-      return &(result->second);
-    }
+
+    return &(result->second);
   }
 
   /** Lookup a segment in the table.  Returns a const pointer
@@ -142,10 +137,8 @@ public:
     {
       return 0;
     }
-    else
-    {
-      return &(result->second);
-    }
+
+    return &(result->second);
   }
 
   /** Returns TRUE if the entry key is found in the table.  FALSE if the key is
@@ -157,10 +150,8 @@ public:
     {
       return false;
     }
-    else
-    {
-      return true;
-    }
+
+    return true;
   }
 
   /** Deletes an entry from the table.   */
@@ -243,6 +234,7 @@ public:
 
   /** Set/Get the maximum depth of image on which this segment table is based.
    * (Should set really be calling modified? jc 11/16/01) */
+  /** @ITKStartGrouping */
   void
   SetMaximumDepth(ScalarType s)
   {
@@ -255,6 +247,7 @@ public:
   {
     return m_MaximumDepth;
   }
+  /** @ITKEndGrouping */
 
   /** Copies the contents of another segment table into this segment table.
       This is really operator= in disguise, although superclass information is
@@ -281,8 +274,7 @@ private:
   operator=(const Self &)
   {}
 };
-} // end namespace watershed
-} // end namespace itk
+} // namespace itk::watershed
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkWatershedSegmentTable.hxx"

@@ -37,7 +37,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa ShapeLabelObject, RelabelComponentImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
@@ -76,29 +76,26 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(AttributeUniqueLabelMapFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   /*  itkConceptMacro(InputEqualityComparableCheck,
       (Concept::EqualityComparable<InputImagePixelType>));
     itkConceptMacro(IntConvertibleToInputCheck,
       (Concept::Convertible<int, InputImagePixelType>));
     itkConceptMacro(InputOStreamWritableCheck,
       (Concept::OStreamWritable<InputImagePixelType>));*/
-  // End concept checking
-#endif
 
   /**
    * Set/Get the order of labeling of the objects. By default, the objects with
    * the highest attribute values are labeled first. Set ReverseOrdering to true
    * make the one with the smallest attributes be labeled first.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(ReverseOrdering, bool);
   itkGetConstReferenceMacro(ReverseOrdering, bool);
   itkBooleanMacro(ReverseOrdering);
-
+  /** @ITKEndGrouping */
 protected:
   AttributeUniqueLabelMapFilter();
   ~AttributeUniqueLabelMapFilter() override = default;
@@ -117,10 +114,9 @@ private:
     using LineType = typename LabelObjectType::LineType;
 
     LineOfLabelObject(const LineType l, LabelObjectType * lo)
-    {
-      this->line = l;
-      this->labelObject = lo;
-    }
+      : line(l)
+      , labelObject(lo)
+    {}
     LineType          line;
     LabelObjectType * labelObject;
   };
@@ -137,7 +133,7 @@ private:
         {
           return true;
         }
-        else if (lla.line.GetIndex()[i] < llb.line.GetIndex()[i])
+        if (lla.line.GetIndex()[i] < llb.line.GetIndex()[i])
         {
           return false;
         }

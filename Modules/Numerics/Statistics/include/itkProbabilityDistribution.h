@@ -24,9 +24,7 @@
 #include "itkArray.h"
 #include "ITKStatisticsExport.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class ProbabilityDistribution
  * \brief ProbabilityDistribution class defines common interface for
@@ -80,7 +78,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ProbabilityDistribution);
 
   /** Type of the parameter vector. */
@@ -166,7 +164,6 @@ protected:
 
   ParametersType m_Parameters{};
 }; // end of class
-} // end of namespace Statistics
-} // end namespace itk
+} // namespace itk::Statistics
 
 #endif

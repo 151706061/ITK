@@ -69,9 +69,7 @@ itkWarpMeshFilterTest(int, char *[])
   size[1] = 25;
   size[2] = 25;
 
-  DisplacementFieldType::RegionType region;
-  region.SetSize(size);
-  region.SetIndex(start);
+  const DisplacementFieldType::RegionType region{ start, size };
 
   deformationField->SetRegions(region);
 
@@ -120,19 +118,19 @@ itkWarpMeshFilterTest(int, char *[])
   ITK_TRY_EXPECT_NO_EXCEPTION(warpFilter->Update());
 
 
-  MeshType::Pointer      outputMesh = warpFilter->GetOutput();
-  MeshType::ConstPointer inputMesh = warpFilter->GetInput();
+  const MeshType::Pointer      outputMesh = warpFilter->GetOutput();
+  const MeshType::ConstPointer inputMesh = warpFilter->GetInput();
 
-  MeshType::PointsContainerPointer      outPoints = outputMesh->GetPoints();
-  MeshType::PointsContainerConstPointer inPoints = inputMesh->GetPoints();
+  const MeshType::PointsContainerPointer      outPoints = outputMesh->GetPoints();
+  const MeshType::PointsContainerConstPointer inPoints = inputMesh->GetPoints();
 
   MeshType::PointsContainer::ConstIterator inputPoint = inPoints->Begin();
   MeshType::PointsContainer::ConstIterator outputPoint = outPoints->Begin();
 
-  MeshType::PointsContainer::ConstIterator lastInputPoint = inPoints->End();
-  MeshType::PointsContainer::ConstIterator lastOutputPoint = outPoints->End();
+  const MeshType::PointsContainer::ConstIterator lastInputPoint = inPoints->End();
+  const MeshType::PointsContainer::ConstIterator lastOutputPoint = outPoints->End();
 
-  const double tolerance = 1e-8;
+  constexpr double tolerance = 1e-8;
 
   while (inputPoint != lastInputPoint && outputPoint != lastOutputPoint)
   {

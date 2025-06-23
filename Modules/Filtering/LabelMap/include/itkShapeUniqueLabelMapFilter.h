@@ -34,7 +34,7 @@ namespace itk
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa ShapeLabelObject, BinaryShapeOpeningImageFilter, LabelStatisticsOpeningImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
@@ -69,33 +69,31 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ShapeUniqueLabelMapFilter);
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
-/*  itkConceptMacro(InputEqualityComparableCheck,
+  /*itkConceptMacro(InputEqualityComparableCheck,
     (Concept::EqualityComparable<InputImagePixelType>));
   itkConceptMacro(IntConvertibleToInputCheck,
     (Concept::Convertible<int, InputImagePixelType>));
   itkConceptMacro(InputOStreamWritableCheck,
     (Concept::OStreamWritable<InputImagePixelType>));*/
-// End concept checking
-#endif
 
   /**
    * Set/Get the ordering of the objects. By default, the objects with
    * a the largest attribute value are kept. If set to true, the filter
    * to keeps the object with the smallest attribute instead.
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(ReverseOrdering, bool);
   itkSetMacro(ReverseOrdering, bool);
   itkBooleanMacro(ReverseOrdering);
-
+  /** @ITKEndGrouping */
   /**
    * Set/Get the attribute to use to select the object to remove. The default
    * is "Size".
    */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Attribute, AttributeType);
   itkSetMacro(Attribute, AttributeType);
   void
@@ -103,7 +101,7 @@ public:
   {
     this->SetAttribute(LabelObjectType::GetAttributeFromName(s));
   }
-
+  /** @ITKEndGrouping */
 protected:
   ShapeUniqueLabelMapFilter();
   ~ShapeUniqueLabelMapFilter() override = default;
@@ -123,7 +121,7 @@ protected:
       typename std::priority_queue<LineOfLabelObject, std::vector<LineOfLabelObject>, LineOfLabelObjectComparator>;
     PriorityQueueType priorityQueue;
 
-    ProgressReporter progress(this, 0, 1);
+    const ProgressReporter progress(this, 0, 1);
     // TODO: really report the progress
 
     for (typename ImageType::Iterator it(this->GetLabelMap()); !it.IsAtEnd(); ++it)
@@ -177,6 +175,8 @@ protected:
         }
       }
 
+      assert(newMainLine || (idx[0] >= prevIdx[0]));
+
       if (newMainLine)
       {
         // just push the line
@@ -184,10 +184,10 @@ protected:
       }
       else
       {
-        OffsetValueType prevLength = prev.line.GetLength();
-        OffsetValueType length = l.line.GetLength();
+        OffsetValueType       prevLength = prev.line.GetLength();
+        const OffsetValueType length = l.line.GetLength();
 
-        if (prevIdx[0] + prevLength >= idx[0])
+        if (prevIdx[0] + prevLength > idx[0])
         {
           // the lines are overlapping. We need to choose which line to keep.
           // the label, the only "attribute" to be guaranteed to be unique, is
@@ -195,11 +195,12 @@ protected:
           // which line to keep. This is necessary to avoid the case where a
           // part of a label is over
           // a second label, and below in another part of the image.
-          bool                                            keepCurrent;
-          typename TAttributeAccessor::AttributeValueType prevAttr = accessor(prev.labelObject);
-          typename TAttributeAccessor::AttributeValueType attr = accessor(l.labelObject);
+
+          const typename TAttributeAccessor::AttributeValueType prevAttr = accessor(prev.labelObject);
+          const typename TAttributeAccessor::AttributeValueType attr = accessor(l.labelObject);
           // this may be changed to a single boolean expression, but may become
           // quite difficult to read
+          bool keepCurrent = false;
           if (Math::ExactlyEquals(attr, prevAttr))
           {
             if (l.labelObject->GetLabel() > prev.labelObject->GetLabel())
@@ -237,13 +238,14 @@ protected:
               // add it to the priority queue
               IndexType newIdx = idx;
               newIdx[0] = idx[0] + length;
-              OffsetValueType newLength = prevIdx[0] + prevLength - newIdx[0];
+              const OffsetValueType newLength = prevIdx[0] + prevLength - newIdx[0];
               priorityQueue.push(LineOfLabelObject(LineType(newIdx, newLength), prev.labelObject));
             }
             // truncate the previous line to let some place for the current one
             prevLength = idx[0] - prevIdx[0];
             if (prevLength != 0)
             {
+              assert(prevIdx[0] <= idx[0]);
               lines.back().line.SetLength(idx[0] - prevIdx[0]);
             }
             else
@@ -259,7 +261,7 @@ protected:
             // keep the previous one. If the previous line fully overlap the
             // current one,
             // the current one is fully discarded.
-            if (prevIdx[0] + prevLength > idx[0] + length)
+            if (prevIdx[0] + prevLength >= idx[0] + length)
             {
               // discarding the current line - just do nothing
             }
@@ -267,10 +269,15 @@ protected:
             {
               IndexType newIdx = idx;
               newIdx[0] = prevIdx[0] + prevLength;
-              OffsetValueType newLength = idx[0] + length - newIdx[0];
-              l.line.SetIndex(newIdx);
-              l.line.SetLength(newLength);
-              lines.push_back(l);
+              const OffsetValueType newLength = idx[0] + length - newIdx[0];
+              if (newLength > 0)
+              {
+                l.line.SetIndex(newIdx);
+                l.line.SetLength(newLength);
+                // The front of this line is trimmed, it may occur after a line in the queue
+                // so the queue is used for the proper ordering.
+                priorityQueue.push(l);
+              }
             }
           }
         }
@@ -297,8 +304,8 @@ protected:
     typename ImageType::Iterator it(this->GetLabelMap());
     while (!it.IsAtEnd())
     {
-      typename LabelObjectType::LabelType label = it.GetLabel();
-      LabelObjectType *                   labelObject = it.GetLabelObject();
+      const typename LabelObjectType::LabelType label = it.GetLabel();
+      LabelObjectType *                         labelObject = it.GetLabelObject();
 
       if (labelObject->Empty())
       {
@@ -325,10 +332,9 @@ private:
   {
     using LineType = typename LabelObjectType::LineType;
     LineOfLabelObject(const LineType _line, LabelObjectType * _lo)
-    {
-      this->line = _line;
-      this->labelObject = _lo;
-    }
+      : line(_line)
+      , labelObject(_lo)
+    {}
 
     LineType          line;
     LabelObjectType * labelObject;
@@ -346,7 +352,7 @@ private:
         {
           return true;
         }
-        else if (lla.line.GetIndex()[i] < llb.line.GetIndex()[i])
+        if (lla.line.GetIndex()[i] < llb.line.GetIndex()[i])
         {
           return false;
         }

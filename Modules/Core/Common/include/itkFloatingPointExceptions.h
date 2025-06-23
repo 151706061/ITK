@@ -18,6 +18,8 @@
 #ifndef itkFloatingPointExceptions_h
 #define itkFloatingPointExceptions_h
 
+#include <cstdint>
+
 #include "itkMacro.h" // for ITKCommon_EXPORT
 #include "itkSingletonMacro.h"
 
@@ -30,7 +32,7 @@ namespace itk
 class FloatingPointExceptionsEnums
 {
 public:
-  /** \class ExceptionAction
+  /**
    * \ingroup ITKCommon
    * defines what should happen when exceptions occur */
   enum class ExceptionAction : uint8_t

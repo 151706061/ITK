@@ -51,6 +51,7 @@ public:
   using ConstPointer = SmartPointer<const Self>;
 
   /** Some convenient type alias. */
+
   /** Kernel type alias. */
   using KernelType = TKernel;
 
@@ -69,13 +70,14 @@ public:
   /** Standard New method. */
   itkNewMacro(Self);
 
-  /** Runtime information support. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VanHerkGilWermanErodeDilateImageFilter);
 
   /** Set/Get the boundary value. */
+  /** @ITKStartGrouping */
   itkSetMacro(Boundary, InputImagePixelType);
   itkGetConstMacro(Boundary, InputImagePixelType);
-
+  /** @ITKEndGrouping */
 protected:
   VanHerkGilWermanErodeDilateImageFilter();
   ~VanHerkGilWermanErodeDilateImageFilter() override = default;

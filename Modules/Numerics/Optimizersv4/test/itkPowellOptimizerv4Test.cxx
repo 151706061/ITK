@@ -19,7 +19,10 @@
 #include "itkPowellOptimizerv4.h"
 #include "itkTestingMacros.h"
 
+namespace
+{
 int POWELL_CALLS_TO_GET_VALUE = 0;
+}
 
 /**
  *  The objective function is the quadratic form:
@@ -56,21 +59,21 @@ public:
   using MeasureType = Superclass::MeasureType;
 
 
-  PowellBoundedMetric() { m_HasLocalSupport = false; }
+  PowellBoundedMetric() = default;
 
   MeasureType
   GetValue() const override
   {
     ++POWELL_CALLS_TO_GET_VALUE;
 
-    double x = this->m_Parameters[0];
-    double y = m_Parameters[1];
+    const double x = this->m_Parameters[0];
+    const double y = m_Parameters[1];
 
     std::cout << "      GetValue( ";
     std::cout << x << ' ';
     std::cout << y << ") = ";
 
-    MeasureType measure = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
+    const MeasureType measure = 0.5 * (3 * x * x + 4 * x * y + 6 * y * y) - 2 * x + 8 * y;
 
     std::cout << measure << std::endl;
 
@@ -136,7 +139,7 @@ public:
 
 private:
   ParametersType m_Parameters;
-  bool           m_HasLocalSupport;
+  bool           m_HasLocalSupport{ false };
 };
 
 
@@ -221,8 +224,8 @@ itkPowellOptimizerv4Test(int argc, char * argv[])
   //
   // check results to see if it is within range
   //
-  bool   pass = true;
-  double trueParameters[2] = { 2, -2 };
+  bool             pass = true;
+  constexpr double trueParameters[2] = { 2, -2 };
   for (unsigned int j = 0; j < 2; ++j)
   {
     if (itk::Math::abs(finalPosition[j] - trueParameters[j]) > 0.01)

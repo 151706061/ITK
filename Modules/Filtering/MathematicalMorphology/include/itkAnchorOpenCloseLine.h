@@ -21,7 +21,7 @@
 #include "itkMorphologyHistogram.h"
 #include "itkIndent.h"
 
-//#define RAWHIST
+// #define RAWHIST
 
 namespace itk
 {
@@ -37,10 +37,11 @@ class ITK_TEMPLATE_EXPORT AnchorOpenCloseLine
 {
 public:
   /** Some convenient type alias. */
+  /** @ITKStartGrouping */
   using InputImagePixelType = TInputPix;
   AnchorOpenCloseLine();
   ~AnchorOpenCloseLine() = default;
-
+  /** @ITKEndGrouping */
   void
   PrintSelf(std::ostream & os, Indent indent) const;
 
@@ -56,7 +57,7 @@ public:
   }
 
 private:
-  unsigned int m_Size;
+  unsigned int m_Size{ 2 };
 
   using HistogramType = Function::MorphologyHistogram<InputImagePixelType, TCompare>;
 

@@ -87,10 +87,7 @@ main(int argc, char * argv[])
   using PixelType = unsigned short;
   using ImageType = itk::VectorImage<unsigned short, 3>;
 
-  itk::ImageFileReader<ImageType>::Pointer reader =
-    itk::ImageFileReader<ImageType>::New();
-
-  ImageType::Pointer img;
+  auto reader = itk::ImageFileReader<ImageType>::New();
 
   // Set the properties for NrrdReader
   reader->SetFileName(argv[1]);
@@ -100,7 +97,6 @@ main(int argc, char * argv[])
   try
   {
     reader->Update();
-    img = reader->GetOutput();
   }
   catch (const itk::ExceptionObject & ex)
   {
@@ -108,6 +104,7 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
+  ImageType::Pointer img = reader->GetOutput();
   // Here we instantiate the DiffusionTensor3DReconstructionImageFilter class.
   // The class is templated over the pixel types of the reference, gradient
   // and the to be created tensor pixel's precision. (We use double here). It
@@ -135,29 +132,29 @@ main(int argc, char * argv[])
   // DWMRI_gradient_0003:=0.110000        0.664000        0.740000
   // ...
   //
-  itk::MetaDataDictionary  imgMetaDictionary = img->GetMetaDataDictionary();
+  const itk::MetaDataDictionary imgMetaDictionary =
+    img->GetMetaDataDictionary();
   std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-  std::string                              metaString;
 
   TensorReconstructionImageFilterType::GradientDirectionType vect3d;
-  TensorReconstructionImageFilterType::GradientDirectionContainerType::Pointer
-    DiffusionVectors = TensorReconstructionImageFilterType::
+  const TensorReconstructionImageFilterType::GradientDirectionContainerType::
+    Pointer DiffusionVectors = TensorReconstructionImageFilterType::
       GradientDirectionContainerType::New();
 
 
-  for (; itKey != imgMetaKeys.end(); ++itKey)
+  for (auto & imgMetaKey : imgMetaKeys)
   {
-    double x, y, z;
-
-    itk::ExposeMetaData<std::string>(imgMetaDictionary, *itKey, metaString);
-    if (itKey->find("DWMRI_gradient") != std::string::npos)
+    std::string metaString;
+    itk::ExposeMetaData<std::string>(
+      imgMetaDictionary, imgMetaKey, metaString);
+    if (imgMetaKey.find("DWMRI_gradient") != std::string::npos)
     {
-      std::cout << *itKey << " ---> " << metaString << std::endl;
-      sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
-      vect3d[0] = x;
-      vect3d[1] = y;
-      vect3d[2] = z;
+      std::cout << imgMetaKey << " ---> " << metaString << std::endl;
+      sscanf(metaString.c_str(),
+             "%lf %lf %lf\n",
+             &(vect3d[0]),
+             &(vect3d[1]),
+             &(vect3d[2]));
       DiffusionVectors->InsertElement(numberOfImages, vect3d);
       ++numberOfImages;
       // If the direction is 0.0, this is a reference image
@@ -167,9 +164,9 @@ main(int argc, char * argv[])
       }
       ++numberOfGradientImages;
     }
-    else if (itKey->find("DWMRI_b-value") != std::string::npos)
+    else if (imgMetaKey.find("DWMRI_b-value") != std::string::npos)
     {
-      std::cout << *itKey << " ---> " << metaString << std::endl;
+      std::cout << imgMetaKey << " ---> " << metaString << std::endl;
       readb0 = true;
       b0 = std::stod(metaString.c_str());
     }
@@ -250,14 +247,15 @@ main(int argc, char * argv[])
       if (DiffusionVectors->ElementAt(i).two_norm() <=
           0.0) // this is a reference image
       {
-        std::string fn("ReferenceImage%d.mhd");
-        snprintf(filename, sizeof(filename), fn.c_str(), referenceImageIndex);
+        snprintf(filename,
+                 sizeof(filename),
+                 "ReferenceImage%u.mhd",
+                 referenceImageIndex);
         ++referenceImageIndex;
       }
       else
       {
-        std::string fn("Gradient%d.mhd");
-        snprintf(filename, sizeof(filename), fn.c_str(), i);
+        snprintf(filename, sizeof(filename), "Gradient%u.mhd", i);
       }
       gradientWriter->SetFileName(filename);
       gradientWriter->Update();

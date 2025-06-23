@@ -62,13 +62,13 @@ public:
       return;
     }
 
-    unsigned int                                               currentLevel = filter->GetCurrentLevel();
+    const unsigned int                                         currentLevel = filter->GetCurrentLevel();
     typename TFilter::TransformParametersAdaptorsContainerType adaptors =
       filter->GetTransformParametersAdaptorsPerLevel();
 
     const itk::ObjectToObjectOptimizerBase * optimizerBase = filter->GetOptimizer();
     using GradientDescentOptimizerv4Type = itk::GradientDescentOptimizerv4;
-    typename GradientDescentOptimizerv4Type::ConstPointer optimizer =
+    const typename GradientDescentOptimizerv4Type::ConstPointer optimizer =
       dynamic_cast<const GradientDescentOptimizerv4Type *>(optimizerBase);
     if (!optimizer)
     {
@@ -121,10 +121,8 @@ itkSimplePointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(argv)[
 
 
   auto fixedPoints = PointSetType::New();
-  fixedPoints->Initialize();
 
   auto movingPoints = PointSetType::New();
-  movingPoints->Initialize();
 
   // two circles with a small offset
   PointType offset;
@@ -137,11 +135,11 @@ itkSimplePointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(argv)[
   {
     auto label = static_cast<unsigned int>(1.5 + count / 100);
 
-    PointType fixedPoint;
-    float     radius = 100.0;
+    PointType       fixedPoint;
+    constexpr float radius = 100.0;
     fixedPoint[0] = radius * std::cos(theta);
     fixedPoint[1] = radius * std::sin(theta);
-    if (PointSetType::PointDimension > 2)
+    if constexpr (PointSetType::PointDimension > 2)
     {
       fixedPoint[2] = radius * std::sin(theta);
     }
@@ -151,7 +149,7 @@ itkSimplePointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(argv)[
     PointType movingPoint;
     movingPoint[0] = fixedPoint[0] + offset[0];
     movingPoint[1] = fixedPoint[1] + offset[1];
-    if (PointSetType::PointDimension > 2)
+    if constexpr (PointSetType::PointDimension > 2)
     {
       movingPoint[2] = fixedPoint[2] + offset[2];
     }
@@ -193,7 +191,7 @@ itkSimplePointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(argv)[
   // scales estimator
   using RegistrationParameterScalesFromShiftType =
     itk::RegistrationParameterScalesFromPhysicalShift<PointSetMetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
   shiftScaleEstimator->SetTransformForward(true);
@@ -233,16 +231,17 @@ itkSimplePointSetRegistrationTest(int itkNotUsed(argc), char * itkNotUsed(argv)[
 
   // applying the resultant transform to moving points and verify result
   std::cout << "Fixed\tMoving\tMovingTransformed\tFixedTransformed\tDiff" << std::endl;
-  bool                                             passed = true;
-  PointType::ValueType                             tolerance = 1e-2;
-  AffineTransformType::InverseTransformBasePointer affineInverseTransform =
+  bool                                                   passed = true;
+  constexpr PointType::ValueType                         tolerance = 1e-2;
+  const AffineTransformType::InverseTransformBasePointer affineInverseTransform =
     affineSimple->GetModifiableTransform()->GetInverseTransform();
   for (unsigned int n = 0; n < movingPoints->GetNumberOfPoints(); ++n)
   {
     // compare the points in virtual domain
-    PointType transformedMovingPoint = affineInverseTransform->TransformPoint(movingPoints->GetPoint(n));
-    PointType fixedPoint = fixedPoints->GetPoint(n);
-    PointType transformedFixedPoint = affineSimple->GetModifiableTransform()->TransformPoint(fixedPoints->GetPoint(n));
+    PointType       transformedMovingPoint = affineInverseTransform->TransformPoint(movingPoints->GetPoint(n));
+    PointType       fixedPoint = fixedPoints->GetPoint(n);
+    const PointType transformedFixedPoint =
+      affineSimple->GetModifiableTransform()->TransformPoint(fixedPoints->GetPoint(n));
     PointType difference;
     difference[0] = transformedMovingPoint[0] - fixedPoint[0];
     difference[1] = transformedMovingPoint[1] - fixedPoint[1];

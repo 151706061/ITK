@@ -155,9 +155,8 @@ void
 ExpectRangeIsNotEmptyForNonEmptyImage()
 {
   // First create a non-empty image:
-  const auto                image = TImage::New();
-  typename TImage::SizeType imageSize;
-  imageSize.Fill(1);
+  const auto image = TImage::New();
+  auto       imageSize = TImage::SizeType::Filled(1);
   image->SetRegions(imageSize);
   SetVectorLengthIfImageIsVectorImage(*image, 1);
   image->Allocate();
@@ -175,7 +174,7 @@ Expect_ImageRegionRange_iterates_forward_over_same_pixels_as_ImageRegionIterator
   using PixelType = typename TImage::PixelType;
 
   itk::ImageRegionIterator<TImage> imageRegionIterator{ &image, iterationRegion };
-  ImageRegionRange<TImage>         range{ image, iterationRegion };
+  const ImageRegionRange<TImage>   range{ image, iterationRegion };
 
   ASSERT_TRUE(imageRegionIterator.IsAtBegin());
 
@@ -195,7 +194,7 @@ Expect_ImageRegionRange_iterates_backward_over_same_pixels_as_ImageRegionIterato
   const itk::ImageRegion<TImage::ImageDimension> & iterationRegion)
 {
   itk::ImageRegionIterator<TImage> imageRegionIterator{ &image, iterationRegion };
-  ImageRegionRange<TImage>         range{ image, iterationRegion };
+  const ImageRegionRange<TImage>   range{ image, iterationRegion };
 
   auto rangeIterator = range.cend();
   imageRegionIterator.GoToEnd();
@@ -282,7 +281,7 @@ TEST(ImageRegionRange, BeginAndEndOfNonEmptyImageRegionAreNotEqual)
   const auto                             image = CreateImage<ImageType>(2, 3);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  ImageRegionRange<ImageType> range{ *image, region };
+  const ImageRegionRange<ImageType> range{ *image, region };
 
   EXPECT_FALSE(range.begin() == range.end());
   EXPECT_NE(range.begin(), range.end());
@@ -299,7 +298,7 @@ TEST(ImageRegionRange, IteratorConvertsToConstIterator)
   const auto                             image = CreateImage<ImageType>(2, 3);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  RangeType range{ *image, region };
+  const RangeType range{ *image, region };
 
   const RangeType::iterator       begin = range.begin();
   const RangeType::const_iterator const_begin_from_begin = begin;
@@ -325,7 +324,7 @@ TEST(ImageRegionRange, IteratorsCanBePassedToStdVectorConstructor)
   const auto                             image = CreateImageFilledWithSequenceOfNaturalNumbers<ImageType>(sizeX, sizeY);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  ImageRegionRange<ImageType> range{ *image, region };
+  const ImageRegionRange<ImageType> range{ *image, region };
 
   // Easily store all pixels of the ImageRegionRange in an std::vector:
   const std::vector<PixelType> stdVector(range.begin(), range.end());
@@ -349,9 +348,9 @@ TEST(ImageRegionRange, IteratorsCanBePassedToStdReverseCopy)
   const auto                             image = CreateImageFilledWithSequenceOfNaturalNumbers<ImageType>(sizeX, sizeY);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  ImageRegionRange<ImageType> range{ *image, region };
+  const ImageRegionRange<ImageType> range{ *image, region };
 
-  const unsigned int numberOfPixels = sizeX * sizeY;
+  constexpr unsigned int numberOfPixels = sizeX * sizeY;
 
   const std::vector<PixelType> stdVector(range.begin(), range.end());
   std::vector<PixelType>       reversedStdVector1(numberOfPixels);
@@ -389,7 +388,7 @@ TEST(ImageRegionRange, IteratorsCanBePassedToStdInnerProduct)
   const auto                             image = CreateImageFilledWithSequenceOfNaturalNumbers<ImageType>(sizeX, sizeY);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  ImageRegionRange<ImageType> range{ *image, region };
+  const ImageRegionRange<ImageType> range{ *image, region };
 
   const double innerProduct = std::inner_product(range.begin(), range.end(), range.begin(), 0.0);
 
@@ -412,7 +411,7 @@ TEST(ImageRegionRange, IteratorsCanBePassedToStdForEach)
   const auto                             image = CreateImageFilledWithSequenceOfNaturalNumbers<ImageType>(sizeX, sizeY);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  ImageRegionRange<ImageType> range{ *image, region };
+  const ImageRegionRange<ImageType> range{ *image, region };
 
   std::for_each(range.begin(), range.end(), [](const PixelType pixel) { EXPECT_TRUE(pixel > 0); });
 }
@@ -467,8 +466,8 @@ TEST(ImageRegionRange, SupportsVectorImage)
     sizeY = 2,
     sizeZ = 2
   };
-  const auto                         image = ImageType::New();
-  const typename ImageType::SizeType imageSize = { { sizeX, sizeY, sizeZ } };
+  const auto                             image = ImageType::New();
+  constexpr typename ImageType::SizeType imageSize = { { sizeX, sizeY, sizeZ } };
   image->SetRegions(imageSize);
   image->SetVectorLength(vectorLength);
   image->AllocateInitialized();
@@ -478,9 +477,9 @@ TEST(ImageRegionRange, SupportsVectorImage)
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
   using RangeType = ImageRegionRange<ImageType>;
-  RangeType range{ *image, region };
+  const RangeType range{ *image, region };
 
-  for (PixelType pixelValue : range)
+  for (const PixelType pixelValue : range)
   {
     EXPECT_EQ(pixelValue, fillPixelValue);
   }
@@ -518,9 +517,9 @@ TEST(ImageRegionRange, ProvidesReverseIterators)
   const auto                             image = CreateImageFilledWithSequenceOfNaturalNumbers<ImageType>(sizeX, sizeY);
   const itk::ImageRegion<ImageDimension> region{ itk::Size<ImageDimension>::Filled(2) };
 
-  RangeType range{ *image, region };
+  const RangeType range{ *image, region };
 
-  const unsigned int numberOfPixels = sizeX * sizeY;
+  constexpr unsigned int numberOfPixels = sizeX * sizeY;
 
   const std::vector<PixelType> stdVector(range.begin(), range.end());
   std::vector<PixelType>       reversedStdVector1(numberOfPixels);
@@ -630,8 +629,8 @@ TEST(ImageRegionRange, ThrowsInReleaseWhenIterationRegionIsOutsideBufferedRegion
 
   const auto image = ImageType::New();
 
-  const IndexType imageIndex{ { -1, -2 } };
-  const SizeType  imageSize{ { 3, 4 } };
+  constexpr IndexType imageIndex{ { -1, -2 } };
+  constexpr SizeType  imageSize{ { 3, 4 } };
 
   image->SetRegions(RegionType{ imageIndex, imageSize });
   image->AllocateInitialized();

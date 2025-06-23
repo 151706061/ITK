@@ -40,7 +40,7 @@ HessianToObjectnessMeasureImageFilter<TInputImage, TOutputImage>::HessianToObjec
 
 template <typename TInputImage, typename TOutputImage>
 void
-HessianToObjectnessMeasureImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() ITKv5_CONST
+HessianToObjectnessMeasureImageFilter<TInputImage, TOutputImage>::VerifyPreconditions() const
 {
   Superclass::VerifyPreconditions();
   if (m_ObjectDimension >= ImageDimension)
@@ -61,7 +61,7 @@ HessianToObjectnessMeasureImageFilter<TInputImage, TOutputImage>::DynamicThreade
 
   // Calculator for computation of the eigen values
   using CalculatorType = SymmetricEigenAnalysisFixedDimension<ImageDimension, InputPixelType, EigenValueArrayType>;
-  CalculatorType eigenCalculator;
+  const CalculatorType eigenCalculator;
 
   // Walk the region of eigen values and get the objectness measure
   ImageRegionConstIterator<InputImageType> it(input, outputRegionForThread);

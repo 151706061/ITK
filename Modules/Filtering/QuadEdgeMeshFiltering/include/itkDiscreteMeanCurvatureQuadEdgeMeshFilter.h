@@ -62,7 +62,7 @@ public:
 
   using typename Superclass::TriangleType;
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(DiscreteMeanCurvatureQuadEdgeMeshFilter);
 
   /** New macro for creation of through a Smart Pointer   */
@@ -70,11 +70,7 @@ public:
 
   using CoefficientType = ConformalMatrixCoefficients<OutputMeshType>;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputIsFloatingPointCheck, (Concept::IsFloatingPoint<OutputCurvatureType>));
-  // End concept checking
-#endif
 
 protected:
   DiscreteMeanCurvatureQuadEdgeMeshFilter() = default;
@@ -83,48 +79,38 @@ protected:
   OutputCurvatureType
   EstimateCurvature(const OutputPointType & iP) override
   {
-    OutputMeshPointer output = this->GetOutput();
+    const OutputMeshPointer output = this->GetOutput();
 
     OutputQEType * qe = iP.GetEdge();
 
     OutputCurvatureType oH(0.);
 
-    OutputVectorType Laplace;
-
-    Laplace.Fill(0.);
+    OutputVectorType Laplace{};
 
     OutputCurvatureType area(0.);
-    OutputVectorType    normal;
-    normal.Fill(0.);
+    OutputVectorType    normal{};
 
     if (qe != nullptr)
     {
       if (qe != qe->GetOnext())
       {
-        CoefficientType coefficent;
+        const CoefficientType coefficent;
 
         OutputQEType * qe_it = qe;
-        OutputQEType * qe_it2;
-
-        OutputCurvatureType temp_area;
-        OutputCoordType     temp_coeff;
-
-        OutputPointType  q0, q1;
-        OutputVectorType face_normal;
 
         do
         {
-          qe_it2 = qe_it->GetOnext();
-          q0 = output->GetPoint(qe_it->GetDestination());
-          q1 = output->GetPoint(qe_it2->GetDestination());
+          OutputQEType *        qe_it2 = qe_it->GetOnext();
+          const OutputPointType q0 = output->GetPoint(qe_it->GetDestination());
+          const OutputPointType q1 = output->GetPoint(qe_it2->GetDestination());
 
-          temp_coeff = coefficent(output, qe_it);
+          const OutputCoordType temp_coeff = coefficent(output, qe_it);
           Laplace += temp_coeff * (iP - q0);
 
-          temp_area = this->ComputeMixedArea(qe_it, qe_it2);
+          const OutputCurvatureType temp_area = this->ComputeMixedArea(qe_it, qe_it2);
           area += temp_area;
 
-          face_normal = TriangleType::ComputeNormal(q0, iP, q1);
+          const OutputVectorType face_normal = TriangleType::ComputeNormal(q0, iP, q1);
           normal += face_normal;
 
           qe_it = qe_it2;

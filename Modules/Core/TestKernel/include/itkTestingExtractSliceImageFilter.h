@@ -22,9 +22,7 @@
 #include "itkImageSource.h"
 #include "itkExtractImageFilterRegionCopier.h"
 
-namespace itk
-{
-namespace Testing
+namespace itk::Testing
 {
 /** \class ExtractSliceImageFilterEnums
  * \brief Contains all enum classes used by the ExtractSliceImageFilterEnums class.
@@ -34,7 +32,6 @@ class ExtractSliceImageFilterEnums
 {
 public:
   /**
-   * \class TestExtractSliceImageFilterCollapseStrategy
    * \ingroup ITKTestKernel
    */
   enum class TestExtractSliceImageFilterCollapseStrategy : uint8_t
@@ -118,7 +115,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ExtractSliceImageFilter);
 
   /** Image type information. */
@@ -207,8 +204,11 @@ public:
   /**
    * Get the currently set strategy for collapsing directions of physical space.
    */
-  DIRECTIONCOLLAPSESTRATEGY
-  GetDirectionCollapseToStrategy() const { return this->m_DirectionCollaspeStrategy; }
+  [[nodiscard]] DIRECTIONCOLLAPSESTRATEGY
+  GetDirectionCollapseToStrategy() const
+  {
+    return this->m_DirectionCollaspeStrategy;
+  }
 
   /** \sa SetDirectionCollapseToStrategy */
   void
@@ -255,11 +255,7 @@ public:
   const TInputImage *
   GetInput() const;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputCovertibleToOutputCheck, (Concept::Convertible<InputImagePixelType, OutputImagePixelType>));
-  // End concept checking
-#endif
 
 protected:
   ExtractSliceImageFilter();
@@ -310,8 +306,7 @@ private:
     TestExtractSliceImageFilterCollapseStrategyEnum::DIRECTIONCOLLAPSETOUNKOWN
   };
 };
-} // end namespace Testing
-} // end namespace itk
+} // namespace itk::Testing
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #  include "itkTestingExtractSliceImageFilter.hxx"

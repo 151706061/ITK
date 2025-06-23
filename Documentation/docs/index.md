@@ -10,7 +10,7 @@ We invite you to join the ITK community and explore our documentation to find ou
 [![Commit Activity](https://img.shields.io/github/commit-activity/y/InsightSoftwareConsortium/ITK)](https://github.com/InsightSoftwareConsortium/ITK)
 [![PyPI](https://img.shields.io/pypi/v/itk.svg)](https://pypi.python.org/pypi/itk)
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/InsightSoftwareConsortium/ITK/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/InsightSoftwareConsortium/ITK/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/800928.svg)](https://zenodo.org/badge/latestdoi/800928)
 [![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](https://numfocus.org)
 
@@ -35,6 +35,7 @@ Tutorial <https://github.com/InsightSoftwareConsortium/ScientificImageAnalysisVi
 Software Guide <https://itk.org/ItkSoftwareGuide.pdf>
 learn/faq.md
 learn/dicom.md
+learn/metaio.md
 learn/courses.md
 learn/third_party_applications.md
 learn/fda_off_the_shelf_sw_guidelines.md
@@ -45,7 +46,7 @@ learn/fda_off_the_shelf_sw_guidelines.md
 :maxdepth: 1
 :caption: 🔨 Develop
 
-API <https://itk.org/Doxygen/html/index.html>
+API <https://docs.itk.org/projects/doxygen/en/stable/index.html>
 Discussion <https://discourse.itk.org>
 Issue tracker <https://github.com/InsightSoftwareConsortium/ITK/issues>
 supported_compilers

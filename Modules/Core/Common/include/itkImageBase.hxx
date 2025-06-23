@@ -37,13 +37,6 @@
 
 namespace itk
 {
-
-template <unsigned int VImageDimension>
-void
-ImageBase<VImageDimension>::Allocate(bool)
-{}
-
-
 template <unsigned int VImageDimension>
 void
 ImageBase<VImageDimension>::Initialize()
@@ -347,14 +340,13 @@ template <unsigned int VImageDimension>
 bool
 ImageBase<VImageDimension>::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  unsigned int      i;
   const IndexType & requestedRegionIndex = this->GetRequestedRegion().GetIndex();
   const IndexType & bufferedRegionIndex = this->GetBufferedRegion().GetIndex();
 
   const SizeType & requestedRegionSize = this->GetRequestedRegion().GetSize();
   const SizeType & bufferedRegionSize = this->GetBufferedRegion().GetSize();
 
-  for (i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     if ((requestedRegionIndex[i] < bufferedRegionIndex[i]) ||
         ((requestedRegionIndex[i] + static_cast<OffsetValueType>(requestedRegionSize[i])) >
@@ -372,9 +364,6 @@ template <unsigned int VImageDimension>
 bool
 ImageBase<VImageDimension>::VerifyRequestedRegion()
 {
-  bool         retval = true;
-  unsigned int i;
-
   // Is the requested region within the LargestPossibleRegion?
   // Note that the test is indeed against the largest possible region
   // rather than the buffered region; see DataObject::VerifyRequestedRegion.
@@ -384,17 +373,16 @@ ImageBase<VImageDimension>::VerifyRequestedRegion()
   const SizeType & requestedRegionSize = this->GetRequestedRegion().GetSize();
   const SizeType & largestPossibleRegionSize = this->GetLargestPossibleRegion().GetSize();
 
-  for (i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     if ((requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
         ((requestedRegionIndex[i] + static_cast<OffsetValueType>(requestedRegionSize[i])) >
          (largestPossibleRegionIndex[i] + static_cast<OffsetValueType>(largestPossibleRegionSize[i]))))
     {
-      retval = false;
+      return false; // Short circuit return on first dimension test failure.
     }
   }
-
-  return retval;
+  return true;
 }
 
 
@@ -528,16 +516,18 @@ ImageBase<VImageDimension>::PrintSelf(std::ostream & os, Indent indent) const
 
   os << indent << "Origin: " << this->GetOrigin() << std::endl;
 
-  os << indent << "Direction: " << std::endl << this->GetDirection() << std::endl;
+
+  os << indent << "Direction: " << std::endl;
+  this->GetDirection().PrintSelf(os, indent.GetNextIndent());
 
   os << indent << "IndexToPointMatrix: " << std::endl;
-  os << this->m_IndexToPhysicalPoint << std::endl;
+  this->m_IndexToPhysicalPoint.PrintSelf(os, indent.GetNextIndent());
 
   os << indent << "PointToIndexMatrix: " << std::endl;
-  os << this->m_PhysicalPointToIndex << std::endl;
+  this->m_PhysicalPointToIndex.PrintSelf(os, indent.GetNextIndent());
 
   os << indent << "Inverse Direction: " << std::endl;
-  os << this->GetInverseDirection() << std::endl;
+  this->m_InverseDirection.PrintSelf(os, indent.GetNextIndent());
 }
 
 } // end namespace itk

@@ -21,11 +21,7 @@
 #include "itkObjectFactory.h"
 #include "itkMath.h"
 
-namespace itk
-{
-namespace Statistics
-{
-namespace SampleTest
+namespace itk::Statistics::SampleTest
 {
 
 template <typename TMeasurementVector>
@@ -41,7 +37,7 @@ public:
 
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Standard macros */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MySample);
 
   /** Method for creation through the object factory. */
@@ -113,9 +109,9 @@ private:
   std::vector<AbsoluteFrequencyType> m_Frequencies;
 };
 
-} // namespace SampleTest
-} // namespace Statistics
-} // namespace itk
+} // namespace itk::Statistics::SampleTest
+
+
 int
 itkSampleTest(int, char *[])
 {
@@ -152,12 +148,12 @@ itkSampleTest(int, char *[])
 
   using AbsoluteFrequencyType = SampleType::AbsoluteFrequencyType;
 
-  AbsoluteFrequencyType frequency = 17;
+  constexpr AbsoluteFrequencyType frequency = 17;
 
   sample->AddMeasurementVector(measure, frequency);
 
-  MeasurementVectorType measureBack = sample->GetMeasurementVector(0);
-  AbsoluteFrequencyType frequencyBack = sample->GetFrequency(0);
+  MeasurementVectorType       measureBack = sample->GetMeasurementVector(0);
+  const AbsoluteFrequencyType frequencyBack = sample->GetFrequency(0);
 
   if (frequencyBack != frequency)
   {

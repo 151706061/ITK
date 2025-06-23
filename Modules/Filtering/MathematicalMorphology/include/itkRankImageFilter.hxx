@@ -34,7 +34,7 @@
  * This code was contributed in the Insight Journal paper:
  * "Efficient implementation of kernel filtering"
  * by Beare R., Lehmann G
- * https://www.insight-journal.org/browse/publication/160
+ * https://doi.org/10.54294/igq8fn
  *
  */
 
@@ -42,9 +42,8 @@ namespace itk
 {
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 RankImageFilter<TInputImage, TOutputImage, TKernel>::RankImageFilter()
-{
-  m_Rank = 0.5;
-}
+  : m_Rank(0.5)
+{}
 
 template <typename TInputImage, typename TOutputImage, typename TKernel>
 void

@@ -25,26 +25,6 @@
 namespace itk
 {
 template <typename T>
-Versor<T>::Versor(const Self & v)
-{
-  m_X = v.m_X;
-  m_Y = v.m_Y;
-  m_Z = v.m_Z;
-  m_W = v.m_W;
-}
-
-template <typename T>
-Versor<T> &
-Versor<T>::operator=(const Self & v)
-{
-  m_X = v.m_X;
-  m_Y = v.m_Y;
-  m_Z = v.m_Z;
-  m_W = v.m_W;
-  return *this;
-}
-
-template <typename T>
 void
 Versor<T>::SetIdentity()
 {
@@ -79,7 +59,8 @@ Versor<T>::operator*=(const Self & v)
 }
 
 template <typename T>
-Versor<T> Versor<T>::operator*(const Self & v) const
+Versor<T>
+Versor<T>::operator*(const Self & v) const
 {
   Self result;
 
@@ -127,11 +108,11 @@ bool
 Versor<T>::operator==(const Self & v) const
 {
   // Evaluate the quaternion ratio between them
-  Self ratio = *this * v.GetReciprocal();
+  const Self ratio = *this * v.GetReciprocal();
 
   const typename itk::NumericTraits<T>::AccumulateType square = ratio.m_W * ratio.m_W;
 
-  const double epsilon = 1e-300;
+  constexpr double epsilon = 1e-300;
 
   if (itk::Math::abs(1.0f - square) < epsilon)
   {
@@ -319,7 +300,7 @@ template <typename T>
 void
 Versor<T>::Set(const MatrixType & mat)
 {
-  // const double epsilon = 1e-30;
+  // constexpr double epsilon = 1e-30;
   // Keep the epsilon value large enough so that the alternate routes of
   // computing the quaternion are used to within floating point precision of the
   // math to be used.  Using 1e-30 results in degenerate matrices for rotations

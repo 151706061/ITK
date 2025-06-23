@@ -73,7 +73,7 @@ itkSLICImageFilterTestHelper(const std::string & inFileName,
   filter->DebugOn();
 
 
-  itk::CStyleCommand::Pointer command = itk::CStyleCommand::New();
+  const itk::CStyleCommand::Pointer command = itk::CStyleCommand::New();
   command->SetCallback(iterationEventCallback<FilterType>);
 
   filter->AddObserver(itk::IterationEvent(), command);
@@ -106,7 +106,7 @@ itkSLICImageFilterTest(int argc, char * argv[])
   const char *       inFileName = argv[1];
   const char *       outFileName = argv[2];
 
-  const unsigned int VDimension = 2;
+  constexpr unsigned int VDimension = 2;
   using InputImageType = itk::VectorImage<float, VDimension>;
 
   using ReaderType = itk::ImageFileReader<InputImageType>;

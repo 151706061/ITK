@@ -33,7 +33,6 @@ testPointsLocatorTest()
 
   using PointsContainerType = TPointsContainer;
   auto points = PointsContainerType::New();
-  points->Initialize();
 
   using PointsLocatorType = itk::PointsLocator<PointsContainerType>;
   auto pointsLocator = PointsLocatorType::New();
@@ -66,7 +65,7 @@ testPointsLocatorTest()
   coords[1] = 50;
   coords[2] = 50;
 
-  typename PointsLocatorType::PointIdentifier pointId = pointsLocator->FindClosestPoint(coords);
+  const typename PointsLocatorType::PointIdentifier pointId = pointsLocator->FindClosestPoint(coords);
   if (pointId != 49)
   {
     std::cerr << "Error with FindClosestPoint(), poindId does not match" << std::endl;
@@ -117,7 +116,7 @@ testPointsLocatorTest()
     std::cout << dist << " * " << distances[i] << std::endl;
   }
 
-  double radius = std::sqrt(3 * itk::Math::sqr(5.1));
+  const double radius = std::sqrt(3 * itk::Math::sqr(5.1));
 
   std::cout << "Test:  FindPointsWithinRadius()" << std::endl;
 
@@ -138,7 +137,7 @@ itkPointsLocatorTest(int, char *[])
   constexpr unsigned int PointDimension = 3;
   using PointType = itk::Point<float, PointDimension>;
 
-  using VectorContainerType = itk::VectorContainer<unsigned int, PointType>;
+  using VectorContainerType = itk::VectorContainer<PointType>;
   using MapContainerType = itk::MapContainer<unsigned int, PointType>;
 
   std::cout << "VectorContainerType" << std::endl;

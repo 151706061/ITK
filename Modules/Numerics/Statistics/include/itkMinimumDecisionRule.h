@@ -21,9 +21,7 @@
 #include "itkDecisionRule.h"
 #include "ITKStatisticsExport.h"
 
-namespace itk
-{
-namespace Statistics
+namespace itk::Statistics
 {
 /** \class MinimumDecisionRule
  *  \brief A decision rule that returns the class label with the
@@ -44,7 +42,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(MinimumDecisionRule);
 
   /** Standard New() method support */
@@ -69,7 +67,6 @@ protected:
   ~MinimumDecisionRule() override = default;
 
 }; // end of class
-} // end of namespace Statistics
-} // end of namespace itk
+} // namespace itk::Statistics
 
 #endif

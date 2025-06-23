@@ -20,6 +20,7 @@
 #include "vnl/algo/vnl_determinant.h"
 
 #include <algorithm> // For copy_n.
+#include <cmath>     // For abs.
 
 namespace itk
 {
@@ -192,13 +193,13 @@ TriangleCell<TCellInterface>::GetEdge(CellFeatureIdentifier edgeId, EdgeAutoPoin
 
 template <typename TCellInterface>
 double
-TriangleCell<TCellInterface>::DistanceToLine(PointType      x,
-                                             PointType      p1,
-                                             PointType      p2,
-                                             double &       t,
-                                             CoordRepType * closestPoint)
+TriangleCell<TCellInterface>::DistanceToLine(PointType        x,
+                                             PointType        p1,
+                                             PointType        p2,
+                                             double &         t,
+                                             CoordinateType * closestPoint)
 {
-  // convert from CoordRepType * to PointType:
+  // convert from CoordinateType * to PointType:
   PointType temp(closestPoint);
   //   for (unsigned int i = 0; i < PointDimension; ++i)
   //     {
@@ -208,7 +209,7 @@ TriangleCell<TCellInterface>::DistanceToLine(PointType      x,
   // Compute the squared distance to the line:
   const double distance2 = this->DistanceToLine(x, p1, p2, t, temp);
 
-  // convert from PointType to CoordRepType * :
+  // convert from PointType to CoordinateType * :
   for (unsigned int j = 0; j < PointDimension; ++j)
   {
     closestPoint[j] = temp[j];
@@ -237,12 +238,7 @@ TriangleCell<TCellInterface>::DistanceToLine(PointType   x,
     denom += static_cast<double>(v21[i] * v21[i]);
   }
 
-  // trying to avoid an expensive fabs
-  double tolerance = 1.e-05 * num;
-  if (tolerance < 0.0)
-  {
-    tolerance = -tolerance;
-  }
+  const double tolerance = std::abs(1.e-05 * num);
   if ((-tolerance < denom) && (denom < tolerance)) // numerically bad!
   {
     closestPoint = p1; // arbitrary, point is (numerically) far away
@@ -268,7 +264,7 @@ TriangleCell<TCellInterface>::DistanceToLine(PointType   x,
 
 template <typename TCellInterface>
 auto
-TriangleCell<TCellInterface>::ComputeArea(PointsContainer * iPoints) -> CoordRepType
+TriangleCell<TCellInterface>::ComputeArea(PointsContainer * iPoints) -> CoordinateType
 {
   PointType p[3];
 
@@ -277,34 +273,31 @@ TriangleCell<TCellInterface>::ComputeArea(PointsContainer * iPoints) -> CoordRep
     p[i] = iPoints->GetElement(m_PointIds[i]);
   }
 
-  CoordRepType a = p[1].EuclideanDistanceTo(p[2]);
-  CoordRepType b = p[0].EuclideanDistanceTo(p[2]);
-  CoordRepType c = p[1].EuclideanDistanceTo(p[0]);
+  CoordinateType a = p[1].EuclideanDistanceTo(p[2]);
+  CoordinateType b = p[0].EuclideanDistanceTo(p[2]);
+  CoordinateType c = p[1].EuclideanDistanceTo(p[0]);
 
-  CoordRepType s = 0.5 * (a + b + c);
+  CoordinateType s = 0.5 * (a + b + c);
   return std::sqrt(s * (s - a) * (s - b) * (s - c));
 }
 
 template <typename TCellInterface>
 auto
-TriangleCell<TCellInterface>::ComputeBarycenter(CoordRepType * iWeights, PointsContainer * iPoints) -> PointType
+TriangleCell<TCellInterface>::ComputeBarycenter(CoordinateType * iWeights, PointsContainer * iPoints) -> PointType
 {
-  PointType    p[3];
-  CoordRepType sum_weights(0.);
-  unsigned int i(0);
+  PointType      p[3];
+  CoordinateType sum_weights(0.);
 
-  for (; i < 3; ++i)
+  for (unsigned int i = 0; i < 3; ++i)
   {
     sum_weights += iWeights[i];
     p[i] = iPoints->GetElement(m_PointIds[i]);
   }
 
-  PointType oP;
-
+  PointType oP{};
   if (sum_weights != 0.)
   {
-    oP.Fill(0.);
-    for (i = 0; i < 3; ++i)
+    for (unsigned int i = 0; i < 3; ++i)
     {
       oP += p[i].GetVectorFromOrigin() * iWeights[i] / sum_weights;
     }
@@ -320,7 +313,7 @@ template <typename TCellInterface>
 auto
 TriangleCell<TCellInterface>::ComputeCenterOfGravity(PointsContainer * iPoints) -> PointType
 {
-  std::vector<CoordRepType> weights(3, 1. / 3.);
+  std::vector<CoordinateType> weights(3, 1. / 3.);
   return ComputeBarycenter(&weights[0], iPoints);
 }
 
@@ -328,61 +321,53 @@ template <typename TCellInterface>
 auto
 TriangleCell<TCellInterface>::ComputeCircumCenter(PointsContainer * iPoints) -> PointType
 {
-  std::vector<CoordRepType> weights(3, 0.);
+  std::vector<CoordinateType> weights(3, 0.);
 
-  PointType    p[3];
-  unsigned int i;
+  PointType p[3];
 
-  for (i = 0; i < 3; ++i)
+  for (unsigned int i = 0; i < 3; ++i)
   {
     p[i] = iPoints->GetElement(m_PointIds[i]);
   }
 
-  CoordRepType a = p[1].SquaredEuclideanDistanceTo(p[2]);
-  CoordRepType b = p[0].SquaredEuclideanDistanceTo(p[2]);
-  CoordRepType c = p[1].SquaredEuclideanDistanceTo(p[0]);
+  CoordinateType a = p[1].SquaredEuclideanDistanceTo(p[2]);
+  CoordinateType b = p[0].SquaredEuclideanDistanceTo(p[2]);
+  CoordinateType c = p[1].SquaredEuclideanDistanceTo(p[0]);
 
   weights[0] = a * (b + c - a);
   weights[1] = b * (c + a - b);
   weights[2] = c * (a + b - c);
 
-  CoordRepType sum_weights = weights[0] + weights[1] + weights[2];
+  CoordinateType sum_weights = weights[0] + weights[1] + weights[2];
 
   if (sum_weights != 0.)
   {
-    PointType oP;
-    oP.Fill(0.);
+    PointType oP{};
 
-    for (i = 0; i < 3; ++i)
+    for (unsigned i = 0; i < 3; ++i)
     {
       oP += p[i].GetVectorFromOrigin() * weights[i] / sum_weights;
     }
 
     return oP;
   }
-  else
-  {
-    return p[0];
-  }
+
+  return p[0];
 }
 
 template <typename TCellInterface>
 bool
-TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
+TriangleCell<TCellInterface>::EvaluatePosition(CoordinateType *          x,
                                                PointsContainer *         points,
-                                               CoordRepType *            closestPoint,
-                                               CoordRepType              pcoord[],
+                                               CoordinateType *          closestPoint,
+                                               CoordinateType            pcoord[],
                                                double *                  minDist2,
                                                InterpolationWeightType * weights)
 {
-  unsigned int i;
-  double       dist2Point;
-  double       dist2Line1;
-  double       dist2Line2;
-  PointType    closest;
-  PointType    closestPoint1;
-  PointType    closestPoint2;
-  PointType    X(x);
+  PointType       closest;
+  PointType       closestPoint1;
+  PointType       closestPoint2;
+  const PointType X(x);
 
   if (!points)
   {
@@ -396,8 +381,8 @@ TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
 
   // Compute Vectors along the edges.
   // These two vectors form a vector base for the 2D space of the triangle cell.
-  VectorType v12 = pt1 - pt2;
-  VectorType v32 = pt3 - pt2;
+  const VectorType v12 = pt1 - pt2;
+  const VectorType v32 = pt3 - pt2;
 
   // Compute Vectors in the dual vector base inside the 2D space of the triangle
   // cell.
@@ -416,13 +401,13 @@ TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
 
   // Compute components of the input point in the 2D
   // space defined by v12 and v32
-  VectorType xo = X - pt2;
+  const VectorType xo = X - pt2;
 
   const double u12p = xo * u12;
   const double u32p = xo * u32;
 
-  VectorType x12 = v12 * u12p;
-  VectorType x32 = v32 * u32p;
+  const VectorType x12 = v12 * u12p;
+  const VectorType x32 = v32 * u32p;
 
   // The projection of point X in the plane is cp
   PointType cp = pt2 + x12 + x32;
@@ -435,7 +420,7 @@ TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
   // Test if the projected point is inside the cell.
 
   // Zero with epsilon
-  const double zwe = -NumericTraits<double>::min();
+  constexpr double zwe = -NumericTraits<double>::min();
 
   // Since the three barycentric coordinates are interdependent
   // only three tests should be necessary. That is, we only need
@@ -447,7 +432,7 @@ TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
     if (closestPoint)
     { // Compute the Distance 2 Between Points
       *minDist2 = 0;
-      for (i = 0; i < PointDimension; ++i)
+      for (unsigned int i = 0; i < PointDimension; ++i)
       {
         const double val = cp[i] - x[i];
         *minDist2 += val * val;
@@ -471,131 +456,133 @@ TriangleCell<TCellInterface>::EvaluatePosition(CoordRepType *            x,
 
     return true;
   }
-  else
+
+  if (closestPoint)
   {
-    if (closestPoint)
+    double lt = NAN; // parameter along the line (not used)
+    if (b1 < 0.0 && b2 < 0.0)
     {
-      double lt; // parameter along the line (not used)
-      if (b1 < 0.0 && b2 < 0.0)
+      double dist2Point = 0;
+      for (unsigned int i = 0; i < PointDimension; ++i)
       {
-        dist2Point = 0;
-        for (i = 0; i < PointDimension; ++i)
-        {
-          dist2Point += (x[i] - pt3[i]) * (x[i] - pt3[i]);
-        }
-        dist2Line1 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint1);
-        dist2Line2 = this->DistanceToLine(x, pt3, pt2, lt, closestPoint2);
-        if (dist2Point < dist2Line1)
-        {
-          *minDist2 = dist2Point;
-          closest = pt3;
-        }
-        else
-        {
-          *minDist2 = dist2Line1;
-          closest = closestPoint1;
-        }
-        if (dist2Line2 < *minDist2)
-        {
-          *minDist2 = dist2Line2;
-          closest = closestPoint2;
-        }
-        for (i = 0; i < PointDimension; ++i)
-        {
-          closestPoint[i] = closest[i];
-        }
-        for (; i < 3; ++i)
-        {
-          closestPoint[i] = 0.;
-        }
+        dist2Point += (x[i] - pt3[i]) * (x[i] - pt3[i]);
       }
-      else if (b2 < 0.0 && b3 < 0.0)
+      double dist2Line1 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint1);
+      double dist2Line2 = this->DistanceToLine(x, pt3, pt2, lt, closestPoint2);
+      if (dist2Point < dist2Line1)
       {
-        dist2Point = 0;
-        for (i = 0; i < PointDimension; ++i)
-        {
-          dist2Point += (x[i] - pt1[i]) * (x[i] - pt1[i]);
-        }
-        dist2Line1 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint1);
-        dist2Line2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint2);
-        if (dist2Point < dist2Line1)
-        {
-          *minDist2 = dist2Point;
-          closest = pt1;
-        }
-        else
-        {
-          *minDist2 = dist2Line1;
-          closest = closestPoint1;
-        }
-        if (dist2Line2 < *minDist2)
-        {
-          *minDist2 = dist2Line2;
-          closest = closestPoint2;
-        }
-        for (i = 0; i < PointDimension; ++i)
-        {
-          closestPoint[i] = closest[i];
-        }
-        for (; i < 3; ++i)
-        {
-          closestPoint[i] = 0.;
-        }
+        *minDist2 = dist2Point;
+        closest = pt3;
       }
-      else if (b1 < 0.0 && b3 < 0.0)
+      else
       {
-        dist2Point = 0;
-        for (i = 0; i < PointDimension; ++i)
-        {
-          dist2Point += (x[i] - pt2[i]) * (x[i] - pt2[i]);
-        }
-        dist2Line1 = this->DistanceToLine(x, pt2, pt3, lt, closestPoint1);
-        dist2Line2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint2);
-        if (dist2Point < dist2Line1)
-        {
-          *minDist2 = dist2Point;
-          closest = pt2;
-        }
-        else
-        {
-          *minDist2 = dist2Line1;
-          closest = closestPoint1;
-        }
-        if (dist2Line2 < *minDist2)
-        {
-          *minDist2 = dist2Line2;
-          closest = closestPoint2;
-        }
-        for (i = 0; i < PointDimension; ++i)
-        {
-          closestPoint[i] = closest[i];
-        }
-        for (; i < 3; ++i)
-        {
-          closestPoint[i] = 0.;
-        }
+        *minDist2 = dist2Line1;
+        closest = closestPoint1;
       }
-      else if (b1 < 0.0)
+      if (dist2Line2 < *minDist2)
       {
-        *minDist2 = this->DistanceToLine(x, pt2, pt3, lt, closestPoint);
+        *minDist2 = dist2Line2;
+        closest = closestPoint2;
       }
-      else if (b2 < 0.0)
+      unsigned int i = 0;
+      for (; i < PointDimension; ++i)
       {
-        *minDist2 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint);
+        closestPoint[i] = closest[i];
       }
-      else if (b3 < 0.0)
+      for (; i < 3; ++i)
       {
-        *minDist2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint);
+        closestPoint[i] = 0.;
       }
     }
-    if (pcoord)
+    else if (b2 < 0.0 && b3 < 0.0)
     {
-      pcoord[0] = b1;
-      pcoord[1] = b2;
-      pcoord[2] = b3;
+      double dist2Point = 0;
+      for (unsigned int i = 0; i < PointDimension; ++i)
+      {
+        dist2Point += (x[i] - pt1[i]) * (x[i] - pt1[i]);
+      }
+      double dist2Line1 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint1);
+      double dist2Line2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint2);
+      if (dist2Point < dist2Line1)
+      {
+        *minDist2 = dist2Point;
+        closest = pt1;
+      }
+      else
+      {
+        *minDist2 = dist2Line1;
+        closest = closestPoint1;
+      }
+      if (dist2Line2 < *minDist2)
+      {
+        *minDist2 = dist2Line2;
+        closest = closestPoint2;
+      }
+      unsigned int i = 0;
+      for (; i < PointDimension; ++i)
+      {
+        closestPoint[i] = closest[i];
+      }
+      for (; i < 3; ++i)
+      {
+        closestPoint[i] = 0.;
+      }
     }
-    // Just fall through to default return false;
+    else if (b1 < 0.0 && b3 < 0.0)
+    {
+      double dist2Point = 0;
+      for (unsigned int i = 0; i < PointDimension; ++i)
+      {
+        dist2Point += (x[i] - pt2[i]) * (x[i] - pt2[i]);
+      }
+      double dist2Line1 = this->DistanceToLine(x, pt2, pt3, lt, closestPoint1);
+      double dist2Line2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint2);
+      if (dist2Point < dist2Line1)
+      {
+        *minDist2 = dist2Point;
+        closest = pt2;
+      }
+      else
+      {
+        *minDist2 = dist2Line1;
+        closest = closestPoint1;
+      }
+      if (dist2Line2 < *minDist2)
+      {
+        *minDist2 = dist2Line2;
+        closest = closestPoint2;
+      }
+      unsigned int i = 0;
+      for (; i < PointDimension; ++i)
+      {
+        closestPoint[i] = closest[i];
+      }
+      for (; i < 3; ++i)
+      {
+        closestPoint[i] = 0.;
+      }
+    }
+    else if (b1 < 0.0)
+    {
+      *minDist2 = this->DistanceToLine(x, pt2, pt3, lt, closestPoint);
+    }
+    else if (b2 < 0.0)
+    {
+      *minDist2 = this->DistanceToLine(x, pt1, pt3, lt, closestPoint);
+    }
+    else if (b3 < 0.0)
+    {
+      *minDist2 = this->DistanceToLine(x, pt1, pt2, lt, closestPoint);
+    }
   }
+  if (pcoord)
+  {
+    pcoord[0] = b1;
+    pcoord[1] = b2;
+    pcoord[2] = b3;
+  }
+  // Just fall through to default return false;
+
   return false; // Default case that should never be reached.
 }
 } // end namespace itk

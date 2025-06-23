@@ -25,9 +25,9 @@
 
 namespace itk
 {
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 auto
-LinearInterpolateImageFunction<TInputImage, TCoordRep>::EvaluateUnoptimized(const ContinuousIndexType & index) const
+LinearInterpolateImageFunction<TInputImage, TCoordinate>::EvaluateUnoptimized(const ContinuousIndexType & index) const
   -> OutputType
 {
   // Avoid the smartpointer de-reference in the loop for
@@ -51,8 +51,6 @@ LinearInterpolateImageFunction<TInputImage, TCoordRep>::EvaluateUnoptimized(cons
 
   // When RealType is VariableLengthVector, 'value' will be resized properly
   // below when it's assigned again.
-  Concept::Detail::UniqueType<typename NumericTraits<RealType>::ScalarRealType>();
-
   RealType value;
   // Initialize variable "value" with overloaded function so that
   // in the case of variable length vectors the "value" is initialized
@@ -97,9 +95,9 @@ LinearInterpolateImageFunction<TInputImage, TCoordRep>::EvaluateUnoptimized(cons
   return (static_cast<OutputType>(value));
 }
 
-template <typename TInputImage, typename TCoordRep>
+template <typename TInputImage, typename TCoordinate>
 void
-LinearInterpolateImageFunction<TInputImage, TCoordRep>::PrintSelf(std::ostream & os, Indent indent) const
+LinearInterpolateImageFunction<TInputImage, TCoordinate>::PrintSelf(std::ostream & os, Indent indent) const
 {
   this->Superclass::PrintSelf(os, indent);
 }

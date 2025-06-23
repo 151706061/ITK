@@ -40,7 +40,7 @@ itkNormalizedCorrelationImageMetricTest(int, char *[])
 
   // Save the format stream variables for std::cout
   // They will be restored when coutState goes out of scope
-  itk::StdStreamStateSave coutState(std::cout);
+  const itk::StdStreamStateSave coutState(std::cout);
 
   //------------------------------------------------------------
   // Create two simple images
@@ -67,8 +67,8 @@ itkNormalizedCorrelationImageMetricTest(int, char *[])
   FixedImageType::SpacingValueType  fixedImageSpacing[] = { 1.0f, 1.0f };
   MovingImageType::SpacingValueType movingImageSpacing[] = { 1.0f, 1.0f };
 
-  FixedImageType::PointValueType  fixedImageOrigin[] = { 0.0f, 0.0f };
-  MovingImageType::PointValueType movingImageOrigin[] = { 0.0f, 0.0f };
+  constexpr FixedImageType::PointValueType  fixedImageOrigin[] = { 0.0f, 0.0f };
+  constexpr MovingImageType::PointValueType movingImageOrigin[] = { 0.0f, 0.0f };
 
   auto movingImageSource = MovingImageSourceType::New();
   auto fixedImageSource = FixedImageSourceType::New();
@@ -88,8 +88,8 @@ itkNormalizedCorrelationImageMetricTest(int, char *[])
   movingImageSource->Update(); // Force the filter to run
   fixedImageSource->Update();  // Force the filter to run
 
-  MovingImageType::Pointer movingImage = movingImageSource->GetOutput();
-  FixedImageType::Pointer  fixedImage = fixedImageSource->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageSource->GetOutput();
+  const FixedImageType::Pointer  fixedImage = fixedImageSource->GetOutput();
 
 
   //-----------------------------------------------------------
@@ -177,12 +177,12 @@ itkNormalizedCorrelationImageMetricTest(int, char *[])
   // for parameters[1] = {-10,10}  (arbitrary choice...)
   //---------------------------------------------------------
 
-  MetricType::MeasureType    measure;
+  MetricType::MeasureType    measure = NAN;
   MetricType::DerivativeType derivative;
 
   std::cout << "param[1]   Metric    d(Metric)/d(param[1] " << std::endl;
 
-  bool subtractMean = true;
+  constexpr bool subtractMean = true;
   ITK_TEST_SET_GET_BOOLEAN(metric, SubtractMean, subtractMean);
 
   for (double trans = -10; trans <= 5; trans += 0.2)

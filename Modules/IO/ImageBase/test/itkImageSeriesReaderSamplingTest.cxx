@@ -37,7 +37,7 @@ itkImageSeriesReaderSamplingTest(int argc, char * argv[])
   for (int i = 1; i < argc; ++i)
   {
     std::cout << argv[i] << std::endl;
-    fnames.push_back(argv[i]);
+    fnames.emplace_back(argv[i]);
   }
 
   std::cout << "testing reading a series of 2D images to 3D with extra slices" << std::endl;
@@ -61,8 +61,8 @@ itkImageSeriesReaderSamplingTest(int argc, char * argv[])
     // iterate over all slices to detect offending slice
     for (auto d : *reader->GetMetaDataDictionaryArray())
     {
-      itk::MetaDataDictionary theMetadata = *d;
-      double                  samplingDeviation = 0.0;
+      const itk::MetaDataDictionary theMetadata = *d;
+      double                        samplingDeviation = 0.0;
       if (itk::ExposeMetaData<double>(theMetadata, "ITK_non_uniform_sampling_deviation", samplingDeviation))
       {
         std::cout << "slice ITK_non_uniform_sampling_deviation detected: " << samplingDeviation << std::endl;

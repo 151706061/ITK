@@ -82,25 +82,25 @@ public:
 
   static constexpr unsigned int Dimension = NeighborhoodType::Dimension;
 
-  const RadiusType &
+  [[nodiscard]] const RadiusType &
   GetRadius() const
   {
     return m_Radius;
   }
 
-  const unsigned int &
+  [[nodiscard]] const unsigned int &
   GetArrayIndex(unsigned int i) const
   {
     return m_ArrayIndex[i];
   }
 
-  const OffsetType &
+  [[nodiscard]] const OffsetType &
   GetNeighborhoodOffset(unsigned int i) const
   {
     return m_NeighborhoodOffset[i];
   }
 
-  const unsigned int &
+  [[nodiscard]] const unsigned int &
   GetSize() const
   {
     return m_Size;
@@ -243,12 +243,7 @@ private:
  *  FiniteDifferenceFunction to use for calculations.  This is set using the
  *  method SetDifferenceFunction in the parent class.
  *
- * \par REFERENCES
- * Whitaker, Ross. A Level-Set Approach to 3D Reconstruction from Range Data.
- * International Journal of Computer Vision.  V. 29 No. 3, 203-231. 1998.
- *
- * \par
- * Sethian, J.A. Level Set Methods. Cambridge University Press. 1996.
+ * For algorithmic details see \cite whitaker1998 and \cite sethian1996.
  *
  * \ingroup ITKLevelSets
  */
@@ -274,7 +269,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ParallelSparseFieldLevelSetImageFilter);
 
   /** Information derived from the image types. */
@@ -318,13 +313,15 @@ public:
   /** Set/Get the number of layers to use in the sparse field.  Argument is the
    *  number of layers on ONE side of the active layer, so the total layers in
    *   the sparse field is 2 * NumberOfLayers + 1 */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfLayers, StatusType);
   itkGetConstMacro(NumberOfLayers, StatusType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the value of the isosurface to use in the input image. */
+  /** @ITKStartGrouping */
   itkSetMacro(IsoSurfaceValue, ValueType);
   itkGetConstMacro(IsoSurfaceValue, ValueType);
-
+  /** @ITKEndGrouping */
   LayerPointerType
   GetActiveListForIndex(const IndexType index)
   {
@@ -337,13 +334,9 @@ public:
     return m_Data[ThreadNum].m_Layers[0];
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<PixelType>));
   itkConceptMacro(DoubleConvertibleToOutputCheck, (Concept::Convertible<double, PixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   ParallelSparseFieldLevelSetImageFilter();
@@ -692,11 +685,12 @@ protected:
 
   /** Redistribute an load among the threads to obtain a more balanced load distribution.
    *  This is performed in parallel by all the threads. */
+  /** @ITKStartGrouping */
   void
   ThreadedLoadBalance1(ThreadIdType ThreadId);
   void
   ThreadedLoadBalance2(ThreadIdType ThreadId);
-
+  /** @ITKEndGrouping */
   void
   SignalNeighborsAndWait(ThreadIdType ThreadId);
 

@@ -45,9 +45,7 @@ namespace itk
  * provided, the algorithm will only search pixels within the
  * narrowband.
  *
- * Implementation of this class is based on Chapter 11 of
- * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
- * Cambridge Press, Second edition, 1999.
+ * Implementation of this class is based on \cite sethian1999b.
  *
  * \ingroup LevelSetSegmentation
  *
@@ -68,7 +66,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LevelSetNeighborhoodExtractor);
 
   /** LevelSetType type alias support */
@@ -88,9 +86,10 @@ public:
   using IndexType = Index<Self::SetDimension>;
 
   /** Get/Set the input level set. */
+  /** @ITKStartGrouping */
   itkSetConstObjectMacro(InputLevelSet, LevelSetImageType);
   itkGetConstObjectMacro(InputLevelSet, LevelSetImageType);
-
+  /** @ITKEndGrouping */
   /** Set the value of the level set to be located. Default is 0. */
   itkSetMacro(LevelSetValue, double);
 
@@ -107,15 +106,17 @@ public:
   itkSetMacro(NarrowBanding, bool);
 
   /** Get the narrowbanding flag. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(NarrowBanding, bool);
   itkBooleanMacro(NarrowBanding);
-
+  /** @ITKEndGrouping */
   /** Set/Get the input narrowband. A narrowband is represented as
    * a VectorContainer of LevelSetNodes. */
+  /** @ITKStartGrouping */
   void
   SetInputNarrowBand(NodeContainer * ptr);
   itkGetModifiableObjectMacro(InputNarrowBand, NodeContainer);
-
+  /** @ITKEndGrouping */
   /** Get the container of inside points. The inside points are
    * stored in a VectorContainer of LevelSetNodes. */
   NodeContainerPointer

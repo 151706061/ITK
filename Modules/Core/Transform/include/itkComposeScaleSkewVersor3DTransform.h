@@ -64,7 +64,7 @@ public:
   /** New macro for creation of through a Smart Pointer. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ComposeScaleSkewVersor3DTransform);
 
   /** Dimension of parameters. */
@@ -113,11 +113,12 @@ public:
    * Orthogonality testing is bypassed in this case.
    *
    * \sa MatrixOffsetTransformBase::SetMatrix() */
+  /** @ITKStartGrouping */
   void
   SetMatrix(const MatrixType & matrix) override;
   void
   SetMatrix(const MatrixType & matrix, const TParametersValueType tolerance) override;
-
+  /** @ITKEndGrouping */
   /** Set the transformation from a container of parameters
    * This is typically used by optimizers.
    * There are 12 parameters:
@@ -152,7 +153,10 @@ public:
 
 protected:
   ComposeScaleSkewVersor3DTransform();
-  ComposeScaleSkewVersor3DTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] ComposeScaleSkewVersor3DTransform(const MatrixType &       matrix,
+                                                                                 const OutputVectorType & offset);
+#endif
   ComposeScaleSkewVersor3DTransform(unsigned int parametersDimension);
   ~ComposeScaleSkewVersor3DTransform() override = default;
 

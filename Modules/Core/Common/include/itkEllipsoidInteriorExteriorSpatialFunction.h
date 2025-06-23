@@ -48,7 +48,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(EllipsoidInteriorExteriorSpatialFunction);
 
   /** Method for creation through the object factory. */
@@ -64,13 +64,15 @@ public:
   using OrientationType = vnl_matrix_fixed<double, VDimension, VDimension>;
 
   /** Set/Get and set the center of the ellipsoid. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Center, InputType);
   itkSetMacro(Center, InputType);
-
+  /** @ITKEndGrouping */
   /** Get and set the axes lengths of the ellipsoid. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Axes, InputType);
   itkSetMacro(Axes, InputType);
-
+  /** @ITKEndGrouping */
   /** Set the orientation vectors (must be orthogonal) of the ellipsoid axes.
    * Must be normalized!!!!! */
   void

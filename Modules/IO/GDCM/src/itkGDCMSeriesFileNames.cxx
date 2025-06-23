@@ -40,7 +40,7 @@ GDCMSeriesFileNames::SetInputDirectory(const char * name)
   {
     itkExceptionMacro("SetInputDirectory() received a nullptr string");
   }
-  std::string fname = name;
+  const std::string fname = name;
   this->SetInputDirectory(fname);
 }
 
@@ -51,7 +51,7 @@ GDCMSeriesFileNames::AddSeriesRestriction(const std::string & tag)
 }
 
 void
-GDCMSeriesFileNames::SetInputDirectory(std::string const & name)
+GDCMSeriesFileNames::SetInputDirectory(const std::string & name)
 {
   if (name.empty())
   {
@@ -85,14 +85,14 @@ GDCMSeriesFileNames::GetSeriesUIDs()
   gdcm::FileList * flist = m_SerieHelper->GetFirstSingleSerieUIDFileSet();
   while (flist)
   {
-    if (!flist->empty()) // make sure we have at leat one serie
+    if (!flist->empty()) // make sure we have at least one serie
     {
       gdcm::File * file = (*flist)[0]; // for example take the first one
 
       // Create its unique series ID
-      std::string id = m_SerieHelper->CreateUniqueSeriesIdentifier(file).c_str();
+      const std::string id = m_SerieHelper->CreateUniqueSeriesIdentifier(file).c_str();
 
-      m_SeriesUIDs.push_back(id.c_str());
+      m_SeriesUIDs.emplace_back(id.c_str());
     }
     flist = m_SerieHelper->GetNextSingleSerieUIDFileSet();
   }
@@ -119,10 +119,10 @@ GDCMSeriesFileNames::GetFileNames(const std::string serie)
     bool found = false;
     while (flist && !found)
     {
-      if (!flist->empty()) // make sure we have at leat one serie
+      if (!flist->empty()) // make sure we have at least one serie
       {
-        gdcm::File * file = (*flist)[0]; // for example take the first one
-        std::string  id = m_SerieHelper->CreateUniqueSeriesIdentifier(file).c_str();
+        gdcm::File *      file = (*flist)[0]; // for example take the first one
+        const std::string id = m_SerieHelper->CreateUniqueSeriesIdentifier(file).c_str();
 
         if (id == serie)
         {
@@ -140,32 +140,14 @@ GDCMSeriesFileNames::GetFileNames(const std::string serie)
   }
   m_SerieHelper->OrderFileList(flist);
 
-  gdcm::FileList::iterator it;
   if (!flist->empty())
   {
     ProgressReporter progress(this, 0, static_cast<itk::SizeValueType>(flist->size()), 10);
-    for (it = flist->begin(); it != flist->end(); ++it)
+    for (auto & element : *flist)
     {
-#if GDCM_MAJOR_VERSION < 2
-      gdcm::File * header = *it;
-      if (!header)
-      {
-        itkWarningMacro("GDCMSeriesFileNames got nullptr header, "
-                        "this is a serious bug");
-        continue;
-      }
-      if (!header->IsReadable())
-      {
-        itkWarningMacro("GDCMSeriesFileNames got a non DICOM file:" << header->GetFileName());
-        continue;
-      }
-      m_InputFileNames.push_back(header->GetFileName());
-      progress.CompletedPixel();
-#else
-      gdcm::FileWithName * header = *it;
+      gdcm::FileWithName * header = element;
       m_InputFileNames.push_back(header->filename);
       progress.CompletedPixel();
-#endif
     }
   }
   else
@@ -287,10 +269,10 @@ GDCMSeriesFileNames::PrintSelf(std::ostream & os, Indent indent) const
 
   os << indent << "SeriesUIDs: " << m_SeriesUIDs << std::endl;
 
-  os << indent << "UseSeriesDetails: " << (m_UseSeriesDetails ? "On" : "Off") << std::endl;
-  os << indent << "Recursive: " << (m_Recursive ? "On" : "Off") << std::endl;
-  os << indent << "LoadSequences: " << (m_LoadSequences ? "On" : "Off") << std::endl;
-  os << indent << "LoadPrivateTags: " << (m_LoadPrivateTags ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseSeriesDetails);
+  itkPrintSelfBooleanMacro(Recursive);
+  itkPrintSelfBooleanMacro(LoadSequences);
+  itkPrintSelfBooleanMacro(LoadPrivateTags);
 }
 
 void

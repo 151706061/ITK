@@ -58,9 +58,8 @@ itkAttributeUniqueLabelMapFilterTest1(int argc, char * argv[])
 
   using KernelType = itk::FlatStructuringElement<dim>;
   using DilateType = itk::BinaryDilateImageFilter<ImageType, ImageType, KernelType>;
-  auto                 dilate = DilateType::New();
-  KernelType::SizeType rad;
-  rad.Fill(15);
+  auto dilate = DilateType::New();
+  auto rad = KernelType::SizeType::Filled(15);
   dilate->SetKernel(KernelType::Ball(rad));
 
   using OIType = itk::ObjectByObjectLabelMapFilter<LabelMapType, LabelMapType, DilateType>;
@@ -81,7 +80,7 @@ itkAttributeUniqueLabelMapFilterTest1(int argc, char * argv[])
 
   unique->SetInput(oi->GetOutput());
 
-  itk::SimpleFilterWatcher watcher(unique, "filter");
+  const itk::SimpleFilterWatcher watcher(unique, "filter");
 
   using L2IType = itk::LabelMapToLabelImageFilter<LabelMapType, ImageType>;
   auto l2i = L2IType::New();

@@ -39,17 +39,11 @@ ActualTest(std::string filename, typename TImageType::SizeType size)
   using IteratorType = itk::ImageRegionIterator<ImageType>;
   using ConstIteratorType = itk::ImageRegionConstIterator<ImageType>;
 
-  typename ImageType::RegionType region;
-  typename ImageType::IndexType  index;
-
-
-  itk::TimeProbesCollectorBase chronometer;
+  const typename ImageType::IndexType  index{};
+  const typename ImageType::RegionType region{ index, size };
 
   { // begin write block
     auto image = ImageType::New();
-    index.Fill(0);
-    region.SetSize(size);
-    region.SetIndex(index);
 
     image->SetRegions(region);
 
@@ -63,6 +57,7 @@ ActualTest(std::string filename, typename TImageType::SizeType size)
 
     std::cout << "Trying to allocate an image of size " << sizeInMebiBytes << " MiB " << std::endl;
 
+    itk::TimeProbesCollectorBase chronometer;
     chronometer.Start("Allocate");
     image->Allocate();
     chronometer.Stop("Allocate");
@@ -106,6 +101,8 @@ ActualTest(std::string filename, typename TImageType::SizeType size)
 
   try
   {
+
+    itk::TimeProbesCollectorBase chronometer;
     chronometer.Start("Read");
     reader->Update();
     chronometer.Stop("Read");
@@ -116,7 +113,7 @@ ActualTest(std::string filename, typename TImageType::SizeType size)
     return EXIT_FAILURE;
   }
 
-  typename ImageType::ConstPointer readImage = reader->GetOutput();
+  const typename ImageType::ConstPointer readImage = reader->GetOutput();
 
   ConstIteratorType ritr(readImage, region);
   // IteratorType oitr( image, region );
@@ -128,6 +125,8 @@ ActualTest(std::string filename, typename TImageType::SizeType size)
 
   PixelType pixelValue{};
 
+
+  itk::TimeProbesCollectorBase chronometer;
   chronometer.Start("Compare");
   while (!ritr.IsAtEnd())
   {
@@ -177,24 +176,18 @@ itkLargeImageWriteReadTest(int argc, char * argv[])
     using PixelType = unsigned short;
     using ImageType = itk::Image<PixelType, Dimension>;
 
-    ImageType::SizeType size;
-
-    size.Fill(atol(argv[2]));
+    auto size = ImageType::SizeType::Filled(atol(argv[2]));
 
     return ActualTest<ImageType>(filename, size);
   }
-  else
-  {
-    constexpr unsigned int Dimension = 3;
 
-    using PixelType = unsigned short;
-    using ImageType = itk::Image<PixelType, Dimension>;
+  constexpr unsigned int Dimension = 3;
 
-    ImageType::SizeType size;
+  using PixelType = unsigned short;
+  using ImageType = itk::Image<PixelType, Dimension>;
 
-    size.Fill(atol(argv[2]));
-    size[2] = atol(argv[3]);
+  auto size = ImageType::SizeType::Filled(atol(argv[2]));
+  size[2] = atol(argv[3]);
 
-    return ActualTest<ImageType>(filename, size);
-  }
+  return ActualTest<ImageType>(filename, size);
 }

@@ -157,8 +157,7 @@ GPUDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GPUGenerateData()
   // progress->SetMiniPipelineFilter(this);
 
   // Set up the operators
-  unsigned int i;
-  for (i = 0; i < filterDimensionality; ++i)
+  for (unsigned int i = 0; i < filterDimensionality; ++i)
   {
     // we reverse the direction to minimize computation while, because
     // the largest dimension will be split slice wise for streaming
@@ -166,7 +165,7 @@ GPUDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GPUGenerateData()
 
     // Set up the operator for this dimension
     oper[reverse_i].SetDirection(i);
-    if (this->GetUseImageSpacing() == true)
+    if (this->GetUseImageSpacing())
     {
       if (localInput->GetSpacing()[i] == 0.0)
       {
@@ -231,7 +230,7 @@ GPUDiscreteGaussianImageFilter<TInputImage, TOutputImage>::GPUGenerateData()
     // Middle filters convolves from real to real
     if (filterDimensionality > 2)
     {
-      for (i = 1; i < filterDimensionality - 1; ++i)
+      for (unsigned int i = 1; i < filterDimensionality - 1; ++i)
       {
         typename IntermediateFilterType::Pointer f = m_IntermediateFilters[i - 1];
         f->SetOperator(oper[i]);

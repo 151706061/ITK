@@ -24,9 +24,7 @@
 
 #include "vnl/vnl_vector.h"
 
-namespace itk
-{
-namespace fem
+namespace itk::fem
 {
 /**
  * \class LoadLandmark
@@ -48,7 +46,7 @@ public:
   /** Method for creation through the object factory. */
   itkSimpleNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(LoadLandmark);
 
   /** CreateAnother method will clone the existing instance of this type,
@@ -281,7 +279,7 @@ protected:
   Solution::ConstPointer m_Solution{ nullptr };
 };
 
-} // namespace fem
-} // namespace itk
+} // namespace itk::fem
+
 
 #endif // itkFEMLoadLandmark_h

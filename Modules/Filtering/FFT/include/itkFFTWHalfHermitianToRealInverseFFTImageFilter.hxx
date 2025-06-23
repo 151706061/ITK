@@ -39,8 +39,8 @@ void
 FFTWHalfHermitianToRealInverseFFTImageFilter<TInputImage, TOutputImage>::BeforeThreadedGenerateData()
 {
   // Get pointers to the input and output.
-  typename InputImageType::ConstPointer inputPtr = this->GetInput();
-  typename OutputImageType::Pointer     outputPtr = this->GetOutput();
+  typename InputImageType::ConstPointer   inputPtr = this->GetInput();
+  const typename OutputImageType::Pointer outputPtr = this->GetOutput();
 
   if (!inputPtr || !outputPtr)
   {
@@ -49,7 +49,7 @@ FFTWHalfHermitianToRealInverseFFTImageFilter<TInputImage, TOutputImage>::BeforeT
 
   // We don't have a nice progress to report, but at least this simple line
   // reports the beginning and the end of the process.
-  ProgressReporter progress(this, 0, 1);
+  const ProgressReporter progress(this, 0, 1);
 
   // Allocate output buffer memory.
   outputPtr->SetBufferedRegion(outputPtr->GetRequestedRegion());
@@ -75,8 +75,7 @@ FFTWHalfHermitianToRealInverseFFTImageFilter<TInputImage, TOutputImage>::BeforeT
   // FFTW_PRESERVE_INPUT flag at this time. So if the input can't be
   // destroyed, we have to copy the input data to a buffer before
   // running the IFFT.
-  typename FFTWProxyType::ComplexType * const in = [&]() -> typename FFTWProxyType::ComplexType *
-  {
+  typename FFTWProxyType::ComplexType * const in = [&]() -> typename FFTWProxyType::ComplexType * {
     if (m_CanUseDestructiveAlgorithm)
     {
       // Ok, so lets use the input buffer directly, to save some memory.
@@ -88,8 +87,7 @@ FFTWHalfHermitianToRealInverseFFTImageFilter<TInputImage, TOutputImage>::BeforeT
       // We must use a buffer where fftw can work and destroy what it wants.
       return new typename FFTWProxyType::ComplexType[totalInputSize];
     }
-  }
-  ();
+  }();
   OutputPixelType *                out = outputPtr->GetBufferPointer();
   typename FFTWProxyType::PlanType plan;
 
@@ -129,8 +127,8 @@ FFTWHalfHermitianToRealInverseFFTImageFilter<TInputImage, TOutputImage>::Dynamic
   const OutputRegionType & outputRegionForThread)
 {
   using IteratorType = ImageRegionIterator<OutputImageType>;
-  unsigned long totalOutputSize = this->GetOutput()->GetRequestedRegion().GetNumberOfPixels();
-  IteratorType  it(this->GetOutput(), outputRegionForThread);
+  const unsigned long totalOutputSize = this->GetOutput()->GetRequestedRegion().GetNumberOfPixels();
+  IteratorType        it(this->GetOutput(), outputRegionForThread);
   while (!it.IsAtEnd())
   {
     it.Set(it.Value() / totalOutputSize);

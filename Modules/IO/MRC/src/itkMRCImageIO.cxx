@@ -60,7 +60,7 @@ MRCImageIO::PrintSelf(std::ostream & os, Indent indent) const
 bool
 MRCImageIO::CanReadFile(const char * filename)
 {
-  std::string fname = filename;
+  const std::string fname = filename;
 
   if (this->HasSupportedReadExtension(filename))
   {
@@ -71,7 +71,7 @@ MRCImageIO::CanReadFile(const char * filename)
 
   try
   {
-    // this may throw an expection, but we just return false
+    // this may throw an exception, but we just return false
     this->OpenFileForReading(file, fname);
   }
   catch (const ExceptionObject &)
@@ -219,7 +219,7 @@ MRCImageIO::ReadImageInformation()
   // can be accessed
   MetaDataDictionary & thisDic = this->GetMetaDataDictionary();
 
-  std::string classname(this->GetNameOfClass());
+  const std::string classname(this->GetNameOfClass());
   EncapsulateMetaData<std::string>(thisDic, ITK_InputFilterName, classname);
   EncapsulateMetaData<MRCHeaderObject::ConstPointer>(
     thisDic, m_MetaDataHeaderName, MRCHeaderObject::ConstPointer(m_MRCHeader));
@@ -278,7 +278,7 @@ MRCImageIO::Read(void * buffer)
     this->OpenFileForReading(file, m_FileName);
 
     // seek base the header
-    std::streampos dataPos = static_cast<std::streampos>(this->GetHeaderSize());
+    const std::streampos dataPos = static_cast<std::streampos>(this->GetHeaderSize());
     file.seekg(dataPos, std::ios::beg);
 
     if (file.fail())
@@ -290,21 +290,23 @@ MRCImageIO::Read(void * buffer)
     this->ReadBufferAsBinary(file, buffer, this->GetImageSizeInBytes());
   }
 
-  int size = this->GetComponentSize();
+  const int size = this->GetComponentSize();
   switch (size)
   {
     case 1:
       break;
     case 2:
       this->GetByteOrder() == IOByteOrderEnum::BigEndian
-        ? ByteSwapper<uint16_t>::SwapRangeFromSystemToBigEndian((uint16_t *)buffer, this->GetImageSizeInComponents())
-        : ByteSwapper<uint16_t>::SwapRangeFromSystemToLittleEndian((uint16_t *)buffer,
+        ? ByteSwapper<uint16_t>::SwapRangeFromSystemToBigEndian(static_cast<uint16_t *>(buffer),
+                                                                this->GetImageSizeInComponents())
+        : ByteSwapper<uint16_t>::SwapRangeFromSystemToLittleEndian(static_cast<uint16_t *>(buffer),
                                                                    this->GetImageSizeInComponents());
       break;
     case 4:
       this->GetByteOrder() == IOByteOrderEnum::BigEndian
-        ? ByteSwapper<uint32_t>::SwapRangeFromSystemToBigEndian((uint32_t *)buffer, this->GetImageSizeInComponents())
-        : ByteSwapper<uint32_t>::SwapRangeFromSystemToLittleEndian((uint32_t *)buffer,
+        ? ByteSwapper<uint32_t>::SwapRangeFromSystemToBigEndian(static_cast<uint32_t *>(buffer),
+                                                                this->GetImageSizeInComponents())
+        : ByteSwapper<uint32_t>::SwapRangeFromSystemToLittleEndian(static_cast<uint32_t *>(buffer),
                                                                    this->GetImageSizeInComponents());
       break;
     default:
@@ -315,7 +317,7 @@ MRCImageIO::Read(void * buffer)
 bool
 MRCImageIO::CanWriteFile(const char * fname)
 {
-  std::string filename = fname;
+  const std::string filename = fname;
 
   return this->HasSupportedWriteExtension(fname);
 }
@@ -330,9 +332,9 @@ MRCImageIO::UpdateHeaderWithMinMaxMean(const TPixelType * bufferBegin)
 
   // this could be replaced with std::min_element and
   // std::max_element, but that is slightly less efficient
-  std::pair<ConstPixelPointer, ConstPixelPointer> mm = itk::min_max_element(bufferBegin, bufferEnd);
+  const std::pair<ConstPixelPointer, ConstPixelPointer> mm = itk::min_max_element(bufferBegin, bufferEnd);
 
-  double mean = std::accumulate(bufferBegin, bufferEnd, 0.0) / std::distance(bufferBegin, bufferEnd);
+  const double mean = std::accumulate(bufferBegin, bufferEnd, 0.0) / std::distance(bufferBegin, bufferEnd);
 
   m_MRCHeader->m_Header.amin = static_cast<float>(*mm.first);
   m_MRCHeader->m_Header.amax = static_cast<float>(*mm.second);
@@ -342,11 +344,9 @@ MRCImageIO::UpdateHeaderWithMinMaxMean(const TPixelType * bufferBegin)
 void
 MRCImageIO::UpdateHeaderFromImageIO()
 {
-  MRCHeaderObject::Header header;
+  MRCHeaderObject::Header header{};
 
-  memset(&header, 0, sizeof(MRCHeaderObject::Header));
-
-  itkAssertOrThrowMacro(this->GetNumberOfDimensions() != 0, "Invalid Dimension for Writting");
+  itkAssertOrThrowMacro(this->GetNumberOfDimensions() != 0, "Invalid Dimension for Writing");
   if (this->GetNumberOfDimensions() > 3)
   {
     itkExceptionMacro("MRC Writer can not write more than 3-dimensional images");
@@ -355,7 +355,7 @@ MRCImageIO::UpdateHeaderFromImageIO()
   // magic number
   memcpy(header.cmap, magicMAP, 4);
 
-  if (ByteSwapper<void *>::SystemIsBigEndian())
+  if constexpr (ByteSwapper<void *>::SystemIsBigEndian())
   {
     header.stamp[0] = 17;
     header.stamp[1] = 17;
@@ -419,8 +419,8 @@ MRCImageIO::UpdateHeaderFromImageIO()
   if (header.mode == -1)
   {
     itkExceptionMacro("Unsupported pixel type: "
-                      << this->GetPixelTypeAsString(this->GetPixelType()) << ' '
-                      << this->GetComponentTypeAsString(this->GetComponentType()) << std::endl
+                      << ImageIOBase::GetPixelTypeAsString(this->GetPixelType()) << ' '
+                      << ImageIOBase::GetComponentTypeAsString(this->GetComponentType()) << std::endl
                       << "Supported pixel types include unsigned byte, unsigned short, short, float, rgb "
                          "unsigned char, float complex");
   }
@@ -552,7 +552,7 @@ MRCImageIO::Write(const void * buffer)
       // write one byte at the end of the file to allocate (this is a
       // nifty trick which should not write the entire size of the file
       // just allocate it, if the system supports sparse files)
-      std::streampos seekPos = this->GetImageSizeInBytes() + this->GetHeaderSize() - 1;
+      const std::streampos seekPos = this->GetImageSizeInBytes() + this->GetHeaderSize() - 1;
       file.seekp(seekPos, std::ios::cur);
       file.write("\0", 1);
       file.seekp(0);
@@ -561,7 +561,7 @@ MRCImageIO::Write(const void * buffer)
     {
       if (m_MRCHeader.IsNull())
       {
-        // need to determin the size of the header in the file by
+        // need to determine the size of the header in the file by
         // reading the header into m_MRCHeader
 
         // we assume that GetActualNumberOfSplitsForWriting is called
@@ -596,7 +596,7 @@ MRCImageIO::Write(const void * buffer)
     this->OpenFileForWriting(file, m_FileName, false);
 
     // seek pass the header
-    std::streampos dataPos = static_cast<std::streampos>(this->GetHeaderSize());
+    const std::streampos dataPos = static_cast<std::streampos>(this->GetHeaderSize());
     file.seekp(dataPos, std::ios::beg);
 
     if (file.fail())

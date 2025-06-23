@@ -44,16 +44,13 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::IncrementThresholds(InstanceI
                                                                        MeanVectorType &               classMean,
                                                                        FrequencyVectorType &          classFrequency)
 {
-  typename TInputHistogram::ConstPointer histogram = this->GetInputHistogram();
+  const typename TInputHistogram::ConstPointer histogram = this->GetInputHistogram();
 
   const SizeValueType numberOfHistogramBins = histogram->Size();
   const auto          numberOfClasses = static_cast<const SizeValueType>(classMean.size());
 
-  unsigned int k;
-  int          j;
-
   // From the upper threshold down
-  for (j = static_cast<int>(m_NumberOfThresholds - 1); j >= 0; j--)
+  for (int j = static_cast<int>(m_NumberOfThresholds - 1); j >= 0; j--)
   {
     // If this threshold can be incremented (i.e. we're not at the end of the
     // histogram)
@@ -82,7 +79,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::IncrementThresholds(InstanceI
 
       // Set higher thresholds adjacent to their previous ones, and update mean
       // and frequency of the respective classes
-      for (k = j + 1; k < m_NumberOfThresholds; ++k)
+      for (unsigned int k = j + 1; k < m_NumberOfThresholds; ++k)
       {
         thresholdIndexes[k] = thresholdIndexes[k - 1] + 1;
         classFrequency[k] = histogram->GetFrequency(thresholdIndexes[k]);
@@ -100,7 +97,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::IncrementThresholds(InstanceI
       classFrequency[numberOfClasses - 1] = histogram->GetTotalFrequency();
       classMean[numberOfClasses - 1] = globalMean * histogram->GetTotalFrequency();
 
-      for (k = 0; k < numberOfClasses - 1; ++k)
+      for (unsigned int k = 0; k < numberOfClasses - 1; ++k)
       {
         classFrequency[numberOfClasses - 1] -= classFrequency[k];
         classMean[numberOfClasses - 1] -= classMean[k] * static_cast<MeanType>(classFrequency[k]);
@@ -118,14 +115,12 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::IncrementThresholds(InstanceI
       // Exit the for loop if a threshold has been incremented
       break;
     }
-    else // If this threshold can't be incremented
+    // If this threshold can't be incremented
+    // If it's the lowest threshold
+    if (j == 0)
     {
-      // If it's the lowest threshold
-      if (j == 0)
-      {
-        // We couldn't increment because we're done
-        return false;
-      }
+      // We couldn't increment because we're done
+      return false;
     }
   }
   // We incremented
@@ -136,7 +131,7 @@ template <typename TInputHistogram>
 void
 OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
 {
-  typename TInputHistogram::ConstPointer histogram = this->GetInputHistogram();
+  const typename TInputHistogram::ConstPointer histogram = this->GetInputHistogram();
 
   // TODO: as an improvement, the class could accept multi-dimensional
   // histograms
@@ -147,8 +142,8 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   }
 
   // Compute global mean
-  typename TInputHistogram::ConstIterator iter = histogram->Begin();
-  typename TInputHistogram::ConstIterator end = histogram->End();
+  typename TInputHistogram::ConstIterator       iter = histogram->Begin();
+  const typename TInputHistogram::ConstIterator end = histogram->End();
 
   MeanType            globalMean{};
   const FrequencyType globalFrequency = histogram->GetTotalFrequency();
@@ -159,13 +154,11 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   }
   globalMean /= static_cast<MeanType>(globalFrequency);
 
-  SizeValueType numberOfClasses = m_NumberOfThresholds + 1;
+  const SizeValueType numberOfClasses = m_NumberOfThresholds + 1;
 
   // Initialize thresholds
   InstanceIdentifierVectorType thresholdIndexes(m_NumberOfThresholds);
-
-  SizeValueType j;
-  for (j = 0; j < m_NumberOfThresholds; ++j)
+  for (SizeValueType j = 0; j < m_NumberOfThresholds; ++j)
   {
     thresholdIndexes[j] = j;
   }
@@ -175,7 +168,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   // Compute frequency and mean of initial classes
   FrequencyType       freqSum{};
   FrequencyVectorType classFrequency(numberOfClasses);
-  for (j = 0; j < numberOfClasses - 1; ++j)
+  for (SizeValueType j = 0; j < numberOfClasses - 1; ++j)
   {
     classFrequency[j] = histogram->GetFrequency(thresholdIndexes[j]);
     freqSum += classFrequency[j];
@@ -183,16 +176,16 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   classFrequency[numberOfClasses - 1] = globalFrequency - freqSum;
 
   // Convert the frequencies to probabilities (i.e. normalize the histogram).
-  SizeValueType    histSize = histogram->GetSize()[0];
-  WeightVectorType imgPDF(histSize);
-  for (j = 0; j < histSize; ++j)
+  const SizeValueType histSize = histogram->GetSize()[0];
+  WeightVectorType    imgPDF(histSize);
+  for (SizeValueType j = 0; j < histSize; ++j)
   {
     imgPDF[j] = (WeightType)histogram->GetFrequency(j) / (WeightType)globalFrequency;
   }
 
   MeanType       meanSum{};
   MeanVectorType classMean(numberOfClasses);
-  for (j = 0; j < numberOfClasses - 1; ++j)
+  for (SizeValueType j = 0; j < numberOfClasses - 1; ++j)
   {
     if (NumericTraits<FrequencyType>::IsPositive(classFrequency[j]))
     {
@@ -232,7 +225,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   // format. In this way making numerical results consistent across platforms.
   //
 
-  for (j = 0; j < numberOfClasses; ++j)
+  for (SizeValueType j = 0; j < numberOfClasses; ++j)
   {
     maxVarBetween +=
       (static_cast<VarianceType>(classFrequency[j])) * static_cast<VarianceType>((classMean[j]) * (classMean[j]));
@@ -243,7 +236,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   WeightType valleyEmphasisFactor{};
   if (m_ValleyEmphasis)
   {
-    for (j = 0; j < numberOfClasses - 1; ++j)
+    for (SizeValueType j = 0; j < numberOfClasses - 1; ++j)
     {
       valleyEmphasisFactor = imgPDF[thresholdIndexes[j]];
     }
@@ -273,7 +266,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
     // format. In this way making numerical results consistent across platforms.
     //
 
-    for (j = 0; j < numberOfClasses; ++j)
+    for (SizeValueType j = 0; j < numberOfClasses; ++j)
     {
       // The true between-class variance \sigma_B^2 for any number of classes is defined as:
       // \sigma_B^2 = \sum_{k=1}^{M} \omega_k (\mu_k - \mu_T)^2
@@ -298,7 +291,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
     {
       // Sum relevant weights to get valley emphasis factor
       valleyEmphasisFactor = WeightType{};
-      for (j = 0; j < numberOfClasses - 1; ++j)
+      for (SizeValueType j = 0; j < numberOfClasses - 1; ++j)
       {
         valleyEmphasisFactor += imgPDF[thresholdIndexes[j]];
       }
@@ -317,7 +310,7 @@ OtsuMultipleThresholdsCalculator<TInputHistogram>::Compute()
   // Copy corresponding bin max to threshold vector
   m_Output.resize(m_NumberOfThresholds);
 
-  for (j = 0; j < m_NumberOfThresholds; ++j)
+  for (SizeValueType j = 0; j < m_NumberOfThresholds; ++j)
   {
     if (m_ReturnBinMidpoint)
     {

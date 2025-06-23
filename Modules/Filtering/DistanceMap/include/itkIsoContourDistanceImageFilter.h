@@ -49,6 +49,8 @@ namespace itk
  *`Krissian K. and Westin C.F.',
  * EUROCAST NeuroImaging Workshop Las Palmas Spain,
  * Ninth International Conference on Computer Aided Systems Theory , pages 48-51, Feb 2003.
+ * NOTE: Attribution is incorrect, the manuscript does not appear to be
+ * part of the EUROCAST'03 proceedings (https://doi.org/10.1007/b13239).
  *
  *
  * \ingroup LevelSetSegmentation
@@ -70,7 +72,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(IsoContourDistanceImageFilter);
 
   /**Typedefs from the superclass */
@@ -108,20 +110,23 @@ public:
 
   /** Set/Get the value of the level set to be located. The default value is
    *  0. */
+  /** @ITKStartGrouping */
   itkSetMacro(LevelSetValue, PixelRealType);
   itkGetConstMacro(LevelSetValue, PixelRealType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the value of the level set to be located. The default value is
    *  0. */
+  /** @ITKStartGrouping */
   itkSetMacro(FarValue, PixelType);
   itkGetConstMacro(FarValue, PixelType);
-
+  /** @ITKEndGrouping */
   /** Set/Get the narrowbanding flag. By default, narrowbanding is switched
    * off. */
+  /** @ITKStartGrouping */
   itkSetMacro(NarrowBanding, bool);
   itkGetConstMacro(NarrowBanding, bool);
   itkBooleanMacro(NarrowBanding);
-
+  /** @ITKEndGrouping */
   /** Set/Get the narrowband. */
   void
   SetNarrowBand(NarrowBandType * ptr);
@@ -132,8 +137,6 @@ public:
     return m_NarrowBand;
   }
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputEqualityComparableCheck, (Concept::EqualityComparable<InputPixelType>));
   itkConceptMacro(OutputEqualityComparableCheck, (Concept::EqualityComparable<PixelType>));
   itkConceptMacro(SameDimensionCheck, (Concept::SameDimension<ImageDimension, OutputImageDimension>));
@@ -142,8 +145,6 @@ public:
   itkConceptMacro(OutputAdditiveOperatorsCheck, (Concept::AdditiveOperators<PixelType>));
   itkConceptMacro(InputOStreamWritableCheck, (Concept::OStreamWritable<InputPixelType>));
   itkConceptMacro(OutputOStreamWritableCheck, (Concept::OStreamWritable<PixelType>));
-  // End concept checking
-#endif
 
 protected:
   IsoContourDistanceImageFilter();

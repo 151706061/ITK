@@ -52,7 +52,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(SymmetricEllipsoidInteriorExteriorSpatialFunction);
 
   /** Input type for the function. */
@@ -66,9 +66,10 @@ public:
   Evaluate(const InputType & position) const override;
 
   /** Get and set the center of the ellipsoid. */
+  /** @ITKStartGrouping */
   itkGetConstMacro(Center, InputType);
   itkSetMacro(Center, InputType);
-
+  /** @ITKEndGrouping */
   /** Set the orientation vector of the ellipsoid's unique axis and axes lengths.
    * Must be normalized!!!!! */
   void

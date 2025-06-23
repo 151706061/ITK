@@ -52,20 +52,18 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::GetMeasurementVect
   {
     return m_MeasurementVectorInternal;
   }
-  else
-  {
-    IndexType reqIndex;
-    ImageHelper<ImageType::ImageDimension, ImageType::ImageDimension>::ComputeIndex(
-      m_Region.GetIndex(), id, m_OffsetTable, reqIndex);
 
-    OffsetType offset = reqIndex - m_NeighborIndexInternal;
+  IndexType reqIndex;
+  ImageHelper<ImageType::ImageDimension, ImageType::ImageDimension>::ComputeIndex(
+    m_Region.GetIndex(), id, m_OffsetTable, reqIndex);
 
-    m_NeighborIndexInternal = reqIndex;
-    m_MeasurementVectorInternal[0] += offset;
-    m_InstanceIdentifierInternal = id;
+  const OffsetType offset = reqIndex - m_NeighborIndexInternal;
 
-    return m_MeasurementVectorInternal;
-  }
+  m_NeighborIndexInternal = reqIndex;
+  m_MeasurementVectorInternal[0] += offset;
+  m_InstanceIdentifierInternal = id;
+
+  return m_MeasurementVectorInternal;
 }
 
 /** returns the number of measurement vectors in this container*/
@@ -82,7 +80,8 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::Size() const -> In
 }
 
 template <typename TImage, typename TBoundaryCondition>
-inline auto ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::GetFrequency(InstanceIdentifier) const
+inline auto
+ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::GetFrequency(InstanceIdentifier) const
   -> AbsoluteFrequencyType
 {
   if (m_Image.IsNull())
@@ -113,7 +112,7 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::PrintSelf(std::ost
      << std::endl;
   os << indent << "Region: " << m_Region << std::endl;
   os << indent << "OffsetTable: " << m_OffsetTable << std::endl;
-  os << indent << "UseImageRegion: " << (m_UseImageRegion ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(UseImageRegion);
   os << indent << "Neighborhood Radius: " << m_Radius << std::endl;
 }
 
@@ -126,8 +125,7 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::SetImage(const TIm
   {
     m_Region = m_Image->GetLargestPossibleRegion();
   }
-  NeighborhoodIteratorType neighborIt;
-  neighborIt = NeighborhoodIteratorType(m_Radius, m_Image, m_Region);
+  NeighborhoodIteratorType neighborIt(m_Radius, m_Image, m_Region);
   neighborIt.GoToBegin();
   m_NeighborIndexInternal = neighborIt.GetBeginIndex();
   m_MeasurementVectorInternal.clear();
@@ -159,8 +157,7 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::SetRadius(const Ne
     m_Radius = radius;
     if (m_Image.IsNotNull())
     {
-      NeighborhoodIteratorType neighborIt;
-      neighborIt = NeighborhoodIteratorType(m_Radius, m_Image, m_Region);
+      NeighborhoodIteratorType neighborIt(m_Radius, m_Image, m_Region);
       neighborIt.GoToBegin();
       m_NeighborIndexInternal = neighborIt.GetBeginIndex();
       m_MeasurementVectorInternal.clear();
@@ -188,8 +185,7 @@ ImageToNeighborhoodSampleAdaptor<TImage, TBoundaryCondition>::SetRegion(const Re
     m_UseImageRegion = false;
     if (m_Image.IsNotNull())
     {
-      NeighborhoodIteratorType neighborIt;
-      neighborIt = NeighborhoodIteratorType(m_Radius, m_Image, m_Region);
+      NeighborhoodIteratorType neighborIt(m_Radius, m_Image, m_Region);
       neighborIt.GoToBegin();
       m_NeighborIndexInternal = neighborIt.GetBeginIndex();
       m_MeasurementVectorInternal.clear();
@@ -240,7 +236,7 @@ template <typename TImage, typename TBoundaryCondition>
 std::ostream &
 operator<<(std::ostream & os, const std::vector<itk::ConstNeighborhoodIterator<TImage, TBoundaryCondition>> & mv)
 {
-  itk::ConstNeighborhoodIterator<TImage, TBoundaryCondition> nbhd = mv[0];
+  const itk::ConstNeighborhoodIterator<TImage, TBoundaryCondition> nbhd = mv[0];
   os << "Neighborhood: " << std::endl;
   os << "    Radius: " << nbhd.GetRadius() << std::endl;
   os << "    Size: " << nbhd.GetSize() << std::endl;

@@ -59,7 +59,7 @@ public:
   /** New macro for creation of through a Smart Pointer   */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods).   */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(QuaternionRigidTransform);
 
   /** Dimension of parameters   */
@@ -135,7 +135,10 @@ public:
   ComputeJacobianWithRespectToParameters(const InputPointType & p, JacobianType & jacobian) const override;
 
 protected:
-  QuaternionRigidTransform(const MatrixType & matrix, const OutputVectorType & offset);
+#if !defined(ITK_LEGACY_REMOVE)
+  [[deprecated("Removed unused constructor")]] QuaternionRigidTransform(const MatrixType &       matrix,
+                                                                        const OutputVectorType & offset);
+#endif
   QuaternionRigidTransform(unsigned int parametersDimension);
   QuaternionRigidTransform();
   ~QuaternionRigidTransform() override = default;

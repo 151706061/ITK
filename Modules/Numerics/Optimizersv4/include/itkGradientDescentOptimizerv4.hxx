@@ -221,7 +221,7 @@ GradientDescentOptimizerv4Template<TInternalComputationValueType>::ModifyGradien
     // Take the modulo of the index to handle gradients from transforms
     // with local support. The gradient array stores the gradient of local
     // parameters at each local index with linear packing.
-    IndexValueType index = j % scales.Size();
+    const IndexValueType index = j % scales.Size();
     this->m_Gradient[j] = this->m_Gradient[j] * factor[index];
   }
 }
@@ -281,8 +281,7 @@ GradientDescentOptimizerv4Template<TInternalComputationValueType>::PrintSelf(std
   os << indent
      << "BestParameters: " << static_cast<typename NumericTraits<ParametersType>::PrintType>(this->m_BestParameters)
      << std::endl;
-  os << indent << "ReturnBestParametersAndValue: " << (this->m_ReturnBestParametersAndValue ? "On" : "Off")
-     << std::endl;
+  itkPrintSelfBooleanMacro(ReturnBestParametersAndValue);
   os << indent
      << "PreviousGradient: " << static_cast<typename NumericTraits<DerivativeType>::PrintType>(this->m_PreviousGradient)
      << std::endl;

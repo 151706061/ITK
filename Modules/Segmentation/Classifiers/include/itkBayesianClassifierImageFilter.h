@@ -97,7 +97,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(BayesianClassifierImageFilter);
 
   /** Input and Output image types. */
@@ -161,26 +161,26 @@ public:
 
   /** Set/Get the smoothing filter that may optionally be applied to the
    *  posterior image. */
+  /** @ITKStartGrouping */
   void
   SetSmoothingFilter(SmoothingFilterType *);
   itkGetConstMacro(SmoothingFilter, SmoothingFilterPointer);
-
+  /** @ITKEndGrouping */
   /** Set the priors image. */
   virtual void
   SetPriors(const PriorsImageType *);
 
   /** Number of iterations to apply the smoothing filter. */
+  /** @ITKStartGrouping */
   itkSetMacro(NumberOfSmoothingIterations, unsigned int);
   itkGetConstMacro(NumberOfSmoothingIterations, unsigned int);
-
+  /** @ITKEndGrouping */
   /** This is overloaded to create the Posteriors output image. */
   using DataObjectPointerArraySizeType = ProcessObject::DataObjectPointerArraySizeType;
   using Superclass::MakeOutput;
   DataObjectPointer
   MakeOutput(DataObjectPointerArraySizeType idx) override;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(UnsignedIntConvertibleToLabelsCheck, (Concept::Convertible<unsigned int, TLabelsType>));
   itkConceptMacro(PosteriorsAdditiveOperatorsCheck, (Concept::AdditiveOperators<TPosteriorsPrecisionType>));
   itkConceptMacro(IntConvertibleToPosteriorsCheck, (Concept::Convertible<int, TPosteriorsPrecisionType>));
@@ -190,8 +190,6 @@ public:
   itkConceptMacro(
     InputPriorsPosteriorsMultiplyOperatorCheck,
     (Concept::MultiplyOperator<typename InputPixelType::ValueType, PriorsPixelType, PosteriorsPixelType>));
-  // End concept checking
-#endif
 
 protected:
   BayesianClassifierImageFilter();

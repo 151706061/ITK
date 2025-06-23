@@ -61,8 +61,7 @@ namespace itk
  *  FiniteDifferenceFunction to use for calculations.  This is set using the
  *  method SetDifferenceFunction in the parent class.
  *
- * \par REFERENCES
- * Sethian, J.A. Level Set Methods. Cambridge University Press. 1996.
+ * For algorithmic details see \cite sethian1996.
  *
  * \ingroup ITKNarrowBand
  */
@@ -78,7 +77,7 @@ public:
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
 
-  /** Run-time type information (and related methods) */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(NarrowBandImageFilterBase);
 
   /**Typedefs from the superclass */
@@ -114,8 +113,10 @@ public:
   using NarrowBandIterator = typename NarrowBandType::Iterator;
 
   /** Set/Get IsoSurfaceValue to use in the input image */
+  /** @ITKStartGrouping */
   itkSetMacro(IsoSurfaceValue, ValueType);
   itkGetConstMacro(IsoSurfaceValue, ValueType);
+  /** @ITKEndGrouping */
 
   /** Root Mean Square Change between successive iterations */
   //  itkGetConstMacro( RMSChange, ValueType);
@@ -124,6 +125,7 @@ public:
    *   entire narrow band can be constructed using this method.  Usually,
    *   however, the narrow band is initialized and reinitialized automatically
    *   by the subclass. */
+  /** @ITKStartGrouping */
   void
   InsertNarrowBandNode(const BandNodeType & node)
   {
@@ -153,6 +155,7 @@ public:
     m_NarrowBand->PushBack(tmpnode);
     this->Modified();
   }
+  /** @ITKEndGrouping */
 
   /** Set the narrow band total radius. The narrow band width will be
    * twice this value (positive and negative distance to the zero level
@@ -168,7 +171,7 @@ public:
   }
 
   /** Get the narrow band total radius. */
-  float
+  [[nodiscard]] float
   GetNarrowBandTotalRadius() const
   {
     return m_NarrowBand->GetTotalRadius();
@@ -187,7 +190,7 @@ public:
   }
 
   /** Get the narrow band inner radius. */
-  float
+  [[nodiscard]] float
   GetNarrowBandInnerRadius() const
   {
     return m_NarrowBand->GetInnerRadius();
@@ -217,14 +220,12 @@ public:
 
 protected:
   NarrowBandImageFilterBase()
+    : m_NarrowBand(NarrowBandType::New())
+    , m_ReinitializationFrequency(6)
+    , m_IsoSurfaceValue(0.0)
   {
-    m_NarrowBand = NarrowBandType::New();
     m_NarrowBand->SetTotalRadius(4);
     m_NarrowBand->SetInnerRadius(2);
-    m_ReinitializationFrequency = 6;
-    m_IsoSurfaceValue = 0.0;
-    m_Step = 0;
-    m_Touched = false;
   }
 
   ~NarrowBandImageFilterBase() override = default;
@@ -238,6 +239,7 @@ protected:
   Defines a subregion of the narrowband. */
   struct ThreadRegionType
   {
+
     /** this is the actual first element */
     NarrowBandIterator first;
 
@@ -271,7 +273,8 @@ protected:
   /** This method allows deallocation of data and further post processing
    */
   void
-  PostProcessOutput() override;
+  PostProcessOutput() override
+  {}
 
   /* This function clears all pixels from the narrow band */
   void

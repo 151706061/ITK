@@ -55,6 +55,7 @@ namespace itk
  *
  * \ingroup ITKIOGDCM
  */
+
 /** \todo: remove these from the itk:: namespace */
 using FilenamesContainer = std::vector<std::string>;
 using SerieUIDContainer = std::vector<std::string>;
@@ -78,7 +79,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(GDCMSeriesFileNames);
 
   /* -------- Define the API for GDCMSeriesFileNames ----------- */
@@ -89,11 +90,11 @@ public:
 
   /** Set the directory that contains the DICOM series. */
   void
-  SetInputDirectory(std::string const & name);
+  SetInputDirectory(const std::string & name);
 
   /** Set the directory that contains the DICOM series. */
   void
-  SetDirectory(std::string const & name)
+  SetDirectory(const std::string & name)
   {
     SetInputDirectory(name);
   }
@@ -106,7 +107,7 @@ public:
 
   /** Set the directory where the output DICOM series should be written. */
   void
-  SetOutputDirectory(std::string const & name)
+  SetOutputDirectory(const std::string & name)
   {
     m_OutputDirectory = name;
     this->Modified();
@@ -139,9 +140,11 @@ public:
 
   /** Recursively parse the input directory.
    * Must be set before the call to SetInputDirectory(). */
+  /** @ITKStartGrouping */
   itkSetMacro(Recursive, bool);
   itkGetConstMacro(Recursive, bool);
   itkBooleanMacro(Recursive);
+  /** @ITKEndGrouping */
 
   /** Use additional series information such as ProtocolName
    *   and SeriesName to identify when a single SeriesUID contains
@@ -173,18 +176,21 @@ public:
    *  to skip sequences. This makes loading DICOM files faster when
    *  sequences are not needed.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(LoadSequences, bool);
   itkGetConstMacro(LoadSequences, bool);
   itkBooleanMacro(LoadSequences);
+  /** @ITKEndGrouping */
 
   /** Parse any private tags in the DICOM file. Defaults to false
    * to skip private tags. This makes loading DICOM files faster when
    * private tags are not needed.
    */
+  /** @ITKStartGrouping */
   itkSetMacro(LoadPrivateTags, bool);
   itkGetConstMacro(LoadPrivateTags, bool);
   itkBooleanMacro(LoadPrivateTags);
-
+  /** @ITKEndGrouping */
 protected:
   GDCMSeriesFileNames();
   ~GDCMSeriesFileNames() override;

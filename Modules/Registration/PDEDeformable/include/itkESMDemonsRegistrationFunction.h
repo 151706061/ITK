@@ -47,7 +47,7 @@ public:
 };
 // Define how to print enumeration
 extern ITKPDEDeformableRegistration_EXPORT std::ostream &
-                                           operator<<(std::ostream & out, const ESMDemonsRegistrationFunctionEnums::Gradient value);
+operator<<(std::ostream & out, const ESMDemonsRegistrationFunctionEnums::Gradient value);
 /**
  * \class ESMDemonsRegistrationFunction
  *
@@ -70,7 +70,7 @@ extern ITKPDEDeformableRegistration_EXPORT std::ostream &
  * \author Tom Vercauteren, INRIA & Mauna Kea Technologies
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/154
+ * https://doi.org/10.54294/ux2obj
  *
  * \sa SymmetricForcesDemonsRegistrationFunction
  * \sa SymmetricForcesDemonsRegistrationFilter
@@ -97,7 +97,7 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information (and related methods). */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(ESMDemonsRegistrationFunction);
 
   /** MovingImage image type. */
@@ -128,11 +128,15 @@ public:
   using typename Superclass::TimeStepType;
 
   /** Interpolator type. */
-  using CoordRepType = double;
-  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordRepType>;
+  using CoordinateType = double;
+#ifndef ITK_FUTURE_LEGACY_REMOVE
+  using CoordRepType ITK_FUTURE_DEPRECATED(
+    "ITK 6 discourages using `CoordRepType`. Please use `CoordinateType` instead!") = CoordinateType;
+#endif
+  using InterpolatorType = InterpolateImageFunction<MovingImageType, CoordinateType>;
   using InterpolatorPointer = typename InterpolatorType::Pointer;
   using PointType = typename InterpolatorType::PointType;
-  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordRepType>;
+  using DefaultInterpolatorType = LinearInterpolateImageFunction<MovingImageType, CoordinateType>;
 
   /** Warper type */
   using WarperType = WarpImageFilter<MovingImageType, MovingImageType, DisplacementFieldType>;
@@ -147,7 +151,7 @@ public:
   using GradientCalculatorPointer = typename GradientCalculatorType::Pointer;
 
   /** Moving image gradient (unwarped) calculator type. */
-  using MovingImageGradientCalculatorType = CentralDifferenceImageFunction<MovingImageType, CoordRepType>;
+  using MovingImageGradientCalculatorType = CentralDifferenceImageFunction<MovingImageType, CoordinateType>;
   using MovingImageGradientCalculatorPointer = typename MovingImageGradientCalculatorType::Pointer;
 
   /** Set the moving image interpolator. */
@@ -200,7 +204,7 @@ public:
 
   /** Get the metric value. The metric value is the mean square difference
    * in intensity between the fixed image and transforming moving image
-   * computed over the the overlapping region between the two images. */
+   * computed over the overlapping region between the two images. */
   virtual double
   GetMetric() const
   {
@@ -249,6 +253,7 @@ public:
 #endif
 
   /** Set/Get the type of used image forces */
+  /** @ITKStartGrouping */
   virtual void
   SetUseGradientType(GradientEnum gtype)
   {
@@ -259,6 +264,7 @@ public:
   {
     return m_UseGradientType;
   }
+  /** @ITKEndGrouping */
 
 protected:
   ESMDemonsRegistrationFunction();

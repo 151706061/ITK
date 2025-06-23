@@ -80,7 +80,7 @@ public:
   /** Instantiation through object factory. */
   itkNewMacro(Self);
 
-  /** Run-time type information. */
+  /** \see LightObject::GetNameOfClass() */
   itkOverrideGetNameOfClassMacro(VectorCurvatureAnisotropicDiffusionImageFilter);
 
   /** Convenient type alias. */
@@ -89,19 +89,14 @@ public:
   /** Determine the image dimension. */
   static constexpr unsigned int ImageDimension = Superclass::ImageDimension;
 
-#ifdef ITK_USE_CONCEPT_CHECKING
-  // Begin concept checking
   itkConceptMacro(InputHasNumericTraitsCheck, (Concept::HasNumericTraits<typename TInputImage::PixelType::ValueType>));
   itkConceptMacro(OutputHasNumericTraitsCheck,
                   (Concept::HasNumericTraits<typename TOutputImage::PixelType::ValueType>));
-  // End concept checking
-#endif
 
 protected:
   VectorCurvatureAnisotropicDiffusionImageFilter()
   {
-    typename VectorCurvatureNDAnisotropicDiffusionFunction<UpdateBufferType>::Pointer q =
-      VectorCurvatureNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
+    auto q = VectorCurvatureNDAnisotropicDiffusionFunction<UpdateBufferType>::New();
     this->SetDifferenceFunction(q);
   }
 
@@ -111,7 +106,7 @@ protected:
   InitializeIteration() override
   {
     Superclass::InitializeIteration();
-    if (this->GetTimeStep() > 0.5 / std::pow(2.0, static_cast<double>(ImageDimension)))
+    if (this->GetTimeStep() > 0.5 / double{ 1ULL << ImageDimension })
     {
       itkWarningMacro(
         << "Anisotropic diffusion has attempted to use a time step which may introduce instability into the solution.");

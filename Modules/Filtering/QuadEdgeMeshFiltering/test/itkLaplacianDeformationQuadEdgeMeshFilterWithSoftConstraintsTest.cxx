@@ -57,7 +57,7 @@ itkLaplacianDeformationQuadEdgeMeshFilterWithSoftConstraintsTest(int argc, char 
   filter->SetInput(reader->GetOutput());
   filter->SetOrder(1);
 
-  typename FilterType::OutputCoordRepType lambda = 1.0;
+  constexpr typename FilterType::OutputCoordinateType lambda = 1.0;
   filter->SetLambda(lambda);
   ITK_TEST_SET_GET_VALUE(lambda, filter->GetLambda());
 
@@ -99,7 +99,7 @@ itkLaplacianDeformationQuadEdgeMeshFilterWithSoftConstraintsTest(int argc, char 
   constraints[40] = e;
   constraints[371] = e;
 
-  std::map<MeshType::PointIdentifier, MeshType::VectorType>::const_iterator it = constraints.begin();
+  auto it = constraints.begin();
   while (it != constraints.end())
   {
     filter->SetDisplacement(it->first, it->second);
@@ -124,19 +124,15 @@ itkLaplacianDeformationQuadEdgeMeshFilterWithSoftConstraintsTest(int argc, char 
   writer->SetFileName(argv[2]);
   writer->Update();
 
-  MeshType::Pointer inputMesh = reader->GetOutput();
-  MeshType::Pointer outputMesh = filter->GetOutput();
+  const MeshType::Pointer inputMesh = reader->GetOutput();
+  const MeshType::Pointer outputMesh = filter->GetOutput();
 
   it = constraints.begin();
-
-  MeshType::PointType  iPt, oPt;
-  MeshType::VectorType displacement;
-
   while (it != constraints.end())
   {
-    iPt = inputMesh->GetPoint(it->first);
-    oPt = outputMesh->GetPoint(it->first);
-    displacement = oPt - iPt;
+    const MeshType::PointType  iPt = inputMesh->GetPoint(it->first);
+    const MeshType::PointType  oPt = outputMesh->GetPoint(it->first);
+    const MeshType::VectorType displacement = oPt - iPt;
 
     if (it->second.GetNorm() > 1e-6)
     {

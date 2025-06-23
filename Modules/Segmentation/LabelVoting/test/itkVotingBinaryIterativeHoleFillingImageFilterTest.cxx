@@ -47,8 +47,8 @@ itkVotingBinaryIterativeHoleFillingImageFilterTest(int, char *[])
   ImageType::PointValueType origin[2] = { 15, 400 };
   random->SetOrigin(origin);
 
-  ImageType::PixelType foreground = 97; // prime numbers are good testers
-  ImageType::PixelType background = 29;
+  constexpr ImageType::PixelType foreground = 97; // prime numbers are good testers
+  constexpr ImageType::PixelType background = 29;
 
   itk::BinaryThresholdImageFilter<ImageType, ImageType>::Pointer thresholder;
   thresholder = itk::BinaryThresholdImageFilter<ImageType, ImageType>::New();
@@ -80,17 +80,17 @@ itkVotingBinaryIterativeHoleFillingImageFilterTest(int, char *[])
 
   // Set the maximum number of times the filter should perform passes filling
   // the border of holes and cavities.
-  unsigned int maximumNumberOfIterations = 10;
+  constexpr unsigned int maximumNumberOfIterations = 10;
   voting->SetMaximumNumberOfIterations(maximumNumberOfIterations);
   ITK_TEST_SET_GET_VALUE(maximumNumberOfIterations, voting->GetMaximumNumberOfIterations());
 
-  unsigned int currentNumberOfIterations = 0;
+  constexpr unsigned int currentNumberOfIterations = 0;
   voting->SetCurrentNumberOfIterations(currentNumberOfIterations);
   ITK_TEST_SET_GET_VALUE(currentNumberOfIterations, voting->GetCurrentNumberOfIterations());
 
   // Set the number of pixels over 50% that will tip the decision about
   // switching a pixel.
-  unsigned int majorityThreshold = 1;
+  constexpr unsigned int majorityThreshold = 1;
   voting->SetMajorityThreshold(majorityThreshold);
   ITK_TEST_SET_GET_VALUE(majorityThreshold, voting->GetMajorityThreshold());
 
@@ -103,8 +103,7 @@ itkVotingBinaryIterativeHoleFillingImageFilterTest(int, char *[])
   itk::ImageRegionIterator<ImageType> it;
   it = itk::ImageRegionIterator<ImageType>(random->GetOutput(), random->GetOutput()->GetBufferedRegion());
   std::cout << "Input image" << std::endl;
-  unsigned int i;
-  for (i = 1; !it.IsAtEnd(); ++i, ++it)
+  for (unsigned int i = 1; !it.IsAtEnd(); ++i, ++it)
   {
     std::cout << '\t' << it.Get();
     if ((i % 8) == 0)
@@ -116,7 +115,7 @@ itkVotingBinaryIterativeHoleFillingImageFilterTest(int, char *[])
   it = itk::ImageRegionIterator<ImageType>(thresholder->GetOutput(), thresholder->GetOutput()->GetBufferedRegion());
   std::cout << "Binary image" << std::endl;
 
-  for (i = 1; !it.IsAtEnd(); ++i, ++it)
+  for (unsigned int i = 1; !it.IsAtEnd(); ++i, ++it)
   {
     std::cout << '\t' << it.Get();
     if ((i % 8) == 0)
@@ -128,7 +127,7 @@ itkVotingBinaryIterativeHoleFillingImageFilterTest(int, char *[])
 
   std::cout << "Output image" << std::endl;
   it = itk::ImageRegionIterator<ImageType>(voting->GetOutput(), voting->GetOutput()->GetBufferedRegion());
-  for (i = 1; !it.IsAtEnd(); ++i, ++it)
+  for (unsigned int i = 1; !it.IsAtEnd(); ++i, ++it)
   {
     std::cout << '\t' << it.Get();
     if ((i % 8) == 0)

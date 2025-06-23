@@ -18,9 +18,7 @@
 #ifndef itkLabelObjectLineComparator_h
 #define itkLabelObjectLineComparator_h
 
-namespace itk
-{
-namespace Functor
+namespace itk::Functor
 {
 
 /**
@@ -31,7 +29,7 @@ namespace Functor
  * \author Gaetan Lehmann. Biologie du Developpement et de la Reproduction, INRA de Jouy-en-Josas, France.
  *
  * This implementation was taken from the Insight Journal paper:
- * https://www.insight-journal.org/browse/publication/176
+ * https://doi.org/10.54294/q6auw4
  *
  * \sa LabelObjectLine
  * \ingroup LabeledImageObject
@@ -42,7 +40,7 @@ class LabelObjectLineComparator
 {
 public:
   bool
-  operator()(TLabelObjectLine const & l1, TLabelObjectLine const & l2) const
+  operator()(const TLabelObjectLine & l1, const TLabelObjectLine & l2) const
   {
     const typename TLabelObjectLine::IndexType & idx1 = l1.GetIndex();
     const typename TLabelObjectLine::IndexType & idx2 = l2.GetIndex();
@@ -53,7 +51,7 @@ public:
       {
         return true;
       }
-      else if (idx1[i] > idx2[i])
+      if (idx1[i] > idx2[i])
       {
         return false;
       }
@@ -62,7 +60,6 @@ public:
   }
 };
 
-} // end namespace Functor
-} // end namespace itk
+} // namespace itk::Functor
 
 #endif

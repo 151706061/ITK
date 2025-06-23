@@ -28,12 +28,11 @@ namespace itk
 
 template <typename TInternalComputationValueType>
 LBFGS2Optimizerv4Template<TInternalComputationValueType>::LBFGS2Optimizerv4Template()
+  : m_EstimateScalesAtEachIteration(true)
+  , m_StatusCode(100)
 {
   // Initialize to default parameters
   lbfgs_parameter_init(&m_Parameters);
-  m_StatusCode = 100;
-
-  this->m_EstimateScalesAtEachIteration = true;
 }
 
 
@@ -87,7 +86,7 @@ LBFGS2Optimizerv4Template<TInternalComputationValueType>::ResumeOptimization()
   // Copy parameters
   const ParametersType & parameters = this->m_Metric->GetParameters();
 
-  int N = parameters.GetSize();
+  const int N = parameters.GetSize();
   if (N == 0)
   {
     itkExceptionMacro("Optimizer parameters are not initialized.");
@@ -149,7 +148,7 @@ LBFGS2Optimizerv4Template<TInternalComputationValueType>::EvaluateCost(
 
   this->m_Gradient.SetSize(n);
   this->m_Gradient.SetData(g, n, false);
-  PrecisionType value;
+  PrecisionType value = NAN;
   this->m_Metric->GetValueAndDerivative(value, this->m_Gradient);
 
   this->ModifyGradientByScales();
@@ -217,7 +216,7 @@ LBFGS2Optimizerv4Template<TInternalComputationValueType>::UpdateProgress(
 }
 
 template <typename TInternalComputationValueType>
-const typename LBFGS2Optimizerv4Template<TInternalComputationValueType>::StopConditionReturnStringType
+typename LBFGS2Optimizerv4Template<TInternalComputationValueType>::StopConditionReturnStringType
 LBFGS2Optimizerv4Template<TInternalComputationValueType>::GetStopConditionDescription() const
 {
   switch (m_StatusCode)
@@ -414,7 +413,7 @@ auto
 LBFGS2Optimizerv4Template<TInternalComputationValueType>::GetLineSearch() const -> LineSearchMethodEnum
 {
   LineSearchMethodEnum linesearch = LineSearchMethodEnum::LINESEARCH_DEFAULT;
-  int                  lbfgsLineSearch = m_Parameters.linesearch;
+  const int            lbfgsLineSearch = m_Parameters.linesearch;
   if (lbfgsLineSearch == LBFGS_LINESEARCH_BACKTRACKING)
   {
     linesearch = LineSearchMethodEnum::LINESEARCH_BACKTRACKING;

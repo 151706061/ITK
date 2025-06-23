@@ -55,12 +55,11 @@ itkNrrdComplexImageReadWriteTest(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  myImage::Pointer image = reader->GetOutput();
+  const myImage::Pointer image = reader->GetOutput();
   image->Print(std::cout);
 
   // Generate test image
-  itk::ImageFileWriter<myImage>::Pointer writer;
-  writer = itk::ImageFileWriter<myImage>::New();
+  const itk::ImageFileWriter<myImage>::Pointer writer = itk::ImageFileWriter<myImage>::New();
   writer->SetImageIO(itk::NrrdImageIO::New());
   writer->SetInput(reader->GetOutput());
   writer->SetFileName(argv[2]);

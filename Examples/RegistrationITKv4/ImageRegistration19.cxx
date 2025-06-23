@@ -89,7 +89,7 @@ main(int argc, char * argv[])
     return EXIT_FAILURE;
   }
 
-  itk::FileOutputWindow::Pointer fow = itk::FileOutputWindow::New();
+  auto fow = itk::FileOutputWindow::New();
   fow->SetInstance(fow);
 
   // The types of each one of the components in the registration methods
@@ -261,7 +261,7 @@ main(int argc, char * argv[])
 
 
   // This parameter is tightly coupled to the stepInParametricSpace above.
-  double translationScale = 1.0 / 1000.0;
+  constexpr double translationScale = 1.0 / 1000.0;
 
   using OptimizerScalesType = OptimizerType::ScalesType;
   OptimizerScalesType optimizerScales(numberOfParameters);
@@ -393,7 +393,7 @@ main(int argc, char * argv[])
   //  interpolator to be the same type of interpolator as the
   //  registration method used (nearest neighbor).
   //
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   resample->SetSize(fixedImage->GetLargestPossibleRegion().GetSize());
   resample->SetOutputOrigin(fixedImage->GetOrigin());
   resample->SetOutputSpacing(fixedImage->GetSpacing());

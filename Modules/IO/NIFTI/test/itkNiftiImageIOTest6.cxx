@@ -33,11 +33,11 @@ itkNiftiImageIOTest6(int argc, char * argv[])
   int success(EXIT_SUCCESS);
 
   using VectorImageType = itk::VectorImage<double, 3>;
-  VectorImageType::RegionType       imageRegion;
-  VectorImageType::SizeType         size;
-  VectorImageType::IndexType        index;
-  VectorImageType::SpacingType      spacing;
-  VectorImageType::VectorLengthType vecLength(4);
+  VectorImageType::RegionType                 imageRegion;
+  VectorImageType::SizeType                   size;
+  VectorImageType::IndexType                  index;
+  VectorImageType::SpacingType                spacing;
+  constexpr VectorImageType::VectorLengthType vecLength(4);
 
   for (unsigned int i = 0; i < 3; ++i)
   {
@@ -47,7 +47,7 @@ itkNiftiImageIOTest6(int argc, char * argv[])
   }
   imageRegion.SetSize(size);
   imageRegion.SetIndex(index);
-  VectorImageType::Pointer vecImage =
+  const VectorImageType::Pointer vecImage =
     itk::IOTestHelper::AllocateImageFromRegionAndSpacing<VectorImageType>(imageRegion, spacing, vecLength);
 
   itk::ImageRegionIterator<VectorImageType> it(vecImage, vecImage->GetLargestPossibleRegion());
@@ -77,7 +77,8 @@ itkNiftiImageIOTest6(int argc, char * argv[])
   itk::ImageRegionIterator<VectorImageType> readbackIt(readback, readback->GetLargestPossibleRegion());
   for (it.GoToBegin(), readbackIt.GoToBegin(); !it.IsAtEnd() && !readbackIt.IsAtEnd(); ++it, ++readbackIt)
   {
-    VectorImageType::PixelType p(vecLength), readbackP(vecLength);
+    VectorImageType::PixelType p(vecLength);
+    VectorImageType::PixelType readbackP(vecLength);
     p = it.Get();
     readbackP = readbackIt.Get();
     if (p != readbackP)

@@ -40,11 +40,9 @@ itkMultiLevelSetDenseImageTest(int, char *[])
   size[0] = 10;
   size[1] = 10;
 
-  ImageType::RegionType region;
-  region.SetIndex(index);
-  region.SetSize(size);
+  const ImageType::RegionType region{ index, size };
 
-  PixelType value = 0.;
+  constexpr PixelType value = 0.;
 
   auto input1 = ImageType::New();
   input1->SetRegions(region);
@@ -103,23 +101,20 @@ itkMultiLevelSetDenseImageTest(int, char *[])
   auto filter = DomainMapImageFilterType::New();
   filter->SetInput(id_image);
   filter->Update();
-  CacheImageType::Pointer output = filter->GetOutput();
+  const CacheImageType::Pointer output = filter->GetOutput();
 
   itk::ImageRegionConstIteratorWithIndex<CacheImageType> it(output, output->GetLargestPossibleRegion());
 
   it.GoToBegin();
 
-  CacheImageType::IndexType out_index;
-  CacheImageType::PixelType out_id;
-
   using DomainMapType = DomainMapImageFilterType::DomainMapType;
-  const DomainMapType                 domainMap = filter->GetDomainMap();
-  DomainMapType::const_iterator       mapIt;
-  const DomainMapType::const_iterator mapEnd = domainMap.end();
+  const DomainMapType           domainMap = filter->GetDomainMap();
+  DomainMapType::const_iterator mapIt;
+  const auto                    mapEnd = domainMap.end();
   while (!it.IsAtEnd())
   {
-    out_index = it.GetIndex();
-    out_id = it.Get();
+    CacheImageType::IndexType out_index = it.GetIndex();
+    CacheImageType::PixelType out_id = it.Get();
 
     IdListType solution;
     if ((out_index[0] < 5) && (out_index[1] < 5))
@@ -147,20 +142,18 @@ itkMultiLevelSetDenseImageTest(int, char *[])
         {
           return EXIT_FAILURE;
         }
-        else
-        {
-          for (const auto & lIt : *lout)
-          {
-            std::cout << lIt << ' ' << level_set[lIt]->Evaluate(out_index) << std::endl;
-          }
-          std::cout << std::endl;
 
-          // lout->sort();
-          if (*lout != solution)
-          {
-            std::cerr << "FAILURE!!!" << std::endl;
-            return EXIT_FAILURE;
-          }
+        for (const auto & lIt : *lout)
+        {
+          std::cout << lIt << ' ' << level_set[lIt]->Evaluate(out_index) << std::endl;
+        }
+        std::cout << std::endl;
+
+        // lout->sort();
+        if (*lout != solution)
+        {
+          std::cerr << "FAILURE!!!" << std::endl;
+          return EXIT_FAILURE;
         }
       }
     }

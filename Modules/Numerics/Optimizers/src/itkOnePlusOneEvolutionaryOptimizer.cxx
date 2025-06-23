@@ -22,24 +22,15 @@
 namespace itk
 {
 OnePlusOneEvolutionaryOptimizer::OnePlusOneEvolutionaryOptimizer()
+  : m_RandomGenerator(nullptr)
+  , m_MaximumIteration(100)
+  , m_Epsilon(1.5e-4)
+  , m_InitialRadius(1.01)
+  , m_GrowthFactor(1.05)
+  , m_ShrinkFactor(std::pow(m_GrowthFactor, -0.25))
+
 {
-  m_CatchGetValueException = false;
-  m_MetricWorstPossibleValue = 0;
-
-  m_Maximize = false;
-  m_Epsilon = 1.5e-4;
-  m_RandomGenerator = nullptr;
-
-  m_Initialized = false;
-  m_GrowthFactor = 1.05;
-  m_ShrinkFactor = std::pow(m_GrowthFactor, -0.25);
-  m_InitialRadius = 1.01;
-  m_MaximumIteration = 100;
-  m_Stop = false;
   m_StopConditionDescription.str("");
-  m_CurrentCost = 0;
-  m_CurrentIteration = 0;
-  m_FrobeniusNorm = 0.0;
 }
 
 void
@@ -88,7 +79,7 @@ OnePlusOneEvolutionaryOptimizer::StartOptimization()
   this->InvokeEvent(StartEvent());
   m_Stop = false;
 
-  unsigned int       spaceDimension = m_CostFunction->GetNumberOfParameters();
+  const unsigned int spaceDimension = m_CostFunction->GetNumberOfParameters();
   vnl_matrix<double> A(spaceDimension, spaceDimension);
   vnl_vector<double> parent(this->GetInitialPosition());
   vnl_vector<double> f_norm(spaceDimension);
@@ -265,7 +256,7 @@ OnePlusOneEvolutionaryOptimizer::StartOptimization()
     // f_norm, f_norm)
 
     // A = A + (adjust - 1.0) * A;
-    double alpha = ((adjust - 1.0) / dot_product(f_norm, f_norm));
+    const double alpha = ((adjust - 1.0) / dot_product(f_norm, f_norm));
     for (unsigned int c = 0; c < spaceDimension; ++c)
     {
       for (unsigned int r = 0; r < spaceDimension; ++r)
@@ -287,7 +278,7 @@ OnePlusOneEvolutionaryOptimizer::StartOptimization()
  *
  */
 
-const std::string
+std::string
 OnePlusOneEvolutionaryOptimizer::GetStopConditionDescription() const
 {
   return m_StopConditionDescription.str();

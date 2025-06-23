@@ -71,8 +71,7 @@ itkReleaseDataFilterTest(int, char *[])
   mean1->SetInput(monitor1->GetOutput());
 
   // define the neighborhood size used for the mean filter
-  ImageType::SizeType neighRadius;
-  neighRadius.Fill(2);
+  auto neighRadius = ImageType::SizeType::Filled(2);
   mean1->SetRadius(neighRadius);
 
   auto monitor2a = MonitorFilter::New();
@@ -100,8 +99,7 @@ itkReleaseDataFilterTest(int, char *[])
   streamer->SetNumberOfStreamDivisions(4);
 
 
-  ImageType::SizeType zeroSize;
-  zeroSize.Fill(0);
+  constexpr ImageType::SizeType zeroSize{};
 
 
   std::cout << "---- Updating \"a\" Pipeline ---" << std::endl;

@@ -28,16 +28,12 @@ namespace itk
 
 template <typename TLevelSet, typename TSpeedImage>
 FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::FastMarchingUpwindGradientImageFilter()
-{
-  m_TargetPoints = nullptr;
-  m_ReachedTargetPoints = nullptr;
-  m_GradientImage = GradientImageType::New();
-  m_GenerateGradientImage = false;
-  m_TargetOffset = 1.0;
-  m_TargetReachedMode = TargetConditionEnum::NoTargets;
-  m_TargetValue = 0.0;
-  m_NumberOfTargets = 0;
-}
+  : m_TargetPoints(nullptr)
+  , m_ReachedTargetPoints(nullptr)
+  , m_GradientImage(GradientImageType::New())
+  , m_TargetOffset(1.0)
+  , m_TargetReachedMode(TargetConditionEnum::NoTargets)
+{}
 
 template <typename TLevelSet, typename TSpeedImage>
 void
@@ -49,7 +45,7 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::PrintSelf(std::os
   itkPrintSelfObjectMacro(ReachedTargetPoints);
   itkPrintSelfObjectMacro(GradientImage);
 
-  os << indent << "GenerateGradientImage: " << (m_GenerateGradientImage ? "On" : "Off") << std::endl;
+  itkPrintSelfBooleanMacro(GenerateGradientImage);
   os << indent << "TargetOffset: " << m_TargetOffset << std::endl;
   os << indent << "TargetReachedMode: " << m_TargetReachedMode << std::endl;
   os << indent << "TargetValue: " << m_TargetValue << std::endl;
@@ -60,7 +56,7 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::PrintSelf(std::os
 
 template <typename TLevelSet, typename TSpeedImage>
 void
-FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::VerifyPreconditions() ITKv5_CONST
+FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::VerifyPreconditions() const
 {
   Superclass::VerifyPreconditions();
 
@@ -127,7 +123,7 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::GenerateData()
   // cache the original stopping value that was set by the user
   // because this subclass may change it once a target point is
   // reached in order to control the execution of the superclass.
-  double stoppingValue = this->GetStoppingValue();
+  const double stoppingValue = this->GetStoppingValue();
 
   // run the GenerateData() method of the superclass
   try
@@ -172,8 +168,8 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::UpdateNeighbors(c
 
     if (m_TargetReachedMode == TargetConditionEnum::OneTarget)
     {
-      typename NodeContainer::ConstIterator pointsIter = m_TargetPoints->Begin();
-      typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
+      typename NodeContainer::ConstIterator       pointsIter = m_TargetPoints->Begin();
+      const typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
       for (; pointsIter != pointsEnd; ++pointsIter)
       {
         node = pointsIter.Value();
@@ -187,8 +183,8 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::UpdateNeighbors(c
     }
     else if (m_TargetReachedMode == TargetConditionEnum::SomeTargets)
     {
-      typename NodeContainer::ConstIterator pointsIter = m_TargetPoints->Begin();
-      typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
+      typename NodeContainer::ConstIterator       pointsIter = m_TargetPoints->Begin();
+      const typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
       for (; pointsIter != pointsEnd; ++pointsIter)
       {
         node = pointsIter.Value();
@@ -207,8 +203,8 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::UpdateNeighbors(c
     }
     else if (m_TargetReachedMode == TargetConditionEnum::AllTargets)
     {
-      typename NodeContainer::ConstIterator pointsIter = m_TargetPoints->Begin();
-      typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
+      typename NodeContainer::ConstIterator       pointsIter = m_TargetPoints->Begin();
+      const typename NodeContainer::ConstIterator pointsEnd = m_TargetPoints->End();
       for (; pointsIter != pointsEnd; ++pointsIter)
       {
         node = pointsIter.Value();
@@ -229,7 +225,7 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::UpdateNeighbors(c
     if (targetReached)
     {
       m_TargetValue = static_cast<double>(output->GetPixel(index));
-      double newStoppingValue = m_TargetValue + m_TargetOffset;
+      const double newStoppingValue = m_TargetValue + m_TargetOffset;
       if (newStoppingValue < this->GetStoppingValue())
       {
         // This changes the stopping value that may have been set by
@@ -265,7 +261,7 @@ FastMarchingUpwindGradientImageFilter<TLevelSet, TSpeedImage>::ComputeGradient(
   const LevelSetIndexType & lastIndex = this->GetLastIndex();
   const LevelSetIndexType & startIndex = this->GetStartIndex();
 
-  const LevelSetPixelType ZERO{};
+  constexpr LevelSetPixelType ZERO{};
 
   OutputSpacingType spacing = this->GetOutput()->GetSpacing();
 

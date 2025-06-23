@@ -44,7 +44,9 @@ template <typename TRegistration>
 class ShowProgressObject
 {
 public:
-  ShowProgressObject(TRegistration * o) { m_Process = o; }
+  ShowProgressObject(TRegistration * o)
+    : m_Process(o)
+  {}
   void
   ShowProgress()
   {
@@ -112,9 +114,9 @@ itkANTSNeighborhoodCorrelationImageToImageRegistrationTest(int argc, char * argv
 
   // get the images
   fixedImageReader->Update();
-  FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
+  const FixedImageType::Pointer fixedImage = fixedImageReader->GetOutput();
   movingImageReader->Update();
-  MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
+  const MovingImageType::Pointer movingImage = movingImageReader->GetOutput();
 
   /** define a resample filter that will ultimately be used to deform the image */
   using ResampleFilterType = itk::ResampleImageFilter<MovingImageType, FixedImageType>;
@@ -145,8 +147,7 @@ itkANTSNeighborhoodCorrelationImageToImageRegistrationTest(int argc, char * argv
             << "fixedImage->GetBufferedRegion(): " << fixedImage->GetBufferedRegion() << std::endl;
   field->Allocate();
   // Fill it with 0's
-  DisplacementTransformType::OutputVectorType zeroVector;
-  zeroVector.Fill(0);
+  constexpr DisplacementTransformType::OutputVectorType zeroVector{};
   field->FillBuffer(zeroVector);
   // Assign to transform
   displacementTransform->SetDisplacementField(field);
@@ -160,9 +161,8 @@ itkANTSNeighborhoodCorrelationImageToImageRegistrationTest(int argc, char * argv
 
   // The metric
   using MetricType = itk::ANTSNeighborhoodCorrelationImageToImageMetricv4<FixedImageType, MovingImageType>;
-  auto                 metric = MetricType::New();
-  itk::Size<Dimension> radSize;
-  radSize.Fill(2);
+  auto metric = MetricType::New();
+  auto radSize = itk::Size<Dimension>::Filled(2);
   metric->SetRadius(radSize);
 
   // Assign images and transforms.
@@ -173,13 +173,13 @@ itkANTSNeighborhoodCorrelationImageToImageRegistrationTest(int argc, char * argv
   metric->SetMovingImage(movingImage);
   metric->SetFixedTransform(identityTransform);
   metric->SetMovingTransform(affineTransform);
-  bool gaussian = false;
+  constexpr bool gaussian = false;
   metric->SetUseMovingImageGradientFilter(gaussian);
   metric->SetUseFixedImageGradientFilter(gaussian);
   metric->Initialize();
 
   using RegistrationParameterScalesFromShiftType = itk::RegistrationParameterScalesFromPhysicalShift<MetricType>;
-  RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
+  const RegistrationParameterScalesFromShiftType::Pointer shiftScaleEstimator =
     RegistrationParameterScalesFromShiftType::New();
   shiftScaleEstimator->SetMetric(metric);
   shiftScaleEstimator->SetTransformForward(true); // by default, scales for the moving transform
@@ -236,7 +236,7 @@ itkANTSNeighborhoodCorrelationImageToImageRegistrationTest(int argc, char * argv
   using PointSetType = MetricType::FixedSampledPointSetType;
   using PointType = PointSetType::PointType;
   std::cout << "Using sparse point set..." << std::endl;
-  PointSetType::Pointer                             pset(PointSetType::New());
+  const PointSetType::Pointer                       pset(PointSetType::New());
   unsigned int                                      ind = 0;
   itk::ImageRegionIteratorWithIndex<FixedImageType> It(fixedImage, fixedImage->GetLargestPossibleRegion());
   for (It.GoToBegin(); !It.IsAtEnd(); ++It)

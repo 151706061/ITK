@@ -30,12 +30,12 @@ namespace itk
 template <typename TTimeVaryingVelocityField, typename TDisplacementField>
 TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField,
                                                TDisplacementField>::TimeVaryingVelocityFieldIntegrationImageFilter()
+
 {
   this->m_LowerTimeBound = 0.0, this->m_UpperTimeBound = 1.0, this->m_NumberOfIntegrationSteps = 100;
-  this->m_NumberOfTimePoints = 0;
   this->SetNumberOfRequiredInputs(1);
 
-  if (InputImageDimension - 1 != OutputImageDimension)
+  if constexpr (InputImageDimension - 1 != OutputImageDimension)
   {
     itkExceptionMacro("The time-varying velocity field (input) should have "
                       << "dimensionality of 1 greater than the deformation field (output). ");
@@ -44,16 +44,14 @@ TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField,
   using DefaultVelocityFieldInterpolatorType =
     VectorLinearInterpolateImageFunction<TimeVaryingVelocityFieldType, ScalarType>;
 
-  typename DefaultVelocityFieldInterpolatorType::Pointer velocityFieldInterpolator =
-    DefaultVelocityFieldInterpolatorType::New();
+  auto velocityFieldInterpolator = DefaultVelocityFieldInterpolatorType::New();
 
   this->m_VelocityFieldInterpolator = velocityFieldInterpolator;
 
   using DefaultDisplacementFieldInterpolatorType =
     VectorLinearInterpolateImageFunction<DisplacementFieldType, ScalarType>;
 
-  typename DefaultDisplacementFieldInterpolatorType::Pointer deformationFieldInterpolator =
-    DefaultDisplacementFieldInterpolatorType::New();
+  auto deformationFieldInterpolator = DefaultDisplacementFieldInterpolatorType::New();
 
   this->m_DisplacementFieldInterpolator = deformationFieldInterpolator;
   this->DynamicMultiThreadingOn();
@@ -66,11 +64,11 @@ TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField,
 {
   const TimeVaryingVelocityFieldType * input = this->GetInput();
   DisplacementFieldType *              output = this->GetOutput();
-  this->m_NumberOfTimePoints = input->GetLargestPossibleRegion().GetSize()[OutputImageDimension];
   if (!input || !output)
   {
     return;
   }
+  this->m_NumberOfTimePoints = input->GetLargestPossibleRegion().GetSize()[OutputImageDimension];
 
   //
   // The ImageBase::CopyInformation() method ca not be used here
@@ -143,13 +141,13 @@ TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField, TDispl
 
   const TimeVaryingVelocityFieldType * inputField = this->GetInput();
 
-  typename DisplacementFieldType::Pointer outputField = this->GetOutput();
+  const typename DisplacementFieldType::Pointer outputField = this->GetOutput();
 
   for (ImageRegionIteratorWithIndex<DisplacementFieldType> It(outputField, region); !It.IsAtEnd(); ++It)
   {
     PointType point;
     outputField->TransformIndexToPhysicalPoint(It.GetIndex(), point);
-    VectorType displacement = this->IntegrateVelocityAtPoint(point, inputField);
+    const VectorType displacement = this->IntegrateVelocityAtPoint(point, inputField);
     It.Set(displacement);
   }
 }
@@ -163,8 +161,7 @@ TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField, TDispl
   // Solve the initial value problem using fourth-order Runge-Kutta
   //    y' = f(t, y), y(t_0) = y_0
 
-  VectorType zeroVector;
-  zeroVector.Fill(0.0);
+  constexpr VectorType zeroVector{};
 
   // Initial conditions
 
@@ -188,7 +185,7 @@ TimeVaryingVelocityFieldIntegrationImageFilter<TTimeVaryingVelocityField, TDispl
     typename TimeVaryingVelocityFieldType::PointType spaceTimeOrigin = inputField->GetOrigin();
 
     using RegionType = typename TimeVaryingVelocityFieldType::RegionType;
-    RegionType region = inputField->GetLargestPossibleRegion();
+    const RegionType region = inputField->GetLargestPossibleRegion();
 
     typename RegionType::IndexType lastIndex = region.GetIndex();
     typename RegionType::SizeType  size = region.GetSize();

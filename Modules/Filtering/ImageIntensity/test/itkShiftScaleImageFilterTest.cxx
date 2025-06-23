@@ -33,18 +33,16 @@ itkShiftScaleImageFilterTest(int, char *[])
   using TestOutputImage = itk::Image<unsigned char, 3>;
   using RealType = itk::NumericTraits<char>::RealType;
 
-  auto                       inputImage = TestInputImage::New();
-  TestInputImage::RegionType region;
-  TestInputImage::SizeType   size;
-  size.Fill(64);
-  TestInputImage::IndexType index;
-  index.Fill(0);
+  auto                                inputImage = TestInputImage::New();
+  TestInputImage::RegionType          region;
+  auto                                size = TestInputImage::SizeType::Filled(64);
+  constexpr TestInputImage::IndexType index{};
 
   region.SetIndex(index);
   region.SetSize(size);
 
   // first try a constant image
-  double fillValue = -100.0;
+  constexpr double fillValue = -100.0;
   inputImage->SetRegions(region);
   inputImage->Allocate();
   inputImage->FillBuffer(static_cast<TestInputImage::PixelType>(fillValue));
@@ -53,7 +51,7 @@ itkShiftScaleImageFilterTest(int, char *[])
   auto filter = FilterType::New();
 
   // Set up Start, End and Progress callbacks
-  itk::SimpleFilterWatcher filterWatch(filter);
+  const itk::SimpleFilterWatcher filterWatch(filter);
 
   // Filter the image
   filter->SetInput(inputImage);
@@ -66,12 +64,12 @@ itkShiftScaleImageFilterTest(int, char *[])
   TestInputImage::SizeValueType randomSize[3] = { 17, 8, 20 };
 
   // Set up Start, End and Progress callbacks
-  itk::SimpleFilterWatcher sourceWatch(source);
+  const itk::SimpleFilterWatcher sourceWatch(source);
 
   // Set up source
   source->SetSize(randomSize);
-  double minValue = -128.0;
-  double maxValue = 127.0;
+  constexpr double minValue = -128.0;
+  constexpr double maxValue = 127.0;
 
   source->SetMin(static_cast<TestInputImage::PixelType>(minValue));
   source->SetMax(static_cast<TestInputImage::PixelType>(maxValue));
@@ -79,13 +77,13 @@ itkShiftScaleImageFilterTest(int, char *[])
 
 
   // Test GetMacros
-  RealType getShift = filter->GetShift();
+  const RealType getShift = filter->GetShift();
   std::cout << "filter->GetShift(): " << getShift << std::endl;
-  RealType getScale = filter->GetScale();
+  const RealType getScale = filter->GetScale();
   std::cout << "filter->GetScale(): " << getScale << std::endl;
-  long underflowCount = filter->GetUnderflowCount();
+  const long underflowCount = filter->GetUnderflowCount();
   std::cout << "filter->GetUnderflowCount(): " << underflowCount << std::endl;
-  long overflowCount = filter->GetOverflowCount();
+  const long overflowCount = filter->GetOverflowCount();
   std::cout << "filter->GetOverflowCount(): " << overflowCount << std::endl;
 
 

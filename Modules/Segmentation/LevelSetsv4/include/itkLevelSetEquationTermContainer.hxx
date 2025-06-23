@@ -27,9 +27,8 @@ namespace itk
 // ----------------------------------------------------------------------------
 template <typename TInputImage, typename TLevelSetContainer>
 LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::LevelSetEquationTermContainer()
-{
-  this->m_CurrentLevelSetId = LevelSetIdentifierType();
-}
+  : m_CurrentLevelSetId(LevelSetIdentifierType())
+{}
 
 // ----------------------------------------------------------------------------
 template <typename TInputImage, typename TLevelSetContainer>
@@ -101,8 +100,8 @@ LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::AddTerm(const Te
 
     RequiredDataType termRequiredData = iTerm->GetRequiredData();
 
-    typename RequiredDataType::const_iterator dIt = termRequiredData.begin();
-    typename RequiredDataType::const_iterator dEnd = termRequiredData.end();
+    auto       dIt = termRequiredData.begin();
+    const auto dEnd = termRequiredData.end();
 
     while (dIt != dEnd)
     {
@@ -186,7 +185,7 @@ LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::GetTerm(const st
 
   if (it == m_Container.end())
   {
-    itkGenericExceptionMacro("the term " << iName.c_str() << " is not present in the container");
+    itkGenericExceptionMacro("the term " << iName << " is not present in the container");
   }
 
   return it->second;
@@ -269,9 +268,9 @@ LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::Evaluate(const L
 
   while (term_it != term_end)
   {
-    LevelSetOutputRealType temp_val = (term_it->second)->Evaluate(iP);
+    const LevelSetOutputRealType temp_val = (term_it->second)->Evaluate(iP);
 
-    LevelSetOutputRealType abs_temp_value = itk::Math::abs(temp_val);
+    const LevelSetOutputRealType abs_temp_value = itk::Math::abs(temp_val);
 
     // This is a thread-safe equivalent of:
     // cfl_it->second = std::max(abs_temp_value, cfl_it->second);
@@ -304,9 +303,9 @@ LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::Evaluate(const L
 
   while (term_it != term_end)
   {
-    LevelSetOutputRealType temp_val = (term_it->second)->Evaluate(iP, iData);
+    const LevelSetOutputRealType temp_val = (term_it->second)->Evaluate(iP, iData);
 
-    LevelSetOutputRealType abs_temp_value = itk::Math::abs(temp_val);
+    const LevelSetOutputRealType abs_temp_value = itk::Math::abs(temp_val);
 
     // This is a thread-safe equivalent of:
     // cfl_it->second = std::max(abs_temp_value, cfl_it->second);
@@ -377,12 +376,12 @@ void
 LevelSetEquationTermContainer<TInputImage, TLevelSetContainer>::ComputeRequiredData(const LevelSetInputIndexType & iP,
                                                                                     LevelSetDataType & ioData)
 {
-  typename RequiredDataType::const_iterator dIt = m_RequiredData.begin();
-  typename RequiredDataType::const_iterator dEnd = m_RequiredData.end();
+  auto       dIt = m_RequiredData.begin();
+  const auto dEnd = m_RequiredData.end();
 
   auto tIt = m_Container.begin();
 
-  LevelSetPointer levelset = (tIt->second)->GetModifiableCurrentLevelSetPointer();
+  const LevelSetPointer levelset = (tIt->second)->GetModifiableCurrentLevelSetPointer();
 
   while (dIt != dEnd)
   {
